@@ -10,6 +10,7 @@ import {
 } from '../utils/format.js';
 import MonthlyPLChart from './charts/MonthlyPLChart.jsx';
 import PortfolioChart from './charts/PortfolioChart.jsx';
+import StockDetailModal from './StockDetailModal.jsx';
 
 function StatCard({ label, value, sub, highlight }) {
   return (
@@ -21,8 +22,11 @@ function StatCard({ label, value, sub, highlight }) {
   );
 }
 
-export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
+export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell }) {
   const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [] } = data;
+
+  // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
+  const [selectedSymbolModal, setSelectedSymbolModal] = useState(null);
 
   // State giá thị trường thực tế & phiên giao dịch
   const [pricesData, setPricesData] = useState({ session: null, prices: {} });
@@ -352,20 +356,23 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                     {/* Header Thẻ: Mã CP, Tỷ trọng, Giá thị trường */}
                     <div className="flex items-center justify-between pb-2.5 border-b border-gray-200/60">
                       <div className="flex items-center gap-2">
-                        <span
-                          className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border"
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSymbolModal(p.symbol)}
+                          className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border hover:opacity-85 transition-opacity cursor-pointer"
                           style={{
                             backgroundColor: `${stockColor}15`,
                             borderColor: `${stockColor}40`,
                             color: stockColor,
                           }}
+                          title={`Xem sổ cái tích luỹ ${p.symbol}`}
                         >
                           <span
                             className="w-2 h-2 rounded-full mr-1.5 shrink-0"
                             style={{ backgroundColor: stockColor }}
                           />
                           {p.symbol}
-                        </span>
+                        </button>
                         {(() => {
                           const allocTier = getAllocationTier(allocationPct);
                           return (
@@ -529,20 +536,23 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                     <tr key={p.symbol} className="hover:bg-indigo-50/30 transition-colors">
                       {/* 1. Mã CP */}
                       <td className="px-5 py-4">
-                        <span
-                          className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border transition-all"
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSymbolModal(p.symbol)}
+                          className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border transition-all hover:scale-105 cursor-pointer"
                           style={{
                             backgroundColor: `${stockColor}15`,
                             borderColor: `${stockColor}40`,
                             color: stockColor,
                           }}
+                          title={`Xem sổ cái tích luỹ ${p.symbol}`}
                         >
                           <span
                             className="w-2 h-2 rounded-full mr-1.5 shrink-0 shadow-2xs"
                             style={{ backgroundColor: stockColor }}
                           />
                           {p.symbol}
-                        </span>
+                        </button>
                       </td>
 
                       {/* 2. Số lượng */}
@@ -793,6 +803,17 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
           </div>
         </div>
       )}
+
+      {/* Modal Sổ Cái Tích Luỹ Từng Mã */}
+      <StockDetailModal
+        symbol={selectedSymbolModal}
+        isOpen={!!selectedSymbolModal}
+        onClose={() => setSelectedSymbolModal(null)}
+        data={data}
+        marketPrices={pricesData?.prices || {}}
+        onNavigateBuy={onNavigateBuy}
+        onNavigateSell={onNavigateSell}
+      />
     </div>
   );
 }

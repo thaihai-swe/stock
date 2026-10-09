@@ -1,9 +1,26 @@
-import { useState, useMemo, Fragment } from 'react';
-import { deleteBuy, deleteSell } from '../utils/api.js';
+import { useState, useMemo, useEffect, Fragment } from 'react';
+import { deleteBuy, deleteSell, fetchPrices } from '../utils/api.js';
 import { fmtMoney, fmtDate, plColor, plBg, getStockColor } from '../utils/format.js';
+import StockPerformanceTable from './StockPerformanceTable.jsx';
+import StockDetailModal from './StockDetailModal.jsx';
 
-export default function TransactionHistory({ data, onSuccess }) {
+export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onNavigateSell }) {
   const { buyOrders = [], sellOrders = [] } = data;
+  const [subTab, setSubTab] = useState('orders'); // 'orders' | 'performance'
+  const [selectedSymbolModal, setSelectedSymbolModal] = useState(null);
+  const [marketPrices, setMarketPrices] = useState({});
+
+  useEffect(() => {
+    if (data.portfolio && data.portfolio.length > 0) {
+      const symbols = data.portfolio.map(p => p.symbol);
+      fetchPrices(symbols, false)
+        .then(res => {
+          if (res?.prices) setMarketPrices(res.prices);
+        })
+        .catch(() => {});
+    }
+  }, [data.portfolio]);
+
   const [tab, setTab] = useState('all'); // 'all' | 'buy' | 'sell'
   const [pnlFilter, setPnlFilter] = useState('all'); // 'all' | 'profit' | 'loss'
   const [textSearch, setTextSearch] = useState('');
@@ -165,7 +182,51 @@ export default function TransactionHistory({ data, onSuccess }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="space-y-4">
+      {/* Thanh Chuyển Đổi Sub-Tab */}
+      <div className="flex items-center gap-2 p-1 bg-gray-200/80 rounded-2xl w-fit shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setSubTab('orders')}
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            subTab === 'orders'
+              ? 'bg-white text-indigo-700 shadow-xs'
+              : 'text-gray-600 hover:text-gray-900 font-medium'
+          }`}
+        >
+          <span>📑</span>
+          <span>Nhật Ký Từng Lệnh</span>
+          <span className="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.2 rounded-full font-bold ml-0.5">
+            {allTx.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSubTab('performance')}
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            subTab === 'performance'
+              ? 'bg-white text-indigo-700 shadow-xs'
+              : 'text-gray-600 hover:text-gray-900 font-medium'
+          }`}
+        >
+          <span>📊</span>
+          <span>Hiệu Suất Theo Mã</span>
+          <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded-full font-bold ml-0.5">
+            {uniqueSymbols.length}
+          </span>
+        </button>
+      </div>
+
+      {/* Nội dung Sub-Tab */}
+      {subTab === 'performance' ? (
+        <StockPerformanceTable
+          data={data}
+          marketPrices={marketPrices}
+          onSelectSymbol={setSelectedSymbolModal}
+        />
+      ) : (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Header + Tabs + View Switcher */}
       <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center justify-between">
@@ -470,20 +531,26 @@ export default function TransactionHistory({ data, onSuccess }) {
                       }`}>
                         {isBuy ? '🛒 MUA' : '💸 BÁN'}
                       </span>
-                      <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold border shadow-2xs"
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSymbolModal(tx.symbol);
+                        }}
+                        className="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold border shadow-2xs hover:opacity-80 transition-opacity cursor-pointer"
                         style={{
                           backgroundColor: `${stockColor}15`,
                           borderColor: `${stockColor}40`,
                           color: stockColor,
                         }}
+                        title={`Xem sổ cái tích luỹ ${tx.symbol}`}
                       >
                         <span
                           className="w-1.5 h-1.5 rounded-full mr-1.5 shrink-0"
                           style={{ backgroundColor: stockColor }}
                         />
                         {tx.symbol}
-                      </span>
+                      </button>
                       <span className="text-[11px] text-gray-400 font-medium">
                         {fmtDate(tx.date)}
                       </span>
@@ -776,7 +843,25 @@ export default function TransactionHistory({ data, onSuccess }) {
                       </td>
 
                       {/* Mã */}
-                      <td className="px-4 py-3.5 font-bold text-gray-800">{tx.symbol}</td>
+                      <td className="px-4 py-3.5">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSymbolModal(tx.symbol)}
+                          className="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold border shadow-2xs hover:opacity-80 transition-opacity cursor-pointer"
+                          style={{
+                            backgroundColor: `${getStockColor(tx.symbol)}15`,
+                            borderColor: `${getStockColor(tx.symbol)}40`,
+                            color: getStockColor(tx.symbol),
+                          }}
+                          title={`Xem sổ cái tích luỹ ${tx.symbol}`}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full mr-1.5 shrink-0"
+                            style={{ backgroundColor: getStockColor(tx.symbol) }}
+                          />
+                          {tx.symbol}
+                        </button>
+                      </td>
 
                       {/* SL */}
                       <td className="px-4 py-3.5 text-right font-medium">{tx.quantity.toLocaleString()}</td>
@@ -996,6 +1081,19 @@ export default function TransactionHistory({ data, onSuccess }) {
           </div>
         )}
       </div>
+    </div>
+  )}
+
+      {/* Modal Sổ Cái Chi Tiết Từng Mã */}
+      <StockDetailModal
+        symbol={selectedSymbolModal}
+        isOpen={!!selectedSymbolModal}
+        onClose={() => setSelectedSymbolModal(null)}
+        data={data}
+        marketPrices={marketPrices}
+        onNavigateBuy={onNavigateBuy}
+        onNavigateSell={onNavigateSell}
+      />
     </div>
   );
 }

@@ -418,6 +418,10 @@ export default function App({ hasGoogleClientId = false }) {
                 data={data}
                 onNavigateBuy={handleSelectBuy}
                 onNavigateDca={handleSelectDca}
+                onNavigateSell={(symbol) => {
+                  setSellInitialSymbol(symbol || '');
+                  setTab('sell');
+                }}
               />
             )}
             {tab === 'dca' && (
@@ -449,7 +453,18 @@ export default function App({ hasGoogleClientId = false }) {
               />
             )}
             {tab === 'history' && (
-              <TransactionHistory data={data} onSuccess={loadData} />
+              <TransactionHistory
+                data={data}
+                onSuccess={loadData}
+                onNavigateBuy={(init) => {
+                  setBuyInitial(init || { symbol: '', quantity: '', price: '' });
+                  setTab('buy');
+                }}
+                onNavigateSell={(symbol) => {
+                  setSellInitialSymbol(symbol || '');
+                  setTab('sell');
+                }}
+              />
             )}
             {tab === 'dividend' && (
               <DividendManager

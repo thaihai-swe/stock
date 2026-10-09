@@ -70,11 +70,23 @@ export const PORTFOLIO_COLORS = [
   '#14b8a6', // teal
 ];
 
-// Lấy màu đồng bộ theo thứ tự mã trong danh mục
+// Lấy màu đồng bộ theo thứ tự mã trong danh mục hoặc hash cố định theo mã
 export function getStockColor(symbol, portfolio = []) {
-  const index = portfolio.findIndex(p => p.symbol === symbol);
-  if (index === -1) return PORTFOLIO_COLORS[0];
-  return PORTFOLIO_COLORS[index % PORTFOLIO_COLORS.length];
+  if (!symbol) return PORTFOLIO_COLORS[0];
+  if (Array.isArray(portfolio) && portfolio.length > 0) {
+    const index = portfolio.findIndex(p => (typeof p === 'string' ? p : p?.symbol) === symbol);
+    if (index !== -1) {
+      return PORTFOLIO_COLORS[index % PORTFOLIO_COLORS.length];
+    }
+  }
+  // Hash code theo mã CP để màu luôn cố định và đẹp mắt
+  let hash = 0;
+  const str = String(symbol);
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return PORTFOLIO_COLORS[Math.abs(hash) % PORTFOLIO_COLORS.length];
 }
 
 // 8. Định dạng phân tầng màu sắc theo mốc Tỷ Trọng (%)
