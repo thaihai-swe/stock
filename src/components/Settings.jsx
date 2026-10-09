@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { fetchBackup, restoreData, clearUserData, fetchHealth } from '../utils/api.js';
-import { fmtMoney, plColor } from '../utils/format.js';
+import {
+  fetchBackup,
+  restoreData,
+  clearUserData,
+  fetchHealth,
+  fetchSupportedStocks,
+  updateSupportedStocks,
+  triggerFundamentalsSync,
+} from '../utils/api.js';
+import { fmtMoney, plColor, fmtDate } from '../utils/format.js';
 
 export default function Settings({ data, currentUser, onSuccess, showToast }) {
   const { sellOrders = [] } = data;
@@ -22,11 +30,41 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
   // 4. System & Environment Health info
   const [sysInfo, setSysInfo] = useState(null);
 
+  // 5. Background Fundamentals Sync state
+  // 5. Background Fundamentals Sync state (Chỉ đọc từ source code data/supported_stocks.json)
+  const [syncConfig, setSyncConfig] = useState({
+    symbols: [],
+    lastSyncedAt: null,
+    syncedCount: 0,
+  });
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState('');
+
   useEffect(() => {
     fetchHealth()
       .then(info => setSysInfo(info))
       .catch(() => {});
+
+    fetchSupportedStocks()
+      .then(cfg => { if (cfg && cfg.symbols) setSyncConfig(cfg); })
+      .catch(() => {});
   }, []);
+
+  async function handleTriggerSync() {
+    setIsSyncing(true);
+    setSyncMsg('');
+    try {
+      const res = await triggerFundamentalsSync();
+      setSyncMsg(res.message || 'Đồng bộ thành công!');
+      if (showToast) showToast(res.message || 'Đồng bộ dữ liệu định giá thành công!', 'success');
+      const refreshed = await fetchSupportedStocks();
+      if (refreshed) setSyncConfig(refreshed);
+    } catch (err) {
+      setSyncMsg('❌ Lỗi đồng bộ: ' + (err.message || 'Không thể kết nối TradingView'));
+    } finally {
+      setIsSyncing(false);
+    }
+  }
 
   // Download Backup JSON
   async function handleDownloadBackup() {
@@ -244,7 +282,125 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
         </div>
       </div>
 
-      {/* 3. Vùng Nguy Hiểm (Danger Zone) - Xoá Toàn Bộ Dữ Liệu */}
+      {/* 3. Đồng Bộ Dữ Liệu Định Giá Cơ Bản Chạy Nền (Background Sync & GitHub Actions) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50/70 via-blue-50/40 to-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+              <span>⚡</span> Đồng Bộ Dữ Liệu Định Giá Chạy Nền (Background Sync & GitHub Actions)
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Tải trước 50+ chỉ số định giá (P/E, ROE, Yield, 52w) vào bộ nhớ cache để ứng dụng mở tức thì (0ms) mà không tốn tài nguyên
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleTriggerSync}
+              disabled={isSyncing}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
+            >
+              <span>{isSyncing ? '⏳' : '🔄'}</span>
+              <span>{isSyncing ? 'Đang đồng bộ nền...' : 'Đồng bộ ngay'}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-5">
+          {/* Trạng thái tóm tắt */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <span className="text-[10px] font-bold text-gray-400 uppercase block">Số mã đã lưu dữ liệu</span>
+              <span className="text-base font-extrabold text-indigo-700 block mt-0.5">
+                {syncConfig.syncedCount || (syncConfig.symbols || []).length} mã
+              </span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <span className="text-[10px] font-bold text-gray-400 uppercase block">Lần đồng bộ gần nhất</span>
+              <span className="text-base font-bold text-gray-800 block mt-0.5">
+                {syncConfig.lastSyncedAt ? new Date(syncConfig.lastSyncedAt).toLocaleString('vi-VN') : 'Chưa có'}
+              </span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <span className="text-[10px] font-bold text-gray-400 uppercase block">Lịch GitHub Actions</span>
+              <span className="text-base font-bold text-emerald-700 block mt-0.5">
+                18:00 T2 - T6 (Hàng ngày)
+              </span>
+            </div>
+          </div>
+
+          {syncMsg && (
+            <div className={`text-xs p-3 rounded-xl border ${
+              syncMsg.startsWith('❌') ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            }`}>
+              {syncMsg}
+            </div>
+          )}
+
+          {/* Danh sách mã cổ phiếu hỗ trợ (Chỉ đọc - Quản lý trong source code) */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-bold text-gray-700 uppercase tracking-wide flex items-center gap-1.5">
+                  <span>🔒</span> Danh sách mã cổ phiếu hỗ trợ ({syncConfig.symbols?.length || 0} mã)
+                </label>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                  Chỉ đọc (Read-only)
+                </span>
+              </div>
+              <span className="text-[11px] text-gray-400">
+                Cấu hình tại: <code className="text-indigo-600 font-mono text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 font-bold">data/supported_stocks.json</code>
+              </span>
+            </div>
+
+            {/* Thông báo phân quyền quản trị */}
+            <div className="flex items-start gap-2.5 p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-2xl text-xs text-blue-900 leading-relaxed">
+              <span className="shrink-0 text-base">🛡️</span>
+              <div>
+                <p className="font-semibold text-blue-950">Quản lý tập trung trong source code:</p>
+                <p className="text-blue-800 text-[11px] mt-0.5">
+                  Để đảm bảo an toàn tài nguyên máy chủ và hiệu suất quét nền, giao diện web không cho phép người dùng tự ý thêm, xoá hoặc sửa danh sách mã. Chỉ quản trị viên mới có quyền thay đổi bằng cách cập nhật file <code className="font-mono font-bold bg-white/80 px-1 py-0.5 rounded text-blue-900">data/supported_stocks.json</code> trong mã nguồn dự án.
+                </p>
+              </div>
+            </div>
+
+            {/* Danh sách Chips mã (Chỉ đọc) */}
+            <div className="flex flex-wrap gap-1.5 max-h-56 overflow-y-auto p-3.5 bg-gray-50/80 rounded-2xl border border-gray-100">
+              {(syncConfig.symbols || []).length > 0 ? (
+                (syncConfig.symbols || []).map(sym => (
+                  <span
+                    key={sym}
+                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-gray-800 border border-gray-200 shadow-2xs select-none hover:border-indigo-300 transition-colors"
+                  >
+                    {sym}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-gray-400 italic">Đang tải danh sách mã...</span>
+              )}
+            </div>
+          </div>
+
+          {/* Hướng dẫn cấu hình GitHub Actions & Terminal */}
+          <div className="bg-indigo-50/50 rounded-2xl p-4 border border-indigo-100/70 text-xs space-y-2">
+            <div className="font-bold text-indigo-950 flex items-center gap-1.5">
+              <span>🐍</span> Tự Động Hóa Với Python & GitHub Actions:
+            </div>
+            <p className="text-gray-600 leading-relaxed">
+              Hệ thống sử dụng động cơ <b>Python 3</b> (<code className="px-1.5 py-0.5 rounded bg-white text-indigo-700 font-mono text-[11px] border">scripts/sync_fundamentals.py</code>) để tải và chuẩn hóa 50+ chỉ số, dễ dàng mở rộng và tích hợp mô hình phân tích định lượng sau này.
+              Workflow GitHub Actions (<code className="px-1.5 py-0.5 rounded bg-white text-indigo-700 font-mono text-[11px] border">.github/workflows/sync-fundamentals.yml</code>) sẽ tự động chạy Python và commit file cache mới về kho lưu trữ.
+            </p>
+            <div className="flex flex-wrap gap-4 text-[11px] text-gray-500 pt-1">
+              <div>• <b>Lịch tự động:</b> 18:00 T2 - T6 (Hàng ngày sau giờ đóng sàn)</div>
+              <div>• <b>Chạy qua npm:</b> <code className="font-mono bg-white px-1.5 py-0.5 rounded text-gray-800 font-bold border">npm run sync:fundamentals</code></div>
+              <div>• <b>Chạy trực tiếp Python:</b> <code className="font-mono bg-white px-1.5 py-0.5 rounded text-gray-800 font-bold border">python3 scripts/sync_fundamentals.py</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Vùng Nguy Hiểm (Danger Zone) - Xoá Toàn Bộ Dữ Liệu */}
       <div className="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-red-100 bg-red-50/40 flex items-center justify-between">
           <div>

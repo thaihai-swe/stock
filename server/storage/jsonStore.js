@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { DATA_DIR, DATA_FILE, PRICES_CACHE_FILE, FUNDAMENTALS_CACHE_FILE } from '../config/constants.js';
+import { DATA_DIR, DATA_FILE, PRICES_CACHE_FILE, FUNDAMENTALS_CACHE_FILE, SUPPORTED_STOCKS_FILE } from '../config/constants.js';
 
 export function readData() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -90,4 +90,37 @@ export function saveFundamentalsCache(cache) {
   } catch (e) {
     // Không làm gián đoạn server nếu ở môi trường Read-only
   }
+}
+
+export function loadSupportedStocks() {
+  let symbols = [];
+  if (fs.existsSync(SUPPORTED_STOCKS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(SUPPORTED_STOCKS_FILE, 'utf-8'));
+      symbols = Array.isArray(data) ? data : (data.symbols || []);
+    } catch {
+      symbols = [];
+    }
+  }
+
+  // Lấy thông tin đồng bộ mới nhất từ cache
+  const cache = loadFundamentalsCache();
+  const validKeys = Object.keys(cache).filter(k => !k.startsWith('_'));
+  let lastSyncedAt = cache._meta?.lastSyncedAt || null;
+  if (!lastSyncedAt && validKeys.length > 0) {
+    const latest = Math.max(...validKeys.map(k => cache[k]?.updatedAt || 0).filter(Boolean));
+    if (latest > 0) lastSyncedAt = new Date(latest).toISOString();
+  }
+
+  return {
+    symbols: [...new Set(symbols.map(s => (s || '').trim().toUpperCase()).filter(Boolean))],
+    syncedCount: validKeys.length,
+    lastSyncedAt,
+    isReadOnly: true
+  };
+}
+
+export function saveSupportedStocks(config) {
+  // Khoá không cho ghi đè - file supported_stocks.json do Developer quản lý trong source code
+  console.warn('⚠️ supported_stocks.json được quản lý trong source code, bỏ qua yêu cầu ghi đè.');
 }

@@ -67,6 +67,9 @@ export const cloneDemoData    = ()       => request('/auth/clone-demo', { method
 export const fetchHealth      = ()       => request('/health');
 export const fetchFundamentals = (symbols = [], force = false) =>
   request(`/fundamentals?symbols=${encodeURIComponent(symbols.join(','))}&force=${force ? 'true' : 'false'}`);
+export const fetchSupportedStocks = () => request('/fundamentals/supported-stocks');
+export const updateSupportedStocks = (body) => request('/fundamentals/supported-stocks', { method: 'POST', body: JSON.stringify(body) });
+export const triggerFundamentalsSync = () => request('/fundamentals/sync', { method: 'POST' });
 
 
 
