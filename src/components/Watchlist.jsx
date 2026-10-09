@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { addWatchlist, deleteWatchlist, fetchPrices } from '../utils/api.js';
-import { fmtMoney, fmtDate } from '../utils/format.js';
+import { fmtDate, fmtMoney } from '../utils/format.js';
 
 export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell }) {
   const [symbol, setSymbol] = useState('');
@@ -196,9 +196,8 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-gray-800">📋 Cổ Phiếu Đang Quan Tâm ({watchlist.length})</h3>
             {pricesData?.session && (
-              <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
-                pricesData.session.isOpen ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-              }`}>
+              <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${pricesData.session.isOpen ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                }`}>
                 {pricesData.session.label}
               </span>
             )}
@@ -210,22 +209,20 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
               <button
                 type="button"
                 onClick={() => setMobileViewMode('card')}
-                className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${
-                  mobileViewMode === 'card'
-                    ? 'bg-white text-indigo-700 shadow-2xs'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${mobileViewMode === 'card'
+                  ? 'bg-white text-indigo-700 shadow-2xs'
+                  : 'text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 📱 Thẻ
               </button>
               <button
                 type="button"
                 onClick={() => setMobileViewMode('table')}
-                className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${
-                  mobileViewMode === 'table'
-                    ? 'bg-white text-indigo-700 shadow-2xs'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${mobileViewMode === 'table'
+                  ? 'bg-white text-indigo-700 shadow-2xs'
+                  : 'text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 📊 Bảng
               </button>
@@ -304,13 +301,12 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                           <div className="flex items-baseline justify-end gap-1.5">
                             <span className="text-sm font-extrabold text-gray-900">{fmtMoney(curPrice)}đ</span>
                             <span
-                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
-                                changePct > 0
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                  : changePct < 0
+                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${changePct > 0
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : changePct < 0
                                   ? 'bg-red-50 text-red-600 border-red-200'
                                   : 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                              }`}
+                                }`}
                             >
                               {changePct > 0 ? '▲ +' : changePct < 0 ? '▼ ' : '■ '}{changePct}%
                             </span>
@@ -403,24 +399,22 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => onSelectBuy(item.symbol)}
-                          className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-all ${
-                            isBuyReached
-                              ? 'bg-emerald-600 text-white shadow-xs'
-                              : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                          }`}
+                          className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-all ${isBuyReached
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                            }`}
                         >
                           🛒 Mua
                         </button>
                         {onSelectSell && (
                           <button
                             onClick={() => onSelectSell(item.symbol)}
-                            className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-all ${
-                              isSellReached
-                                ? 'bg-purple-600 text-white shadow-xs'
-                                : holding
+                            className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-all ${isSellReached
+                              ? 'bg-purple-600 text-white shadow-xs'
+                              : holding
                                 ? 'bg-orange-100 text-orange-800 hover:bg-orange-200'
                                 : 'bg-gray-200 text-gray-700'
-                            }`}
+                              }`}
                           >
                             💸 Bán
                           </button>
@@ -510,15 +504,13 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                                 {fmtMoney(curPrice)}đ
                               </div>
                               <div className="text-[11px] flex items-center justify-end gap-1.5 mt-0.5">
-                                <span className="text-gray-400">({(curPrice / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
                                 <span
-                                  className={`inline-flex items-center text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${
-                                    changePct > 0
-                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                      : changePct < 0
+                                  className={`inline-flex items-center text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${changePct > 0
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    : changePct < 0
                                       ? 'bg-red-50 text-red-600 border-red-200'
                                       : 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                  }`}
+                                    }`}
                                 >
                                   {changePct > 0 ? '▲ +' : changePct < 0 ? '▼ ' : '■ '}{changePct}%
                                 </span>
@@ -535,9 +527,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                             <div>
                               <div className="font-extrabold text-emerald-700 text-sm sm:text-base">
                                 {fmtMoney(buyTarget)}đ
-                                <span className="text-[10px] text-emerald-600/90 font-semibold bg-emerald-100/70 border border-emerald-200/80 px-1.5 py-0.2 rounded ml-1">
-                                  {(buyTarget / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}
-                                </span>
+
                               </div>
                               <div className="mt-1">
                                 {curPrice ? (
@@ -570,9 +560,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                             <div>
                               <div className="font-extrabold text-purple-700 text-sm sm:text-base">
                                 {fmtMoney(sellTarget)}đ
-                                <span className="text-[10px] text-purple-600/90 font-semibold bg-purple-100/70 border border-purple-200/80 px-1.5 py-0.2 rounded ml-1">
-                                  {(sellTarget / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}
-                                </span>
+
                               </div>
                               <div className="mt-1">
                                 {curPrice ? (
@@ -609,11 +597,10 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                         <td className="px-5 py-4 text-right space-x-1.5 whitespace-nowrap">
                           <button
                             onClick={() => onSelectBuy(item.symbol)}
-                            className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all ${
-                              isBuyReached
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-                                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
-                            }`}
+                            className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all ${isBuyReached
+                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
+                              }`}
                             title="Tạo lệnh mua ngay với mã này"
                           >
                             🛒 Mua
@@ -621,13 +608,12 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                           {onSelectSell && (
                             <button
                               onClick={() => onSelectSell(item.symbol)}
-                              className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all ${
-                                isSellReached
-                                  ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
-                                  : holding
+                              className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all ${isSellReached
+                                ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
+                                : holding
                                   ? 'bg-orange-50 hover:bg-orange-100 text-orange-700'
                                   : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                              }`}
+                                }`}
                               title={holding ? `Bán mã này (Có sẵn ${holding.totalQty} cp)` : 'Chuyển sang màn hình Bán'}
                             >
                               💸 Bán
