@@ -14,18 +14,25 @@ export function analyzeStrategies(buyOrders = [], sellOrders = [], marketPrices 
     return 'Chưa gắn thẻ';
   }
 
-  // Hàm xác định 1 tag duy nhất cho lệnh bán
+  const disciplineTagNames = new Set(['🎯 Đạt mục tiêu', '🛑 Cắt lỗ chuẩn', '🏃 Chốt non', '😰 Cắt lỗ trễ', '⚡ Bán hoảng', '🔄 Đảo hàng']);
+
+  // Hàm xác định 1 tag chiến lược duy nhất cho lệnh bán
   function getSellOrderTag(sellOrder) {
-    if (sellOrder.tags && sellOrder.tags.length > 0 && sellOrder.tags[0]) {
-      return sellOrder.tags[0];
+    if (sellOrder.tags && sellOrder.tags.length > 0) {
+      const strat = sellOrder.tags.find(t => !disciplineTagNames.has(t));
+      if (strat) return strat;
     }
     if (sellOrder.matchedLots && sellOrder.matchedLots.length > 0) {
       for (const m of sellOrder.matchedLots) {
         const parent = buyMap.get(m.buyOrderId);
-        if (parent?.tags && parent.tags.length > 0 && parent.tags[0]) {
-          return parent.tags[0];
+        if (parent?.tags && parent.tags.length > 0) {
+          const strat = parent.tags.find(t => !disciplineTagNames.has(t));
+          if (strat) return strat;
         }
       }
+    }
+    if (sellOrder.tags && sellOrder.tags.length > 0 && sellOrder.tags[0]) {
+      return sellOrder.tags[0];
     }
     return 'Chưa gắn thẻ';
   }

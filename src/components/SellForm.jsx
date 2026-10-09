@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { addSellOrder } from '../utils/api.js';
-import { fmtMoney, plColor, plBg, getTodayDate, DEFAULT_TAGS, fmtDate } from '../utils/format.js';
+import { fmtMoney, plColor, plBg, getTodayDate, DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate } from '../utils/format.js';
 
 export default function SellForm({ onSuccess, portfolio = [], initialSymbol = '' }) {
   const [form, setForm] = useState({
@@ -19,6 +19,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
     }
   }, [initialSymbol]);
   const [selectedTag, setSelectedTag] = useState('');
+  const [selectedDiscipline, setSelectedDiscipline] = useState('');
   const [customTag, setCustomTag] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -136,12 +137,13 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
         feePct: form.feePct !== '' ? Number(form.feePct) : 0.1,
         note: form.note,
         date: form.date || getTodayDate(),
-        tags: selectedTag ? [selectedTag] : [],
+        tags: [selectedTag, selectedDiscipline].filter(Boolean),
         matchMethod: form.matchMethod || 'lowest',
       });
       setResult(order);
       setForm({ symbol: '', quantity: '100', price: '', feePct: '0.1', note: '', date: getTodayDate(), matchMethod: form.matchMethod || 'lowest' });
       setSelectedTag('');
+      setSelectedDiscipline('');
       onSuccess();
     } catch (err) {
       setError(err.message);
@@ -535,6 +537,51 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               >
                 + Chọn
               </button>
+            </div>
+          </div>
+
+          {/* Psychological Review & Discipline Assessment */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-gray-700">
+                🧠 Đánh giá tâm lý & kỷ luật <span className="text-xs text-indigo-600 font-semibold">(Tự soi xét bản thân)</span>
+              </label>
+              {selectedDiscipline && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDiscipline('')}
+                  className="text-[11px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                >
+                  ✕ Bỏ chọn
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mb-2">
+              Ghi nhận tâm lý khi chốt lệnh bán để rèn luyện kỷ luật và tránh mắc lỗi lặp lại
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {DISCIPLINE_TAGS.map(item => {
+                const isSelected = selectedDiscipline === item.name;
+                return (
+                  <button
+                    type="button"
+                    key={item.name}
+                    onClick={() => setSelectedDiscipline(prev => (prev === item.name ? '' : item.name))}
+                    className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? `${item.color} shadow-xs font-semibold ring-2 ring-indigo-400/40 border-current`
+                        : 'bg-white border-gray-200 hover:border-gray-300 text-gray-700'
+                    }`}
+                  >
+                    <div className="text-xs font-medium leading-tight">
+                      {isSelected ? '✓ ' : ''}{item.name}
+                    </div>
+                    <div className="text-[10px] text-gray-400 mt-0.5 line-clamp-1">
+                      {item.desc}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -427,6 +427,24 @@ export async function updateSettings(settings, userId = 'demo') {
   return settings;
 }
 
+export async function updateCashBalance(cashBalance, userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: "SELECT value FROM app_settings WHERE key = 'settings' AND user_id = ?;",
+    args: [userId],
+  });
+  let currentSettings = {};
+  if (res.rows && res.rows.length > 0) {
+    currentSettings = safeJsonParse(res.rows[0].value, {});
+  }
+  currentSettings.cashBalance = Number(cashBalance) || 0;
+  await db.execute({
+    sql: "INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('settings', ?, ?);",
+    args: [JSON.stringify(currentSettings), userId],
+  });
+  return currentSettings.cashBalance;
+}
+
 export async function updateGoal(goal, userId = 'demo') {
   await initDatabase();
   await db.execute({

@@ -11,7 +11,7 @@ import {
   Pie,
 } from 'recharts';
 import { analyzeStrategies } from '../utils/strategyAnalytics.js';
-import { fmtMoney, fmtDate, plColor, plBg } from '../utils/format.js';
+import { fmtMoney, fmtDate, plColor, plBg, DISCIPLINE_TAGS } from '../utils/format.js';
 import { fetchPrices } from '../utils/api.js';
 
 const PIE_COLORS = [
@@ -89,6 +89,51 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
     if (!selectedTag) return null;
     return strategyList.find(s => s.tag === selectedTag) || null;
   }, [selectedTag, strategyList]);
+
+  // Thống kê nhật ký tâm lý & điểm kỷ luật từ các lệnh bán
+  const disciplineStats = useMemo(() => {
+    const map = {};
+    DISCIPLINE_TAGS.forEach(d => {
+      map[d.name] = {
+        ...d,
+        count: 0,
+        winCount: 0,
+        totalPL: 0,
+      };
+    });
+
+    let evaluatedCount = 0;
+    let positiveCount = 0;
+
+    sellOrders.forEach(order => {
+      if (!order.tags || !Array.isArray(order.tags)) return;
+      order.tags.forEach(t => {
+        if (map[t]) {
+          map[t].count += 1;
+          const pl = order.profitLoss !== undefined ? order.profitLoss : (order.realizedPL || 0);
+          map[t].totalPL += pl;
+          if (pl > 0) {
+            map[t].winCount += 1;
+          }
+          evaluatedCount += 1;
+          if (t === '🎯 Đạt mục tiêu' || t === '🛑 Cắt lỗ chuẩn' || t === '🔄 Đảo hàng') {
+            positiveCount += 1;
+          }
+        }
+      });
+    });
+
+    const disciplineScore = evaluatedCount > 0
+      ? Math.round((positiveCount / evaluatedCount) * 100)
+      : null;
+
+    return {
+      evaluatedCount,
+      positiveCount,
+      disciplineScore,
+      items: Object.values(map),
+    };
+  }, [sellOrders]);
 
   if (strategyList.length === 0) {
     return (
@@ -530,6 +575,93 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
               })}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* 🧠 Thống Kê Tâm Lý & Điểm Kỷ Luật Giao Dịch */}
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+          <div>
+            <h3 className="font-bold text-gray-900 text-base flex items-center gap-2">
+              <span>🧠</span> Nhật Ký Đánh Giá Tâm Lý & Kỷ Luật Giao Dịch
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Tự soi xét tâm lý khi chốt lệnh giúp kiểm soát cảm xúc, nâng cao kỷ luật cá nhân
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+            <div>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                Điểm Kỷ Luật
+              </div>
+              <div className="text-sm font-bold text-gray-800">
+                {disciplineStats.disciplineScore !== null ? (
+                  <span className={disciplineStats.disciplineScore >= 70 ? 'text-emerald-600' : disciplineStats.disciplineScore >= 50 ? 'text-amber-600' : 'text-red-500'}>
+                    {disciplineStats.disciplineScore}%
+                  </span>
+                ) : (
+                  <span className="text-gray-400 text-xs">Chưa đủ dữ liệu</span>
+                )}
+              </div>
+            </div>
+            <div className="text-xs text-gray-500 border-l border-gray-200 pl-3">
+              {disciplineStats.evaluatedCount > 0 ? (
+                <><b>{disciplineStats.positiveCount}</b> / {disciplineStats.evaluatedCount} lệnh chuẩn kỷ luật</>
+              ) : (
+                <>Gắn thẻ tâm lý khi bán để đo lường</>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 6 Psychological Categories Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {disciplineStats.items.map(item => {
+            const hasData = item.count > 0;
+            const winRate = hasData ? Math.round((item.winCount / item.count) * 100) : 0;
+            return (
+              <div
+                key={item.name}
+                className={`p-4 rounded-2xl border transition-all ${
+                  hasData
+                    ? 'bg-gray-50/60 border-gray-200 hover:border-gray-300 shadow-2xs'
+                    : 'bg-white border-gray-100 opacity-70'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className={`text-xs px-2.5 py-1 rounded-lg font-bold border ${item.color}`}>
+                    {item.name}
+                  </span>
+                  <span className="text-xs font-bold text-gray-600 bg-white px-2 py-0.5 rounded-full border border-gray-200">
+                    {item.count} lệnh
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-400 mt-2 line-clamp-1">
+                  {item.desc}
+                </p>
+
+                {hasData ? (
+                  <div className="mt-3 pt-2.5 border-t border-gray-200/60 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">Lãi/Lỗ ròng</span>
+                      <span className={`font-bold ${plColor(item.totalPL)}`}>
+                        {item.totalPL >= 0 ? '+' : ''}{fmtMoney(item.totalPL)}đ
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-gray-400 block">Tỷ lệ thắng</span>
+                      <span className="font-bold text-gray-700">{winRate}%</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-3 pt-2.5 border-t border-gray-100 text-[11px] text-gray-300 italic">
+                    Chưa có giao dịch gắn nhãn này
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
