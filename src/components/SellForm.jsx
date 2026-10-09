@@ -231,8 +231,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 value={form.quantity}
                 onChange={handleChange}
                 type="number"
-                min={maxQty && maxQty < 100 ? '1' : '100'}
-                step="100"
+                min="1"
                 max={maxQty || undefined}
                 placeholder="100"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"

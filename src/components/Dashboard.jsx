@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchPrices, fetchFundamentals } from '../utils/api.js';
+import { fetchPrices } from '../utils/api.js';
 import {
   fmtMoney,
   getStockColor,
@@ -90,17 +90,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
     loadMarketPrices(false);
   }, [loadMarketPrices]);
 
-  // Dữ liệu định giá & cơ bản của các mã đang giữ
-  const [fundamentalsMap, setFundamentalsMap] = useState({});
-
-  useEffect(() => {
-    if (!portfolio || portfolio.length === 0) return;
-    const symbols = portfolio.map(p => p.symbol);
-    fetchFundamentals(symbols, false)
-      .then(map => { if (map) setFundamentalsMap(map); })
-      .catch(err => console.warn('Lỗi lấy chỉ số cơ bản cho dashboard:', err));
-  }, [portfolio]);
-
   // Tổng giá trị danh mục theo thị trường (Market Value)
   const totalMarketValue = portfolio.reduce((sum, p) => {
     const curPrice = pricesData?.prices?.[p.symbol]?.price;
@@ -113,39 +102,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
   const totalUnrealizedPLPct = holdingCost > 0
     ? parseFloat(((totalUnrealizedPL / holdingCost) * 100).toFixed(2))
     : 0;
-
-  // Tính Portfolio Beta & Tỷ suất Cổ tức bình quân danh mục
-  const { portfolioBeta, portfolioDividendYield } = useMemo(() => {
-    if (!portfolio || portfolio.length === 0 || totalMarketValue <= 0) {
-      return { portfolioBeta: null, portfolioDividendYield: null };
-    }
-    let weightedBeta = 0;
-    let weightedYield = 0;
-    let validBetaWeight = 0;
-    let validYieldWeight = 0;
-
-    for (const p of portfolio) {
-      const quote = pricesData?.prices?.[p.symbol];
-      const curPrice = quote?.price || p.avgCost;
-      const val = p.totalQty * curPrice;
-      const weight = val / totalMarketValue;
-      const fund = fundamentalsMap[p.symbol];
-
-      if (fund?.technicals?.beta != null) {
-        weightedBeta += weight * fund.technicals.beta;
-        validBetaWeight += weight;
-      }
-      if (fund?.dividends?.yield != null) {
-        weightedYield += weight * fund.dividends.yield;
-        validYieldWeight += weight;
-      }
-    }
-
-    const beta = validBetaWeight > 0 ? Number((weightedBeta / validBetaWeight).toFixed(2)) : null;
-    const yieldPct = validYieldWeight > 0 ? Number((weightedYield / validYieldWeight).toFixed(2)) : null;
-
-    return { portfolioBeta: beta, portfolioDividendYield: yieldPct };
-  }, [portfolio, pricesData, totalMarketValue, fundamentalsMap]);
 
   // 2. Thống kê hiệu suất (Performance metrics)
   const wins = sellOrders.filter(s => s.profitLoss > 0);
@@ -1012,8 +968,8 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         )}
       </div>
 
-      {/* Stat Cards - Hàng 2: Thống kê hiệu suất trading & Rủi ro danh mục */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
+      {/* Stat Cards - Hàng 2: Thống kê hiệu suất trading */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tỷ lệ thắng (Win Rate)</p>
           <p className="text-2xl font-bold text-indigo-600 mt-1">{winRate}%</p>
@@ -1033,18 +989,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Profit Factor</p>
           <p className="text-2xl font-bold text-gray-800 mt-1">{profitFactor}</p>
           <p className="text-xs text-gray-400 mt-1">tổng lãi / tổng lỗ</p>
-        </div>
-        <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Beta & Yield DM</p>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-2xl font-bold text-indigo-700">
-              {portfolioBeta != null ? portfolioBeta : '—'}
-            </span>
-            <span className="text-xs text-gray-400 font-medium">Beta</span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            {portfolioDividendYield != null ? `Cổ tức: +${portfolioDividendYield}%/năm` : 'Độ nhạy so với VN-Index'}
-          </p>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { DATA_DIR, DATA_FILE, PRICES_CACHE_FILE, FUNDAMENTALS_CACHE_FILE } from '../config/constants.js';
+import { DATA_DIR, DATA_FILE, PRICES_CACHE_FILE } from '../config/constants.js';
 
 export function readData() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -65,28 +65,6 @@ export function savePriceCache(cache) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(PRICES_CACHE_FILE, JSON.stringify(cache, null, 2));
-  } catch (e) {
-    // Không làm gián đoạn server nếu ở môi trường Read-only
-  }
-}
-
-export function loadFundamentalsCache() {
-  if (fs.existsSync(FUNDAMENTALS_CACHE_FILE)) {
-    try {
-      return JSON.parse(fs.readFileSync(FUNDAMENTALS_CACHE_FILE, 'utf-8'));
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-export function saveFundamentalsCache(cache) {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    fs.writeFileSync(FUNDAMENTALS_CACHE_FILE, JSON.stringify(cache, null, 2));
   } catch (e) {
     // Không làm gián đoạn server nếu ở môi trường Read-only
   }

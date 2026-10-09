@@ -65,8 +65,6 @@ export const fetchCurrentUser = ()       => request('/auth/me');
 export const loginGoogle      = (token)   => request('/auth/google', { method: 'POST', body: JSON.stringify({ token }) });
 export const cloneDemoData    = ()       => request('/auth/clone-demo', { method: 'POST' });
 export const fetchHealth      = ()       => request('/health');
-export const fetchFundamentals = (symbols = [], force = false) =>
-  request(`/fundamentals?symbols=${encodeURIComponent(symbols.join(','))}&force=${force ? 'true' : 'false'}`);
 
 
 
