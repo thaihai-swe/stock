@@ -3,12 +3,24 @@ import {
   getAllData,
   updateGoal,
   updateCashBalance,
+  getCashBalance,
   restoreAllData,
   clearUserData,
 } from '../storage/sqliteStore.js';
 import { getTodayString } from '../services/matchingService.js';
 
 const router = express.Router();
+
+// Lấy số dư tiền mặt
+router.get(['/cash-balance', '/settings/cash-balance'], async (req, res) => {
+  try {
+    const userId = req.user?.id || 'demo';
+    const cashBalance = await getCashBalance(userId);
+    res.json({ cashBalance });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Cập nhật số dư tiền mặt (hỗ trợ cả /cash-balance và /settings/cash-balance)
 router.post(['/cash-balance', '/settings/cash-balance'], async (req, res) => {

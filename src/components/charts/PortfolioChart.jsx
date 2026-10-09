@@ -24,11 +24,11 @@ export default function PortfolioChart({ portfolio = [] }) {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
-        <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100 text-xs">
-          <p className="font-bold text-gray-800 text-sm">{item.name}</p>
-          <p className="text-gray-600 mt-1">Số lượng: <b>{item.qty.toLocaleString()} cp</b></p>
-          <p className="text-indigo-600">Giá trị vốn: <b>{fmtMoney(item.value)}đ</b></p>
-          <p className="text-gray-500">Tỷ trọng: <b>{item.pct}%</b></p>
+        <div className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 text-xs">
+          <p className="font-bold text-gray-800 dark:text-slate-100 text-sm">{item.name}</p>
+          <p className="text-gray-600 dark:text-slate-300 mt-1">Số lượng: <b>{item.qty.toLocaleString()} cp</b></p>
+          <p className="text-indigo-600 dark:text-indigo-400">Giá trị vốn: <b>{fmtMoney(item.value)}đ</b></p>
+          <p className="text-gray-500 dark:text-slate-400">Tỷ trọng: <b>{item.pct}%</b></p>
         </div>
       );
     }
@@ -57,7 +57,7 @@ export default function PortfolioChart({ portfolio = [] }) {
             verticalAlign="bottom"
             height={36}
             formatter={(value, entry) => (
-              <span className="text-xs font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">
                 {value} ({entry.payload.pct}%)
               </span>
             )}

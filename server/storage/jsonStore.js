@@ -69,7 +69,6 @@ export function savePriceCache(cache) {
     // Không làm gián đoạn server nếu ở môi trường Read-only
   }
 }
-
 export function loadFundamentalsCache() {
   if (fs.existsSync(FUNDAMENTALS_CACHE_FILE)) {
     try {

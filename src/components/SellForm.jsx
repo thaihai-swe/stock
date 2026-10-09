@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { addSellOrder } from '../utils/api.js';
-import { fmtMoney, plColor, plBg, getTodayDate, DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate } from '../utils/format.js';
+import { DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate, fmtMoney, getTodayDate, plBg, plColor } from '../utils/format.js';
 
 export default function SellForm({ onSuccess, portfolio = [], initialSymbol = '' }) {
   const [form, setForm] = useState({
@@ -128,6 +128,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
       setError('Vui lòng điền đầy đủ mã CP, số lượng và giá.');
       return;
     }
+    if (Number(form.quantity) <= 0) {
+      setError('Số lượng cổ phiếu bán phải lớn hơn 0.');
+      return;
+    }
     setLoading(true);
     try {
       const order = await addSellOrder({
@@ -165,7 +169,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Symbol + Quantity */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -232,8 +236,17 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 name="quantity"
                 value={form.quantity}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.min(maxQty || 999999, (Number(f.quantity) || 0) + 100)) }));
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.max(1, (Number(f.quantity) || 0) - 100)) }));
+                  }
+                }}
                 type="number"
-                min={maxQty && maxQty < 100 ? '1' : '100'}
+                min="0"
                 step="100"
                 max={maxQty || undefined}
                 placeholder="100"
@@ -287,11 +300,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'lowest' }))}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  (form.matchMethod || 'lowest') === 'lowest'
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${(form.matchMethod || 'lowest') === 'lowest'
                     ? 'bg-orange-50/80 border-orange-400 text-orange-950 ring-2 ring-orange-400/20 shadow-2xs'
                     : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold flex items-center gap-1.5">
@@ -310,11 +322,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'highest' }))}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  form.matchMethod === 'highest'
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${form.matchMethod === 'highest'
                     ? 'bg-indigo-50/80 border-indigo-400 text-indigo-950 ring-2 ring-indigo-400/20 shadow-2xs'
                     : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold flex items-center gap-1.5">
@@ -333,11 +344,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'fifo' }))}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  form.matchMethod === 'fifo'
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${form.matchMethod === 'fifo'
                     ? 'bg-emerald-50/80 border-emerald-400 text-emerald-950 ring-2 ring-emerald-400/20 shadow-2xs'
                     : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold flex items-center gap-1.5">
@@ -364,7 +374,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 <span className="text-[11px] bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-semibold">
                   {costPreview.matched.length} lô ({
                     form.matchMethod === 'highest' ? '📈 Giá cao nhất' :
-                    form.matchMethod === 'fifo' ? '⏱️ Mua sớm nhất (FIFO)' : '📉 Giá thấp nhất'
+                      form.matchMethod === 'fifo' ? '⏱️ Mua sớm nhất (FIFO)' : '📉 Giá thấp nhất'
                   })
                 </span>
               </div>
@@ -497,11 +507,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     type="button"
                     key={t}
                     onClick={() => selectTag(t)}
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${
-                      isSelected
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${isSelected
                         ? 'bg-orange-600 text-white shadow-xs font-bold ring-2 ring-orange-400/30'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                    }`}
+                      }`}
                   >
                     {isSelected ? '✓ ' : ''}{t}
                   </button>
@@ -561,22 +570,21 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {DISCIPLINE_TAGS.map(item => {
-                const isSelected = selectedDiscipline === item.name;
+                const isSelected = selectedDiscipline === item.label;
                 return (
                   <button
                     type="button"
-                    key={item.name}
-                    onClick={() => setSelectedDiscipline(prev => (prev === item.name ? '' : item.name))}
-                    className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
-                      isSelected
+                    key={item.id}
+                    onClick={() => setSelectedDiscipline(prev => (prev === item.label ? '' : item.label))}
+                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${isSelected
                         ? `${item.color} shadow-xs font-semibold ring-2 ring-indigo-400/40 border-current`
-                        : 'bg-white border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
+                        : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700 text-gray-700 dark:text-slate-300'
+                      }`}
                   >
                     <div className="text-xs font-medium leading-tight">
-                      {isSelected ? '✓ ' : ''}{item.name}
+                      {isSelected ? '✓ ' : ''}{item.label}
                     </div>
-                    <div className="text-[10px] text-gray-400 mt-0.5 line-clamp-1">
+                    <div className="text-[10px] text-gray-400 dark:text-slate-400 mt-0.5 line-clamp-1">
                       {item.desc}
                     </div>
                   </button>
@@ -690,7 +698,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
             <p className="text-xs font-bold text-gray-700 uppercase mb-2">
               📋 Danh sách các lô mua gốc đã khớp ({
                 result.matchMethod === 'highest' ? 'giá cao nhất trước' :
-                result.matchMethod === 'fifo' ? 'theo ngày mua FIFO' : 'giá thấp nhất trước'
+                  result.matchMethod === 'fifo' ? 'theo ngày mua FIFO' : 'giá thấp nhất trước'
               })
             </p>
             <div className="space-y-1.5">

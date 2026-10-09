@@ -54,6 +54,10 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
       setError('Vui lòng điền đầy đủ mã CP, số lượng và giá.');
       return;
     }
+    if (Number(form.quantity) <= 0) {
+      setError('Số lượng cổ phiếu phải lớn hơn 0.');
+      return;
+    }
     setLoading(true);
     try {
       const order = await addBuyOrder({
@@ -84,7 +88,7 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
           <p className="text-indigo-200 text-sm mt-0.5">Ghi nhận giao dịch mua cổ phiếu</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Symbol + Quantity */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -135,6 +139,15 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
                 name="quantity"
                 value={form.quantity}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.max(1, (Number(f.quantity) || 0) + 100)) }));
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.max(1, (Number(f.quantity) || 0) - 100)) }));
+                  }
+                }}
                 type="number"
                 min="0"
                 step="100"
@@ -254,8 +267,8 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
                     key={t}
                     onClick={() => selectTag(t)}
                     className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${isSelected
-                        ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-400/30'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                      ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-400/30'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
                       }`}
                   >
                     {isSelected ? '✓ ' : ''}{t}

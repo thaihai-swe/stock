@@ -9,6 +9,7 @@ import {
   Cell,
   PieChart,
   Pie,
+  Legend,
 } from 'recharts';
 import { analyzeStrategies } from '../utils/strategyAnalytics.js';
 import { fmtMoney, fmtDate, plColor, plBg, DISCIPLINE_TAGS } from '../utils/format.js';
@@ -92,14 +93,18 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
 
   // Thống kê nhật ký tâm lý & điểm kỷ luật từ các lệnh bán
   const disciplineStats = useMemo(() => {
-    const map = {};
-    DISCIPLINE_TAGS.forEach(d => {
-      map[d.name] = {
-        ...d,
-        count: 0,
-        winCount: 0,
-        totalPL: 0,
-      };
+    const list = DISCIPLINE_TAGS.map(d => ({
+      ...d,
+      count: 0,
+      winCount: 0,
+      totalPL: 0,
+    }));
+
+    const lookupMap = new Map();
+    list.forEach(item => {
+      lookupMap.set(item.label, item);
+      lookupMap.set(item.shortLabel, item);
+      lookupMap.set(item.id, item);
     });
 
     let evaluatedCount = 0;
@@ -107,16 +112,22 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
 
     sellOrders.forEach(order => {
       if (!order.tags || !Array.isArray(order.tags)) return;
+      const matchedSet = new Set();
       order.tags.forEach(t => {
-        if (map[t]) {
-          map[t].count += 1;
+        let matched = lookupMap.get(t);
+        if (!matched && typeof t === 'string') {
+          matched = list.find(d => t.includes(d.shortLabel) || t.includes(d.id));
+        }
+        if (matched && !matchedSet.has(matched.id)) {
+          matchedSet.add(matched.id);
+          matched.count += 1;
           const pl = order.profitLoss !== undefined ? order.profitLoss : (order.realizedPL || 0);
-          map[t].totalPL += pl;
+          matched.totalPL += pl;
           if (pl > 0) {
-            map[t].winCount += 1;
+            matched.winCount += 1;
           }
           evaluatedCount += 1;
-          if (t === '🎯 Đạt mục tiêu' || t === '🛑 Cắt lỗ chuẩn' || t === '🔄 Đảo hàng') {
+          if (matched.type === 'disciplined') {
             positiveCount += 1;
           }
         }
@@ -131,7 +142,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
       evaluatedCount,
       positiveCount,
       disciplineScore,
-      items: Object.values(map),
+      items: list,
     };
   }, [sellOrders]);
 
@@ -365,15 +376,15 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
               Không có vị thế nắm giữ nào đang mở
             </div>
           ) : (
-            <div className="w-full h-64">
+            <div className="w-full h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={pieChartData}
                     cx="50%"
-                    cy="50%"
+                    cy="45%"
                     innerRadius={50}
-                    outerRadius={80}
+                    outerRadius={75}
                     paddingAngle={3}
                     dataKey="value"
                   >
@@ -386,16 +397,25 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                       if (active && payload && payload.length) {
                         const item = payload[0].payload;
                         return (
-                          <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100 text-xs">
-                            <p className="font-bold text-indigo-700 text-sm">#{item.name}</p>
-                            <p className="text-gray-600 mt-1">Vốn đang giữ: <b>{fmtMoney(item.value)}đ</b></p>
-                            <p className="text-gray-500">Tỷ trọng: <b>{item.pct}%</b></p>
-                            {item.symbols && <p className="text-gray-400 text-[11px] mt-0.5">Mã: {item.symbols}</p>}
+                          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 text-xs">
+                            <p className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">#{item.name}</p>
+                            <p className="text-gray-600 dark:text-slate-300 mt-1">Vốn đang giữ: <b>{fmtMoney(item.value)}đ</b></p>
+                            <p className="text-gray-500 dark:text-slate-400">Tỷ trọng: <b>{item.pct}%</b></p>
+                            {item.symbols && <p className="text-gray-400 dark:text-slate-400 text-[11px] mt-0.5">Mã CP: <b className="text-gray-700 dark:text-slate-200">{item.symbols}</b></p>}
                           </div>
                         );
                       }
                       return null;
                     }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    formatter={(value, entry) => (
+                      <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">
+                        #{value} ({entry.payload.pct}%)
+                      </span>
+                    )}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -622,18 +642,18 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
             const winRate = hasData ? Math.round((item.winCount / item.count) * 100) : 0;
             return (
               <div
-                key={item.name}
+                key={item.id}
                 className={`p-4 rounded-2xl border transition-all ${
                   hasData
-                    ? 'bg-gray-50/60 border-gray-200 hover:border-gray-300 shadow-2xs'
-                    : 'bg-white border-gray-100 opacity-70'
+                    ? 'bg-gray-50/60 dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 shadow-2xs'
+                    : 'bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800/60 opacity-70'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className={`text-xs px-2.5 py-1 rounded-lg font-bold border ${item.color}`}>
-                    {item.name}
+                    {item.label}
                   </span>
-                  <span className="text-xs font-bold text-gray-600 bg-white px-2 py-0.5 rounded-full border border-gray-200">
+                  <span className="text-xs font-bold text-gray-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-full border border-gray-200 dark:border-slate-700">
                     {item.count} lệnh
                   </span>
                 </div>
@@ -642,20 +662,20 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                 </p>
 
                 {hasData ? (
-                  <div className="mt-3 pt-2.5 border-t border-gray-200/60 flex items-center justify-between text-xs">
+                  <div className="mt-3 pt-2.5 border-t border-gray-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
                     <div>
-                      <span className="text-[10px] text-gray-400 block">Lãi/Lỗ ròng</span>
+                      <span className="text-[10px] text-gray-400 dark:text-slate-500 block">Lãi/Lỗ ròng</span>
                       <span className={`font-bold ${plColor(item.totalPL)}`}>
                         {item.totalPL >= 0 ? '+' : ''}{fmtMoney(item.totalPL)}đ
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-gray-400 block">Tỷ lệ thắng</span>
-                      <span className="font-bold text-gray-700">{winRate}%</span>
+                      <span className="text-[10px] text-gray-400 dark:text-slate-500 block">Tỷ lệ thắng</span>
+                      <span className="font-bold text-gray-700 dark:text-slate-200">{winRate}%</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-3 pt-2.5 border-t border-gray-100 text-[11px] text-gray-300 italic">
+                  <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-slate-800/80 text-[11px] text-gray-400 dark:text-slate-500 italic">
                     Chưa có giao dịch gắn nhãn này
                   </div>
                 )}

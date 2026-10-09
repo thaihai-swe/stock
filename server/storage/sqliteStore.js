@@ -437,7 +437,7 @@ export async function updateCashBalance(cashBalance, userId = 'demo') {
   if (res.rows && res.rows.length > 0) {
     currentSettings = safeJsonParse(res.rows[0].value, {});
   }
-  currentSettings.cashBalance = Number(cashBalance) || 0;
+  currentSettings.cashBalance = Math.max(0, Number(cashBalance) || 0);
   await db.execute({
     sql: "INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('settings', ?, ?);",
     args: [JSON.stringify(currentSettings), userId],
@@ -445,6 +445,18 @@ export async function updateCashBalance(cashBalance, userId = 'demo') {
   return currentSettings.cashBalance;
 }
 
+export async function getCashBalance(userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: "SELECT value FROM app_settings WHERE key = 'settings' AND user_id = ?;",
+    args: [userId],
+  });
+  if (res.rows && res.rows.length > 0) {
+    const currentSettings = safeJsonParse(res.rows[0].value, {});
+    return Math.max(0, Number(currentSettings.cashBalance) || 0);
+  }
+  return 0;
+}
 export async function updateGoal(goal, userId = 'demo') {
   await initDatabase();
   await db.execute({

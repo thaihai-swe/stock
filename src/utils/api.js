@@ -71,13 +71,9 @@ export const fetchSupportedStocks = () => request('/fundamentals/supported-stock
 export const updateSupportedStocks = (body) => request('/fundamentals/supported-stocks', { method: 'POST', body: JSON.stringify(body) });
 export const triggerFundamentalsSync = () => request('/fundamentals/sync', { method: 'POST' });
 
-// Tiền mặt & Chỉ số thị trường
+// Quản lý số dư tiền mặt & thị trường
+export const fetchCashBalance  = ()       => request('/cash-balance');
 export const updateCashBalance = (cashBalance) =>
   request('/cash-balance', { method: 'POST', body: JSON.stringify({ cashBalance }) });
 export const fetchMarketIndex = (force = false) =>
   request(`/market-index?force=${force ? 'true' : 'false'}`);
-
-
-
-
-
