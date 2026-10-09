@@ -8,11 +8,15 @@ const dbMode = (process.env.DB_MODE || '').trim().toLowerCase();
 const tursoUrl = (process.env.TURSO_DATABASE_URL || '').trim();
 const tursoToken = (process.env.TURSO_AUTH_TOKEN || '').trim();
 
+const isVercel = Boolean(process.env.VERCEL);
+
 // Quyết định chế độ kết nối:
-// 1. Nếu DB_MODE=local -> Ép buộc dùng file SQLite cục bộ
-// 2. Nếu có TURSO_DATABASE_URL và DB_MODE !== 'local' -> Dùng Turso Cloud
-// 3. Mặc định -> Dùng file SQLite cục bộ
-const shouldUseTurso = (dbMode === 'turso' || (!dbMode && tursoUrl)) && Boolean(tursoUrl);
+// 1. Trên Vercel (Production Cloud) -> Bắt buộc dùng Turso Cloud SQLite
+// 2. Chạy Local (Local Development) -> Mặc định dùng file SQLite cục bộ (data/stock.db).
+//    Chỉ dùng Turso trên local nếu DB_MODE=turso được chỉ định rõ ràng trong .env.
+const shouldUseTurso = isVercel
+  ? Boolean(tursoUrl)
+  : (dbMode === 'turso' && Boolean(tursoUrl));
 
 let clientConfig;
 let dbInfo;
@@ -29,7 +33,7 @@ if (shouldUseTurso) {
     isTurso: true,
   };
 } else {
-  if (process.env.VERCEL) {
+  if (isVercel) {
     console.error('❌ Chưa cấu hình biến môi trường TURSO_DATABASE_URL trên Vercel!');
     throw new Error('Chưa cấu hình TURSO_DATABASE_URL và TURSO_AUTH_TOKEN trên Vercel! Vui lòng vào Vercel Dashboard -> Settings -> Environment Variables để thêm.');
   }
@@ -42,7 +46,7 @@ if (shouldUseTurso) {
   };
   dbInfo = {
     mode: 'local',
-    label: 'Local SQLite File',
+    label: 'Local SQLite File (data/stock.db)',
     url: `file:${localDbPath}`,
     isTurso: false,
   };

@@ -92,7 +92,6 @@ export default function App({ hasGoogleClientId = false }) {
     dividends: [],
     watchlist: [],
     goal: null,
-    settings: { maxAllocationPct: 50 },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

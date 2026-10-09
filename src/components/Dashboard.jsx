@@ -22,7 +22,7 @@ function StatCard({ label, value, sub, highlight }) {
 }
 
 export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
-  const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [], settings } = data;
+  const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [] } = data;
 
   // State giá thị trường thực tế & phiên giao dịch
   const [pricesData, setPricesData] = useState({ session: null, prices: {} });
@@ -438,8 +438,8 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                       </div>
                     </div>
 
-                    {/* Footer Thẻ: Lãi/Lỗ tạm tính & Nút công cụ DCA */}
-                    <div className="pt-2.5 flex items-center justify-between">
+                    {/* Footer Thẻ: Lãi/Lỗ tạm tính */}
+                    <div className="pt-2.5">
                       <div>
                         <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">Lãi / Lỗ tạm tính</span>
                         {marketPrice ? (
@@ -455,19 +455,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                           <span className="text-xs text-gray-400">—</span>
                         )}
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onNavigateDca) {
-                            onNavigateDca(p);
-                          }
-                        }}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-700 transition-colors shadow-2xs cursor-pointer border border-indigo-200/60"
-                        title="Lập kế hoạch mua gom / bình quân giá DCA"
-                      >
-                        <span>🧮</span> DCA
-                      </button>
                     </div>
                   </div>
                 );
@@ -518,7 +505,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                   <th className="text-right px-4 py-3.5">Giá thị trường</th>
                   <th className="text-right px-5 py-3.5 font-bold text-gray-700">Giá trị danh mục</th>
                   <th className="text-right px-5 py-3.5 font-bold text-gray-700">Lãi / Lỗ</th>
-                  <th className="text-center px-4 py-3.5">Công cụ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -657,22 +643,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                           <div className="text-xs text-gray-400">—</div>
                         )}
                       </td>
-
-                      {/* 9. Công cụ DCA */}
-                      <td className="px-4 py-4 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (onNavigateDca) {
-                              onNavigateDca(p);
-                            }
-                          }}
-                          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors shadow-2xs cursor-pointer"
-                          title="Lập kế hoạch mua gom / bình quân giá DCA"
-                        >
-                          <span>🧮</span> DCA
-                        </button>
-                      </td>
                     </tr>
                   );
                 })}
@@ -705,8 +675,6 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca }) {
                         </span>
                       </div>
                     </td>
-                    {/* 9. Công cụ */}
-                    <td className="px-4 py-3.5 text-center text-gray-400">—</td>
                   </tr>
                 </tfoot>
               )}

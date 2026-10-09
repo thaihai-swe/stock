@@ -1,7 +1,6 @@
 import express from 'express';
 import {
   getAllData,
-  updateSettings,
   updateGoal,
   restoreAllData,
   clearUserData,
@@ -23,23 +22,6 @@ router.post('/goal', async (req, res) => {
     };
     await updateGoal(goal, userId);
     res.json(goal);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Cập nhật cài đặt rủi ro / tỷ trọng
-router.post('/settings', async (req, res) => {
-  const { maxAllocationPct } = req.body;
-  try {
-    const userId = req.user?.id || 'demo';
-    const data = await getAllData(userId);
-    const newSettings = {
-      ...data.settings,
-      maxAllocationPct: parseFloat(maxAllocationPct) || 50,
-    };
-    await updateSettings(newSettings, userId);
-    res.json(newSettings);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -78,7 +60,7 @@ router.post('/restore', async (req, res) => {
       dividends: Array.isArray(incoming.dividends) ? incoming.dividends : [],
       watchlist: Array.isArray(incoming.watchlist) ? incoming.watchlist : [],
       goal: incoming.goal || null,
-      settings: incoming.settings || { maxAllocationPct: 50 },
+      settings: incoming.settings || {},
     };
     await restoreAllData(cleanData, userId);
     res.json({ success: true, message: 'Khôi phục dữ liệu thành công.' });

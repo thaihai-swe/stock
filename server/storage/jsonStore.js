@@ -13,7 +13,7 @@ export function readData() {
       watchlist: [],
       dividends: [],
       goal: null,
-      settings: { maxAllocationPct: 50 },
+      settings: {},
     };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
     return initial;
@@ -27,7 +27,7 @@ export function readData() {
     if (!Array.isArray(data.watchlist)) data.watchlist = [];
     if (!Array.isArray(data.dividends)) data.dividends = [];
     if (data.goal === undefined) data.goal = null;
-    if (!data.settings) data.settings = { maxAllocationPct: 50 };
+    if (!data.settings) data.settings = {};
     return data;
   } catch {
     return {
@@ -36,7 +36,7 @@ export function readData() {
       watchlist: [],
       dividends: [],
       goal: null,
-      settings: { maxAllocationPct: 50 },
+      settings: {},
     };
   }
 }

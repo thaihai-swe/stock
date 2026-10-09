@@ -116,12 +116,16 @@ export async function getAllData(userId = 'demo') {
   const dividends = divRes.rows.map(mapDividend);
   const watchlist = watchRes.rows.map(mapWatchlist);
 
-  let settings = { maxAllocationPct: 50 };
+  let settings = {};
   let goal = null;
 
   for (const row of setRes.rows) {
     if (row.key === 'settings') {
-      settings = safeJsonParse(row.value, { maxAllocationPct: 50 });
+      const parsed = safeJsonParse(row.value, {});
+      if (parsed && typeof parsed === 'object') {
+        const { maxAllocationPct, ...rest } = parsed;
+        settings = rest;
+      }
     } else if (row.key === 'goal') {
       goal = safeJsonParse(row.value, null);
     }
@@ -543,11 +547,14 @@ export async function restoreAllData(fullJson, userId = 'demo') {
     }
   }
 
-  if (fullJson.settings) {
-    statements.push({
-      sql: `INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('settings', ?, ?);`,
-      args: [JSON.stringify(fullJson.settings), userId],
-    });
+  if (fullJson.settings && typeof fullJson.settings === 'object') {
+    const { maxAllocationPct, ...cleanSettings } = fullJson.settings;
+    if (Object.keys(cleanSettings).length > 0) {
+      statements.push({
+        sql: `INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('settings', ?, ?);`,
+        args: [JSON.stringify(cleanSettings), userId],
+      });
+    }
   }
   if (fullJson.goal) {
     statements.push({

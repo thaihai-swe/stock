@@ -56,7 +56,6 @@ export const fetchDividends  = ()        => request('/dividends');
 export const addDividend    = (body)    => request('/dividends', { method: 'POST', body: JSON.stringify(body) });
 export const deleteDividend = (id)      => request(`/dividends/${id}`, { method: 'DELETE' });
 
-export const saveSettings    = (body)    => request('/settings', { method: 'POST', body: JSON.stringify(body) });
 export const fetchBackup     = ()        => request('/backup');
 export const restoreData     = (body)    => request('/restore',  { method: 'POST', body: JSON.stringify(body) });
 export const clearUserData   = ()        => request('/user-data', { method: 'DELETE' });
@@ -65,4 +64,8 @@ export const clearUserData   = ()        => request('/user-data', { method: 'DEL
 export const fetchCurrentUser = ()       => request('/auth/me');
 export const loginGoogle      = (token)   => request('/auth/google', { method: 'POST', body: JSON.stringify({ token }) });
 export const cloneDemoData    = ()       => request('/auth/clone-demo', { method: 'POST' });
+export const fetchHealth      = ()       => request('/health');
+
+
+
 

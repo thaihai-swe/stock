@@ -26,9 +26,18 @@ app.use('/api', priceRoutes);
 app.use('/api', settingsRoutes);
 app.use('/api', dividendRoutes);
 
-// Health check endpoint
+import { getDbInfo } from './storage/db.js';
+
+// Health check & Environment info endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() });
+  const isVercel = Boolean(process.env.VERCEL);
+  res.json({
+    status: 'ok',
+    environment: isVercel ? 'production' : 'local',
+    label: isVercel ? 'Vercel Serverless (Production)' : 'Local Express Server (Port ' + (process.env.PORT || 3001) + ')',
+    database: getDbInfo(),
+    time: new Date().toISOString(),
+  });
 });
 
 // Serve React build (khi chạy local độc lập hoặc Docker)

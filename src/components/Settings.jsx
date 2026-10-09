@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { fetchBackup, restoreData, clearUserData } from '../utils/api.js';
+import { useState, useRef, useEffect } from 'react';
+import { fetchBackup, restoreData, clearUserData, fetchHealth } from '../utils/api.js';
 import { fmtMoney, plColor } from '../utils/format.js';
 
 export default function Settings({ data, currentUser, onSuccess, showToast }) {
@@ -18,6 +18,15 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
   const [confirmInput, setConfirmInput] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState('');
+
+  // 4. System & Environment Health info
+  const [sysInfo, setSysInfo] = useState(null);
+
+  useEffect(() => {
+    fetchHealth()
+      .then(info => setSysInfo(info))
+      .catch(() => {});
+  }, []);
 
   // Download Backup JSON
   async function handleDownloadBackup() {
@@ -380,6 +389,60 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
           </div>
         </div>
       )}
+
+      {/* 4. Thông Tin Môi Trường & Hạ Tầng (Environment & Connection Status) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+              <span>🔌</span> Môi Trường Kết Nối (Environment & Data Source)
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Phân biệt kết nối API và cơ sở dữ liệu giữa máy cục bộ (Local) và máy chủ (Vercel)
+            </p>
+          </div>
+          <span className={`px-2.5 py-1 text-xs font-bold rounded-lg border ${
+            sysInfo?.environment === 'production'
+              ? 'bg-purple-50 text-purple-700 border-purple-200'
+              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          }`}>
+            {sysInfo?.environment === 'production' ? '☁️ Vercel Cloud' : '💻 Local Development'}
+          </span>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <p className="text-xs text-gray-400 uppercase font-semibold">API Server</p>
+            <p className="text-sm font-bold text-gray-800 mt-1">
+              {sysInfo?.label || (sysInfo?.environment === 'production' ? 'Vercel Serverless API' : 'Local Express (Port 3001)')}
+            </p>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {sysInfo?.environment === 'production' ? 'Tự động mở rộng không giới hạn' : 'Proxy qua http://localhost:3001'}
+            </p>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <p className="text-xs text-gray-400 uppercase font-semibold">Cơ Sở Dữ Liệu (Database)</p>
+            <p className="text-sm font-bold text-gray-800 mt-1">
+              {sysInfo?.database?.label || 'SQLite'}
+            </p>
+            <p className="text-[11px] text-gray-400 mt-0.5 truncate" title={sysInfo?.database?.url}>
+              {sysInfo?.database?.isTurso ? 'Đám mây Turso Cloud' : 'File nội bộ máy tính (data/stock.db)'}
+            </p>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <p className="text-xs text-gray-400 uppercase font-semibold">Trạng Thái Kết Nối</p>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-sm font-bold text-emerald-700">Đang hoạt động tốt</span>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              Thời gian phản hồi bình thường
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
