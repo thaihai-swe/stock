@@ -38,6 +38,30 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'profit' | 'loss'
   const [mobileViewMode, setMobileViewMode] = useState('card'); // 'card' | 'table'
 
+  // State Sắp xếp dữ liệu danh mục nắm giữ (tương tự Lịch Sử Giao Dịch)
+  const [sortField, setSortField] = useState('totalCost');
+  const [sortDirection, setSortDirection] = useState('desc'); // 'asc' | 'desc'
+
+  function handleSort(field) {
+    if (sortField === field) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection(field === 'symbol' ? 'asc' : 'desc');
+    }
+  }
+
+  function renderSortIcon(field) {
+    if (sortField !== field) {
+      return <span className="text-gray-300 group-hover:text-gray-500 text-xs ml-1 font-mono">⇅</span>;
+    }
+    return (
+      <span className="text-indigo-600 text-xs ml-1 font-bold">
+        {sortDirection === 'asc' ? '▲' : '▼'}
+      </span>
+    );
+  }
+
   // 1. Tổng quan cơ bản
   const totalInvested = buyOrders.reduce((s, o) => s + (o.totalCost || (o.quantity * o.price)), 0);
   const holdingCost = buyOrders.reduce((s, o) => s + (o.remainingQty * (o.costPerShare || o.price)), 0);
@@ -111,8 +135,8 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
     return { profit, loss };
   }, [portfolio, pricesData]);
 
-  // Lọc danh sách danh mục hiển thị
-  const displayedPortfolio = useMemo(() => {
+  // Lọc danh sách danh mục theo từ khóa và trạng thái P&L
+  const filteredPortfolio = useMemo(() => {
     return portfolio.filter(p => {
       if (symbolFilter && !p.symbol.toUpperCase().includes(symbolFilter.trim().toUpperCase())) {
         return false;
@@ -127,6 +151,89 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
       return true;
     });
   }, [portfolio, symbolFilter, statusFilter, pricesData]);
+
+  // Sắp xếp danh mục hiển thị (hỗ trợ tất cả các cột như Lịch Sử Giao Dịch)
+  const displayedPortfolio = useMemo(() => {
+    return [...filteredPortfolio].sort((a, b) => {
+      let valA, valB;
+      const quoteA = pricesData?.prices?.[a.symbol];
+      const marketPriceA = quoteA?.price ?? null;
+      const marketValA = marketPriceA !== null ? a.totalQty * marketPriceA : a.totalCost;
+      const unrealizedPLA = marketPriceA !== null ? (marketValA - a.totalCost) : 0;
+      const effectiveAvgCostA = a.avgCost ?? (a.totalQty > 0 ? a.totalCost / a.totalQty : 0);
+
+      const quoteB = pricesData?.prices?.[b.symbol];
+      const marketPriceB = quoteB?.price ?? null;
+      const marketValB = marketPriceB !== null ? b.totalQty * marketPriceB : b.totalCost;
+      const unrealizedPLB = marketPriceB !== null ? (marketValB - b.totalCost) : 0;
+      const effectiveAvgCostB = b.avgCost ?? (b.totalQty > 0 ? b.totalCost / b.totalQty : 0);
+
+      switch (sortField) {
+        case 'symbol':
+          valA = a.symbol;
+          valB = b.symbol;
+          break;
+        case 'totalQty':
+          valA = a.totalQty;
+          valB = b.totalQty;
+          break;
+        case 'allocation':
+          valA = a.totalCost;
+          valB = b.totalCost;
+          break;
+        case 'avgCost':
+          valA = effectiveAvgCostA;
+          valB = effectiveAvgCostB;
+          break;
+        case 'totalCost':
+          valA = a.totalCost;
+          valB = b.totalCost;
+          break;
+        case 'marketPrice':
+          valA = marketPriceA !== null ? marketPriceA : -1;
+          valB = marketPriceB !== null ? marketPriceB : -1;
+          break;
+        case 'marketVal':
+          valA = marketValA;
+          valB = marketValB;
+          break;
+        case 'profitLoss':
+          valA = unrealizedPLA;
+          valB = unrealizedPLB;
+          break;
+        default:
+          valA = a.totalCost;
+          valB = b.totalCost;
+          break;
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return a.symbol.localeCompare(b.symbol);
+    });
+  }, [filteredPortfolio, sortField, sortDirection, pricesData]);
+
+  // Tổng hợp số liệu các mã đang hiển thị
+  const displayedHoldingQty = useMemo(() => {
+    return displayedPortfolio.reduce((sum, p) => sum + p.totalQty, 0);
+  }, [displayedPortfolio]);
+
+  const displayedHoldingCost = useMemo(() => {
+    return displayedPortfolio.reduce((sum, p) => sum + p.totalCost, 0);
+  }, [displayedPortfolio]);
+
+  const displayedMarketValue = useMemo(() => {
+    return displayedPortfolio.reduce((sum, p) => {
+      const curPrice = pricesData?.prices?.[p.symbol]?.price;
+      const effectivePrice = curPrice || p.avgCost;
+      return sum + (p.totalQty * effectivePrice);
+    }, 0);
+  }, [displayedPortfolio, pricesData]);
+
+  const displayedUnrealizedPL = displayedMarketValue - displayedHoldingCost;
+  const displayedUnrealizedPLPct = displayedHoldingCost > 0
+    ? parseFloat(((displayedUnrealizedPL / displayedHoldingCost) * 100).toFixed(2))
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -336,6 +443,43 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           <>
             {/* Chế độ xem Thẻ (Mobile Card View) - Thân thiện trên điện thoại */}
             <div className={`p-3.5 space-y-3 ${mobileViewMode === 'card' ? 'block sm:hidden' : 'hidden'}`}>
+              {/* Sắp xếp nhanh cho giao diện thẻ trên điện thoại */}
+              {displayedPortfolio.length > 1 && (
+                <div className="flex items-center justify-between bg-white border border-gray-200/80 rounded-xl px-3 py-2 text-xs shadow-2xs">
+                  <span className="text-gray-500 font-medium text-[11px] flex items-center gap-1">
+                    <span>↕️</span> Sắp xếp:
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      value={sortField}
+                      onChange={e => {
+                        const newField = e.target.value;
+                        setSortField(newField);
+                        setSortDirection(newField === 'symbol' ? 'asc' : 'desc');
+                      }}
+                      className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-xs font-semibold text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                    >
+                      <option value="totalCost">Giá trị vốn</option>
+                      <option value="symbol">Mã CP</option>
+                      <option value="totalQty">Số lượng</option>
+                      <option value="allocation">Tỷ trọng</option>
+                      <option value="avgCost">Giá vốn TB</option>
+                      <option value="marketPrice">Giá thị trường</option>
+                      <option value="marketVal">Giá trị danh mục</option>
+                      <option value="profitLoss">Lãi / Lỗ</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'))}
+                      className="px-2 py-1 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-indigo-600 transition-colors shadow-2xs"
+                      title={sortDirection === 'asc' ? 'Tăng dần (nhấn để đổi)' : 'Giảm dần (nhấn để đổi)'}
+                    >
+                      {sortDirection === 'asc' ? '▲' : '▼'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {displayedPortfolio.map((p) => {
                 const allocationPct = holdingCost > 0 ? ((p.totalCost / holdingCost) * 100).toFixed(1) : 0;
                 const quote = pricesData?.prices?.[p.symbol];
@@ -468,30 +612,32 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
               })}
 
               {/* Thẻ Tổng kết danh mục trên Mobile */}
-              {portfolio.length > 1 && (
+              {displayedPortfolio.length > 1 && (
                 <div className="bg-indigo-50/60 border border-indigo-200/80 rounded-2xl p-3.5 text-xs text-gray-700">
                   <div className="flex justify-between items-center mb-2 pb-2 border-b border-indigo-200/60">
-                    <span className="font-bold text-indigo-950 uppercase text-[11px]">Tổng cộng danh mục</span>
-                    <span className="font-semibold text-gray-600">{totalHolding.toLocaleString()} cổ phiếu</span>
+                    <span className="font-bold text-indigo-950 uppercase text-[11px]">
+                      {displayedPortfolio.length === portfolio.length ? 'Tổng cộng danh mục' : `Tổng hiển thị (${displayedPortfolio.length}/${portfolio.length} mã)`}
+                    </span>
+                    <span className="font-semibold text-gray-600">{displayedHoldingQty.toLocaleString()} cổ phiếu</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                     <div>
                       <span className="text-gray-500 block text-[10px]">Tổng giá vốn:</span>
-                      <span className="font-bold text-gray-900">{fmtMoney(holdingCost)}đ</span>
+                      <span className="font-bold text-gray-900">{fmtMoney(displayedHoldingCost)}đ</span>
                     </div>
                     <div>
                       <span className="text-gray-500 block text-[10px]">Tổng giá trị TT:</span>
-                      <span className="font-bold text-gray-900">{fmtMoney(totalMarketValue)}đ</span>
+                      <span className="font-bold text-gray-900">{fmtMoney(displayedMarketValue)}đ</span>
                     </div>
                   </div>
                   <div className="pt-2 border-t border-indigo-200/60 flex items-center justify-between">
                     <span className="text-gray-600 font-semibold text-[11px]">Tổng Lãi / Lỗ:</span>
                     <div className="text-right">
-                      <span className={`text-sm font-extrabold mr-1.5 ${plColor(totalUnrealizedPL)}`}>
-                        {totalUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(totalUnrealizedPL)}đ
+                      <span className={`text-sm font-extrabold mr-1.5 ${plColor(displayedUnrealizedPL)}`}>
+                        {displayedUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(displayedUnrealizedPL)}đ
                       </span>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${plBg(totalUnrealizedPL)}`}>
-                        {totalUnrealizedPL >= 0 ? '▲ +' : '▼ '}{totalUnrealizedPLPct}%
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${plBg(displayedUnrealizedPL)}`}>
+                        {displayedUnrealizedPL >= 0 ? '▲ +' : '▼ '}{displayedUnrealizedPLPct}%
                       </span>
                     </div>
                   </div>
@@ -502,16 +648,103 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
             {/* Chế độ xem Bảng (Desktop mặc định / Mobile khi chọn Bảng) */}
             <div className={`overflow-x-auto ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
               <table className="w-full text-sm">
-              <thead className="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100 font-semibold">
+              <thead className="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100 font-semibold select-none">
                 <tr>
-                  <th className="text-left px-5 py-3.5 font-bold text-gray-700">Mã CP</th>
-                  <th className="text-right px-4 py-3.5">Số lượng</th>
-                  <th className="text-right px-4 py-3.5">Tỷ trọng</th>
-                  <th className="text-right px-4 py-3.5">Giá vốn TB</th>
-                  <th className="text-right px-4 py-3.5 font-bold text-gray-700">Giá trị vốn</th>
-                  <th className="text-right px-4 py-3.5">Giá thị trường</th>
-                  <th className="text-right px-5 py-3.5 font-bold text-gray-700">Giá trị danh mục</th>
-                  <th className="text-right px-5 py-3.5 font-bold text-gray-700">Lãi / Lỗ</th>
+                  {/* 1. Mã CP */}
+                  <th
+                    onClick={() => handleSort('symbol')}
+                    className="text-left px-5 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Mã cổ phiếu"
+                  >
+                    <div className="inline-flex items-center">
+                      <span className={sortField === 'symbol' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Mã CP</span>
+                      {renderSortIcon('symbol')}
+                    </div>
+                  </th>
+
+                  {/* 2. Số lượng */}
+                  <th
+                    onClick={() => handleSort('totalQty')}
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Số lượng"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'totalQty' ? 'text-indigo-600 font-bold' : ''}>Số lượng</span>
+                      {renderSortIcon('totalQty')}
+                    </div>
+                  </th>
+
+                  {/* 3. Tỷ trọng */}
+                  <th
+                    onClick={() => handleSort('allocation')}
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Tỷ trọng danh mục"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'allocation' ? 'text-indigo-600 font-bold' : ''}>Tỷ trọng</span>
+                      {renderSortIcon('allocation')}
+                    </div>
+                  </th>
+
+                  {/* 4. Giá vốn TB */}
+                  <th
+                    onClick={() => handleSort('avgCost')}
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Giá vốn TB"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'avgCost' ? 'text-indigo-600 font-bold' : ''}>Giá vốn TB</span>
+                      {renderSortIcon('avgCost')}
+                    </div>
+                  </th>
+
+                  {/* 5. Giá trị vốn */}
+                  <th
+                    onClick={() => handleSort('totalCost')}
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Giá trị vốn"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'totalCost' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Giá trị vốn</span>
+                      {renderSortIcon('totalCost')}
+                    </div>
+                  </th>
+
+                  {/* 6. Giá thị trường */}
+                  <th
+                    onClick={() => handleSort('marketPrice')}
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Giá thị trường"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'marketPrice' ? 'text-indigo-600 font-bold' : ''}>Giá thị trường</span>
+                      {renderSortIcon('marketPrice')}
+                    </div>
+                  </th>
+
+                  {/* 7. Giá trị danh mục */}
+                  <th
+                    onClick={() => handleSort('marketVal')}
+                    className="text-right px-5 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Giá trị danh mục"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'marketVal' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Giá trị danh mục</span>
+                      {renderSortIcon('marketVal')}
+                    </div>
+                  </th>
+
+                  {/* 8. Lãi / Lỗ */}
+                  <th
+                    onClick={() => handleSort('profitLoss')}
+                    className="text-right px-5 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    title="Nhấn để sắp xếp theo Lãi / Lỗ"
+                  >
+                    <div className="inline-flex items-center justify-end w-full">
+                      <span className={sortField === 'profitLoss' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Lãi / Lỗ</span>
+                      {renderSortIcon('profitLoss')}
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -657,31 +890,35 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   );
                 })}
               </tbody>
-              {portfolio.length > 1 && (
+              {displayedPortfolio.length > 1 && (
                 <tfoot className="bg-gray-50/80 border-t-2 border-gray-200 font-semibold text-xs text-gray-700">
                   <tr>
                     {/* 1. Mã */}
-                    <td className="px-5 py-3.5 text-left font-bold uppercase text-gray-500">Tổng cộng</td>
+                    <td className="px-5 py-3.5 text-left font-bold uppercase text-gray-500">
+                      {displayedPortfolio.length === portfolio.length ? 'Tổng cộng' : 'Tổng hiển thị'}
+                    </td>
                     {/* 2. SL */}
-                    <td className="px-4 py-3.5 text-right font-bold text-gray-900">{totalHolding.toLocaleString()} cp</td>
+                    <td className="px-4 py-3.5 text-right font-bold text-gray-900">{displayedHoldingQty.toLocaleString()} cp</td>
                     {/* 3. Tỷ trọng */}
-                    <td className="px-4 py-3.5 text-right font-bold text-gray-700">100%</td>
+                    <td className="px-4 py-3.5 text-right font-bold text-gray-700">
+                      {holdingCost > 0 ? `${((displayedHoldingCost / holdingCost) * 100).toFixed(1)}%` : '100%'}
+                    </td>
                     {/* 4. Giá vốn TB */}
                     <td className="px-4 py-3.5 text-right text-gray-400">—</td>
                     {/* 5. Giá trị vốn */}
-                    <td className="px-4 py-3.5 text-right font-bold text-gray-900">{fmtMoney(holdingCost)}đ</td>
+                    <td className="px-4 py-3.5 text-right font-bold text-gray-900">{fmtMoney(displayedHoldingCost)}đ</td>
                     {/* 6. Giá thị trường */}
                     <td className="px-4 py-3.5 text-right text-gray-400">—</td>
                     {/* 7. Giá trị danh mục */}
-                    <td className="px-5 py-3.5 text-right font-bold text-gray-900 text-sm">{fmtMoney(totalMarketValue)}đ</td>
+                    <td className="px-5 py-3.5 text-right font-bold text-gray-900 text-sm">{fmtMoney(displayedMarketValue)}đ</td>
                     {/* 8. Lãi / Lỗ */}
                     <td className="px-5 py-3.5 text-right">
-                      <div className={`font-bold text-sm ${plColor(totalUnrealizedPL)}`}>
-                        {totalUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(totalUnrealizedPL)}đ
+                      <div className={`font-bold text-sm ${plColor(displayedUnrealizedPL)}`}>
+                        {displayedUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(displayedUnrealizedPL)}đ
                       </div>
                       <div className="mt-0.5">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${plBg(totalUnrealizedPL)}`}>
-                          {totalUnrealizedPL >= 0 ? '▲ +' : '▼ '}{totalUnrealizedPLPct}%
+                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${plBg(displayedUnrealizedPL)}`}>
+                          {displayedUnrealizedPL >= 0 ? '▲ +' : '▼ '}{displayedUnrealizedPLPct}%
                         </span>
                       </div>
                     </td>
@@ -691,6 +928,43 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
             </table>
           </div>
           </>
+        )}
+
+        {/* Footer tổng kết & trạng thái sắp xếp giống Lịch Sử Giao Dịch */}
+        {displayedPortfolio.length > 0 && (
+          <div className="px-4 sm:px-6 py-3 border-t border-gray-100 text-xs text-gray-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-gray-50/50">
+            <span>
+              Đang hiển thị <b>{displayedPortfolio.length}</b> / {portfolio.length} mã cổ phiếu
+              {sortField && (
+                <span className="ml-2 text-gray-400">
+                  (Sắp xếp theo: <b className="text-gray-600">{
+                    sortField === 'symbol' ? 'Mã CP' :
+                    sortField === 'totalQty' ? 'Số lượng' :
+                    sortField === 'allocation' ? 'Tỷ trọng' :
+                    sortField === 'avgCost' ? 'Giá vốn TB' :
+                    sortField === 'totalCost' ? 'Giá trị vốn' :
+                    sortField === 'marketPrice' ? 'Giá thị trường' :
+                    sortField === 'marketVal' ? 'Giá trị danh mục' :
+                    sortField === 'profitLoss' ? 'Lãi/Lỗ' : ''
+                  } {sortDirection === 'asc' ? '▲ Tăng dần' : '▼ Giảm dần'}</b>)
+                </span>
+              )}
+            </span>
+
+            {(sortField !== 'totalCost' || sortDirection !== 'desc') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSortField('totalCost');
+                  setSortDirection('desc');
+                }}
+                className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold px-2 py-0.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
+                title="Đặt lại sắp xếp về mặc định (Giá trị vốn giảm dần)"
+              >
+                ↺ Mặc định
+              </button>
+            )}
+          </div>
         )}
       </div>
 
