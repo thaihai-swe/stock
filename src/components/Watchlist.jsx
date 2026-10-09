@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { addWatchlist, deleteWatchlist, fetchPrices } from '../utils/api.js';
+import { addWatchlist, deleteWatchlist, fetchPrices, fetchFundamentals } from '../utils/api.js';
 import { fmtMoney, fmtDate } from '../utils/format.js';
 
 export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell }) {
@@ -16,15 +16,24 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
   const [pricesData, setPricesData] = useState({ session: null, prices: {} });
   const [loadingPrices, setLoadingPrices] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('');
+  const [fundamentalsMap, setFundamentalsMap] = useState({});
 
   const loadMarketPrices = useCallback(async (force = false) => {
     if (!watchlist || watchlist.length === 0) return;
     const symbols = watchlist.map(w => w.symbol);
     setLoadingPrices(true);
     try {
-      const res = await fetchPrices(symbols, force);
-      setPricesData(res);
-      setLastUpdated(new Date().toLocaleTimeString('vi-VN'));
+      const [resPrices, resFund] = await Promise.allSettled([
+        fetchPrices(symbols, force),
+        fetchFundamentals(symbols, force),
+      ]);
+      if (resPrices.status === 'fulfilled') {
+        setPricesData(resPrices.value);
+        setLastUpdated(new Date().toLocaleTimeString('vi-VN'));
+      }
+      if (resFund.status === 'fulfilled' && resFund.value) {
+        setFundamentalsMap(resFund.value);
+      }
     } catch (e) {
       console.error('Không thể lấy giá cho watchlist:', e);
     } finally {
@@ -397,6 +406,26 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                       </p>
                     )}
 
+                    {/* Chỉ số cơ bản doanh nghiệp */}
+                    {fundamentalsMap[item.symbol] && (
+                      <div className="flex flex-wrap items-center gap-1.5 text-[10px] bg-indigo-50/50 p-2 rounded-xl border border-indigo-100/60">
+                        <span className="px-1.5 py-0.5 rounded bg-white font-bold text-indigo-900 shadow-2xs">
+                          P/E: {fundamentalsMap[item.symbol].valuation?.pe != null ? `${fundamentalsMap[item.symbol].valuation.pe}x` : '—'}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-white font-bold text-emerald-800 shadow-2xs">
+                          ROE: {fundamentalsMap[item.symbol].profitability?.roe != null ? `${fundamentalsMap[item.symbol].profitability.roe}%` : '—'}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-white font-bold text-amber-800 shadow-2xs">
+                          Yield: {fundamentalsMap[item.symbol].dividends?.yield != null ? `${fundamentalsMap[item.symbol].dividends.yield}%` : '—'}
+                        </span>
+                        {fundamentalsMap[item.symbol].technicals?.rsi != null && (
+                          <span className="px-1.5 py-0.5 rounded bg-white font-bold text-gray-700 shadow-2xs">
+                            RSI: {fundamentalsMap[item.symbol].technicals.rsi}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     {/* Footer Actions */}
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-[10px] text-gray-400">Thêm: {fmtDate(item.createdAt)}</span>
@@ -446,6 +475,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                   <tr>
                     <th className="text-left px-5 py-3.5">Mã CP</th>
                     <th className="text-right px-4 py-3.5 bg-blue-50/40 text-blue-900">Giá thị trường</th>
+                    <th className="text-right px-4 py-3.5 bg-indigo-50/40 text-indigo-950">Chỉ số cơ bản</th>
                     <th className="text-right px-4 py-3.5 bg-emerald-50/40 text-emerald-900">Mua kỳ vọng</th>
                     <th className="text-right px-4 py-3.5 bg-purple-50/40 text-purple-900">Bán kỳ vọng</th>
                     <th className="text-left px-4 py-3.5">Ghi chú</th>
@@ -526,6 +556,30 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                             </div>
                           ) : (
                             <span className="text-xs text-gray-400">{loadingPrices ? 'Đang lấy giá...' : '—'}</span>
+                          )}
+                        </td>
+
+                        {/* Chỉ số Cơ bản */}
+                        <td className="px-4 py-4 text-right bg-indigo-50/15">
+                          {fundamentalsMap[item.symbol] ? (
+                            <div className="space-y-0.5">
+                              <div className="text-xs font-bold text-gray-900 flex items-center justify-end gap-1.5">
+                                <span>P/E: <b className="text-indigo-600">{fundamentalsMap[item.symbol].valuation?.pe != null ? `${fundamentalsMap[item.symbol].valuation.pe}x` : '—'}</b></span>
+                                <span>•</span>
+                                <span>ROE: <b className={fundamentalsMap[item.symbol].profitability?.roe >= 15 ? 'text-emerald-600' : 'text-gray-700'}>{fundamentalsMap[item.symbol].profitability?.roe != null ? `${fundamentalsMap[item.symbol].profitability.roe}%` : '—'}</b></span>
+                              </div>
+                              <div className="text-[11px] text-gray-500 flex items-center justify-end gap-1.5">
+                                <span>Cổ tức: <b className="text-amber-700">{fundamentalsMap[item.symbol].dividends?.yield != null ? `${fundamentalsMap[item.symbol].dividends.yield}%` : '—'}</b></span>
+                                {fundamentalsMap[item.symbol].technicals?.rsi != null && (
+                                  <>
+                                    <span>•</span>
+                                    <span>RSI: <b>{fundamentalsMap[item.symbol].technicals.rsi}</b></span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-300">—</span>
                           )}
                         </td>
 
