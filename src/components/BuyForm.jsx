@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { addBuyOrder } from '../utils/api.js';
-import { getTodayDate, fmtMoney, DEFAULT_TAGS } from '../utils/format.js';
+import { DEFAULT_TAGS, fmtMoney, getTodayDate } from '../utils/format.js';
 
 export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity = '', initialPrice = '' }) {
   const [form, setForm] = useState({
@@ -54,6 +54,10 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
       setError('Vui lòng điền đầy đủ mã CP, số lượng và giá.');
       return;
     }
+    if (Number(form.quantity) <= 0) {
+      setError('Số lượng cổ phiếu phải lớn hơn 0.');
+      return;
+    }
     setLoading(true);
     try {
       const order = await addBuyOrder({
@@ -84,7 +88,7 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
           <p className="text-indigo-200 text-sm mt-0.5">Ghi nhận giao dịch mua cổ phiếu</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Symbol + Quantity */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -100,15 +104,53 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Số lượng <span className="text-red-500">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Số lượng <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, quantity: String((Number(f.quantity) || 0) + 100) }))}
+                    className="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-1.5 py-0.5 rounded transition-colors"
+                    title="Cộng thêm 100 cổ phiếu"
+                  >
+                    +100
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, quantity: String((Number(f.quantity) || 0) + 500) }))}
+                    className="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-1.5 py-0.5 rounded transition-colors"
+                    title="Cộng thêm 500 cổ phiếu"
+                  >
+                    +500
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, quantity: String((Number(f.quantity) || 0) + 1000) }))}
+                    className="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-1.5 py-0.5 rounded transition-colors"
+                    title="Cộng thêm 1.000 cổ phiếu"
+                  >
+                    +1.000
+                  </button>
+                </div>
+              </div>
               <input
                 name="quantity"
                 value={form.quantity}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.max(1, (Number(f.quantity) || 0) + 100)) }));
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.max(1, (Number(f.quantity) || 0) - 100)) }));
+                  }
+                }}
                 type="number"
-                min="1"
+                min="0"
+                step="100"
                 placeholder="100"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
@@ -224,11 +266,10 @@ export default function BuyForm({ onSuccess, initialSymbol = '', initialQuantity
                     type="button"
                     key={t}
                     onClick={() => selectTag(t)}
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-400/30'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                    }`}
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${isSelected
+                      ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-400/30'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                      }`}
                   >
                     {isSelected ? '✓ ' : ''}{t}
                   </button>

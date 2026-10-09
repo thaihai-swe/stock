@@ -66,6 +66,7 @@ export const loginGoogle      = (token)   => request('/auth/google', { method: '
 export const cloneDemoData    = ()       => request('/auth/clone-demo', { method: 'POST' });
 export const fetchHealth      = ()       => request('/health');
 
-
-
-
+// Quản lý số dư tiền mặt
+export const fetchCashBalance  = ()       => request('/cash-balance');
+export const updateCashBalance = (cashBalance) =>
+  request('/cash-balance', { method: 'POST', body: JSON.stringify({ cashBalance }) });

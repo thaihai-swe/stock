@@ -78,6 +78,24 @@ export default function App({ hasGoogleClientId = false }) {
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [toast, setToast] = useState(null);
 
+  // Quản lý Dark Mode / Light Mode
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('stock_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  });
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('stock_theme', theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  }
+
   const showToast = useCallback((message, type = 'info') => {
     setToast({ message, type });
     setTimeout(() => {
@@ -260,7 +278,7 @@ export default function App({ hasGoogleClientId = false }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900 selection:bg-indigo-100 selection:text-indigo-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col font-sans text-gray-900 dark:text-slate-100 selection:bg-indigo-100 selection:text-indigo-800 transition-colors">
       {/* 0. DEMO NOTICE BANNER (Khi đang ở tài khoản Demo) */}
       {currentUser?.isDemo && !bannerDismissed && (
         <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-orange-500 text-white text-xs py-1.5 px-3 border-b border-amber-600/30">
@@ -293,7 +311,7 @@ export default function App({ hasGoogleClientId = false }) {
       )}
 
       {/* 1. TOP HEADER (Sticky, tối ưu cho cả Desktop & Mobile) */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30 shadow-2xs">
+      <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 sticky top-0 z-30 shadow-2xs">
         <div className="w-[94%] sm:w-[95%] max-w-[2400px] mx-auto px-2 sm:px-4">
           <div className="flex items-center justify-between h-14 gap-2">
             {/* Logo */}
@@ -303,7 +321,7 @@ export default function App({ hasGoogleClientId = false }) {
             >
               <span className="text-2xl drop-shadow-2xs">📈</span>
               <div className="leading-tight">
-                <span className="font-extrabold text-gray-800 text-base sm:text-lg tracking-tight block">
+                <span className="font-extrabold text-gray-800 dark:text-white text-base sm:text-lg tracking-tight block">
                   Nhật Ký Giao Dịch
                 </span>
               </div>
@@ -343,11 +361,22 @@ export default function App({ hasGoogleClientId = false }) {
                 isCloning={isCloning}
               />
 
+              {/* Nút Chuyển Đổi Dark Mode / Light Mode */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:text-amber-500 dark:text-gray-300 dark:hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-base"
+                title={theme === 'dark' ? 'Chuyển sang Giao diện Sáng (Light)' : 'Chuyển sang Giao diện Tối (Dark Mode)'}
+                aria-label="Chuyển chế độ giao diện"
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+
               {/* Nút Làm Mới (Reload) */}
               <button
                 onClick={loadData}
                 disabled={loading}
-                className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:text-indigo-600 hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer disabled:opacity-50"
+                className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 transition-colors cursor-pointer disabled:opacity-50"
                 title="Tải lại dữ liệu"
                 aria-label="Tải lại dữ liệu"
               >
@@ -357,7 +386,7 @@ export default function App({ hasGoogleClientId = false }) {
               {/* Nút Mở Menu Drawer Trên Mobile (md:hidden) */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 active:scale-95 transition-all cursor-pointer font-bold"
+                className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 active:scale-95 transition-all cursor-pointer font-bold"
                 title="Mở toàn bộ danh mục tính năng"
                 aria-label="Menu"
               >
@@ -373,8 +402,8 @@ export default function App({ hasGoogleClientId = false }) {
                 key={t.id}
                 onClick={() => switchTab(t.id)}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${tab === t.id
-                    ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50 rounded-t-lg'
-                    : 'border-transparent text-gray-500 hover:text-gray-800 hover:bg-gray-50/80 rounded-t-lg'
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-t-lg'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50/80 dark:hover:bg-slate-800/60 rounded-t-lg'
                   }`}
               >
                 <span>{t.icon}</span>
@@ -416,6 +445,7 @@ export default function App({ hasGoogleClientId = false }) {
             {tab === 'dashboard' && (
               <Dashboard
                 data={data}
+                onSuccess={loadData}
                 onNavigateBuy={handleSelectBuy}
                 onNavigateDca={handleSelectDca}
                 onNavigateSell={(symbol) => {
@@ -759,6 +789,16 @@ export default function App({ hasGoogleClientId = false }) {
                 <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
                   SQLite Cloud (Turso)
                 </span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] pt-1">
+                <span className="text-gray-400">Giao diện (Theme):</span>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg font-semibold text-gray-700 flex items-center gap-1.5"
+                >
+                  {theme === 'dark' ? '☀️ Chế độ Sáng' : '🌙 Chế độ Tối'}
+                </button>
               </div>
               <button
                 type="button"

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, Fragment } from 'react';
 import { deleteBuy, deleteSell, fetchPrices } from '../utils/api.js';
-import { fmtMoney, fmtDate, plColor, plBg, getStockColor } from '../utils/format.js';
+import { fmtMoney, fmtDate, plColor, plBg, getStockColor, getDisciplineTagInfo } from '../utils/format.js';
 import StockPerformanceTable from './StockPerformanceTable.jsx';
 import StockDetailModal from './StockDetailModal.jsx';
 
@@ -645,16 +645,24 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                       )}
                       {tx.tags && tx.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {tx.tags.map(t => (
-                            <button
-                              key={t}
-                              type="button"
-                              onClick={() => setTagFilter(t)}
-                              className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-medium hover:bg-indigo-100 border border-indigo-100 cursor-pointer"
-                            >
-                              #{t}
-                            </button>
-                          ))}
+                          {tx.tags.map(t => {
+                            const disc = getDisciplineTagInfo(t);
+                            return (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => setTagFilter(t)}
+                                className={`text-[10px] px-2 py-0.5 rounded-md font-medium cursor-pointer transition-opacity hover:opacity-80 ${
+                                  disc
+                                    ? `${disc.color} border font-semibold`
+                                    : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100'
+                                }`}
+                                title={disc ? disc.desc : `Lọc theo #${t}`}
+                              >
+                                {disc ? t : `#${t}`}
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -690,10 +698,10 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
 
                   {/* Chi tiết các lô mua gốc đã khớp (Mini cards trên mobile) */}
                   {isExpanded && tx.matchedLots && (
-                    <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 space-y-2 mt-1">
-                      <div className="flex items-center justify-between text-xs font-bold text-amber-950 pb-1.5 border-b border-amber-200/60">
+                    <div className="bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/50 rounded-xl p-3 space-y-2 mt-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-amber-950 dark:text-amber-300 pb-1.5 border-b border-amber-200/60 dark:border-amber-800/40">
                         <span>Chi tiết {tx.matchedLots.length} lô mua gốc đã khớp</span>
-                        <span className="text-[10px] font-normal text-amber-800">FIFO</span>
+                        <span className="text-[10px] font-normal text-amber-800 dark:text-amber-400">FIFO</span>
                       </div>
                       <div className="space-y-2">
                         {tx.matchedLots.map((lot, idx) => {
@@ -701,17 +709,17 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                           const lotTotalCost = lot.quantityUsed * lotUnit;
                           const diff = tx.price - lotUnit;
                           return (
-                            <div key={idx} className="bg-white p-2.5 rounded-lg border border-amber-200/60 text-xs space-y-1 shadow-2xs">
-                              <div className="flex justify-between items-center font-bold text-gray-800">
+                            <div key={idx} className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-amber-200/60 dark:border-amber-800/40 text-xs space-y-1 shadow-2xs">
+                              <div className="flex justify-between items-center font-bold text-gray-800 dark:text-slate-200">
                                 <span>Lô #{idx + 1} ({fmtDate(lot.buyDate)})</span>
-                                <span className={diff >= 0 ? 'text-green-600 font-bold' : 'text-red-500 font-bold'}>
+                                <span className={diff >= 0 ? 'text-green-600 dark:text-emerald-400 font-bold' : 'text-red-500 dark:text-rose-400 font-bold'}>
                                   {diff >= 0 ? '+' : ''}{fmtMoney(diff)}đ/cp ({((diff / lotUnit) * 100).toFixed(1)}%)
                                 </span>
                               </div>
-                              <div className="grid grid-cols-3 gap-1 text-[11px] text-gray-500 pt-0.5">
-                                <div>SL: <b className="text-gray-800">{lot.quantityUsed.toLocaleString()} cp</b></div>
-                                <div>Giá gốc: <b className="text-gray-800">{fmtMoney(lot.buyPrice)}đ</b></div>
-                                <div>Vốn lô: <b className="text-gray-800">{fmtMoney(lotTotalCost)}đ</b></div>
+                              <div className="grid grid-cols-3 gap-1 text-[11px] text-gray-500 dark:text-slate-400 pt-0.5">
+                                <div>SL: <b className="text-gray-800 dark:text-slate-200">{lot.quantityUsed.toLocaleString()} cp</b></div>
+                                <div>Giá gốc: <b className="text-gray-800 dark:text-slate-200">{fmtMoney(lot.buyPrice)}đ</b></div>
+                                <div>Vốn lô: <b className="text-gray-800 dark:text-slate-200">{fmtMoney(lotTotalCost)}đ</b></div>
                               </div>
                             </div>
                           );
@@ -940,16 +948,23 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                         {tx.note && <div className="text-gray-700 text-xs truncate">{tx.note}</div>}
                         {tx.tags && tx.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {tx.tags.map(t => (
-                              <span
-                                key={t}
-                                onClick={() => setTagFilter(t)}
-                                className="cursor-pointer text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-medium hover:bg-indigo-100"
-                                title={`Lọc theo #${t}`}
-                              >
-                                #{t}
-                              </span>
-                            ))}
+                            {tx.tags.map(t => {
+                              const disc = getDisciplineTagInfo(t);
+                              return (
+                                <span
+                                  key={t}
+                                  onClick={() => setTagFilter(t)}
+                                  className={`cursor-pointer text-[10px] px-1.5 py-0.5 rounded font-medium transition-opacity hover:opacity-80 ${
+                                    disc
+                                      ? `${disc.color} border font-semibold`
+                                      : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                  }`}
+                                  title={disc ? disc.desc : `Lọc theo #${t}`}
+                                >
+                                  {disc ? t : `#${t}`}
+                                </span>
+                              );
+                            })}
                           </div>
                         )}
                         {!tx.note && (!tx.tags || tx.tags.length === 0) && (
@@ -983,22 +998,22 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
 
                     {/* DÒNG CHI TIẾT CÁC LÔ MUA GỐC ĐÃ KHỚP (Mở rộng khi bấm) */}
                     {isExpanded && tx.matchedLots && (
-                      <tr className="bg-amber-50/50">
-                        <td colSpan={9} className="px-6 py-3.5 border-b border-amber-100">
-                          <div className="bg-white rounded-xl p-3.5 border border-amber-200/80 shadow-xs">
+                      <tr className="bg-amber-50/50 dark:bg-amber-950/20">
+                        <td colSpan={9} className="px-6 py-3.5 border-b border-amber-100 dark:border-amber-900/40">
+                          <div className="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-amber-200/80 dark:border-amber-800/50 shadow-xs">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
                                 <span>🏷️</span> Chi Tiết Giá Vốn Gốc Từng Lô Đã Khớp (Lệnh Bán {tx.symbol} ngày {fmtDate(tx.date)})
                               </span>
-                              <span className="text-xs text-gray-500">
-                                Giá bán: <b>{fmtMoney(tx.price)}đ</b> · Vốn gốc TB: <b className="text-amber-800">{fmtMoney(avgCost)}đ</b>
+                              <span className="text-xs text-gray-500 dark:text-slate-400">
+                                Giá bán: <b className="text-gray-900 dark:text-slate-100">{fmtMoney(tx.price)}đ</b> · Vốn gốc TB: <b className="text-amber-800 dark:text-amber-300">{fmtMoney(avgCost)}đ</b>
                               </span>
                             </div>
 
                             <div className="overflow-x-auto">
                               <table className="w-full text-xs">
                                 <thead>
-                                  <tr className="text-gray-500 border-b border-gray-100 text-[11px]">
+                                  <tr className="text-gray-500 dark:text-slate-400 border-b border-gray-100 dark:border-slate-800 text-[11px]">
                                     <th className="text-left py-1.5 px-2">Lô</th>
                                     <th className="text-left py-1.5 px-2">Ngày Mua Gốc</th>
                                     <th className="text-right py-1.5 px-2">SL Khớp</th>
@@ -1009,27 +1024,27 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                                     <th className="text-right py-1.5 px-2">Chênh Lệch Với Giá Bán</th>
                                   </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
                                   {tx.matchedLots.map((lot, idx) => {
                                     const lotUnit = lot.unitCost || lot.buyPrice;
                                     const lotTotalCost = lot.quantityUsed * lotUnit;
                                     const diff = tx.price - lotUnit;
                                     return (
-                                      <tr key={idx} className="hover:bg-amber-50/30">
-                                        <td className="py-2 px-2 font-semibold text-gray-700">#{idx + 1}</td>
-                                        <td className="py-2 px-2 text-gray-600">{fmtDate(lot.buyDate)}</td>
-                                        <td className="py-2 px-2 text-right font-medium">{lot.quantityUsed.toLocaleString()} cp</td>
-                                        <td className="py-2 px-2 text-right font-semibold text-gray-800">
+                                      <tr key={idx} className="hover:bg-amber-50/30 dark:hover:bg-amber-950/30">
+                                        <td className="py-2 px-2 font-semibold text-gray-700 dark:text-slate-300">#{idx + 1}</td>
+                                        <td className="py-2 px-2 text-gray-600 dark:text-slate-400">{fmtDate(lot.buyDate)}</td>
+                                        <td className="py-2 px-2 text-right font-medium text-gray-800 dark:text-slate-200">{lot.quantityUsed.toLocaleString()} cp</td>
+                                        <td className="py-2 px-2 text-right font-semibold text-gray-800 dark:text-slate-200">
                                           {fmtMoney(lot.buyPrice)}đ
-                                          <span className="text-[10px] text-gray-400 font-normal ml-1">({(lot.buyPrice / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
+                                          <span className="text-[10px] text-gray-400 dark:text-slate-500 font-normal ml-1">({(lot.buyPrice / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
                                         </td>
-                                        <td className="py-2 px-2 text-right text-gray-500">{lot.buyFeePct || 0}%</td>
-                                        <td className="py-2 px-2 text-right font-bold text-amber-900">
+                                        <td className="py-2 px-2 text-right text-gray-500 dark:text-slate-400">{lot.buyFeePct || 0}%</td>
+                                        <td className="py-2 px-2 text-right font-bold text-amber-900 dark:text-amber-300">
                                           {fmtMoney(lotUnit)}đ
-                                          <span className="text-[10px] text-gray-400 font-normal ml-1">({(lotUnit / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
+                                          <span className="text-[10px] text-gray-400 dark:text-slate-500 font-normal ml-1">({(lotUnit / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
                                         </td>
-                                        <td className="py-2 px-2 text-right font-bold text-gray-800">{fmtMoney(lotTotalCost)}đ</td>
-                                        <td className={`py-2 px-2 text-right font-bold ${diff >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                        <td className="py-2 px-2 text-right font-bold text-gray-800 dark:text-slate-200">{fmtMoney(lotTotalCost)}đ</td>
+                                        <td className={`py-2 px-2 text-right font-bold ${diff >= 0 ? 'text-green-600 dark:text-emerald-400' : 'text-red-500 dark:text-rose-400'}`}>
                                           {diff >= 0 ? '+' : ''}{fmtMoney(diff)}đ/cp
                                           <span className="text-[10px] font-normal ml-1">({((diff / lotUnit) * 100).toFixed(1)}%)</span>
                                         </td>

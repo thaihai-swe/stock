@@ -385,13 +385,13 @@ export default function DcaPlannerView({
       {tabMode === 'grid' && (
         <div className="space-y-6">
           {/* Form Tùy Biến Tham Số Kế Hoạch */}
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-5">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-xs space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h4 className="text-xs font-bold text-indigo-900 uppercase tracking-wide flex items-center gap-2">
+              <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-400 uppercase tracking-wide flex items-center gap-2">
                 <span>⚙️</span> Thiết Lập Thông Số Chiến Dịch Mua Gom
               </h4>
               {currentQty > 0 && (
-                <label className="flex items-center gap-2.5 text-xs font-bold text-indigo-900 bg-indigo-50/70 px-4 py-2 rounded-xl border border-indigo-200 cursor-pointer shadow-2xs hover:bg-indigo-100/60 transition-colors">
+                <label className="flex items-center gap-2.5 text-xs font-bold text-indigo-900 dark:text-indigo-300 bg-indigo-50/70 dark:bg-indigo-950/60 px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800/60 cursor-pointer shadow-2xs hover:bg-indigo-100/60 dark:hover:bg-indigo-900/60 transition-colors">
                   <input
                     type="checkbox"
                     checked={includeCurrentHoldings}
@@ -405,9 +405,9 @@ export default function DcaPlannerView({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {/* Giá khởi điểm P0 */}
-              <div className="bg-gray-50/60 p-3.5 rounded-xl border border-gray-100">
+              <div className="bg-gray-50/60 dark:bg-slate-800/70 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-gray-700">
+                  <label className="text-xs font-bold text-gray-700 dark:text-slate-300">
                     Giá khởi điểm P₀ (x1.000đ)
                   </label>
                   <div className="flex items-center gap-1.5">
@@ -415,7 +415,7 @@ export default function DcaPlannerView({
                       <button
                         type="button"
                         onClick={() => setGridBasePriceK(String(livePrice / 1000))}
-                        className="text-[10px] text-blue-600 font-bold hover:underline"
+                        className="text-[10px] text-blue-600 dark:text-blue-400 font-bold hover:underline"
                         title="Lấy giá sàn hiện tại"
                       >
                         ⚡ Giá Live
@@ -425,7 +425,7 @@ export default function DcaPlannerView({
                       <button
                         type="button"
                         onClick={() => setGridBasePriceK(String(Math.round(currentStock.avgCost / 1000)))}
-                        className="text-[10px] text-amber-700 font-bold hover:underline"
+                        className="text-[10px] text-amber-700 dark:text-amber-400 font-bold hover:underline"
                         title="Lấy giá vốn hiện tại"
                       >
                         🎯 Giá vốn
@@ -440,27 +440,27 @@ export default function DcaPlannerView({
                     value={gridBasePriceK}
                     onChange={e => setGridBasePriceK(e.target.value)}
                     placeholder="VD: 34.5"
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2 text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-16 shadow-2xs"
+                    className="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm font-bold text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-16 shadow-2xs"
                   />
-                  <span className="absolute right-2.5 top-2 text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                  <span className="absolute right-2.5 top-2 text-[10px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 rounded">
                     × 1.000đ
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-500 mt-1.5 flex items-center justify-between">
-                  <span>= <b className="text-gray-900">{fmtMoney(P0)}đ</b></span>
+                <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 flex items-center justify-between">
+                  <span>= <b className="text-gray-900 dark:text-slate-100">{fmtMoney(P0)}đ</b></span>
                   {livePrice > 0 && Math.abs(P0 - livePrice) < 50 && (
-                    <span className="text-[10px] text-blue-600 font-semibold bg-blue-50 px-1.5 py-0.2 rounded">Mặc định: Giá Live</span>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.2 rounded">Mặc định: Giá Live</span>
                   )}
                 </p>
               </div>
 
               {/* Bước giá giảm mỗi đợt */}
-              <div className="bg-gray-50/60 p-3.5 rounded-xl border border-gray-100">
+              <div className="bg-gray-50/60 dark:bg-slate-800/70 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-gray-700">
+                  <label className="text-xs font-bold text-gray-700 dark:text-slate-300">
                     Bước giá giảm mỗi đợt
                   </label>
-                  <span className="text-[11px] text-red-600 font-extrabold">-{gridDropPct}%</span>
+                  <span className="text-[11px] text-red-600 dark:text-rose-400 font-extrabold">-{gridDropPct}%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {[-2, -3, -5, -7].map(val => (
@@ -470,7 +470,7 @@ export default function DcaPlannerView({
                       onClick={() => setGridDropPct(Math.abs(val))}
                       className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${gridDropPct === Math.abs(val)
                           ? 'bg-red-600 text-white shadow-2xs'
-                          : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                          : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       {val}%
@@ -483,20 +483,20 @@ export default function DcaPlannerView({
                     step="0.5"
                     value={gridDropPct}
                     onChange={e => setGridDropPct(Math.max(0.5, parseFloat(e.target.value) || 1))}
-                    className="w-14 bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-center focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                    className="w-14 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-xs font-semibold text-center text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                     title="Tự nhập %"
                   />
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">Mỗi đợt giảm {gridDropPct}%</p>
+                <p className="text-[11px] text-gray-400 dark:text-slate-400 mt-1.5">Mỗi đợt giảm {gridDropPct}%</p>
               </div>
 
               {/* Số đợt gom (Steps) */}
-              <div className="bg-gray-50/60 p-3.5 rounded-xl border border-gray-100">
+              <div className="bg-gray-50/60 dark:bg-slate-800/70 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-gray-700">
+                  <label className="text-xs font-bold text-gray-700 dark:text-slate-300">
                     Số đợt gom kế hoạch
                   </label>
-                  <span className="text-[11px] text-indigo-600 font-extrabold">{totalSteps} lần</span>
+                  <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold">{totalSteps} lần</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {[5, 10, 15, 20].map(val => (
@@ -506,7 +506,7 @@ export default function DcaPlannerView({
                       onClick={() => setGridSteps(val)}
                       className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${totalSteps === val
                           ? 'bg-indigo-600 text-white shadow-2xs'
-                          : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                          : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       {val}
@@ -518,20 +518,20 @@ export default function DcaPlannerView({
                     max="30"
                     value={totalSteps}
                     onChange={e => setGridSteps(Math.min(30, Math.max(2, parseInt(e.target.value) || 5)))}
-                    className="w-14 bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-center focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                    className="w-14 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-xs font-semibold text-center text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                     title="Tự nhập số đợt"
                   />
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">Kế hoạch {totalSteps} lần gom</p>
+                <p className="text-[11px] text-gray-400 dark:text-slate-400 mt-1.5">Kế hoạch {totalSteps} lần gom</p>
               </div>
 
               {/* Lô cơ sở (Base Lot) */}
-              <div className="bg-gray-50/60 p-3.5 rounded-xl border border-gray-100">
+              <div className="bg-gray-50/60 dark:bg-slate-800/70 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-gray-700">
+                  <label className="text-xs font-bold text-gray-700 dark:text-slate-300">
                     Lô cơ sở (Đợt 1)
                   </label>
-                  <span className="text-[11px] text-gray-600 font-bold">{baseLot.toLocaleString()} cp</span>
+                  <span className="text-[11px] text-gray-600 dark:text-slate-300 font-bold">{baseLot.toLocaleString()} cp</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {[100, 200, 500, 1000].map(val => (
@@ -541,14 +541,14 @@ export default function DcaPlannerView({
                       onClick={() => setGridBaseLot(val)}
                       className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${baseLot === val
                           ? 'bg-indigo-600 text-white shadow-2xs'
-                          : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                          : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       {val}
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">1 lô chuẩn sàn HOSE / HNX</p>
+                <p className="text-[11px] text-gray-400 dark:text-slate-400 mt-1.5">1 lô chuẩn sàn HOSE / HNX</p>
               </div>
             </div>
 
@@ -621,26 +621,26 @@ export default function DcaPlannerView({
 
           {/* Hộp Thống Kê Tổng Kết Kế Hoạch Gom (Campaign Summary Cards) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-gradient-to-br from-indigo-50/70 to-white p-5 rounded-2xl border border-indigo-100 shadow-xs">
-              <div className="text-xs font-bold text-indigo-700 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-gradient-to-br from-indigo-50/70 to-white dark:from-indigo-950/40 dark:to-slate-900 dark:bg-slate-900 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 shadow-xs">
+              <div className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
                 <span>💰</span> Vốn Gom Thêm Dự Trù
               </div>
-              <div className="text-2xl font-black text-gray-900 mt-2">
+              <div className="text-2xl font-black text-gray-900 dark:text-slate-100 mt-2">
                 {fmtMoney(newCampaignCapital)}đ
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                 Dự trù giải ngân đủ {totalSteps} đợt gom
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50/70 to-white p-5 rounded-2xl border border-blue-100 shadow-xs">
-              <div className="text-xs font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-gradient-to-br from-blue-50/70 to-white dark:from-blue-950/40 dark:to-slate-900 dark:bg-slate-900 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/50 shadow-xs">
+              <div className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
                 <span>💼</span> Tổng Vốn Toàn Bộ
               </div>
-              <div className="text-2xl font-black text-blue-900 mt-2">
+              <div className="text-2xl font-black text-blue-900 dark:text-blue-300 mt-2">
                 {fmtMoney(finalTotalCapital)}đ
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                 {initialQty > 0 ? (
                   <span>{fmtMoney(initialTotalCost)}đ gốc + {fmtMoney(newCampaignCapital)}đ gom</span>
                 ) : (
@@ -649,14 +649,14 @@ export default function DcaPlannerView({
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50/70 to-white p-5 rounded-2xl border border-emerald-100 shadow-xs">
-              <div className="text-xs font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-gradient-to-br from-emerald-50/70 to-white dark:from-emerald-950/40 dark:to-slate-900 dark:bg-slate-900 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/50 shadow-xs">
+              <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                 <span>📦</span> Tổng SL Sau Cùng
               </div>
-              <div className="text-2xl font-black text-emerald-800 mt-2">
-                {finalTotalShares.toLocaleString()} <span className="text-sm font-normal text-gray-600">cp</span>
+              <div className="text-2xl font-black text-emerald-800 dark:text-emerald-300 mt-2">
+                {finalTotalShares.toLocaleString()} <span className="text-sm font-normal text-gray-600 dark:text-slate-400">cp</span>
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                 {initialQty > 0 ? (
                   <span>{initialQty.toLocaleString()} gốc + {newCampaignShares.toLocaleString()} gom</span>
                 ) : (
@@ -665,54 +665,54 @@ export default function DcaPlannerView({
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-50/70 to-white p-5 rounded-2xl border border-amber-100 shadow-xs">
-              <div className="text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-gradient-to-br from-amber-50/70 to-white dark:from-amber-950/40 dark:to-slate-900 dark:bg-slate-900 p-5 rounded-2xl border border-amber-100 dark:border-amber-900/50 shadow-xs">
+              <div className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                 <span>🎯</span> Kéo Hạ Giá Vốn TB
               </div>
-              <div className="text-2xl font-black text-amber-900 mt-2">
+              <div className="text-2xl font-black text-amber-900 dark:text-amber-300 mt-2">
                 {fmtMoney(finalAvgCost)}đ
               </div>
-              <div className="text-xs text-emerald-600 font-bold mt-1">
+              <div className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1">
                 Hạ -{finalDiscountPct}% so với vốn ban đầu ({fmtMoney(initialAvgCost)}đ)
               </div>
             </div>
           </div>
 
           {/* So sánh mục tiêu về bờ tại đáy */}
-          <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+          <div className="bg-amber-50/80 dark:bg-amber-950/30 p-4 rounded-2xl border border-amber-200/90 dark:border-amber-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
             <div className="flex items-center gap-2.5">
               <span className="text-xl">🚀</span>
-              <span className="text-gray-800 font-medium">
+              <span className="text-gray-800 dark:text-slate-200 font-medium">
                 Tại mức giá đáy <b>{fmtMoney(lastStepPrice)}đ</b>: Cổ phiếu chỉ cần hồi phục{' '}
-                <span className="font-black text-emerald-700 text-base">+{finalReqGain}%</span> là hòa vốn toàn bộ danh mục!
+                <span className="font-black text-emerald-700 dark:text-emerald-400 text-base">+{finalReqGain}%</span> là hòa vốn toàn bộ danh mục!
               </span>
             </div>
             {initialQty > 0 && (
-              <div className="text-gray-600 sm:text-right font-medium">
-                (Thay vì phải chờ tăng <span className="text-red-600 font-bold">+{naiveReqGain}%</span> nếu không DCA mà giữ nguyên vị thế cũ)
+              <div className="text-gray-600 dark:text-slate-400 sm:text-right font-medium">
+                (Thay vì phải chờ tăng <span className="text-red-600 dark:text-rose-400 font-bold">+{naiveReqGain}%</span> nếu không DCA mà giữ nguyên vị thế cũ)
               </div>
             )}
           </div>
 
           {/* Bảng Chi Tiết Lộ Trình Gom Đa Tầng Full-Width */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
-            <div className="px-6 py-4 bg-gray-50/90 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div className="px-6 py-4 bg-gray-50/90 dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <span className="font-extrabold text-sm uppercase text-gray-800 tracking-wider">
+                <span className="font-extrabold text-sm uppercase text-gray-800 dark:text-slate-100 tracking-wider">
                   📋 Bảng Lộ Trình Gom Từng Thời Điểm ({gridRows.length} đợt)
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-400 dark:text-slate-400">
                   (Bao gồm số lượng cổ phiếu, giá trị vốn và định giá tại từng bước)
                 </span>
               </div>
-              <div className="text-xs text-gray-500 font-semibold">
-                Click <span className="font-bold text-indigo-600">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Đặt Lệnh Mua
+              <div className="text-xs text-gray-500 dark:text-slate-400 font-semibold">
+                Click <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Đặt Lệnh Mua
               </div>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-gray-100 text-gray-600 uppercase font-bold text-[11px] sticky top-0 z-10 border-b border-gray-200">
+                <thead className="bg-gray-100 dark:bg-slate-950 text-gray-600 dark:text-slate-400 uppercase font-bold text-[11px] sticky top-0 z-10 border-b border-gray-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-3.5 text-center">Đợt</th>
                     <th className="py-3 px-3 text-center">% Giảm</th>
@@ -726,22 +726,22 @@ export default function DcaPlannerView({
                     <th className="py-3 px-4 text-center">Thao Tác</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 font-medium text-gray-700">
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-800 font-medium text-gray-700 dark:text-slate-300">
                   {/* ĐỢT 0: VỊ THẾ BAN ĐẦU (HIỆN TẠI) NẾU CÓ NẮM GIỮ */}
                   {initialQty > 0 && (
-                    <tr className="bg-slate-50/95 border-b-2 border-indigo-200 font-medium text-slate-800">
+                    <tr className="bg-slate-50/95 dark:bg-slate-900 border-b-2 border-indigo-200 dark:border-indigo-900 font-medium text-slate-800 dark:text-slate-200">
                       <td className="py-3 px-3.5 text-center whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[11px] font-black">
                           <span>⚓</span> Đợt 0 (Hiện tại)
                         </span>
                       </td>
                       <td className="py-3 px-3 text-center whitespace-nowrap">
-                        <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 text-slate-700">
+                        <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                           0% (Gốc)
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right font-bold text-blue-700 whitespace-nowrap">
-                        {fmtMoney(P0)}đ <span className="text-[10px] text-blue-500 font-normal block">(Giá Live)</span>
+                      <td className="py-3 px-4 text-right font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap">
+                        {fmtMoney(P0)}đ <span className="text-[10px] text-blue-500 dark:text-blue-300 font-normal block">(Giá Live)</span>
                       </td>
                       <td className="py-3 px-4 text-right text-gray-500 whitespace-nowrap">
                         <span className="italic text-xs">Vị thế ban đầu</span>

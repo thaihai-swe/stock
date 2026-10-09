@@ -5,11 +5,468 @@
 body {
   background-color: #f1f5f9;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Smooth transitions */
+/* ==========================================================
+   🌙 CHẾ ĐỘ DARK MODE TOÀN DIỆN (HIGH-CONTRAST TRADING THEME)
+   ========================================================== */
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Thẻ, Box, Card, Khung chứa chính */
+html.dark .bg-white {
+  background-color: #111827 !important;
+}
+
+/* Header, Navbar & Drawer */
+html.dark header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #1e293b !important;
+}
+
+/* Loại bỏ triệt để gradient dải sáng/trắng gây chói hoặc đè màu tối */
+html.dark [class*="to-white"],
+html.dark [class*="to-slate-50"],
+html.dark [class*="to-gray-50"] {
+  background-image: none !important;
+  background-color: #111827 !important;
+}
+
+html.dark [class*="from-gray-50/50"],
+html.dark [class*="from-gray-50"] {
+  background-image: none !important;
+}
+
+/* Thẻ thống kê có gradient màu trong DCA Planner & Dashboard */
+html.dark [class*="from-indigo-50"][class*="to-white"] {
+  background-color: #161e31 !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+html.dark [class*="from-blue-50"][class*="to-white"] {
+  background-color: #132238 !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+html.dark [class*="from-emerald-50"][class*="to-white"] {
+  background-color: #0f2723 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+html.dark [class*="from-amber-50"][class*="to-white"] {
+  background-color: #262014 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Các nền Gray / Slate trung tính (kể cả có độ mờ opacity /70, /80, /90) */
+html.dark .bg-gray-50,
+html.dark .bg-slate-50,
+html.dark [class^="bg-gray-50/"],
+html.dark [class*=" bg-gray-50/"],
+html.dark [class^="bg-slate-50/"],
+html.dark [class*=" bg-slate-50/"] {
+  background-color: #161e2e !important;
+}
+
+html.dark .bg-gray-100,
+html.dark .bg-slate-100,
+html.dark [class^="bg-gray-100/"],
+html.dark [class*=" bg-gray-100/"],
+html.dark [class^="bg-slate-100/"],
+html.dark [class*=" bg-slate-100/"] {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-gray-200,
+html.dark .bg-slate-200,
+html.dark [class^="bg-gray-200/"],
+html.dark [class*=" bg-gray-200/"],
+html.dark [class^="bg-slate-200/"],
+html.dark [class*=" bg-slate-200/"] {
+  background-color: #27354a !important;
+}
+
+/* Hover effects */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark [class*="hover:bg-gray-50"]:hover,
+html.dark [class*="hover:bg-slate-50"]:hover {
+  background-color: #1e293b !important;
+}
+
+html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark [class*="hover:bg-gray-100"]:hover,
+html.dark [class*="hover:bg-slate-100"]:hover {
+  background-color: #28354c !important;
+}
+
+html.dark .hover\:bg-gray-200:hover,
+html.dark [class*="hover:bg-gray-200"]:hover {
+  background-color: #334155 !important;
+}
+
+/* Đường viền & Phân cách */
+html.dark .border-gray-50,
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300,
+html.dark .border-slate-50,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark [class*="border-gray-100/"],
+html.dark [class*="border-gray-200/"],
+html.dark [class*="border-slate-100/"],
+html.dark [class*="border-slate-200/"] {
+  border-color: #252f44 !important;
+}
+
+html.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #222b3d !important;
+}
+
+/* Viền phân loại theo màu */
+html.dark .border-indigo-100,
+html.dark .border-indigo-200,
+html.dark .border-indigo-300,
+html.dark [class*="border-indigo-100/"],
+html.dark [class*="border-indigo-200/"] {
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+html.dark .border-emerald-100,
+html.dark .border-emerald-200,
+html.dark .border-emerald-300,
+html.dark [class*="border-emerald-100/"],
+html.dark [class*="border-emerald-200/"] {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark .border-amber-100,
+html.dark .border-amber-200,
+html.dark .border-amber-300,
+html.dark [class*="border-amber-100/"],
+html.dark [class*="border-amber-200/"] {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark .border-red-100,
+html.dark .border-red-200,
+html.dark .border-red-300,
+html.dark .border-rose-100,
+html.dark .border-rose-200,
+html.dark [class*="border-red-100/"],
+html.dark [class*="border-red-200/"] {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+html.dark .border-blue-100,
+html.dark .border-blue-200,
+html.dark .border-blue-300,
+html.dark [class*="border-blue-100/"],
+html.dark [class*="border-blue-200/"] {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark .border-purple-100,
+html.dark .border-purple-200,
+html.dark .border-purple-300,
+html.dark [class*="border-purple-100/"],
+html.dark [class*="border-purple-200/"] {
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+html.dark .border-orange-100,
+html.dark .border-orange-200,
+html.dark [class*="border-orange-100/"],
+html.dark [class*="border-orange-200/"] {
+  border-color: rgba(249, 115, 22, 0.35) !important;
+}
+
+/* ==========================================================
+   MÀU CHỮ CƠ BẢN (TYPOGRAPHY HIERARCHY - HIGH CONTRAST)
+   ========================================================== */
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-gray-700,
+html.dark .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-400,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-gray-300,
+html.dark .text-slate-300 {
+  color: #64748b !important;
+}
+
+/* ==========================================================
+   MÀU CHỮ CHUYÊN BIỆT (CHUYỂN -700, -800, -900, -950 SANG MÀU SÁNG RỰC RỠ)
+   ========================================================== */
+html.dark .text-indigo-600,
+html.dark .text-indigo-700,
+html.dark .text-indigo-800,
+html.dark .text-indigo-900,
+html.dark .text-indigo-950 {
+  color: #a5b4fc !important;
+}
+
+html.dark .text-emerald-600,
+html.dark .text-emerald-700,
+html.dark .text-emerald-800,
+html.dark .text-emerald-900,
+html.dark .text-emerald-950,
+html.dark .text-green-600,
+html.dark .text-green-700,
+html.dark .text-green-800,
+html.dark .text-green-900,
+html.dark .text-green-950 {
+  color: #6ee7b7 !important;
+}
+
+html.dark .text-red-500,
+html.dark .text-red-600,
+html.dark .text-red-700,
+html.dark .text-red-800,
+html.dark .text-red-900,
+html.dark .text-red-950,
+html.dark .text-rose-600,
+html.dark .text-rose-700,
+html.dark .text-rose-800,
+html.dark .text-rose-900,
+html.dark .text-rose-950 {
+  color: #fca5a5 !important;
+}
+
+html.dark .text-amber-600,
+html.dark .text-amber-700,
+html.dark .text-amber-800,
+html.dark .text-amber-900,
+html.dark .text-amber-950,
+html.dark .text-yellow-600,
+html.dark .text-yellow-700,
+html.dark .text-yellow-800,
+html.dark .text-yellow-900,
+html.dark .text-yellow-950 {
+  color: #fde047 !important;
+}
+
+html.dark .text-blue-600,
+html.dark .text-blue-700,
+html.dark .text-blue-800,
+html.dark .text-blue-900,
+html.dark .text-blue-950 {
+  color: #93c5fd !important;
+}
+
+html.dark .text-purple-600,
+html.dark .text-purple-700,
+html.dark .text-purple-800,
+html.dark .text-purple-900,
+html.dark .text-purple-950 {
+  color: #d8b4fe !important;
+}
+
+html.dark .text-orange-600,
+html.dark .text-orange-700,
+html.dark .text-orange-800,
+html.dark .text-orange-900,
+html.dark .text-orange-950 {
+  color: #fdba74 !important;
+}
+
+/* ==========================================================
+   BADGE & TINTED HIGHLIGHTS
+   ========================================================== */
+html.dark .bg-indigo-50,
+html.dark [class^="bg-indigo-50/"],
+html.dark [class*=" bg-indigo-50/"] {
+  background-color: rgba(99, 102, 241, 0.16) !important;
+}
+html.dark .bg-indigo-100 {
+  background-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-green-50,
+html.dark [class^="bg-emerald-50/"],
+html.dark [class*=" bg-emerald-50/"],
+html.dark [class^="bg-green-50/"],
+html.dark [class*=" bg-green-50/"] {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+}
+html.dark .bg-emerald-100,
+html.dark .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-yellow-50,
+html.dark [class^="bg-amber-50/"],
+html.dark [class*=" bg-amber-50/"],
+html.dark [class^="bg-yellow-50/"],
+html.dark [class*=" bg-yellow-50/"] {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+}
+html.dark .bg-amber-100,
+html.dark .bg-yellow-100 {
+  background-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.dark .bg-red-50,
+html.dark .bg-rose-50,
+html.dark [class^="bg-red-50/"],
+html.dark [class*=" bg-red-50/"],
+html.dark [class^="bg-rose-50/"],
+html.dark [class*=" bg-rose-50/"] {
+  background-color: rgba(239, 68, 68, 0.16) !important;
+}
+html.dark .bg-red-100,
+html.dark .bg-rose-100 {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+html.dark .bg-blue-50,
+html.dark [class^="bg-blue-50/"],
+html.dark [class*=" bg-blue-50/"] {
+  background-color: rgba(59, 130, 246, 0.16) !important;
+}
+html.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+html.dark .bg-purple-50,
+html.dark [class^="bg-purple-50/"],
+html.dark [class*=" bg-purple-50/"] {
+  background-color: rgba(168, 85, 247, 0.16) !important;
+}
+html.dark .bg-purple-100 {
+  background-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+html.dark .bg-orange-50,
+html.dark [class^="bg-orange-50/"],
+html.dark [class*=" bg-orange-50/"] {
+  background-color: rgba(249, 115, 22, 0.16) !important;
+}
+html.dark .bg-orange-100 {
+  background-color: rgba(249, 115, 22, 0.25) !important;
+}
+
+/* ==========================================================
+   BẢNG DỮ LIỆU (TABLES)
+   ========================================================== */
+html.dark thead,
+html.dark thead th,
+html.dark thead tr {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: #1e293b !important;
+}
+
+html.dark tfoot,
+html.dark tfoot td,
+html.dark tfoot tr {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #1e293b !important;
+}
+
+html.dark tbody tr {
+  border-color: #1e293b !important;
+}
+
+html.dark tbody tr:hover,
+html.dark .hover\:bg-indigo-50\/30:hover {
+  background-color: #1b2438 !important;
+}
+
+/* ==========================================================
+   FORM CONTROLS: INPUT, SELECT, TEXTAREA
+   ========================================================== */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+  background-color: #161e2e !important;
+  color: #f8fafc !important;
+  border-color: #2e3b54 !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #818cf8 !important;
+  background-color: #1a2333 !important;
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark option {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+}
+
+/* ==========================================================
+   RECHARTS SVG GRAPHICS TRONG DARK MODE
+   ========================================================== */
+html.dark .recharts-cartesian-axis-tick text {
+  fill: #94a3b8 !important;
+}
+html.dark .recharts-cartesian-axis-line {
+  stroke: #334155 !important;
+}
+html.dark .recharts-reference-line line {
+  stroke: #475569 !important;
+}
+html.dark .recharts-legend-item-text {
+  color: #cbd5e1 !important;
+}
+
+/* Modals & Popups backdrop & containers */
+html.dark .shadow-sm,
+html.dark .shadow-md,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Tabs & Navigation */
 .tab-active {
   @apply bg-white text-indigo-600 shadow-sm font-semibold;
+}
+
+html.dark .tab-active {
+  background-color: #242f46 !important;
+  color: #a5b4fc !important;
 }
 
 /* Custom scrollbar */
@@ -17,3 +474,7 @@ body {
 ::-webkit-scrollbar-track { background: #f1f5f9; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+html.dark ::-webkit-scrollbar-track { background: #0b0f19; }
+html.dark ::-webkit-scrollbar-thumb { background: #2e384d; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }

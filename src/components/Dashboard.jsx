@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchPrices } from '../utils/api.js';
+import { fetchPrices, updateCashBalance } from '../utils/api.js';
 import {
   fmtMoney,
   getStockColor,
@@ -22,7 +22,7 @@ function StatCard({ label, value, sub, highlight }) {
   );
 }
 
-export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell }) {
+export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess }) {
   const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [] } = data;
 
   // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
@@ -102,6 +102,40 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
   const totalUnrealizedPLPct = holdingCost > 0
     ? parseFloat(((totalUnrealizedPL / holdingCost) * 100).toFixed(2))
     : 0;
+
+  // Quản lý số dư tiền mặt
+  const [cashBalance, setCashBalance] = useState(data.settings?.cashBalance ?? 0);
+  const [isEditingCash, setIsEditingCash] = useState(false);
+  const [cashInput, setCashInput] = useState('');
+  const [savingCash, setSavingCash] = useState(false);
+
+  useEffect(() => {
+    if (data.settings?.cashBalance !== undefined) {
+      setCashBalance(data.settings.cashBalance);
+    }
+  }, [data.settings?.cashBalance]);
+
+  async function handleSaveCash(e) {
+    e?.preventDefault();
+    const val = Number(cashInput);
+    if (isNaN(val) || val < 0) return;
+    setSavingCash(true);
+    try {
+      await updateCashBalance(val);
+      setCashBalance(val);
+      setIsEditingCash(false);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      alert(err.message || 'Lỗi cập nhật số dư tiền mặt');
+    } finally {
+      setSavingCash(false);
+    }
+  }
+
+  // Tổng tài sản ròng (NAV) & Tỷ lệ phân bổ tiền mặt / cổ phiếu
+  const totalNAV = cashBalance + totalMarketValue;
+  const cashPct = totalNAV > 0 ? parseFloat(((cashBalance / totalNAV) * 100).toFixed(1)) : (cashBalance > 0 ? 100 : 0);
+  const stockPct = totalNAV > 0 ? parseFloat(((totalMarketValue / totalNAV) * 100).toFixed(1)) : 0;
 
   // 2. Thống kê hiệu suất (Performance metrics)
   const wins = sellOrders.filter(s => s.profitLoss > 0);
@@ -237,6 +271,110 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
   return (
     <div className="space-y-6">
+      {/* 🌟 HERO SECTION: TỔNG TÀI SẢN (NAV), SỐ DƯ TIỀN MẶT & TỶ LỆ PHÂN BỔ */}
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 rounded-3xl p-5 sm:p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        
+        <div>
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+            <span className="text-xs uppercase tracking-wider font-semibold text-indigo-300 flex items-center gap-1.5">
+              <span>💎</span> Tổng Giá Trị Tài Sản Ròng (NAV)
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setCashInput(cashBalance > 0 ? cashBalance.toString() : '');
+                setIsEditingCash(true);
+              }}
+              className="text-xs bg-indigo-800/80 hover:bg-indigo-700 text-indigo-100 px-3 py-1.5 rounded-xl border border-indigo-700/50 flex items-center gap-1.5 transition-all cursor-pointer font-medium shadow-xs"
+            >
+              <span>✏️</span> Nhập / Sửa Tiền Mặt
+            </button>
+          </div>
+
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <span className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              {fmtMoney(totalNAV)}đ
+            </span>
+            <span className="text-xs sm:text-sm font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2.5 py-0.5 rounded-full">
+              Sức mua + Giá trị CP
+            </span>
+          </div>
+
+          {/* Chi tiết Tiền mặt & Cổ phiếu */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-indigo-800/40 text-xs">
+            <div className="bg-white/5 rounded-2xl p-3 sm:p-4 border border-white/5 flex items-center justify-between">
+              <div>
+                <span className="text-indigo-300 text-[11px] block">💵 Tiền mặt khả dụng</span>
+                <span className="text-lg sm:text-xl font-bold text-white mt-0.5 block truncate">
+                  {fmtMoney(cashBalance)}đ
+                </span>
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-700/50 px-2.5 py-1 rounded-xl">
+                {cashPct}%
+              </span>
+            </div>
+
+            <div className="bg-white/5 rounded-2xl p-3 sm:p-4 border border-white/5 flex items-center justify-between">
+              <div>
+                <span className="text-indigo-300 text-[11px] block">📈 Cổ phiếu nắm giữ</span>
+                <span className="text-lg sm:text-xl font-bold text-white mt-0.5 block truncate">
+                  {fmtMoney(totalMarketValue)}đ
+                </span>
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-indigo-300 bg-indigo-950/80 border border-indigo-700/50 px-2.5 py-1 rounded-xl">
+                {stockPct}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Thanh đo phân bổ Tiền mặt / Cổ phiếu (Cash Allocation Gauge) */}
+        <div className="mt-4 pt-3 border-t border-indigo-800/30">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs mb-1.5 flex-wrap gap-1">
+            <span className="text-indigo-200 font-medium flex items-center gap-1">
+              <span>⚖️</span> Tỷ lệ phân bổ: 
+              <b className="text-emerald-300 ml-1">Tiền mặt {cashPct}%</b>
+              <span className="text-indigo-400">/</span>
+              <b className="text-indigo-200">Cổ phiếu {stockPct}%</b>
+            </span>
+            
+            {/* Risk Management Posture */}
+            <span className={`px-2.5 py-0.5 rounded-full font-semibold text-[10px] sm:text-[11px] ${
+              cashPct >= 50
+                ? 'bg-blue-900/80 text-blue-200 border border-blue-700/50'
+                : cashPct >= 20
+                ? 'bg-emerald-900/80 text-emerald-200 border border-emerald-700/50'
+                : cashPct >= 5
+                ? 'bg-amber-900/80 text-amber-200 border border-amber-700/50'
+                : 'bg-rose-900/80 text-rose-200 border border-rose-700/50'
+            }`}>
+              {cashPct >= 50
+                ? '🛡️ Phòng thủ cao'
+                : cashPct >= 20
+                ? '⚖️ Cân bằng tối ưu'
+                : cashPct >= 5
+                ? '🚀 Tấn công chủ động'
+                : '⚡ Full 100% Cổ phiếu'}
+            </span>
+          </div>
+
+          {/* Gauge progress bar */}
+          <div className="w-full bg-slate-800/80 h-3.5 rounded-full overflow-hidden flex p-0.5 border border-indigo-700/40">
+            <div
+              style={{ width: `${cashPct}%` }}
+              className="bg-emerald-500 rounded-l-full transition-all duration-500 relative group"
+              title={`Tiền mặt: ${cashPct}% (${fmtMoney(cashBalance)}đ)`}
+            />
+            <div
+              style={{ width: `${stockPct}%` }}
+              className="bg-indigo-500 rounded-r-full transition-all duration-500 relative group"
+              title={`Cổ phiếu: ${stockPct}% (${fmtMoney(totalMarketValue)}đ)`}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Stat Cards - Hàng 1: Tổng vốn, Giá trị thị trường, Lãi thực hiện & Cổ tức */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-4">
         <StatCard
@@ -285,19 +423,19 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
       {/* BẢNG DANH MỤC ĐANG NẮM GIỮ (HIỂN THỊ TRÊN CÙNG THEO YÊU CẦU) */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-gray-50/50 to-white">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-gray-50/50 to-white dark:from-slate-900 dark:to-slate-900">
           <div className="flex items-center justify-between gap-2 flex-wrap w-full sm:w-auto">
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-1.5">
+              <h2 className="font-bold text-gray-800 dark:text-slate-100 text-sm sm:text-base flex items-center gap-1.5">
                 <span>📂</span> Danh Mục Đang Nắm Giữ
               </h2>
-              <span className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">
+              <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-semibold border border-indigo-100 dark:border-indigo-900/50">
                 {portfolio.length} mã
               </span>
 
               {/* Trạng thái phiên giao dịch thị trường */}
               {pricesData?.session && (
-                <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${pricesData.session.isOpen ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${pricesData.session.isOpen ? 'bg-green-100 dark:bg-emerald-950/60 text-green-800 dark:text-emerald-300 border border-green-200 dark:border-emerald-800/50' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700'
                   }`}>
                   {pricesData.session.label}
                 </span>
@@ -306,14 +444,14 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
             {/* Toggle dạng Thẻ / Bảng trên mobile */}
             {portfolio.length > 0 && (
-              <div className="sm:hidden flex items-center bg-gray-100 p-0.5 rounded-lg text-xs">
+              <div className="sm:hidden flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs">
                 <button
                   type="button"
                   onClick={() => setMobileViewMode('card')}
                   className={`px-2 py-0.5 rounded-md font-semibold text-[11px] transition-all cursor-pointer ${
                     mobileViewMode === 'card'
-                      ? 'bg-white text-indigo-700 shadow-2xs'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
                   📱 Thẻ
@@ -323,8 +461,8 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   onClick={() => setMobileViewMode('table')}
                   className={`px-2 py-0.5 rounded-md font-semibold text-[11px] transition-all cursor-pointer ${
                     mobileViewMode === 'table'
-                      ? 'bg-white text-indigo-700 shadow-2xs'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
                   📊 Bảng
@@ -335,12 +473,12 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
           <div className="flex items-center justify-between sm:justify-end gap-2 text-xs">
             {lastUpdated && (
-              <span className="text-gray-400 text-[11px]">Cập nhật: {lastUpdated}</span>
+              <span className="text-gray-400 dark:text-slate-400 text-[11px]">Cập nhật: {lastUpdated}</span>
             )}
             <button
               onClick={() => loadMarketPrices(true)}
               disabled={loadingPrices}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium transition-colors disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-200 font-medium transition-colors disabled:opacity-50 cursor-pointer"
               title="Làm mới giá thị trường từ sàn"
             >
               <span>{loadingPrices ? '⏳' : '🔄'}</span>
@@ -351,15 +489,15 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
         {/* Thanh Tìm Kiếm & Bộ Lọc Nhanh 1-Click */}
         {portfolio.length > 0 && (
-          <div className="px-6 py-3 bg-gray-50/70 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+          <div className="px-6 py-3 bg-gray-50/70 dark:bg-slate-900/60 border-b border-gray-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-semibold text-gray-500 uppercase text-[11px] mr-1">Bộ lọc:</span>
+              <span className="font-semibold text-gray-500 dark:text-slate-400 uppercase text-[11px] mr-1">Bộ lọc:</span>
               <button
                 type="button"
                 onClick={() => setStatusFilter('all')}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${statusFilter === 'all'
                     ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
+                    : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                   }`}
               >
                 Tất cả ({portfolio.length})
@@ -369,22 +507,22 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                 onClick={() => setStatusFilter('profit')}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-colors flex items-center gap-1 ${statusFilter === 'profit'
                     ? 'bg-emerald-600 text-white shadow-2xs'
-                    : 'bg-white border border-gray-200 text-emerald-700 hover:bg-emerald-50'
+                    : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
                   }`}
               >
                 <span>🟢 Đang Lãi</span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full">{filterCounts.profit}</span>
+                <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.2 rounded-full">{filterCounts.profit}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setStatusFilter('loss')}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-colors flex items-center gap-1 ${statusFilter === 'loss'
                     ? 'bg-red-600 text-white shadow-2xs'
-                    : 'bg-white border border-gray-200 text-red-600 hover:bg-red-50'
+                    : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-red-600 dark:text-rose-400 hover:bg-red-50 dark:hover:bg-rose-950/40'
                   }`}
               >
                 <span>🔴 Đang Lỗ</span>
-                <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.2 rounded-full">{filterCounts.loss}</span>
+                <span className="text-[10px] bg-red-100 dark:bg-rose-900/60 text-red-700 dark:text-rose-300 px-1.5 py-0.2 rounded-full">{filterCounts.loss}</span>
               </button>
             </div>
 
@@ -395,13 +533,13 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   value={symbolFilter}
                   onChange={e => setSymbolFilter(e.target.value.toUpperCase())}
                   placeholder="🔍 Tìm mã CP..."
-                  className="w-36 sm:w-44 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs uppercase font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-36 sm:w-44 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs uppercase font-bold text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
                 {symbolFilter && (
                   <button
                     type="button"
                     onClick={() => setSymbolFilter('')}
-                    className="absolute right-2 top-1 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2 top-1 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200"
                   >
                     ✕
                   </button>
@@ -416,7 +554,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                       onNavigateDca(portfolio[0]);
                     }
                   }}
-                  className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg border border-indigo-200 transition-colors flex items-center gap-1 shadow-2xs"
+                  className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-semibold rounded-lg border border-indigo-200 dark:border-indigo-800/60 transition-colors flex items-center gap-1 shadow-2xs"
                   title="Mở bảng kế hoạch mua gom DCA"
                 >
                   <span>🧮</span>
@@ -648,16 +786,16 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
             {/* Chế độ xem Bảng (Desktop mặc định / Mobile khi chọn Bảng) */}
             <div className={`overflow-x-auto ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
               <table className="w-full text-sm">
-              <thead className="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100 font-semibold select-none">
+              <thead className="bg-gray-50/80 dark:bg-slate-950 text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-800 font-semibold select-none">
                 <tr>
                   {/* 1. Mã CP */}
                   <th
                     onClick={() => handleSort('symbol')}
-                    className="text-left px-5 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-left px-5 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Mã cổ phiếu"
                   >
                     <div className="inline-flex items-center">
-                      <span className={sortField === 'symbol' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Mã CP</span>
+                      <span className={sortField === 'symbol' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-slate-300 font-bold'}>Mã CP</span>
                       {renderSortIcon('symbol')}
                     </div>
                   </th>
@@ -665,11 +803,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 2. Số lượng */}
                   <th
                     onClick={() => handleSort('totalQty')}
-                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Số lượng"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'totalQty' ? 'text-indigo-600 font-bold' : ''}>Số lượng</span>
+                      <span className={sortField === 'totalQty' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}>Số lượng</span>
                       {renderSortIcon('totalQty')}
                     </div>
                   </th>
@@ -677,11 +815,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 3. Tỷ trọng */}
                   <th
                     onClick={() => handleSort('allocation')}
-                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Tỷ trọng danh mục"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'allocation' ? 'text-indigo-600 font-bold' : ''}>Tỷ trọng</span>
+                      <span className={sortField === 'allocation' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}>Tỷ trọng</span>
                       {renderSortIcon('allocation')}
                     </div>
                   </th>
@@ -689,11 +827,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 4. Giá vốn TB */}
                   <th
                     onClick={() => handleSort('avgCost')}
-                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Giá vốn TB"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'avgCost' ? 'text-indigo-600 font-bold' : ''}>Giá vốn TB</span>
+                      <span className={sortField === 'avgCost' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}>Giá vốn TB</span>
                       {renderSortIcon('avgCost')}
                     </div>
                   </th>
@@ -701,11 +839,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 5. Giá trị vốn */}
                   <th
                     onClick={() => handleSort('totalCost')}
-                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Giá trị vốn"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'totalCost' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Giá trị vốn</span>
+                      <span className={sortField === 'totalCost' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-slate-300 font-bold'}>Giá trị vốn</span>
                       {renderSortIcon('totalCost')}
                     </div>
                   </th>
@@ -713,11 +851,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 6. Giá thị trường */}
                   <th
                     onClick={() => handleSort('marketPrice')}
-                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-4 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Giá thị trường"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'marketPrice' ? 'text-indigo-600 font-bold' : ''}>Giá thị trường</span>
+                      <span className={sortField === 'marketPrice' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}>Giá thị trường</span>
                       {renderSortIcon('marketPrice')}
                     </div>
                   </th>
@@ -725,11 +863,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 7. Giá trị danh mục */}
                   <th
                     onClick={() => handleSort('marketVal')}
-                    className="text-right px-5 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-5 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Giá trị danh mục"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'marketVal' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Giá trị danh mục</span>
+                      <span className={sortField === 'marketVal' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-slate-300 font-bold'}>Giá trị danh mục</span>
                       {renderSortIcon('marketVal')}
                     </div>
                   </th>
@@ -737,17 +875,17 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   {/* 8. Lãi / Lỗ */}
                   <th
                     onClick={() => handleSort('profitLoss')}
-                    className="text-right px-5 py-3.5 cursor-pointer hover:bg-gray-100 transition-colors group select-none"
+                    className="text-right px-5 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
                     title="Nhấn để sắp xếp theo Lãi / Lỗ"
                   >
                     <div className="inline-flex items-center justify-end w-full">
-                      <span className={sortField === 'profitLoss' ? 'text-indigo-600 font-bold' : 'text-gray-700 font-bold'}>Lãi / Lỗ</span>
+                      <span className={sortField === 'profitLoss' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-slate-300 font-bold'}>Lãi / Lỗ</span>
                       {renderSortIcon('profitLoss')}
                     </div>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                 {displayedPortfolio.map((p) => {
                   const allocationPct = holdingCost > 0 ? ((p.totalCost / holdingCost) * 100).toFixed(1) : 0;
 
@@ -766,7 +904,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   const stockColor = getStockColor(p.symbol, portfolio);
 
                   return (
-                    <tr key={p.symbol} className="hover:bg-indigo-50/30 transition-colors">
+                    <tr key={p.symbol} className="hover:bg-indigo-50/30 dark:hover:bg-slate-800/60 transition-colors">
                       {/* 1. Mã CP */}
                       <td className="px-5 py-4">
                         <button
@@ -789,8 +927,8 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                       </td>
 
                       {/* 2. Số lượng */}
-                      <td className="px-4 py-4 text-right font-semibold text-gray-800">
-                        {p.totalQty.toLocaleString()} <span className="text-[11px] font-normal text-gray-400">cp</span>
+                      <td className="px-4 py-4 text-right font-semibold text-gray-800 dark:text-slate-200">
+                        {p.totalQty.toLocaleString()} <span className="text-[11px] font-normal text-gray-400 dark:text-slate-400">cp</span>
                       </td>
 
                       {/* 3. Tỷ trọng */}
@@ -802,7 +940,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                               <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold border shadow-2xs ${allocTier.bg} ${allocTier.text} ${allocTier.border}`}>
                                 {allocationPct}%
                               </span>
-                              <div className="w-12 h-1 bg-gray-200/80 rounded-full overflow-hidden" title={`Tỷ trọng: ${allocationPct}%`}>
+                              <div className="w-12 h-1 bg-gray-200/80 dark:bg-slate-700 rounded-full overflow-hidden" title={`Tỷ trọng: ${allocationPct}%`}>
                                 <div
                                   className={`h-full ${allocTier.bar} rounded-full`}
                                   style={{ width: `${Math.min(parseFloat(allocationPct) || 0, 100)}%` }}
@@ -836,7 +974,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                       </td>
 
                       {/* 5. Giá trị vốn */}
-                      <td className="px-4 py-4 text-right font-bold text-gray-900">
+                      <td className="px-4 py-4 text-right font-bold text-gray-900 dark:text-slate-100">
                         {fmtMoney(p.totalCost)}đ
                       </td>
 
@@ -844,18 +982,18 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                       <td className="px-4 py-4 text-right">
                         {marketPrice ? (
                           <div>
-                            <div className="font-bold text-gray-900 text-base">
+                            <div className="font-bold text-gray-900 dark:text-slate-100 text-base">
                               {fmtMoney(marketPrice)}đ
                             </div>
                             <div className="text-[11px] flex items-center justify-end gap-1 mt-0.5">
-                              <span className="text-gray-400">({(marketPrice / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
-                              <span className={`font-semibold ${changePct > 0 ? 'text-green-600' : changePct < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+                              <span className="text-gray-400 dark:text-slate-400">({(marketPrice / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
+                              <span className={`font-semibold ${changePct > 0 ? 'text-green-600 dark:text-emerald-400' : changePct < 0 ? 'text-red-500 dark:text-rose-400' : 'text-gray-500 dark:text-slate-400'}`}>
                                 {changePct > 0 ? '▲ +' : changePct < 0 ? '▼ ' : ''}{changePct}%
                               </span>
                             </div>
                           </div>
                         ) : (
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-gray-400 dark:text-slate-400">
                             {loadingPrices ? 'Đang tải...' : '—'}
                           </div>
                         )}
@@ -863,8 +1001,8 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
                       {/* 7. Giá Trị Danh Mục (Thị trường) */}
                       <td className="px-5 py-4 text-right">
-                        <div className="font-bold text-gray-900 text-base">{fmtMoney(marketVal)}đ</div>
-                        <div className="text-[11px] text-gray-400 mt-0.5">
+                        <div className="font-bold text-gray-900 dark:text-slate-100 text-base">{fmtMoney(marketVal)}đ</div>
+                        <div className="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5">
                           {(marketVal / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}k
                         </div>
                       </td>
@@ -883,7 +1021,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                             </div>
                           </div>
                         ) : (
-                          <div className="text-xs text-gray-400">—</div>
+                          <div className="text-xs text-gray-400 dark:text-slate-400">—</div>
                         )}
                       </td>
                     </tr>
@@ -891,26 +1029,26 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                 })}
               </tbody>
               {displayedPortfolio.length > 1 && (
-                <tfoot className="bg-gray-50/80 border-t-2 border-gray-200 font-semibold text-xs text-gray-700">
+                <tfoot className="bg-gray-50/80 dark:bg-slate-950 border-t-2 border-gray-200 dark:border-slate-800 font-semibold text-xs text-gray-700 dark:text-slate-200">
                   <tr>
                     {/* 1. Mã */}
-                    <td className="px-5 py-3.5 text-left font-bold uppercase text-gray-500">
+                    <td className="px-5 py-3.5 text-left font-bold uppercase text-gray-500 dark:text-slate-400">
                       {displayedPortfolio.length === portfolio.length ? 'Tổng cộng' : 'Tổng hiển thị'}
                     </td>
                     {/* 2. SL */}
-                    <td className="px-4 py-3.5 text-right font-bold text-gray-900">{displayedHoldingQty.toLocaleString()} cp</td>
+                    <td className="px-4 py-3.5 text-right font-bold text-gray-900 dark:text-slate-100">{displayedHoldingQty.toLocaleString()} cp</td>
                     {/* 3. Tỷ trọng */}
-                    <td className="px-4 py-3.5 text-right font-bold text-gray-700">
+                    <td className="px-4 py-3.5 text-right font-bold text-gray-700 dark:text-slate-300">
                       {holdingCost > 0 ? `${((displayedHoldingCost / holdingCost) * 100).toFixed(1)}%` : '100%'}
                     </td>
                     {/* 4. Giá vốn TB */}
-                    <td className="px-4 py-3.5 text-right text-gray-400">—</td>
+                    <td className="px-4 py-3.5 text-right text-gray-400 dark:text-slate-500">—</td>
                     {/* 5. Giá trị vốn */}
-                    <td className="px-4 py-3.5 text-right font-bold text-gray-900">{fmtMoney(displayedHoldingCost)}đ</td>
+                    <td className="px-4 py-3.5 text-right font-bold text-gray-900 dark:text-slate-100">{fmtMoney(displayedHoldingCost)}đ</td>
                     {/* 6. Giá thị trường */}
-                    <td className="px-4 py-3.5 text-right text-gray-400">—</td>
+                    <td className="px-4 py-3.5 text-right text-gray-400 dark:text-slate-500">—</td>
                     {/* 7. Giá trị danh mục */}
-                    <td className="px-5 py-3.5 text-right font-bold text-gray-900 text-sm">{fmtMoney(displayedMarketValue)}đ</td>
+                    <td className="px-5 py-3.5 text-right font-bold text-gray-900 dark:text-slate-100 text-sm">{fmtMoney(displayedMarketValue)}đ</td>
                     {/* 8. Lãi / Lỗ */}
                     <td className="px-5 py-3.5 text-right">
                       <div className={`font-bold text-sm ${plColor(displayedUnrealizedPL)}`}>
@@ -932,7 +1070,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
         {/* Footer tổng kết & trạng thái sắp xếp giống Lịch Sử Giao Dịch */}
         {displayedPortfolio.length > 0 && (
-          <div className="px-4 sm:px-6 py-3 border-t border-gray-100 text-xs text-gray-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-gray-50/50">
+          <div className="px-4 sm:px-6 py-3 border-t border-gray-100 dark:border-slate-800 text-xs text-gray-500 dark:text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-gray-50/50 dark:bg-slate-900/50">
             <span>
               Đang hiển thị <b>{displayedPortfolio.length}</b> / {portfolio.length} mã cổ phiếu
               {sortField && (
@@ -1088,6 +1226,86 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         onNavigateBuy={onNavigateBuy}
         onNavigateSell={onNavigateSell}
       />
+
+      {/* Modal Chỉnh Sửa Số Dư Tiền Mặt */}
+      {isEditingCash && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
+                <span>💵</span> Cập Nhật Số Dư Tiền Mặt
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsEditingCash(false)}
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg text-lg cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCash} className="space-y-4 mt-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Nhập số dư tiền mặt hiện tại (VNĐ):
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={cashInput}
+                    onChange={(e) => setCashInput(e.target.value)}
+                    placeholder="VD: 50000000 (= 50.000.000đ)"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12"
+                    autoFocus
+                  />
+                  <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">VNĐ</span>
+                </div>
+                {cashInput && !isNaN(Number(cashInput)) && (
+                  <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+                    💵 Quy đổi: {fmtMoney(Number(cashInput))} đồng
+                  </p>
+                )}
+              </div>
+
+              {/* Phím bấm chọn nhanh */}
+              <div>
+                <p className="text-[11px] text-gray-400 mb-1.5">Gợi ý mốc tiền nhanh:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {[0, 10000000, 20000000, 50000000, 100000000, 200000000].map(amt => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setCashInput(amt.toString())}
+                      className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer"
+                    >
+                      {amt === 0 ? '0đ' : `${amt / 1000000} Triệu`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingCash(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingCash}
+                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                >
+                  {savingCash ? '⏳ Đang lưu...' : '💾 Lưu Số Dư'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

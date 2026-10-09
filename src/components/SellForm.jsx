@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { addSellOrder } from '../utils/api.js';
-import { fmtMoney, plColor, plBg, getTodayDate, DEFAULT_TAGS, fmtDate } from '../utils/format.js';
+import { DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate, fmtMoney, getTodayDate, plBg, plColor } from '../utils/format.js';
 
 export default function SellForm({ onSuccess, portfolio = [], initialSymbol = '' }) {
   const [form, setForm] = useState({
@@ -19,6 +19,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
     }
   }, [initialSymbol]);
   const [selectedTag, setSelectedTag] = useState('');
+  const [selectedDiscipline, setSelectedDiscipline] = useState('');
   const [customTag, setCustomTag] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -127,6 +128,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
       setError('Vui lòng điền đầy đủ mã CP, số lượng và giá.');
       return;
     }
+    if (Number(form.quantity) <= 0) {
+      setError('Số lượng cổ phiếu bán phải lớn hơn 0.');
+      return;
+    }
     setLoading(true);
     try {
       const order = await addSellOrder({
@@ -136,12 +141,13 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
         feePct: form.feePct !== '' ? Number(form.feePct) : 0.1,
         note: form.note,
         date: form.date || getTodayDate(),
-        tags: selectedTag ? [selectedTag] : [],
+        tags: [selectedTag, selectedDiscipline].filter(Boolean),
         matchMethod: form.matchMethod || 'lowest',
       });
       setResult(order);
       setForm({ symbol: '', quantity: '100', price: '', feePct: '0.1', note: '', date: getTodayDate(), matchMethod: form.matchMethod || 'lowest' });
       setSelectedTag('');
+      setSelectedDiscipline('');
       onSuccess();
     } catch (err) {
       setError(err.message);
@@ -163,7 +169,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Symbol + Quantity */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -230,8 +236,18 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 name="quantity"
                 value={form.quantity}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.min(maxQty || 999999, (Number(f.quantity) || 0) + 100)) }));
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, quantity: String(Math.max(1, (Number(f.quantity) || 0) - 100)) }));
+                  }
+                }}
                 type="number"
-                min="1"
+                min="0"
+                step="100"
                 max={maxQty || undefined}
                 placeholder="100"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
@@ -284,11 +300,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'lowest' }))}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  (form.matchMethod || 'lowest') === 'lowest'
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${(form.matchMethod || 'lowest') === 'lowest'
                     ? 'bg-orange-50/80 border-orange-400 text-orange-950 ring-2 ring-orange-400/20 shadow-2xs'
                     : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold flex items-center gap-1.5">
@@ -307,11 +322,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'highest' }))}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  form.matchMethod === 'highest'
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${form.matchMethod === 'highest'
                     ? 'bg-indigo-50/80 border-indigo-400 text-indigo-950 ring-2 ring-indigo-400/20 shadow-2xs'
                     : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold flex items-center gap-1.5">
@@ -330,11 +344,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'fifo' }))}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  form.matchMethod === 'fifo'
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${form.matchMethod === 'fifo'
                     ? 'bg-emerald-50/80 border-emerald-400 text-emerald-950 ring-2 ring-emerald-400/20 shadow-2xs'
                     : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold flex items-center gap-1.5">
@@ -361,7 +374,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 <span className="text-[11px] bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-semibold">
                   {costPreview.matched.length} lô ({
                     form.matchMethod === 'highest' ? '📈 Giá cao nhất' :
-                    form.matchMethod === 'fifo' ? '⏱️ Mua sớm nhất (FIFO)' : '📉 Giá thấp nhất'
+                      form.matchMethod === 'fifo' ? '⏱️ Mua sớm nhất (FIFO)' : '📉 Giá thấp nhất'
                   })
                 </span>
               </div>
@@ -494,11 +507,10 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     type="button"
                     key={t}
                     onClick={() => selectTag(t)}
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${
-                      isSelected
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${isSelected
                         ? 'bg-orange-600 text-white shadow-xs font-bold ring-2 ring-orange-400/30'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                    }`}
+                      }`}
                   >
                     {isSelected ? '✓ ' : ''}{t}
                   </button>
@@ -534,6 +546,50 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               >
                 + Chọn
               </button>
+            </div>
+          </div>
+
+          {/* Psychological Review & Discipline Assessment */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-gray-700">
+                🧠 Đánh giá tâm lý & kỷ luật <span className="text-xs text-indigo-600 font-semibold">(Tự soi xét bản thân)</span>
+              </label>
+              {selectedDiscipline && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDiscipline('')}
+                  className="text-[11px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                >
+                  ✕ Bỏ chọn
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mb-2">
+              Ghi nhận tâm lý khi chốt lệnh bán để rèn luyện kỷ luật và tránh mắc lỗi lặp lại
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {DISCIPLINE_TAGS.map(item => {
+                const isSelected = selectedDiscipline === item.label;
+                return (
+                  <button
+                    type="button"
+                    key={item.id}
+                    onClick={() => setSelectedDiscipline(prev => (prev === item.label ? '' : item.label))}
+                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${isSelected
+                        ? `${item.color} shadow-xs font-semibold ring-2 ring-indigo-400/40 border-current`
+                        : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700 text-gray-700 dark:text-slate-300'
+                      }`}
+                  >
+                    <div className="text-xs font-medium leading-tight">
+                      {isSelected ? '✓ ' : ''}{item.label}
+                    </div>
+                    <div className="text-[10px] text-gray-400 dark:text-slate-400 mt-0.5 line-clamp-1">
+                      {item.desc}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -642,7 +698,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
             <p className="text-xs font-bold text-gray-700 uppercase mb-2">
               📋 Danh sách các lô mua gốc đã khớp ({
                 result.matchMethod === 'highest' ? 'giá cao nhất trước' :
-                result.matchMethod === 'fifo' ? 'theo ngày mua FIFO' : 'giá thấp nhất trước'
+                  result.matchMethod === 'fifo' ? 'theo ngày mua FIFO' : 'giá thấp nhất trước'
               })
             </p>
             <div className="space-y-1.5">

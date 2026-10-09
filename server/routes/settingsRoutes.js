@@ -2,12 +2,38 @@ import express from 'express';
 import {
   getAllData,
   updateGoal,
+  updateCashBalance,
+  getCashBalance,
   restoreAllData,
   clearUserData,
 } from '../storage/sqliteStore.js';
 import { getTodayString } from '../services/matchingService.js';
 
 const router = express.Router();
+
+// Lấy số dư tiền mặt
+router.get(['/cash-balance', '/settings/cash-balance'], async (req, res) => {
+  try {
+    const userId = req.user?.id || 'demo';
+    const cashBalance = await getCashBalance(userId);
+    res.json({ cashBalance });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Cập nhật số dư tiền mặt
+router.post(['/cash-balance', '/settings/cash-balance'], async (req, res) => {
+  const { cashBalance } = req.body;
+  const val = Math.max(0, parseFloat(cashBalance) || 0);
+  try {
+    const userId = req.user?.id || 'demo';
+    await updateCashBalance(val, userId);
+    res.json({ cashBalance: val });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Cập nhật mục tiêu
 router.post('/goal', async (req, res) => {
