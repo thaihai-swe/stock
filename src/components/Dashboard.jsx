@@ -22,7 +22,7 @@ function StatCard({ label, value, sub, highlight }) {
   );
 }
 
-export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess }) {
+export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess, refreshKey }) {
   const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [] } = data;
 
   // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
@@ -100,6 +100,18 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
       .then(map => { if (map) setFundamentalsMap(map); })
       .catch(err => console.warn('Lỗi lấy chỉ số cơ bản cho dashboard:', err));
   }, [portfolio]);
+
+  useEffect(() => {
+    if (refreshKey) {
+      loadMarketPrices(true);
+      if (portfolio && portfolio.length > 0) {
+        const symbols = portfolio.map(p => p.symbol);
+        fetchFundamentals(symbols, true)
+          .then(map => { if (map) setFundamentalsMap(map); })
+          .catch(err => console.warn('Lỗi lấy chỉ số cơ bản cho dashboard:', err));
+      }
+    }
+  }, [refreshKey]);
 
   // Tổng giá trị danh mục theo thị trường (Market Value)
   const totalMarketValue = portfolio.reduce((sum, p) => {

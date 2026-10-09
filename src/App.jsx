@@ -113,11 +113,13 @@ export default function App({ hasGoogleClientId = false }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const loadData = useCallback(async () => {
     try {
       const d = await fetchData();
       setData(d);
+      setRefreshKey(k => k + 1);
       setError('');
     } catch (err) {
       setError(err.message || 'Không thể kết nối server. Hãy đảm bảo server đang chạy.');
@@ -445,6 +447,7 @@ export default function App({ hasGoogleClientId = false }) {
             {tab === 'dashboard' && (
               <Dashboard
                 data={data}
+                refreshKey={refreshKey}
                 onSuccess={loadData}
                 onNavigateBuy={handleSelectBuy}
                 onNavigateDca={handleSelectDca}
@@ -510,6 +513,7 @@ export default function App({ hasGoogleClientId = false }) {
               <Watchlist
                 watchlist={data.watchlist || []}
                 portfolio={data.portfolio || []}
+                refreshKey={refreshKey}
                 onSuccess={loadData}
                 onSelectBuy={handleSelectBuy}
                 onSelectSell={handleSelectSell}

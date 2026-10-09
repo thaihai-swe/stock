@@ -12,6 +12,7 @@ import os
 import sys
 import time
 import ssl
+import sqlite3
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -287,6 +288,38 @@ def sync_to_turso_http(cache_dict):
     except Exception as e:
         print(f"⚠️ Cảnh báo đồng bộ Turso HTTP: {e}")
 
+def sync_to_local_sqlite(cache_dict):
+    db_file = DATA_DIR / "stock.db"
+    print(f"🏠 Chế độ DB_MODE=local: Đang đồng bộ vào SQLite cục bộ ({db_file})...")
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        conn = sqlite3.connect(str(db_file))
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS fundamentals_cache (
+                symbol TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                updated_at INTEGER NOT NULL
+            );
+        """)
+        # Xoá toàn bộ dữ liệu cũ để tránh phình dung lượng
+        cursor.execute("DELETE FROM fundamentals_cache;")
+        now_ts = int(time.time() * 1000)
+        items_to_insert = [
+            (sym, json.dumps(data_obj, ensure_ascii=False), now_ts)
+            for sym, data_obj in cache_dict.items()
+            if not sym.startswith("_")
+        ]
+        cursor.executemany(
+            "INSERT INTO fundamentals_cache (symbol, data, updated_at) VALUES (?, ?, ?);",
+            items_to_insert
+        )
+        conn.commit()
+        conn.close()
+        print(f"✅ Đã xoá dữ liệu cũ và ghi đè {len(items_to_insert)} mã vào SQLite cục bộ (data/stock.db) thành công!")
+    except Exception as e:
+        print(f"⚠️ Cảnh báo đồng bộ SQLite cục bộ: {e}")
+
 def main():
     print("\n======================================================")
     print("🐍 PYTHON BACKGROUND SYNC: ĐỒNG BỘ ĐỊNH GIÁ & CƠ BẢN")
@@ -343,8 +376,15 @@ def main():
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(new_cache, f, ensure_ascii=False, indent=2)
 
-    # Đồng bộ Turso nếu có cấu hình (Xoá bảng cũ và nạp mới 100%)
-    sync_to_turso_http(new_cache)
+    # Phân luồng lưu trữ theo DB_MODE
+    db_mode = os.environ.get("DB_MODE", "").strip().lower()
+    turso_url = os.environ.get("TURSO_DATABASE_URL", "").strip()
+    is_ci = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI") == "true"
+
+    if (db_mode == "turso" or (is_ci and db_mode != "local")) and turso_url:
+        sync_to_turso_http(new_cache)
+    else:
+        sync_to_local_sqlite(new_cache)
 
     elapsed = round(time.time() - t0, 2)
     print(f"\n✅ Đã đồng bộ thành công {valid_count} mã trong {elapsed}s.")

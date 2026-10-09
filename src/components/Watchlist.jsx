@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { addWatchlist, deleteWatchlist, fetchPrices, fetchFundamentals } from '../utils/api.js';
 import { fmtMoney, fmtDate } from '../utils/format.js';
 
-export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell }) {
+export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell, refreshKey }) {
   const [symbol, setSymbol] = useState('');
   const [targetBuyPrice, setTargetBuyPrice] = useState('');
   const [targetSellPrice, setTargetSellPrice] = useState('');
@@ -42,8 +42,8 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
   }, [watchlist]);
 
   useEffect(() => {
-    loadMarketPrices(false);
-  }, [loadMarketPrices]);
+    loadMarketPrices(Boolean(refreshKey));
+  }, [loadMarketPrices, refreshKey]);
 
   async function handleAdd(e) {
     e.preventDefault();
