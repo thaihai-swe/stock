@@ -4,7 +4,7 @@ import { fmtDate, fmtMoney, getDisciplineTagInfo, getStockColor, plBg, plColor }
 import StockDetailModal from './StockDetailModal.jsx';
 import StockPerformanceTable from './StockPerformanceTable.jsx';
 
-export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onNavigateSell }) {
+export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onNavigateSell, onSwitchTab }) {
   const { buyOrders = [], sellOrders = [] } = data;
   const [subTab, setSubTab] = useState('orders'); // 'orders' | 'performance'
   const [selectedSymbolModal, setSelectedSymbolModal] = useState(null);
@@ -1081,6 +1081,7 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
         marketPrices={marketPrices}
         onNavigateBuy={onNavigateBuy}
         onNavigateSell={onNavigateSell}
+        onSwitchTab={onSwitchTab}
       />
     </div>
   );

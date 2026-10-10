@@ -23,7 +23,7 @@ export const TRADINGVIEW_COLUMNS = [
   'price_52_week_high', 'price_52_week_low',
   'average_volume_10d_calc', 'average_volume_30d_calc', 'Volatility.W', 'Volatility.M',
   // Kỹ thuật & Định lượng
-  'Recommend.All', 'RSI', 'MACD.macd', 'MACD.signal', 'beta_1_year'
+  'Recommend.All', 'beta_1_year'
 ];
 
 function normalizeFundamentalRow(row, columns) {
@@ -144,9 +144,6 @@ function normalizeFundamentalRow(row, columns) {
       recommendScore: recScore != null ? Number(recScore.toFixed(2)) : null,
       recommendText,
       recommendColor,
-      rsi: d['RSI'] != null ? Number(d['RSI'].toFixed(1)) : null,
-      macd: d['MACD.macd'] != null ? Number(d['MACD.macd'].toFixed(2)) : null,
-      macdSignal: d['MACD.signal'] != null ? Number(d['MACD.signal'].toFixed(2)) : null,
       beta: d['beta_1_year'] != null ? Number(d['beta_1_year'].toFixed(2)) : null,
     },
 

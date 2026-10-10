@@ -69,10 +69,17 @@ COLUMNS = [
     "Perf.W", "Perf.1M", "Perf.3M", "Perf.6M", "Perf.YTD", "Perf.Y", "Perf.5Y",
     "price_52_week_high", "price_52_week_low",
     "average_volume_10d_calc", "average_volume_30d_calc", "Volatility.W", "Volatility.M",
-    "Recommend.All", "RSI", "MACD.macd", "MACD.signal", "beta_1_year"
+    "Recommend.All", "beta_1_year"
 ]
 
 def load_symbols():
+    if len(sys.argv) > 1:
+        for i, arg in enumerate(sys.argv):
+            if arg == "--symbols" and i + 1 < len(sys.argv):
+                return [s.strip().upper() for s in sys.argv[i+1].split(",") if s.strip()]
+            elif not arg.startswith("-") and i > 0:
+                return [s.strip().upper() for s in arg.split(",") if s.strip()]
+
     symbols = []
     if SUPPORTED_FILE.exists():
         try:
@@ -94,27 +101,15 @@ def load_symbols():
 
     return symbols
 
+try:
+    from fetchers.market_fetcher import MarketFetcher
+except ImportError:
+    from scripts.fetchers.market_fetcher import MarketFetcher
+
 def fetch_tradingview(symbols):
-    url = "https://scanner.tradingview.com/vietnam/scan"
-    payload = {
-        "filter": [{"left": "name", "operation": "in_range", "right": symbols}],
-        "columns": COLUMNS
-    }
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={
-            "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
-        }
-    )
-    try:
-        with urlopen_safe(req, timeout=30) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        print(f"❌ HTTP Error {e.code}: {e.read().decode('utf-8')}")
-        raise e
+    """Ủy thác việc lấy dữ liệu TradingView Scanner sang MarketFetcher độc lập."""
+    fetcher = MarketFetcher()
+    return fetcher.fetch_tradingview_raw(symbols)
 
 def compute_valuation_models(close, eps, pb, dps, revenue, net_income, total_assets, total_debt):
     """
@@ -263,35 +258,14 @@ def compute_dupont(net_margin, revenue, total_assets, total_debt, roe_val):
         "qualityAssessment": quality,
     }
 
-def compute_tech_score(rsi, macd, macd_sig, close, h52, l52, rec_score):
+def compute_tech_score(close, h52, l52, rec_score):
     """
-    Chấm điểm kỹ thuật Active Tech Score (-6 đến +6)
+    Chấm điểm xung lực kỹ thuật (-3 đến +3)
     """
     score = 0
     factors = []
 
-    # 1. RSI Factor
-    if rsi is not None:
-        if 40 <= rsi <= 65:
-            score += 1
-            factors.append("RSI trong vùng vận động tích cực (40-65)")
-        elif rsi < 30:
-            score += 1
-            factors.append("RSI quá bán (<30), khả năng xuất hiện nhịp hồi")
-        elif rsi > 70:
-            score -= 1
-            factors.append("RSI quá mua (>70), rủi ro rung lắc ngắn hạn")
-
-    # 2. MACD Momentum
-    if macd is not None and macd_sig is not None:
-        if macd > macd_sig:
-            score += 1
-            factors.append("MACD nằm trên đường Signal (Động lượng tăng)")
-        else:
-            score -= 1
-            factors.append("MACD nằm dưới đường Signal (Động lượng giảm)")
-
-    # 3. TradingView Recommendation Factor
+    # 1. TradingView Recommendation Factor (-2 đến +2)
     if rec_score is not None:
         if rec_score >= 0.3:
             score += 2
@@ -306,7 +280,7 @@ def compute_tech_score(rsi, macd, macd_sig, close, h52, l52, rec_score):
             score -= 1
             factors.append("Đồng thuận kỹ thuật TradingView: Yếu")
 
-    # 4. Vị thế giá 52 tuần
+    # 2. Vị thế giá 52 tuần (-1 đến +1)
     if close is not None and h52 is not None and l52 is not None and h52 > l52:
         pos = ((close - l52) / (h52 - l52)) * 100
         if pos < 15:
@@ -316,23 +290,23 @@ def compute_tech_score(rsi, macd, macd_sig, close, h52, l52, rec_score):
             score -= 1
             factors.append("Thị giá tiệm cận đỉnh 52 tuần (Áp lực chốt lời lớn)")
 
-    # Giới hạn điểm trong dải [-6, +6]
-    score = max(-6, min(6, score))
+    # Giới hạn điểm trong dải [-3, +3]
+    score = max(-3, min(3, score))
 
-    if score >= 4:
-        verdict = "Cực kỳ tích cực (Strong Bullish)"
-        color = "text-emerald-500 font-bold"
-    elif score >= 1:
+    if score >= 2:
         verdict = "Tích cực (Bullish)"
+        color = "text-emerald-500 font-bold"
+    elif score == 1:
+        verdict = "Khá (Moderate Bullish)"
         color = "text-green-500 font-semibold"
     elif score == 0:
         verdict = "Trung lập (Neutral)"
         color = "text-gray-400"
-    elif score >= -3:
-        verdict = "Tiêu cực (Bearish)"
+    elif score == -1:
+        verdict = "Kém (Moderate Bearish)"
         color = "text-rose-400 font-semibold"
     else:
-        verdict = "Cực kỳ tiêu cực (Strong Bearish)"
+        verdict = "Tiêu cực (Bearish)"
         color = "text-rose-500 font-bold"
 
     return {
@@ -380,14 +354,10 @@ def normalize_row(row):
     debt_val = round(float(d["total_debt_fq"])) if d.get("total_debt_fq") is not None else None
     net_margin_val = round(float(d["net_margin_ttm"]), 2) if d.get("net_margin_ttm") is not None else None
     roe_val = round(float(d["return_on_equity_fq"]), 2) if d.get("return_on_equity_fq") is not None else None
-    rsi_val = round(float(d["RSI"]), 1) if d.get("RSI") is not None else None
-    macd_val = round(float(d["MACD.macd"]), 2) if d.get("MACD.macd") is not None else None
-    macd_sig_val = round(float(d["MACD.signal"]), 2) if d.get("MACD.signal") is not None else None
-
     # Tính toán các mô hình định giá chuyên sâu
     val_models = compute_valuation_models(close, eps_val, pb_val, dps_val, rev_val, ni_val, assets_val, debt_val)
     dupont_models = compute_dupont(net_margin_val, rev_val, assets_val, debt_val, roe_val)
-    tech_eval = compute_tech_score(rsi_val, macd_val, macd_sig_val, close, h52, l52, rec_score)
+    tech_eval = compute_tech_score(close, h52, l52, rec_score)
 
     return {
         "symbol": sym,
@@ -458,9 +428,6 @@ def normalize_row(row):
             "recommendScore": round(float(rec_score), 2) if rec_score is not None else None,
             "recommendText": rec_text,
             "recommendColor": rec_color,
-            "rsi": rsi_val,
-            "macd": macd_val,
-            "macdSignal": macd_sig_val,
             "beta": round(float(d["beta_1_year"]), 2) if d.get("beta_1_year") is not None else None,
             **tech_eval
         },
@@ -878,25 +845,46 @@ def main():
             item["dupont"] = dupont
 
             techs = compute_tech_score(
-                item.get("technicals", {}).get("rsi"),
-                item.get("technicals", {}).get("macd"),
-                item.get("technicals", {}).get("macdSignal"),
                 close,
                 item.get("performance", {}).get("high52w"),
                 item.get("performance", {}).get("low52w"),
                 item.get("technicals", {}).get("recommendScore")
             )
             item.setdefault("technicals", {}).update(techs)
+            item.get("technicals", {}).pop("rsi", None)
+            item.get("technicals", {}).pop("macd", None)
+            item.get("technicals", {}).pop("macdSignal", None)
             item["updatedAt"] = int(time.time() * 1000)
             new_cache[s] = item
             count += 1
+
+    # Nếu đồng bộ một phần (partial sync), merge với cache cũ để không làm mất mã đã có
+    if len(sys.argv) > 1:
+        merged_cache = {**old_cache, **new_cache}
+        # Cập nhật danh sách supported_stocks.json nếu có mã mới
+        if SUPPORTED_FILE.exists():
+            try:
+                with open(SUPPORTED_FILE, "r", encoding="utf-8") as f:
+                    sup_data = json.load(f)
+                cur_syms = sup_data.get("symbols", []) if isinstance(sup_data, dict) else (sup_data if isinstance(sup_data, list) else [])
+                updated = False
+                for s in symbols:
+                    if s not in cur_syms:
+                        cur_syms.append(s)
+                        updated = True
+                if updated:
+                    with open(SUPPORTED_FILE, "w", encoding="utf-8") as f:
+                        json.dump({"symbols": cur_syms}, f, ensure_ascii=False, indent=2)
+            except Exception:
+                pass
+        new_cache = merged_cache
 
     # Lưu metadata đồng bộ vào fundamentals_cache
     valid_count = len([k for k in new_cache if not k.startswith("_")])
     new_cache["_meta"] = {
         "lastSyncedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "syncedCount": valid_count,
-        "symbolsCount": len(symbols)
+        "symbolsCount": valid_count
     }
 
     if not DATA_DIR.exists():

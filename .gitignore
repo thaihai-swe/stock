@@ -154,3 +154,11 @@ vite.config.ts.timestamp-*
 # Turbo Repo
 .turbo
 .DS_Store
+
+# Python & UV Environments
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/

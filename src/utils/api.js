@@ -81,6 +81,84 @@ export const fetchMarketIndex = (force = false) =>
 // Valuation & Local JSON APIs
 export const fetchValuationStocks = () => request('/valuation/stocks');
 export const fetchValuationMacro  = () => request('/valuation/macro');
+export const fetchMacroIndicators = () => request('/valuation/macro-indicators');
 export const fetchStockFinancials = (symbol) => request(`/valuation/financials/${encodeURIComponent(symbol)}`);
 export const fetchRawJson         = (type, symbol = '') => request(`/valuation/raw-json/${type}?symbol=${encodeURIComponent(symbol)}`);
 export const triggerValuationSync = () => request('/valuation/sync', { method: 'POST' });
+export const triggerSingleFinancialSync = (symbol) => request(`/valuation/sync-single/${encodeURIComponent(symbol)}`, { method: 'POST' });
+
+// DNSE OHLC Realtime & Historical Market Index (với fallback trực tiếp tới DNSE API)
+export const fetchDnseOhlc = async ({ symbol = 'VNINDEX', resolution = '1D', from = '', to = '' } = {}) => {
+  const q = new URLSearchParams();
+  if (symbol) q.set('symbol', symbol);
+  if (resolution) q.set('resolution', resolution);
+  if (from) q.set('from', from);
+  if (to) q.set('to', to);
+
+  try {
+    const res = await request(`/valuation/dnse-ohlc?${q.toString()}`);
+    if (res && res.data && res.data.t && res.data.t.length > 0) {
+      return res;
+    }
+  } catch {
+    // Dự phòng gọi trực tiếp DNSE API
+  }
+
+  // Fallback: Gọi trực tiếp tới máy chủ DNSE (hỗ trợ CORS mở)
+  const INDEX_SYMBOLS = ['VNINDEX', 'VN30', 'HNX', 'HNX30', 'UPCOM', 'VN100', 'VNXALLSHARE', 'VNDIVIDEND', 'VNMITECH', 'VN50GROWTH'];
+  let type = 'stock';
+  if (INDEX_SYMBOLS.includes(symbol)) {
+    type = 'index';
+  } else if (symbol.startsWith('VN30F')) {
+    type = 'derivative';
+  }
+
+  const directUrl = new URL(`https://api.dnse.com.vn/chart-api/v2/ohlcs/${type}`);
+  directUrl.searchParams.set('symbol', symbol);
+  directUrl.searchParams.set('resolution', resolution);
+  if (from) directUrl.searchParams.set('from', from);
+  if (to) directUrl.searchParams.set('to', to);
+
+  const directRes = await fetch(directUrl.toString(), {
+    headers: { 'Accept': 'application/json' }
+  });
+  const json = await directRes.json();
+  const c = json.c || [];
+  const n = c.length;
+  const currentPrice = n > 0 ? c[n - 1] : null;
+  const prevPrice = n > 1 ? c[n - 2] : currentPrice;
+  const change = (currentPrice != null && prevPrice != null) ? +(currentPrice - prevPrice).toFixed(2) : 0;
+  const changePercent = (prevPrice && prevPrice > 0) ? +((change / prevPrice) * 100).toFixed(2) : 0;
+
+  return {
+    symbol,
+    type,
+    resolution,
+    count: n,
+    summary: {
+      current: currentPrice,
+      prevClose: prevPrice,
+      change,
+      changePercent,
+    },
+    data: json,
+  };
+};
+
+// Chuỗi Lịch Sử Định Giá Thị Trường (Google Sheets Simply Wall St với fallback sang macro)
+export const fetchMarketValuationHistory = async () => {
+  try {
+    const res = await request('/valuation/market-history');
+    if (res && res.periods && Object.keys(res.periods).length > 0) {
+      return res;
+    }
+  } catch {
+    // Dự phòng fallback sang cache nhúng trong macro_valuation.json
+  }
+
+  const macro = await fetchValuationMacro().catch(() => null);
+  if (macro?.marketValuationHistory && Object.keys(macro.marketValuationHistory.periods || {}).length > 0) {
+    return macro.marketValuationHistory;
+  }
+  return { _meta: {}, metrics: [], periods: {} };
+};

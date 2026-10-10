@@ -9,6 +9,7 @@ import StrategyAnalytics from './components/StrategyAnalytics.jsx';
 import TransactionHistory from './components/TransactionHistory.jsx';
 import Watchlist from './components/Watchlist.jsx';
 import ValuationDashboard from './components/ValuationDashboard.jsx';
+import MacroDashboard from './components/MacroDashboard.jsx';
 import UserNav from './components/UserNav.jsx';
 import LoginModal from './components/LoginModal.jsx';
 import {
@@ -22,7 +23,8 @@ import {
 
 const TABS = [
   { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊' },
-  { id: 'valuation', label: '🏢 Định Giá & Vĩ Mô', shortLabel: 'Định Giá', icon: '🏢' },
+  { id: 'macro', label: '🌐 Vĩ Mô & VN-Index', shortLabel: 'Vĩ Mô', icon: '🌐' },
+  { id: 'valuation', label: '🏢 Định Giá Cổ Phiếu', shortLabel: 'Định Giá', icon: '🏢' },
   { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜' },
   { id: 'buy', label: '🛒 Mua vào', shortLabel: 'Mua vào', icon: '🛒' },
   { id: 'sell', label: '💸 Bán ra', shortLabel: 'Bán ra', icon: '💸' },
@@ -38,7 +40,8 @@ const TAB_GROUPS = [
     groupTitle: 'Quản Trị Danh Mục & Phân Tích',
     items: [
       { id: 'dashboard', label: 'Tổng Quan (Dashboard)', icon: '📊', desc: 'Nắm giữ, lãi/lỗ & phân bổ vốn' },
-      { id: 'valuation', label: 'Định Giá & Vĩ Mô', icon: '🏢', desc: 'Mô hình Graham, DDM, BCTC & VN-Index' },
+      { id: 'macro', label: 'Vĩ Mô & VN-Index', icon: '🌐', desc: 'Regime chu kỳ, nhiệt kế định giá & 11 ngành' },
+      { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: 'Mô hình Graham, DDM, EV/EBITDA & BCTC' },
       { id: 'dca', label: 'Kế Hoạch DCA', icon: '🪜', desc: 'Mô phỏng & lộ trình mua gom đa tầng' },
       { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách' },
     ]
@@ -66,6 +69,7 @@ export default function App({ hasGoogleClientId = false }) {
   const [buyInitial, setBuyInitial] = useState({ symbol: '', quantity: '', price: '' });
   const [sellInitialSymbol, setSellInitialSymbol] = useState('');
   const [dcaInitialStock, setDcaInitialStock] = useState(null);
+  const [valuationInitialSymbol, setValuationInitialSymbol] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isTradeSheetOpen, setIsTradeSheetOpen] = useState(false);
 
@@ -94,6 +98,17 @@ export default function App({ hasGoogleClientId = false }) {
     }
     localStorage.setItem('stock_theme', theme);
   }, [theme]);
+
+  // Lắng nghe phím ESC để đóng Drawer trên Desktop
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape' && isDrawerOpen) {
+        setIsDrawerOpen(false);
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDrawerOpen]);
 
   function toggleTheme() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -263,8 +278,11 @@ export default function App({ hasGoogleClientId = false }) {
     setIsTradeSheetOpen(false);
   }
 
-  function switchTab(targetTab) {
+  function switchTab(targetTab, param) {
     setTab(targetTab);
+    if (targetTab === 'valuation' && param) {
+      setValuationInitialSymbol(param);
+    }
     if (targetTab !== 'buy') setBuyInitial({ symbol: '', quantity: '', price: '' });
     if (targetTab !== 'sell') setSellInitialSymbol('');
     if (targetTab !== 'dca') setDcaInitialStock(null);
@@ -388,20 +406,22 @@ export default function App({ hasGoogleClientId = false }) {
                 <span className={`text-base ${loading ? 'animate-spin' : ''}`}>🔄</span>
               </button>
 
-              {/* Nút Mở Menu Drawer Trên Mobile (md:hidden) */}
+              {/* Nút Mở Menu Drawer Đa Nền Tảng (Mobile & Desktop) */}
               <button
+                type="button"
                 onClick={() => setIsDrawerOpen(true)}
-                className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 active:scale-95 transition-all cursor-pointer font-bold"
-                title="Mở toàn bộ danh mục tính năng"
-                aria-label="Menu"
+                className="flex items-center justify-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 active:scale-95 transition-all cursor-pointer font-bold text-xs border border-gray-200/60 dark:border-slate-700/60 shadow-2xs"
+                title="Mở toàn bộ danh mục tính năng (Phím tắt: ESC để đóng)"
+                aria-label="Menu chức năng"
               >
-                <span className="text-lg leading-none">☰</span>
+                <span className="text-base leading-none">☰</span>
+                <span className="hidden sm:inline font-semibold">Menu</span>
               </button>
             </div>
           </div>
 
           {/* 2. DESKTOP TAB BAR (hidden md:flex) - Hiển thị ngang cao cấp trên màn hình lớn */}
-          <nav className="hidden md:flex gap-1 -mb-px overflow-x-auto no-scrollbar pt-1">
+          <nav className="hidden md:flex items-center gap-1 -mb-px overflow-x-auto no-scrollbar pt-1">
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -415,6 +435,17 @@ export default function App({ hasGoogleClientId = false }) {
                 <span>{t.label.replace(/^.*? /, '')}</span>
               </button>
             ))}
+
+            {/* Nút Mở Toàn Bộ Danh Mục ở cuối thanh Tab Desktop */}
+            <button
+              type="button"
+              onClick={() => setIsDrawerOpen(true)}
+              className="px-3 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 rounded-t-lg transition flex items-center gap-1.5 shrink-0 border-b-2 border-transparent cursor-pointer ml-1"
+              title="Xem toàn bộ 11 chức năng được phân nhóm"
+            >
+              <span className="text-sm">📑</span>
+              <span>Tất Cả</span>
+            </button>
           </nav>
         </div>
       </header>
@@ -458,6 +489,13 @@ export default function App({ hasGoogleClientId = false }) {
                   setSellInitialSymbol(symbol || '');
                   setTab('sell');
                 }}
+                onSwitchTab={switchTab}
+              />
+            )}
+            {tab === 'macro' && (
+              <MacroDashboard
+                refreshKey={refreshKey}
+                onSwitchTab={switchTab}
               />
             )}
             {tab === 'valuation' && (
@@ -465,6 +503,7 @@ export default function App({ hasGoogleClientId = false }) {
                 data={data}
                 refreshKey={refreshKey}
                 onSwitchTab={switchTab}
+                initialSymbol={valuationInitialSymbol}
               />
             )}
             {tab === 'dca' && (
@@ -507,6 +546,7 @@ export default function App({ hasGoogleClientId = false }) {
                   setSellInitialSymbol(symbol || '');
                   setTab('sell');
                 }}
+                onSwitchTab={switchTab}
               />
             )}
             {tab === 'dividend' && (
@@ -694,21 +734,22 @@ export default function App({ hasGoogleClientId = false }) {
           />
 
           {/* Drawer Panel */}
-          <div className="relative w-full max-w-xs sm:max-w-sm bg-white h-full shadow-2xl z-10 flex flex-col animate-in slide-in-from-right duration-250">
+          <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 h-full shadow-2xl z-10 flex flex-col animate-in slide-in-from-right duration-250">
             {/* Header Drawer */}
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white">
+            <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white dark:from-slate-850 dark:to-slate-900">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">📈</span>
                 <div>
-                  <h3 className="font-bold text-gray-800 text-sm">Menu Tính Năng</h3>
-                  <p className="text-[11px] text-gray-400">{data.portfolio.length} mã trong danh mục</p>
+                  <h3 className="font-bold text-gray-800 dark:text-white text-sm">Menu Tính Năng</h3>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500">{data.portfolio.length} mã trong danh mục · ESC để đóng</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsDrawerOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm cursor-pointer"
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-300 flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                title="Đóng menu (ESC)"
               >
                 ✕
               </button>
@@ -716,17 +757,17 @@ export default function App({ hasGoogleClientId = false }) {
 
             {/* Body Drawer: Thông tin tài khoản & Danh sách tính năng */}
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              {/* Account Quick Status inside Mobile Drawer */}
-              <div className="p-3 bg-gray-50 border border-gray-200/80 rounded-2xl flex items-center justify-between">
+              {/* Account Quick Status inside Mobile/Desktop Drawer */}
+              <div className="p-3 bg-gray-50 dark:bg-slate-800/60 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-2xs">
                     {(currentUser.name || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="truncate">
-                    <div className="text-xs font-bold text-gray-800 truncate">
+                    <div className="text-xs font-bold text-gray-800 dark:text-white truncate">
                       {currentUser.name}
                     </div>
-                    <div className="text-[10px] text-gray-400 truncate">
+                    <div className="text-[10px] text-gray-400 dark:text-gray-400 truncate">
                       {currentUser.isDemo ? 'Chế độ Demo' : (currentUser.email || 'Tài khoản cá nhân')}
                     </div>
                   </div>
@@ -747,7 +788,7 @@ export default function App({ hasGoogleClientId = false }) {
                       setIsDrawerOpen(false);
                       handleLogout();
                     }}
-                    className="px-2 py-1 text-red-600 hover:bg-red-50 text-[11px] font-bold rounded-lg shrink-0 cursor-pointer"
+                    className="px-2 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 text-[11px] font-bold rounded-lg shrink-0 cursor-pointer"
                   >
                     Đăng xuất
                   </button>
@@ -756,7 +797,7 @@ export default function App({ hasGoogleClientId = false }) {
 
               {TAB_GROUPS.map((group) => (
                 <div key={group.groupTitle} className="space-y-2">
-                  <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-2">
+                  <h4 className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2">
                     {group.groupTitle}
                   </h4>
                   <div className="space-y-1">
@@ -768,14 +809,14 @@ export default function App({ hasGoogleClientId = false }) {
                           type="button"
                           onClick={() => switchTab(item.id)}
                           className={`w-full p-2.5 rounded-xl flex items-center gap-3 text-left transition-all cursor-pointer ${isActive
-                              ? 'bg-indigo-50 border border-indigo-200/60 text-indigo-900 shadow-2xs'
-                              : 'hover:bg-gray-50 text-gray-700'
+                              ? 'bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 text-indigo-900 dark:text-indigo-200 shadow-2xs'
+                              : 'hover:bg-gray-50 dark:hover:bg-slate-800/60 text-gray-700 dark:text-gray-300'
                             }`}
                         >
                           <span className="text-2xl w-8 text-center shrink-0">{item.icon}</span>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
-                              <span className={`text-xs font-bold ${isActive ? 'text-indigo-700' : 'text-gray-800'}`}>
+                              <span className={`text-xs font-bold ${isActive ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>
                                 {item.label}
                               </span>
                               {isActive && (
@@ -784,7 +825,7 @@ export default function App({ hasGoogleClientId = false }) {
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                            <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
                               {item.desc}
                             </p>
                           </div>
@@ -797,19 +838,19 @@ export default function App({ hasGoogleClientId = false }) {
             </div>
 
             {/* Footer Drawer: Trạng thái & Nút đóng */}
-            <div className="p-4 border-t border-gray-100 bg-gray-50/70 text-xs text-gray-500 space-y-2">
+            <div className="p-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-slate-900/90 text-xs text-gray-500 dark:text-gray-400 space-y-2">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="text-gray-400">Database Engine:</span>
-                <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+                <span className="text-gray-400 dark:text-gray-500">Database Engine:</span>
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/40 dark:border-indigo-800/40 px-2 py-0.5 rounded-md">
                   SQLite Cloud (Turso)
                 </span>
               </div>
               <div className="flex items-center justify-between text-[11px] pt-1">
-                <span className="text-gray-400">Giao diện (Theme):</span>
+                <span className="text-gray-400 dark:text-gray-500">Giao diện (Theme):</span>
                 <button
                   type="button"
                   onClick={toggleTheme}
-                  className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg font-semibold text-gray-700 flex items-center gap-1.5"
+                  className="px-2.5 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   {theme === 'dark' ? '☀️ Chế độ Sáng' : '🌙 Chế độ Tối'}
                 </button>
@@ -817,9 +858,9 @@ export default function App({ hasGoogleClientId = false }) {
               <button
                 type="button"
                 onClick={() => setIsDrawerOpen(false)}
-                className="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-xl font-semibold text-xs transition-colors cursor-pointer"
+                className="w-full py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 rounded-xl font-semibold text-xs transition-colors cursor-pointer"
               >
-                Đóng Menu
+                Đóng Menu (ESC)
               </button>
             </div>
           </div>

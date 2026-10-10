@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import { execFile } from 'child_process';
 import path from 'path';
 import { ROOT_DIR } from '../config/constants.js';
@@ -6,6 +7,9 @@ import { getMultipleFundamentals } from '../services/fundamentalService.js';
 import { loadSupportedStocks, saveSupportedStocks, readData } from '../storage/jsonStore.js';
 
 const router = express.Router();
+
+const VENV_PYTHON = path.join(ROOT_DIR, '.venv', 'bin', 'python');
+const PYTHON_CMD = fs.existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
 
 /**
  * 1. Lấy dữ liệu cơ bản theo danh sách mã
@@ -53,7 +57,7 @@ router.post('/fundamentals/sync', (req, res) => {
   const pythonScript = path.join(ROOT_DIR, 'scripts', 'sync_fundamentals.py');
 
   // Ưu tiên chạy Python sync script
-  execFile('python3', [pythonScript], async (error, stdout, stderr) => {
+  execFile(PYTHON_CMD, [pythonScript], async (error, stdout, stderr) => {
     if (!error) {
       const config = loadSupportedStocks();
       return res.json({

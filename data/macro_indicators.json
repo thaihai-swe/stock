@@ -1,0 +1,1142 @@
+{
+  "_meta": {
+    "source": "TradingEconomics Vietnam",
+    "fetchSource": "LOCAL_RAW_SNAPSHOT_CACHE",
+    "updatedAt": "2026-10-10T12:10:05Z",
+    "totalCategories": 10,
+    "totalIndicators": 95
+  },
+  "macroCore": {
+    "gdp_growth_yoy": 9.95,
+    "cpi_yoy": 5.08,
+    "cpi_core": 4.45,
+    "sbv_refinancing_rate": 4.5,
+    "interbank_rate": 6.47,
+    "credit_growth_yoy": 15.08,
+    "pmi": 51.9,
+    "iip_growth": 16.7,
+    "retail_sales_yoy": 14.1,
+    "unemployment_rate": 2.22,
+    "trade_balance_bn_usd": 1.27,
+    "govt_debt_to_gdp": 33.6,
+    "usdvnd": 25881.0,
+    "stock_index": 1735.0
+  },
+  "categories": {
+    "overview": {
+      "key": "overview",
+      "title": "Tổng Quan",
+      "count": 14,
+      "items": [
+        {
+          "name": "Currency",
+          "value": 25881.0,
+          "previous": 25900.0,
+          "highest": 26457.0,
+          "lowest": 10981.0,
+          "unit": "",
+          "period": "Oct/26",
+          "rawLast": "25881",
+          "rawPrevious": "25900"
+        },
+        {
+          "name": "Stock Market",
+          "value": 1735.0,
+          "previous": 1739.0,
+          "highest": 1937.0,
+          "lowest": 100.0,
+          "unit": "points",
+          "period": "Oct/26",
+          "rawLast": "1735",
+          "rawPrevious": "1739"
+        },
+        {
+          "name": "GDP Annual Growth Rate",
+          "value": 9.95,
+          "previous": 8.81,
+          "highest": 13.71,
+          "lowest": -6.02,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "9.95",
+          "rawPrevious": "8.81"
+        },
+        {
+          "name": "Unemployment Rate",
+          "value": 2.22,
+          "previous": 2.23,
+          "highest": 4.5,
+          "lowest": 1.81,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "2.22",
+          "rawPrevious": "2.23"
+        },
+        {
+          "name": "Inflation Rate",
+          "value": 5.08,
+          "previous": 4.89,
+          "highest": 28.24,
+          "lowest": -2.6,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "5.08",
+          "rawPrevious": "4.89"
+        },
+        {
+          "name": "Interest Rate",
+          "value": 4.5,
+          "previous": 4.5,
+          "highest": 15.0,
+          "lowest": 4.0,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "4.5",
+          "rawPrevious": "4.5"
+        },
+        {
+          "name": "Balance of Trade",
+          "value": 1.27,
+          "previous": -1.13,
+          "highest": 4.99,
+          "lowest": -5.21,
+          "unit": "USD Billion",
+          "period": "Sep/26",
+          "rawLast": "1.27",
+          "rawPrevious": "-1.13"
+        },
+        {
+          "name": "Current Account",
+          "value": 2716.0,
+          "previous": 7654.0,
+          "highest": 12459.0,
+          "lowest": -10823.0,
+          "unit": "USD Million",
+          "period": "Mar/26",
+          "rawLast": "2716",
+          "rawPrevious": "7654"
+        },
+        {
+          "name": "Current Account to GDP",
+          "value": 6.4,
+          "previous": 6.1,
+          "highest": 6.4,
+          "lowest": -12.7,
+          "unit": "percent of GDP",
+          "period": "Dec/25",
+          "rawLast": "6.4",
+          "rawPrevious": "6.1"
+        },
+        {
+          "name": "Government Debt to GDP",
+          "value": 33.6,
+          "previous": 32.9,
+          "highest": 47.9,
+          "lowest": 24.8,
+          "unit": "percent of GDP",
+          "period": "Dec/25",
+          "rawLast": "33.6",
+          "rawPrevious": "32.9"
+        },
+        {
+          "name": "Government Budget",
+          "value": -3.6,
+          "previous": -4.0,
+          "highest": 2.0,
+          "lowest": -9.9,
+          "unit": "percent of GDP",
+          "period": "Dec/24",
+          "rawLast": "-3.6",
+          "rawPrevious": "-4"
+        },
+        {
+          "name": "Manufacturing PMI",
+          "value": 51.9,
+          "previous": 53.3,
+          "highest": 56.5,
+          "lowest": 32.7,
+          "unit": "points",
+          "period": "Sep/26",
+          "rawLast": "51.9",
+          "rawPrevious": "53.3"
+        },
+        {
+          "name": "Corporate Tax Rate",
+          "value": 20.0,
+          "previous": 20.0,
+          "highest": 35.0,
+          "lowest": 20.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "20",
+          "rawPrevious": "20"
+        },
+        {
+          "name": "Personal Income Tax Rate",
+          "value": 35.0,
+          "previous": 35.0,
+          "highest": 40.0,
+          "lowest": 35.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "35",
+          "rawPrevious": "35"
+        }
+      ]
+    },
+    "gdp": {
+      "key": "gdp",
+      "title": "Tăng Trưởng GDP",
+      "count": 16,
+      "items": [
+        {
+          "name": "GDP Annual Growth Rate",
+          "value": 9.95,
+          "previous": 8.81,
+          "highest": 13.71,
+          "lowest": -6.02,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "9.95",
+          "rawPrevious": "8.81"
+        },
+        {
+          "name": "GDP",
+          "value": 515.0,
+          "previous": 476.0,
+          "highest": 515.0,
+          "lowest": 6.29,
+          "unit": "USD Billion",
+          "period": "Dec/25",
+          "rawLast": "515",
+          "rawPrevious": "476"
+        },
+        {
+          "name": "GDP Constant Prices",
+          "value": 3004778.0,
+          "previous": 2865566.0,
+          "highest": 5830725.0,
+          "lowest": 480455.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "3004778",
+          "rawPrevious": "2865566"
+        },
+        {
+          "name": "Gross National Product",
+          "value": 12487929.0,
+          "previous": 11131020.0,
+          "highest": 12487929.0,
+          "lowest": 39284.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "12487929",
+          "rawPrevious": "11131020"
+        },
+        {
+          "name": "Gross Fixed Capital Formation",
+          "value": 2329312.0,
+          "previous": 2144855.0,
+          "highest": 2329312.0,
+          "lowest": 5495.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "2329312",
+          "rawPrevious": "2144855"
+        },
+        {
+          "name": "GDP per Capita",
+          "value": 4308.0,
+          "previous": 4013.0,
+          "highest": 4308.0,
+          "lowest": 595.0,
+          "unit": "USD",
+          "period": "Dec/25",
+          "rawLast": "4308",
+          "rawPrevious": "4013"
+        },
+        {
+          "name": "GDP per Capita PPP",
+          "value": 15457.0,
+          "previous": 14396.0,
+          "highest": 15457.0,
+          "lowest": 2468.0,
+          "unit": "USD",
+          "period": "Dec/25",
+          "rawLast": "15457",
+          "rawPrevious": "14396"
+        },
+        {
+          "name": "Full Year GDP Growth",
+          "value": 8.02,
+          "previous": 7.09,
+          "highest": 8.12,
+          "lowest": 2.55,
+          "unit": "percent",
+          "period": "Dec/25",
+          "rawLast": "8.02",
+          "rawPrevious": "7.09"
+        },
+        {
+          "name": "GDP from Agriculture",
+          "value": 324474.0,
+          "previous": 297882.0,
+          "highest": 630675.0,
+          "lowest": 65298.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "324474",
+          "rawPrevious": "297882"
+        },
+        {
+          "name": "GDP from Construction",
+          "value": 1182578.0,
+          "previous": 1089776.0,
+          "highest": 1182578.0,
+          "lowest": 24018.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "1182578",
+          "rawPrevious": "1089776"
+        },
+        {
+          "name": "GDP from Manufacturing",
+          "value": 995097.0,
+          "previous": 914464.0,
+          "highest": 1339350.0,
+          "lowest": 90932.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "995097",
+          "rawPrevious": "914464"
+        },
+        {
+          "name": "GDP from Mining",
+          "value": 45434.0,
+          "previous": 50952.0,
+          "highest": 240462.0,
+          "lowest": 32168.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "45434",
+          "rawPrevious": "50952"
+        },
+        {
+          "name": "GDP from Public Administration",
+          "value": 37645.0,
+          "previous": 44228.0,
+          "highest": 116930.0,
+          "lowest": 13398.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "37645",
+          "rawPrevious": "44228"
+        },
+        {
+          "name": "GDP from Services",
+          "value": 1265951.0,
+          "previous": 1248925.0,
+          "highest": 2568458.0,
+          "lowest": 216604.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "1265951",
+          "rawPrevious": "1248925"
+        },
+        {
+          "name": "GDP from Transport",
+          "value": 152600.0,
+          "previous": 172916.0,
+          "highest": 328586.0,
+          "lowest": 15783.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "152600",
+          "rawPrevious": "172916"
+        },
+        {
+          "name": "GDP from Utilities",
+          "value": 135732.0,
+          "previous": 122444.0,
+          "highest": 135732.0,
+          "lowest": 3044.0,
+          "unit": "VND Billion",
+          "period": "Sep/26",
+          "rawLast": "135732",
+          "rawPrevious": "122444"
+        }
+      ]
+    },
+    "labour": {
+      "key": "labour",
+      "title": "Lao Động & Việc Làm",
+      "count": 10,
+      "items": [
+        {
+          "name": "Unemployment Rate",
+          "value": 2.22,
+          "previous": 2.23,
+          "highest": 4.5,
+          "lowest": 1.81,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "2.22",
+          "rawPrevious": "2.23"
+        },
+        {
+          "name": "Employed Persons",
+          "value": 52.7,
+          "previous": 52.7,
+          "highest": 55.33,
+          "lowest": 23.5,
+          "unit": "Million",
+          "period": "Sep/26",
+          "rawLast": "52.7",
+          "rawPrevious": "52.7"
+        },
+        {
+          "name": "Unemployed Persons",
+          "value": 1.1,
+          "previous": 1.1,
+          "highest": 2.3,
+          "lowest": 0.8,
+          "unit": "Million",
+          "period": "Sep/26",
+          "rawLast": "1.1",
+          "rawPrevious": "1.1"
+        },
+        {
+          "name": "Minimum Wages",
+          "value": 5310.0,
+          "previous": 4960.0,
+          "highest": 5310.0,
+          "lowest": 1000.0,
+          "unit": "VND Thousand/Month",
+          "period": "Jan/26",
+          "rawLast": "5310",
+          "rawPrevious": "4960"
+        },
+        {
+          "name": "Population",
+          "value": 102.0,
+          "previous": 101.0,
+          "highest": 102.0,
+          "lowest": 34.74,
+          "unit": "Million",
+          "period": "Dec/25",
+          "rawLast": "102",
+          "rawPrevious": "101"
+        },
+        {
+          "name": "Labor Force Participation Rate",
+          "value": 68.5,
+          "previous": 68.4,
+          "highest": 77.5,
+          "lowest": 65.6,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "68.5",
+          "rawPrevious": "68.4"
+        },
+        {
+          "name": "Retirement Age Men",
+          "value": 61.5,
+          "previous": 61.25,
+          "highest": 61.5,
+          "lowest": 60.0,
+          "unit": "Years",
+          "period": "Dec/26",
+          "rawLast": "61.5",
+          "rawPrevious": "61.25"
+        },
+        {
+          "name": "Retirement Age Women",
+          "value": 57.0,
+          "previous": 56.67,
+          "highest": 57.0,
+          "lowest": 55.0,
+          "unit": "Years",
+          "period": "Dec/26",
+          "rawLast": "57",
+          "rawPrevious": "56.67"
+        },
+        {
+          "name": "Wages",
+          "value": 9200.0,
+          "previous": 9000.0,
+          "highest": 9200.0,
+          "lowest": 1399.0,
+          "unit": "VND Thousand/Month",
+          "period": "Sep/26",
+          "rawLast": "9200",
+          "rawPrevious": "9000"
+        },
+        {
+          "name": "Youth Unemployment Rate",
+          "value": 9.07,
+          "previous": 8.67,
+          "highest": 9.07,
+          "lowest": 5.09,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "9.07",
+          "rawPrevious": "8.67"
+        }
+      ]
+    },
+    "prices": {
+      "key": "prices",
+      "title": "Giá Cả & Lạm Phát (CPI)",
+      "count": 12,
+      "items": [
+        {
+          "name": "Inflation Rate",
+          "value": 5.08,
+          "previous": 4.89,
+          "highest": 28.24,
+          "lowest": -2.6,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "5.08",
+          "rawPrevious": "4.89"
+        },
+        {
+          "name": "Consumer Price Index CPI",
+          "value": 109.0,
+          "previous": 108.0,
+          "highest": 120.0,
+          "lowest": 23.16,
+          "unit": "points",
+          "period": "Sep/26",
+          "rawLast": "109",
+          "rawPrevious": "108"
+        },
+        {
+          "name": "Core Inflation Rate",
+          "value": 4.45,
+          "previous": 4.55,
+          "highest": 5.21,
+          "lowest": 0.49,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "4.45",
+          "rawPrevious": "4.55"
+        },
+        {
+          "name": "GDP Deflator",
+          "value": 184.0,
+          "previous": 175.0,
+          "highest": 184.0,
+          "lowest": 0.11,
+          "unit": "points",
+          "period": "Dec/24",
+          "rawLast": "184",
+          "rawPrevious": "175"
+        },
+        {
+          "name": "Export Prices",
+          "value": 128.0,
+          "previous": 127.0,
+          "highest": 129.0,
+          "lowest": 88.1,
+          "unit": "points",
+          "period": "Dec/24",
+          "rawLast": "128",
+          "rawPrevious": "127"
+        },
+        {
+          "name": "Import Prices",
+          "value": 116.0,
+          "previous": 118.0,
+          "highest": 124.0,
+          "lowest": 88.4,
+          "unit": "points",
+          "period": "Dec/24",
+          "rawLast": "116",
+          "rawPrevious": "118"
+        },
+        {
+          "name": "Core Inflation Rate MoM",
+          "value": 0.11,
+          "previous": 0.11,
+          "highest": 0.88,
+          "lowest": -0.26,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "0.11",
+          "rawPrevious": "0.11"
+        },
+        {
+          "name": "Producer Price Inflation MoM",
+          "value": 0.47,
+          "previous": 3.05,
+          "highest": 7.37,
+          "lowest": -1.66,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "0.47",
+          "rawPrevious": "3.05"
+        },
+        {
+          "name": "CPI Transportation",
+          "value": 108.0,
+          "previous": 104.0,
+          "highest": 121.0,
+          "lowest": 73.16,
+          "unit": "points",
+          "period": "Sep/26",
+          "rawLast": "108",
+          "rawPrevious": "104"
+        },
+        {
+          "name": "Food Inflation",
+          "value": 4.44,
+          "previous": 4.13,
+          "highest": 74.29,
+          "lowest": -10.12,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "4.44",
+          "rawPrevious": "4.13"
+        },
+        {
+          "name": "Inflation Rate MoM",
+          "value": 0.62,
+          "previous": 0.47,
+          "highest": 3.91,
+          "lowest": -1.54,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "0.62",
+          "rawPrevious": "0.47"
+        },
+        {
+          "name": "Producer Prices",
+          "value": 105.0,
+          "previous": 105.0,
+          "highest": 121.0,
+          "lowest": 97.41,
+          "unit": "points",
+          "period": "Sep/26",
+          "rawLast": "105",
+          "rawPrevious": "105"
+        }
+      ]
+    },
+    "money": {
+      "key": "money",
+      "title": "Tiền Tệ & Lãi Suất",
+      "count": 6,
+      "items": [
+        {
+          "name": "Interest Rate",
+          "value": 4.5,
+          "previous": 4.5,
+          "highest": 15.0,
+          "lowest": 4.0,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "4.5",
+          "rawPrevious": "4.5"
+        },
+        {
+          "name": "Interbank Rate",
+          "value": 6.47,
+          "previous": 6.75,
+          "highest": 19.77,
+          "lowest": 1.18,
+          "unit": "percent",
+          "period": "Oct/26",
+          "rawLast": "6.47",
+          "rawPrevious": "6.75"
+        },
+        {
+          "name": "Money Supply M0",
+          "value": 1630775.0,
+          "previous": 1425567.0,
+          "highest": 1630775.0,
+          "lowest": 55.0,
+          "unit": "VND Billion",
+          "period": "Dec/24",
+          "rawLast": "1630775",
+          "rawPrevious": "1425567"
+        },
+        {
+          "name": "Money Supply M1",
+          "value": 4318076.0,
+          "previous": 3784491.0,
+          "highest": 4613262.0,
+          "lowest": 109.0,
+          "unit": "VND Billion",
+          "period": "Dec/24",
+          "rawLast": "4318076",
+          "rawPrevious": "3784491"
+        },
+        {
+          "name": "Money Supply M2",
+          "value": 17914566.0,
+          "previous": 15998956.0,
+          "highest": 17914566.0,
+          "lowest": 112.0,
+          "unit": "VND Billion",
+          "period": "Dec/24",
+          "rawLast": "17914566",
+          "rawPrevious": "15998956"
+        },
+        {
+          "name": "Foreign Exchange Reserves",
+          "value": 82813.0,
+          "previous": 86318.0,
+          "highest": 109645.0,
+          "lowest": 878.0,
+          "unit": "USD Million",
+          "period": "Jul/26",
+          "rawLast": "82813",
+          "rawPrevious": "86318"
+        }
+      ]
+    },
+    "trade": {
+      "key": "trade",
+      "title": "Thương Mại & Cán Cân XNK",
+      "count": 12,
+      "items": [
+        {
+          "name": "Balance of Trade",
+          "value": 1.27,
+          "previous": -1.13,
+          "highest": 4.99,
+          "lowest": -5.21,
+          "unit": "USD Billion",
+          "period": "Sep/26",
+          "rawLast": "1.27",
+          "rawPrevious": "-1.13"
+        },
+        {
+          "name": "Current Account",
+          "value": 2716.0,
+          "previous": 7654.0,
+          "highest": 12459.0,
+          "lowest": -10823.0,
+          "unit": "USD Million",
+          "period": "Mar/26",
+          "rawLast": "2716",
+          "rawPrevious": "7654"
+        },
+        {
+          "name": "Current Account to GDP",
+          "value": 6.4,
+          "previous": 6.1,
+          "highest": 6.4,
+          "lowest": -12.7,
+          "unit": "percent of GDP",
+          "period": "Dec/25",
+          "rawLast": "6.4",
+          "rawPrevious": "6.1"
+        },
+        {
+          "name": "Exports",
+          "value": 59.48,
+          "previous": 54.8,
+          "highest": 59.48,
+          "lowest": 0.54,
+          "unit": "USD Billion",
+          "period": "Sep/26",
+          "rawLast": "59.48",
+          "rawPrevious": "54.8"
+        },
+        {
+          "name": "Imports",
+          "value": 58.21,
+          "previous": 54.91,
+          "highest": 58.21,
+          "lowest": 0.74,
+          "unit": "USD Billion",
+          "period": "Sep/26",
+          "rawLast": "58.21",
+          "rawPrevious": "54.91"
+        },
+        {
+          "name": "External Debt",
+          "value": 132511.0,
+          "previous": 140417.0,
+          "highest": 144858.0,
+          "lowest": 10345.0,
+          "unit": "USD Million",
+          "period": "Dec/24",
+          "rawLast": "132511",
+          "rawPrevious": "140417"
+        },
+        {
+          "name": "Terms of Trade",
+          "value": 103.0,
+          "previous": 103.0,
+          "highest": 110.0,
+          "lowest": 94.81,
+          "unit": "points",
+          "period": "Dec/24",
+          "rawLast": "103",
+          "rawPrevious": "103"
+        },
+        {
+          "name": "Foreign Direct Investment",
+          "value": 21.07,
+          "previous": 17.3,
+          "highest": 27.62,
+          "lowest": 0.4,
+          "unit": "USD Billion",
+          "period": "Sep/26",
+          "rawLast": "21.07",
+          "rawPrevious": "17.3"
+        },
+        {
+          "name": "Capital Flows",
+          "value": 893.0,
+          "previous": 7076.0,
+          "highest": 10889.0,
+          "lowest": -6263.0,
+          "unit": "USD Million",
+          "period": "Mar/26",
+          "rawLast": "893",
+          "rawPrevious": "7076"
+        },
+        {
+          "name": "Crude Oil Production",
+          "value": 204.0,
+          "previous": 206.0,
+          "highest": 417.0,
+          "lowest": 5.0,
+          "unit": "BBL/D/1K",
+          "period": "Jun/26",
+          "rawLast": "204",
+          "rawPrevious": "206"
+        },
+        {
+          "name": "Terrorism Index",
+          "value": 0.0,
+          "previous": 0.0,
+          "highest": 1.52,
+          "lowest": 0.0,
+          "unit": "Points",
+          "period": "Dec/25",
+          "rawLast": "0",
+          "rawPrevious": "0"
+        },
+        {
+          "name": "Tourist Arrivals",
+          "value": 1769.0,
+          "previous": 1990.0,
+          "highest": 2454.0,
+          "lowest": 7.2,
+          "unit": "Thousand",
+          "period": "Sep/26",
+          "rawLast": "1769",
+          "rawPrevious": "1990"
+        }
+      ]
+    },
+    "government": {
+      "key": "government",
+      "title": "Tài Khóa & Nợ Công",
+      "count": 9,
+      "items": [
+        {
+          "name": "Government Debt to GDP",
+          "value": 33.6,
+          "previous": 32.9,
+          "highest": 47.9,
+          "lowest": 24.8,
+          "unit": "percent of GDP",
+          "period": "Dec/25",
+          "rawLast": "33.6",
+          "rawPrevious": "32.9"
+        },
+        {
+          "name": "Government Budget",
+          "value": -3.6,
+          "previous": -4.0,
+          "highest": 2.0,
+          "lowest": -9.9,
+          "unit": "percent of GDP",
+          "period": "Dec/24",
+          "rawLast": "-3.6",
+          "rawPrevious": "-4"
+        },
+        {
+          "name": "Government Budget Value",
+          "value": 248600.0,
+          "previous": -1627050.0,
+          "highest": 248600.0,
+          "lowest": -1627050.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "248600",
+          "rawPrevious": "-1627050"
+        },
+        {
+          "name": "Government Spending",
+          "value": 1204620.0,
+          "previous": 1017783.0,
+          "highest": 1204620.0,
+          "lowest": 3164.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "1204620",
+          "rawPrevious": "1017783"
+        },
+        {
+          "name": "Government Revenues",
+          "value": 2650100.0,
+          "previous": 2037500.0,
+          "highest": 2650100.0,
+          "lowest": 19.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "2650100",
+          "rawPrevious": "2037500"
+        },
+        {
+          "name": "Fiscal Expenditure",
+          "value": 2401500.0,
+          "previous": 1830800.0,
+          "highest": 2401500.0,
+          "lowest": 35.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "2401500",
+          "rawPrevious": "1830800"
+        },
+        {
+          "name": "Corruption Index",
+          "value": 41.0,
+          "previous": 40.0,
+          "highest": 42.0,
+          "lowest": 24.0,
+          "unit": "Points",
+          "period": "Dec/25",
+          "rawLast": "41",
+          "rawPrevious": "40"
+        },
+        {
+          "name": "Corruption Rank",
+          "value": 81.0,
+          "previous": 88.0,
+          "highest": 123.0,
+          "lowest": 43.0,
+          "unit": "",
+          "period": "Dec/25",
+          "rawLast": "81",
+          "rawPrevious": "88"
+        },
+        {
+          "name": "Credit Rating",
+          "value": 48.0,
+          "previous": null,
+          "highest": null,
+          "lowest": null,
+          "unit": "",
+          "period": "Oct/26",
+          "rawLast": "48",
+          "rawPrevious": ""
+        }
+      ]
+    },
+    "taxes": {
+      "key": "taxes",
+      "title": "Thuế Suất",
+      "count": 6,
+      "items": [
+        {
+          "name": "Corporate Tax Rate",
+          "value": 20.0,
+          "previous": 20.0,
+          "highest": 35.0,
+          "lowest": 20.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "20",
+          "rawPrevious": "20"
+        },
+        {
+          "name": "Personal Income Tax Rate",
+          "value": 35.0,
+          "previous": 35.0,
+          "highest": 40.0,
+          "lowest": 35.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "35",
+          "rawPrevious": "35"
+        },
+        {
+          "name": "Sales Tax Rate",
+          "value": 8.0,
+          "previous": 10.0,
+          "highest": 10.0,
+          "lowest": 8.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "8",
+          "rawPrevious": "10"
+        },
+        {
+          "name": "Social Security Rate",
+          "value": 32.0,
+          "previous": 32.0,
+          "highest": 32.0,
+          "lowest": 20.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "32",
+          "rawPrevious": "32"
+        },
+        {
+          "name": "Social Security Rate For Companies",
+          "value": 21.5,
+          "previous": 21.5,
+          "highest": 22.0,
+          "lowest": 15.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "21.5",
+          "rawPrevious": "21.5"
+        },
+        {
+          "name": "Social Security Rate For Employees",
+          "value": 10.5,
+          "previous": 10.5,
+          "highest": 10.5,
+          "lowest": 5.0,
+          "unit": "percent",
+          "period": "Dec/26",
+          "rawLast": "10.5",
+          "rawPrevious": "10.5"
+        }
+      ]
+    },
+    "business": {
+      "key": "business",
+      "title": "Sản Xuất & Doanh Nghiệp (PMI)",
+      "count": 7,
+      "items": [
+        {
+          "name": "Manufacturing PMI",
+          "value": 51.9,
+          "previous": 53.3,
+          "highest": 56.5,
+          "lowest": 32.7,
+          "unit": "points",
+          "period": "Sep/26",
+          "rawLast": "51.9",
+          "rawPrevious": "53.3"
+        },
+        {
+          "name": "Industrial Production",
+          "value": 16.7,
+          "previous": 14.4,
+          "highest": 28.4,
+          "lowest": -14.9,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "16.7",
+          "rawPrevious": "14.4"
+        },
+        {
+          "name": "Manufacturing Production",
+          "value": 17.1,
+          "previous": 14.0,
+          "highest": 29.1,
+          "lowest": -12.4,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "17.1",
+          "rawPrevious": "14"
+        },
+        {
+          "name": "Changes in Inventories",
+          "value": 204229.0,
+          "previous": 177463.0,
+          "highest": 204229.0,
+          "lowest": 530.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "204229",
+          "rawPrevious": "177463"
+        },
+        {
+          "name": "Car Registrations",
+          "value": 18891.0,
+          "previous": 25246.0,
+          "highest": 44987.0,
+          "lowest": 2992.0,
+          "unit": "Units",
+          "period": "Aug/26",
+          "rawLast": "18891",
+          "rawPrevious": "25246"
+        },
+        {
+          "name": "Electricity Production",
+          "value": 29600.0,
+          "previous": 30400.0,
+          "highest": 31600.0,
+          "lowest": 671.0,
+          "unit": "Gigawatt-hour",
+          "period": "Sep/26",
+          "rawLast": "29600",
+          "rawPrevious": "30400"
+        },
+        {
+          "name": "Mining Production",
+          "value": 13.4,
+          "previous": 12.1,
+          "highest": 16.8,
+          "lowest": -23.0,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "13.4",
+          "rawPrevious": "12.1"
+        }
+      ]
+    },
+    "consumer": {
+      "key": "consumer",
+      "title": "Tiêu Dùng & Bán Lẻ",
+      "count": 3,
+      "items": [
+        {
+          "name": "Retail Sales YoY",
+          "value": 14.1,
+          "previous": 14.9,
+          "highest": 76.75,
+          "lowest": -33.7,
+          "unit": "percent",
+          "period": "Sep/26",
+          "rawLast": "14.1",
+          "rawPrevious": "14.9"
+        },
+        {
+          "name": "Consumer Spending",
+          "value": 6836385.0,
+          "previous": 6164612.0,
+          "highest": 6836385.0,
+          "lowest": 37572.0,
+          "unit": "VND Billion",
+          "period": "Dec/25",
+          "rawLast": "6836385",
+          "rawPrevious": "6164612"
+        },
+        {
+          "name": "Gasoline Prices",
+          "value": 0.8,
+          "previous": 0.83,
+          "highest": 1.33,
+          "lowest": 0.34,
+          "unit": "USD/Liter",
+          "period": "Sep/26",
+          "rawLast": "0.8",
+          "rawPrevious": "0.83"
+        }
+      ]
+    }
+  }
+}

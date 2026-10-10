@@ -22,7 +22,7 @@ function StatCard({ label, value, sub, highlight }) {
   );
 }
 
-export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess, refreshKey }) {
+export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess, refreshKey, onSwitchTab }) {
   const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [] } = data;
 
   // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
@@ -1293,6 +1293,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         marketPrices={pricesData?.prices || {}}
         onNavigateBuy={onNavigateBuy}
         onNavigateSell={onNavigateSell}
+        onSwitchTab={onSwitchTab}
       />
 
       {/* Modal Chỉnh Sửa Số Dư Tiền Mặt */}

@@ -418,11 +418,6 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                         <span className="px-1.5 py-0.5 rounded bg-white font-bold text-amber-800 shadow-2xs">
                           Yield: {fundamentalsMap[item.symbol].dividends?.yield != null ? `${fundamentalsMap[item.symbol].dividends.yield}%` : '—'}
                         </span>
-                        {fundamentalsMap[item.symbol].technicals?.rsi != null && (
-                          <span className="px-1.5 py-0.5 rounded bg-white font-bold text-gray-700 shadow-2xs">
-                            RSI: {fundamentalsMap[item.symbol].technicals.rsi}
-                          </span>
-                        )}
                       </div>
                     )}
 
@@ -570,12 +565,6 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                               </div>
                               <div className="text-[11px] text-gray-500 flex items-center justify-end gap-1.5">
                                 <span>Cổ tức: <b className="text-amber-700">{fundamentalsMap[item.symbol].dividends?.yield != null ? `${fundamentalsMap[item.symbol].dividends.yield}%` : '—'}</b></span>
-                                {fundamentalsMap[item.symbol].technicals?.rsi != null && (
-                                  <>
-                                    <span>•</span>
-                                    <span>RSI: <b>{fundamentalsMap[item.symbol].technicals.rsi}</b></span>
-                                  </>
-                                )}
                               </div>
                             </div>
                           ) : (
