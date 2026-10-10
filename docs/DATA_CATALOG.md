@@ -173,10 +173,26 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
 └─────────────────────────┴───────────────────────┴──────────────────────┘
 ```
 
-1. **VN-Index P/E & Phân Vị Định Giá Thị Trường**:
-   * *Nguồn trích xuất*: Endpoint định giá thị trường Vietstock (`https://finance.vietstock.vn/dinh-gia-thi-truong`).
-   * *Trường dữ liệu*: `currentPE`, `currentPB`, `historicalMeanPE` (Trung bình P/E 5 năm), `historicalStdPE` (Độ lệch chuẩn), `zScore`, `percentile` (Phân vị).
-   * *Mục đích*: Xác định thị trường chung đang ở vùng **RẺ (Tích lũy)**, **HỢP LÝ (Nắm giữ)** hay **ĐẮT (Phòng thủ/Hạ tỷ trọng)**.
+1. **VN-Index P/E & Phân Vị Định Giá Thị Trường Đa Chu Kỳ (Vietstock 2000–Hiện Tại)**:
+   * *Nguồn trích xuất chính thức*: Endpoint API biểu đồ định giá Vietstock (`POST https://finance.vietstock.vn/Data/Valuation_GetRatiosMarketIndexForChart`) qua module `VietstockValuationFetcher` (`curl_cffi` impersonate Chrome 120, cache 24h tại `data/vnindex_valuation_cache/`).
+   * *Tập dữ liệu lịch sử*: Hơn 316 kỳ quan sát hàng tháng liên tục từ năm 2000 đến hiện tại.
+   * *Động cơ phân tích thống kê đa cửa sổ*: `scripts/lib/market_valuation_analyzer.py` tính toán song song trên 4 chu kỳ:
+     * `five_year`: Chu kỳ kinh tế & tiền tệ 5 năm gần nhất.
+     * `ten_year`: Chuẩn mực vĩ mô dài hạn 10 năm (Khuyến nghị mặc định).
+     * `modern`: Giai đoạn thị trường hiện đại từ 2007 (Việt Nam gia nhập WTO).
+     * `all_time`: Toàn cảnh lịch sử 25 năm từ ngày thành lập sàn HOSE.
+   * *Bộ chỉ số thống kê trên từng cửa sổ*:
+     * `mean`, `median`, `std`: Giá trị trung bình, trung vị và độ lệch chuẩn.
+     * `zscore`: Điểm độ lệch chuẩn $z = \frac{x - \mu}{\sigma}$.
+     * `percentile`: Điểm phân vị xếp hạng tương đối (0% - 100%).
+     * `p10`, `p25`, `p75`, `p90`: Các mốc phân vị cắt ngưỡng phân phối xác suất.
+     * `band`: Gán nhãn động 5 dải định giá (*Rất rẻ*, *Rẻ*, *Trung bình*, *Mắc*, *Rất mắc*).
+     * `vsMedianPct`, `vsMeanPct`: Độ lệch tương đối (%) so với trung vị và trung bình lịch sử.
+   * *Metrics dẫn xuất & Cảnh báo nâng cao*:
+     * `peXpb`: Tích số Graham $P/E \times P/B$ (Đạt chuẩn an toàn khi $\le 22.5x$).
+     * `roeProxy`: Tỷ suất sinh lời trên vốn chủ sở hữu ngụ ý của toàn thị trường $ROE \text{ proxy} = \frac{P/B}{P/E} \times 100\%$.
+     * `compositeSignal`: Điểm định giá tổng hợp (0 - 100) kết hợp $30\% \cdot z_{PE} + 30\% \cdot z_{PB} + 20\% \cdot \text{Pctl}_{PE} + 20\% \cdot \text{Pctl}_{PB}$ đưa ra khuyến nghị (*MUA MẠNH*, *MUA TÍCH LŨY*, *TRUNG LẬP / GIỮ*, *HẠ TỶ TRỌNG*, *PHÒNG THỦ / BÁN*).
+     * `extremeAlert`: Cờ cảnh báo tự động kích hoạt khi có độ lệch chuẩn cực đoan $|z| > 2.0$.
 2. **Đường Cong Lợi Suất Trái Phiếu Chính Phủ (Government Bond Yield Curve)**:
    * *Nguồn trích xuất*: Cổng thông tin trái phiếu Sở GDCK Hà Nội (HNX - `https://hnx.vn/ModuleReportBonds/Bond_YieldCurve/SearchAndNextPageYieldCurveData`).
    * *Trường dữ liệu*: Lợi suất trúng thầu 8 kỳ hạn: 1 năm, 2 năm, 3 năm, 5 năm, 7 năm, 10 năm, 15 năm, 20 năm.
@@ -245,6 +261,58 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
        * `Spread <= 3%`: **BÁN / TRÁNH MUA** (≤ 2% danh mục) do giá trong nước bão hòa, thích hợp chốt lời.
        * `3% < Spread < 10%`: **NẮM GIỮ** (3-5% danh mục) duy trì tỷ trọng tiêu chuẩn.
 
+11. **Đồng Hồ Kinh Tế Vĩ Mô 4 Góc Phần Tư (`macroClock`)**:
+    * *Cơ sở lý thuyết*: Mô hình 4 pha kinh điển kết hợp Tăng trưởng GDP và Lạm phát CPI (Bridgewater All-Weather Framework):
+      * `goldilocks`: **Tăng Trưởng Vàng** (GDP cao >6.5%, CPI ổn định 3.5-5.5%). Ngành ưu tiên: Ngân hàng, Chứng khoán, Bán lẻ, Công nghệ.
+      * `overheating`: **Mở Rộng Tăng Tốc / Quá Nhiệt** (GDP cao, CPI tăng >5.5%). Ngành ưu tiên: Bất động sản, Thép, Hóa chất, Năng lượng.
+      * `stagflation`: **Đình Lạm** (GDP chậm lại <5.0%, CPI cao >5.5%). Ngành ưu tiên: Tiện ích điện nước, Dược phẩm, Tiền mặt, Vàng.
+      * `reflation`: **Phục Hồi / Bơm Tiền** (GDP chạm đáy, CPI thấp <3.5%). Ngành ưu tiên: Chứng khoán, Công nghệ, Bán lẻ, Xây dựng.
+    * *Trường dữ liệu*: `quadrant`, `quadrantKey`, `titleVi`, `desc`, `gdpPhase`, `gdpPhaseVi`, `gdpValue`, `inflationState`, `inflationStateVi`, `cpiValue`, `favoredSectors`, `avoidedSectors`.
+12. **Phân Tích Đường Cong Lợi Suất & Thị Trường Nợ (`yieldCurveAnalysis`)**:
+    * *Trường dữ liệu chi tiết*:
+      * `vn10y`: Lợi suất TPCP 10Y Việt Nam (HNX).
+      * `us10y`: Lợi suất TPCP 10Y Mỹ (Treasury 10Y).
+      * `sbvRefinancingRate`: Lãi suất tái cấp vốn SBV.
+      * `longShortSpread` (LSS): Độ lệch dốc kỳ hạn dài - ngắn ($LSS = VN10Y - SBV$).
+      * `crossCountrySpread`: Chênh lệch quốc tế ($VN10Y - US10Y$), đo lường áp lực chênh lệch lãi suất và dòng vốn ngoại.
+      * `inversionWarning`: Cờ cảnh báo đảo ngược kỳ hạn ($LSS < 0$).
+      * `ycRegime`, `ycRegimeVi`: Phân loại cấu trúc đường cong (*Normal*, *Flat*, *Stress*, *Crisis*).
+      * `ycStressIndex`: Chỉ số căng thẳng nợ thị trường (0 - 100).
+      * `assessment`: Nhận định chuyên sâu cấu trúc kỳ hạn và thanh khoản tiền đồng.
+13. **Ma Trận 3 Kịch Bản Thị Trường & Rủi Ro Đuôi (`scenarioMatrix` & `tailRisks`)**:
+    * *3 Kịch bản định lượng (`scenarioMatrix`)*:
+      * `base` (Kịch bản cơ sở, xác suất ~55%): Dải điểm VN-Index kỳ vọng, điều kiện vĩ mô, các ngành hưởng lợi & thận trọng, luận điểm đầu tư.
+      * `bull` (Kịch bản tích cực, xác suất ~25%): Dải điểm VN-Index, điều kiện nới lỏng dòng vốn, nhóm ngành dẫn sóng High-Beta.
+      * `bear` (Kịch bản thận trọng, xác suất ~20%): Dải điểm VN-Index, áp lực lạm phát/hút thanh khoản, nhóm ngành phòng thủ.
+    * *Bộ 6 Rủi ro đuôi với ngưỡng kích hoạt toán học thực tế (`tailRisks` - zero placeholder)*:
+      * `liquidity_squeeze`: Khủng hoảng thanh khoản tiền đồng (Lãi suất qua đêm >7.5% hoặc LSS <-1.5%).
+      * `stagflation_shock`: Cú sốc đình lạm (CPI >6.5% kết hợp GDP <5.0%).
+      * `credit_crunch`: Đóng băng tín dụng bất động sản (Tín dụng <9.0% hoặc SBV tăng lãi suất).
+      * `external_shock`: Cú sốc tỷ giá ngoại vi (USD/VND >25.500 hoặc US 10Y >5.0%).
+      * `soft_landing`: Hạ cánh mềm (CPI 3.5-4.5% và GDP >6.5%).
+      * `bull_inflection`: Cơ hội bùng nổ vĩ mô (SBV hạ lãi suất, PMI >53, Tín dụng >14%).
+    * `hasActiveTailRisk`, `criticalTailRiskCount`: Cờ nhận diện rủi ro đang kích hoạt trên thị trường.
+14. **Độ Lệch Dẫn Dắt - Trễ & Độ Tin Cậy Mô Hình (`leadLagDivergence` & `confidence`)**:
+    * *Đo lường độ lệch Sớm - Trễ (`leadLagDivergence`)*:
+      * `leadingPct`: Điểm số nhóm chỉ báo sớm thị trường tài chính (Lãi suất liên ngân hàng, Tỷ giá, Giá dầu, Giá vàng).
+      * `laggingPct`: Điểm số nhóm chỉ báo trễ kinh tế thực (GDP, Lạm phát CPI, Doanh số bán lẻ).
+      * `divergence`: Độ lệch chênh lệch ($\Delta = Leading - Lagging$).
+      * `signal`, `signalVi`: Cảnh báo sớm (*⚠️ LEADING WARNS*, *⚠️ LAGGING DRAGS*, *BALANCED*).
+    * *Độ tin cậy mô hình (`confidence`)*:
+      * `overall`: Điểm số tin cậy tổng thể (0 - 100).
+      * `label`, `labelVi`: Phân cấp độ tin cậy (*HIGH / Cao*, *MEDIUM / Trung bình*, *LOW / Thấp*).
+      * `dataQuality`: Điểm chất lượng dữ liệu nguồn.
+      * `regimeStability`: Điểm ổn định pha chu kỳ kinh tế.
+      * `signalClarity`: Điểm độ rõ nét của các tín hiệu định hướng.
+15. **Phân Rã 6 Động Lực Vĩ Mô Cho 11 Nhóm Ngành Niêm Yết (`decomposition`)**:
+    * Trong mỗi đối tượng ngành của `sectorRotation`, trường `decomposition` bóc tách chi tiết đóng góp điểm ròng từ:
+      * `interbank`: Lãi suất liên ngân hàng qua đêm.
+      * `sbvRate`: Lãi suất điều hành tái cấp vốn SBV.
+      * `cpi`: Lạm phát CPI theo năm.
+      * `usdVnd`: Tỷ giá thị trường liên ngân hàng USD/VND.
+      * `oil`: Giá dầu thô Brent thế giới.
+      * `pmi`: Chỉ số Nhà quản trị mua hàng PMI sản xuất.
+
 ---
 
 ### PHÂN HỆ 5: THỊ GIÁ KHỚP LỆNH & CHỈ BÁO KỸ THUẬT (REALTIME & TECHNICALS)
@@ -308,22 +376,25 @@ Hệ thống đã tách biệt hoàn toàn tầng kết nối, cào dữ liệu 
 ```
 scripts/
 ├── fetchers/                         # ⭐ TẦNG THU THẬP DỮ LIỆU ĐỘC LẬP
-│   ├── __init__.py                   # Export BaseFetcher, MarketFetcher, FinancialFetcher, MacroFetcher, TradingEconomicsFetcher
+│   ├── __init__.py                   # Export BaseFetcher, MarketFetcher, FinancialFetcher, MacroFetcher, TradingEconomicsFetcher, VietstockValuationFetcher
 │   ├── base.py                       # BaseFetcher: HTTP session, Rate Limiting, SSL bypass, Auto-retry
 │   ├── market_fetcher.py             # MarketFetcher: TradingView Scanner API, Realtime Quotes
 │   ├── financial_fetcher.py          # FinancialFetcher: vnstock Finance/Company (KQKD, CĐKT, LCTT, Ratios, Events)
 │   ├── macro_fetcher.py              # MacroFetcher: HNX Yield Curve, SBV Rates, Yahoo Finance, PNJ Edge API (SJC & PNJ Gold)
+│   ├── vietstock_valuation_fetcher.py # VietstockValuationFetcher: Lịch sử định giá P/E, P/B VN-Index 25 năm từ Vietstock
 │   ├── market_valuation_history_fetcher.py # MarketValuationHistoryFetcher: Lịch sử định giá P/E, P/S, Vốn hóa Google Sheets
 │   └── tradingeconomics_fetcher.py   # TradingEconomicsFetcher: 95 chỉ số vĩ mô 10 danh mục
 ├── lib/                              # 🧮 TẦNG NGHIỆP VỤ & CHUẨN HÓA TOÁN HỌC
 │   ├── financial_taxonomy.py         # Từ điển chuẩn hóa chỉ tiêu kế toán VN
 │   ├── valuation_models.py           # Graham, DDM, EV/EBITDA, DuPont, CAGR
+│   ├── valuation_engine.py           # Enterprise Stock Valuation Engine (Single Source of Truth)
+│   ├── market_valuation_analyzer.py  # Động cơ thống kê 4 cửa sổ (5Y, 10Y, 2007, All), Composite Signal, Cảnh báo Z > 2
 │   ├── macro_regime.py               # 5-Pha Regime, Risk Score 4 tầng, Luân chuyển 11 ngành, Arbitrage Vàng
 │   ├── macro_advisor.py              # Z-Score, P/E Bands, Khuyến nghị phân bổ tài sản
 │   └── rate_limiter.py               # Quản lý giới hạn tần suất gọi API
 ├── sync_fundamentals.py              # 🎮 CONTROLLER 1: Điều phối định giá & kỹ thuật (dùng MarketFetcher)
 ├── fetch_financial_reports.py        # 🎮 CONTROLLER 2: Điều phối BCTC 8Q/5Y & Ratios (dùng FinancialFetcher)
-├── fetch_macro_valuation.py          # 🎮 CONTROLLER 3: Điều phối Vĩ mô, Regime, Lịch sử định giá & 95 chỉ số
+├── fetch_macro_valuation.py          # 🎮 CONTROLLER 3: Điều phối Vĩ mô, Regime, Định giá VN-Index Vietstock & 95 chỉ số
 └── run_full_pipeline.py              # 🚀 ORCHESTRATOR: Chạy tuần tự toàn bộ luồng tự động
 ```
 
@@ -333,6 +404,7 @@ scripts/
 | :--- | :--- | :--- | :--- |
 | **Thị Giá Realtime & 52 Chỉ Báo Kỹ Thuật** | `scripts/fetchers/market_fetcher.py` (`MarketFetcher`) | `scripts/sync_fundamentals.py` | `data/fundamentals_cache.json` |
 | **BCTC 122+ Chỉ Tiêu, 54 Ratios, Cổ Tức & Cổ Đông** | `scripts/fetchers/financial_fetcher.py` (`FinancialFetcher`) | `scripts/fetch_financial_reports.py` | `data/financials/<MÃ>.json` |
+| **Định Giá VN-Index Đa Chu Kỳ 25 Năm (Vietstock)** | `scripts/fetchers/vietstock_valuation_fetcher.py` & `market_valuation_analyzer.py` | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Vĩ Mô Tổng Quan, TPCP 10Y HNX, SBV & Vàng SJC/PNJ** | `scripts/fetchers/macro_fetcher.py` (`MacroFetcher`) | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Kho 95 Chỉ Số Kinh Tế Vĩ Mô 10 Nhóm** | `scripts/fetchers/tradingeconomics_fetcher.py` (`TradingEconomicsFetcher`) | `scripts/fetch_macro_valuation.py` | `data/macro_indicators.json` |
 | **Lịch Sử Định Giá 10 Năm (P/E, P/S, Vốn Hóa Google Sheets)** | `scripts/fetchers/market_valuation_history_fetcher.py` | `scripts/fetch_macro_valuation.py` | `data/market_valuation_history.json` |

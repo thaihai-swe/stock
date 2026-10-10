@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  fetchValuationStocks,
-  fetchStockFinancials,
   fetchRawJson,
-  triggerValuationSync,
-  triggerSingleFinancialSync
+  fetchStockFinancials,
+  fetchValuationStocks,
+  triggerSingleFinancialSync,
+  triggerValuationSync
 } from '../utils/api.js';
 
 // Tính % chênh lệch giữa giá định giá và thị giá hiện tại (Upside / Downside %)
@@ -288,11 +288,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             type="button"
             onClick={handleTriggerSync}
             disabled={syncing}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs ${
-              syncing
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs ${syncing
                 ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed'
                 : 'bg-indigo-600 hover:bg-indigo-700 text-white active:scale-95'
-            }`}
+              }`}
           >
             <span className={syncing ? 'animate-spin' : ''}>🔄</span>
             {syncing ? 'Đang đồng bộ...' : 'Cập nhật định giá'}
@@ -303,11 +302,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       {/* Thông báo Sync nếu có */}
       {syncMessage && (
         <div
-          className={`p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between ${
-            syncMessage.type === 'success'
+          className={`p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between ${syncMessage.type === 'success'
               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
               : 'bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
-          }`}
+            }`}
         >
           <span>{syncMessage.text}</span>
           <button onClick={() => setSyncMessage(null)} className="text-gray-400 hover:text-gray-600">✕</button>
@@ -395,6 +393,7 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-0.5">
+                    {currentStock.industry ? `Ngành: ${currentStock.industry} • ` : ''}
                     Khối lượng giao dịch: {currentStock.volume ? currentStock.volume.toLocaleString('vi-VN') : '—'} cp
                   </p>
                 </div>
@@ -408,9 +407,8 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                     <span className="text-2xl font-black text-gray-900 dark:text-white">
                       {formatVND(currentStock.close)}
                     </span>
-                    <span className={`text-xs font-bold ${
-                      (currentStock.change || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                    }`}>
+                    <span className={`text-xs font-bold ${(currentStock.change || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      }`}>
                       {(currentStock.change || 0) >= 0 ? '+' : ''}{currentStock.change}%
                     </span>
                   </div>
@@ -496,9 +494,8 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                           % Chênh Lệch vs Thị Giá
                         </span>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className={`text-2xl font-black ${
-                            (upsideValue || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'
-                          }`}>
+                          <span className={`text-2xl font-black ${(upsideValue || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                            }`}>
                             {upsideValue != null ? `${upsideValue >= 0 ? '+' : ''}${upsideValue}%` : '—'}
                           </span>
                           <span className="text-[10px] text-indigo-200 font-medium">
@@ -513,9 +510,8 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                           Biên An Toàn (MoS)
                         </span>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-xl font-black ${
-                            (mosValue || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'
-                          }`}>
+                          <span className={`text-xl font-black ${(mosValue || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                            }`}>
                             {mosValue != null ? `${mosValue >= 0 ? '+' : ''}${mosValue}%` : '—'}
                           </span>
                           <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${valRatingBadge}`}>
@@ -582,11 +578,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                       <div className="mt-1.5 flex items-center justify-center">
                         {m.diff != null ? (
                           <span
-                            className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${
-                              m.diff >= 0
+                            className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${m.diff >= 0
                                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                                 : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                            }`}
+                              }`}
                             title={`Chênh lệch so với giá hiện tại (${formatVND(closePrice)}): ${m.diff >= 0 ? '+' : ''}${m.diff}%`}
                           >
                             <span>{m.diff >= 0 ? '▲' : '▼'}</span>
@@ -622,6 +617,52 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 </div>
               </div>
 
+              {/* Thước Đo Vị Thế Giá 52 Tuần (52-Week Price Range Slider) */}
+              {currentStock.performance?.low52w != null && currentStock.performance?.high52w != null && (
+                <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <span>🎯</span> Vị Trí Thị Giá Trong Chu Kỳ 52 Tuần
+                    </span>
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                      {currentStock.performance.range52wPercent != null
+                        ? `${currentStock.performance.range52wPercent}% từ đáy 52W`
+                        : ''}
+                    </span>
+                  </div>
+
+                  <div className="relative pt-2 pb-1">
+                    <div className="h-3 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden flex relative">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.max(4, Math.min(96, currentStock.performance.range52wPercent || 0))}%` }}
+                      />
+                    </div>
+
+                    <div className="flex justify-between items-center text-xs mt-2 text-gray-500 dark:text-gray-400">
+                      <div>
+                        <span className="text-[10px] text-gray-400 block">Đáy 52 tuần</span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                          {formatVND(currentStock.performance.low52w)}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] text-gray-400 block">Thị giá hiện tại</span>
+                        <span className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
+                          {formatVND(currentStock.close)}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-gray-400 block">Đỉnh 52 tuần</span>
+                        <span className="font-bold text-rose-600 dark:text-rose-400">
+                          {formatVND(currentStock.performance.high52w)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Chu kỳ hiệu suất giá */}
               <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
                 {[
@@ -635,9 +676,8 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 ].map((cycle, i) => (
                   <div key={i} className="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-center">
                     <span className="text-[10px] text-gray-400 font-bold block">{cycle.label}</span>
-                    <span className={`text-xs font-black block mt-0.5 ${
-                      (cycle.val || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                    }`}>
+                    <span className={`text-xs font-black block mt-0.5 ${(cycle.val || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      }`}>
                       {cycle.val != null ? `${(cycle.val >= 0 ? '+' : '')}${cycle.val}%` : '—'}
                     </span>
                   </div>
@@ -819,22 +859,20 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 <button
                   type="button"
                   onClick={() => setFinancialPeriod('quarterly')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    financialPeriod === 'quarterly'
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${financialPeriod === 'quarterly'
                       ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-2xs'
                       : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
-                  }`}
+                    }`}
                 >
                   Theo Quý (8 Quý Gần Nhất)
                 </button>
                 <button
                   type="button"
                   onClick={() => setFinancialPeriod('yearly')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    financialPeriod === 'yearly'
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${financialPeriod === 'yearly'
                       ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-2xs'
                       : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
-                  }`}
+                    }`}
                 >
                   Theo Năm (5 Năm Gần Nhất)
                 </button>
@@ -899,11 +937,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <button
               type="button"
               onClick={() => setMainReportView('statements')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                mainReportView === 'statements'
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${mainReportView === 'statements'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <span>📑</span>
               <span>1. Ba Báo Cáo Tài Chính (VAS/TT200)</span>
@@ -912,11 +949,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <button
               type="button"
               onClick={() => setMainReportView('ratios')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                mainReportView === 'ratios'
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${mainReportView === 'ratios'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <span>📊</span>
               <span>2. Bộ 54 Chỉ Số Tài Chính (Ratios)</span>
@@ -925,11 +961,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <button
               type="button"
               onClick={() => setMainReportView('events')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                mainReportView === 'events'
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${mainReportView === 'events'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <span>🎁</span>
               <span>3. Cổ Tức & Cơ Cấu Cổ Đông</span>
@@ -938,11 +973,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <button
               type="button"
               onClick={() => setMainReportView('formulas')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                mainReportView === 'formulas'
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${mainReportView === 'formulas'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <span>🧮</span>
               <span>4. Giải Phẫu Công Thức Định Giá (Breakdown)</span>
@@ -956,33 +990,30 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 <button
                   type="button"
                   onClick={() => setFinancialTab('income')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    financialTab === 'income'
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${financialTab === 'income'
                       ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
                       : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
-                  }`}
+                    }`}
                 >
                   Kết Quả Kinh Doanh (Income Statement)
                 </button>
                 <button
                   type="button"
                   onClick={() => setFinancialTab('balance')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    financialTab === 'balance'
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${financialTab === 'balance'
                       ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
                       : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
-                  }`}
+                    }`}
                 >
                   Cân Đối Kế Toán (Balance Sheet)
                 </button>
                 <button
                   type="button"
                   onClick={() => setFinancialTab('cashflow')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    financialTab === 'cashflow'
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${financialTab === 'cashflow'
                       ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
                       : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
-                  }`}
+                    }`}
                 >
                   Lưu Chuyển Tiền Tệ (Cash Flow & FCF)
                 </button>
@@ -1593,11 +1624,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                         const diff = calcPriceDiff(financials.valuationMultiples.grahamNumber, currentStock?.close);
                         if (diff == null) return null;
                         return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                            diff >= 0
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                               : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                          }`}>
+                            }`}>
                             {diff >= 0 ? '+' : ''}{diff}%
                           </span>
                         );
@@ -1625,11 +1655,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                         const diff = calcPriceDiff(financials.valuationMultiples.ddmTarget, currentStock?.close);
                         if (diff == null) return null;
                         return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                            diff >= 0
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                               : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                          }`}>
+                            }`}>
                             {diff >= 0 ? '+' : ''}{diff}%
                           </span>
                         );
@@ -1657,11 +1686,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                         const diff = calcPriceDiff(financials.valuationMultiples.evEbitdaFairPrice, currentStock?.close);
                         if (diff == null) return null;
                         return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                            diff >= 0
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                               : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                          }`}>
+                            }`}>
                             {diff >= 0 ? '+' : ''}{diff}%
                           </span>
                         );
@@ -1689,11 +1717,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                         const diff = calcPriceDiff(financials.valuationMultiples.pcfFairPrice, currentStock?.close);
                         if (diff == null) return null;
                         return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                            diff >= 0
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                               : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                          }`}>
+                            }`}>
                             {diff >= 0 ? '+' : ''}{diff}%
                           </span>
                         );
@@ -1721,11 +1748,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                         const diff = calcPriceDiff(financials.valuationMultiples.peTarget, currentStock?.close);
                         if (diff == null) return null;
                         return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                            diff >= 0
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                               : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                          }`}>
+                            }`}>
                             {diff >= 0 ? '+' : ''}{diff}%
                           </span>
                         );
@@ -1751,11 +1777,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                         const diff = calcPriceDiff(financials.valuationMultiples.consensusFairValue, currentStock?.close);
                         if (diff == null) return null;
                         return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                            diff >= 0
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
                               ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/40'
                               : 'bg-rose-500/30 text-rose-300 border border-rose-500/40'
-                          }`}>
+                            }`}>
                             {diff >= 0 ? '+' : ''}{diff}%
                           </span>
                         );
@@ -1842,11 +1867,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           <button
             type="button"
             onClick={() => handleChangeInspectorType('fundamentals')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              inspectorType === 'fundamentals'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${inspectorType === 'fundamentals'
                 ? 'bg-indigo-600 text-white shadow-sm'
                 : 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5'
-            }`}
+              }`}
           >
             📄 fundamentals_cache.json
           </button>
@@ -1854,11 +1878,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           <button
             type="button"
             onClick={() => handleChangeInspectorType('macro')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              inspectorType === 'macro'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${inspectorType === 'macro'
                 ? 'bg-indigo-600 text-white shadow-sm'
                 : 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5'
-            }`}
+              }`}
           >
             🌐 macro_valuation.json
           </button>
@@ -1866,11 +1889,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           <button
             type="button"
             onClick={() => handleChangeInspectorType('financials')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              inspectorType === 'financials'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${inspectorType === 'financials'
                 ? 'bg-indigo-600 text-white shadow-sm'
                 : 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5'
-            }`}
+              }`}
           >
             📊 financials/{selectedSymbol}.json
           </button>
@@ -1878,11 +1900,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           <button
             type="button"
             onClick={() => handleChangeInspectorType('market-history')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              inspectorType === 'market-history'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${inspectorType === 'market-history'
                 ? 'bg-indigo-600 text-white shadow-sm'
                 : 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5'
-            }`}
+              }`}
           >
             📈 market_valuation_history.json
           </button>
@@ -1890,11 +1911,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           <button
             type="button"
             onClick={() => handleChangeInspectorType('indicators')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              inspectorType === 'indicators'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${inspectorType === 'indicators'
                 ? 'bg-indigo-600 text-white shadow-sm'
                 : 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5'
-            }`}
+              }`}
           >
             📑 macro_indicators.json
           </button>

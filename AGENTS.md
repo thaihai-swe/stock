@@ -75,15 +75,16 @@ Toàn bộ dữ liệu tài chính, định giá và thị trường đều đư
 
 Khi phát triển hoặc sửa đổi UI, các Agent phải tuân thủ nghiêm ngặt 3 phân định độc lập sau:
 
-### A. Popup Chi Tiết Cổ Phiếu (`StockDetailModal.jsx`) — SỔ CÁI LÃI/LỖ THUẦN TÚY
+### A. Popup Chi Tiết Cổ Phiếu (`StockDetailModal.jsx`) — SỔ CÁI LÃI/LỖ THUẦN TÚY (FIFO P/L LEDGER)
 * Khi người dùng nhấp vào một mã cổ phiếu tại Dashboard hoặc Lịch sử giao dịch:
-  * **CHỈ ĐƯỢC PHÉP hiển thị Sổ Cái Lãi/Lỗ**:
-    1. **Hero Card**: Tổng P/L tích luỹ (đã chốt + chưa chốt + cổ tức), ROI %, Trạng thái vị thế (*Đang nắm giữ* hoặc *Đã tất toán*).
-    2. **3 Trụ Cột**: Realized P/L, Unrealized P/L (Giá vốn vs Thị giá), Tổng Cổ Tức đã nhận.
-    3. **Vị Thế Hiện Tại**: Số lượng nắm giữ, Giá vốn bình quân, Tổng giá trị thị trường.
-    4. **Nhật Ký Sổ Cái Giao Dịch**: Lịch sử chi tiết từng lệnh Mua, Bán (P/L từng lô theo chuẩn FIFO), Cổ tức.
-  * **TUYỆT ĐỐI KHÔNG**: Nhồi nhét tab Định giá, Sức khỏe cổ tức, hay Phân tích kỹ thuật vào modal này.
-  * Cung cấp nút điều hướng: **`🎯 Sang Tab Định Giá`** để chuyển thẳng người dùng sang tab Định Giá và tự động mở đúng mã đó.
+  * **Chỉ hiển thị Sổ Cái Lãi/Lỗ Tinh Gọn theo Chuẩn FIFO**:
+    1. **Header Sổ Cái**: Mã CP, Trạng thái vị thế (*Đang nắm giữ* kèm số lượng hoặc *Đã tất toán vị thế*).
+    2. **Hero Card**: Tổng P/L tích luỹ toàn thời gian (đã chốt + chưa chốt + cổ tức), ROI %, Tổng vốn mua vào, Số lượt giao dịch & khoảng thời gian.
+    3. **3 Trụ Cột**: Realized P/L (Lãi/lỗ đã chốt), Unrealized P/L (Lãi/lỗ tạm tính), Tổng Cổ Tức tiền mặt đã nhận.
+    4. **Vị Thế Hiện Tại**: Số lượng nắm giữ, Giá vốn bình quân, Thị giá, Tổng giá trị thị trường, Tỷ suất tạm tính.
+    5. **Nhật Ký Sổ Cái Giao Dịch**: Lịch sử chi tiết từng lệnh Mua, Bán (P/L từng lô theo chuẩn FIFO), Cổ tức có bộ lọc tiện lợi.
+  * **TUYỆT ĐỐI KHÔNG**: Không hiển thị thông tin mô tả công ty hay Thước đo vị thế 52 tuần (52W Range Slider) tại modal này (để giữ modal nhẹ, tập trung 100% vào sổ cái lệnh và lãi lỗ).
+  * Cung cấp nút điều hướng: **`🎯 Sang Tab Định Giá`** để chuyển thẳng người dùng sang tab Định Giá và tự động mở đúng mã đó (nơi có đầy đủ thông tin doanh nghiệp & thước đo 52 tuần).
 
 ### B. Tab Vĩ Mô & VN-Index (`MacroDashboard.jsx`) — MACRO REGIME & MARKET THERMOMETER
 * **Giao diện tập trung toàn diện cho phân tích kinh tế vĩ mô & chu kỳ thị trường**:
@@ -109,7 +110,7 @@ Khi phát triển hoặc sửa đổi UI, các Agent phải tuân thủ nghiêm 
      * Price / Cash Flow (P/CF Multiple)
      * Target P/E Multiple
      * Target P/B Multiple
-  4. **Xung Lực Kỹ Thuật & Hiệu Suất Chu Kỳ**: Beta, Vị thế 52W, Tech Score, Hiệu suất từ 1 tuần đến 5 năm.
+  4. **Mô Tả Doanh Nghiệp, Xung Lực Kỹ Thuật & Thước Đo Vị Thế 52 Tuần**: Tên đầy đủ, mô tả ngành nghề kinh doanh, sàn niêm yết, khối lượng khớp lệnh, Thước đo vị thế giá 52 tuần (Đáy 52W — Thị giá hiện tại — Đỉnh 52W kèm % từ đáy), Beta, Tech Score, Hiệu suất từ 1 tuần đến 5 năm.
   5. **4 Chế Độ Xem Báo Cáo Tài Chính Chuyên Sâu**:
      * *BCTC Chi Tiết*: 122+ chỉ tiêu KQKD, CĐKT, LCTT trong 8 quý và 5 năm.
      * *54 Chỉ Số Tài Chính & DuPont*: Phân rã 3 nhân tố ROE (Biên ròng × Vòng quay tài sản × Đòn bẩy tài chính).
@@ -174,6 +175,7 @@ stock/
 │   │   ├── market_fetcher.py          # MarketFetcher (TradingView Scanner, Quotes)
 │   │   ├── financial_fetcher.py       # FinancialFetcher (vnstock/TCBS BCTC, Ratios, Events)
 │   │   ├── macro_fetcher.py           # MacroFetcher (HNX Yield, SBV, Yahoo, SJC)
+│   │   ├── vietstock_valuation_fetcher.py # VietstockValuationFetcher (Lịch sử định giá P/E, P/B VN-Index 25 năm)
 │   │   ├── market_valuation_history_fetcher.py # MarketValuationHistoryFetcher (Định giá lịch sử Google Sheets)
 │   │   └── tradingeconomics_fetcher.py # TradingEconomicsFetcher (95 chỉ số vĩ mô 10 nhóm)
 │   ├── sync_fundamentals.py           # Controller đồng bộ định giá & kỹ thuật
@@ -184,6 +186,7 @@ stock/
 │   └── lib/
 │       ├── valuation_engine.py        # Enterprise Stock Valuation Engine (Single Source of Truth)
 │       ├── valuation_models.py        # Backward Compatibility Bridge re-exporting engine
+│       ├── market_valuation_analyzer.py # Động cơ phân tích thống kê 4 cửa sổ, Composite Signal & Cảnh báo Z>2
 │       ├── financial_taxonomy.py      # Từ điển chuẩn hóa chỉ tiêu BCTC Việt Nam
 │       ├── macro_regime.py            # Logic 5-pha Regime, Risk Score 4 tầng, Luân chuyển 11 ngành
 │       ├── macro_advisor.py           # Logic phân tích kinh tế vĩ mô & chu kỳ lãi suất
@@ -193,6 +196,7 @@ stock/
 │   ├── macro_valuation.json           # Cache vĩ mô, chu kỳ regime & lãi suất
 │   ├── macro_indicators.json          # Cache 95 chỉ số TradingEconomics theo 10 phân nhóm
 │   ├── market_valuation_history.json  # Cache định giá lịch sử 10 năm P/E, P/S, Vốn hóa Google Sheets
+│   ├── vnindex_valuation_cache/       # Cache dữ liệu định giá Vietstock VN-Index 25 năm
 │   ├── supported_stocks.json          # Danh sách mã được hỗ trợ
 │   ├── financials/                    # BCTC JSON chuẩn hóa từng mã (<MÃ>.json)
 │   └── stock.db                       # SQLite Database

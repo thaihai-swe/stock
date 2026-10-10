@@ -11,6 +11,8 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'regime' | 'sectors' | 'allocation' | 'indicators'
   const [indicatorCategory, setIndicatorCategory] = useState('overview');
   const [indicatorSearch, setIndicatorSearch] = useState('');
+  const [valuationWindow, setValuationWindow] = useState('ten_year'); // 'five_year' | 'ten_year' | 'modern' | 'all_time'
+  const [selectedSectorKey, setSelectedSectorKey] = useState(null);
 
   const loadAllMacroData = async () => {
     setLoading(true);
@@ -90,6 +92,29 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
   const leading = macroData?.leadingSignals || {};
   const assetAlloc = macroData?.assetAllocation || {};
   const goldAdv = macroData?.goldAdvisor || {};
+  const macroClock = macroData?.macroClock || {};
+  const yieldCurve = macroData?.yieldCurveAnalysis || {};
+  const scenarioMatrix = macroData?.scenarioMatrix || {};
+  const tailRisks = macroData?.tailRisks || [];
+  const hasActiveTailRisk = macroData?.hasActiveTailRisk || false;
+  const leadLag = macroData?.leadLagDivergence || {};
+  const confidence = macroData?.confidence || {};
+
+  const VALUATION_WINDOWS = [
+    { id: 'five_year', label: '5 Năm', shortLabel: '5N', desc: 'Chu kỳ kinh tế & tiền tệ gần nhất' },
+    { id: 'ten_year', label: '10 Năm', shortLabel: '10N', desc: 'Cửa sổ chuẩn mực vĩ mô dài hạn (Khuyến nghị)' },
+    { id: 'modern', label: 'Từ 2007', shortLabel: '2007', desc: 'Thời kỳ hội nhập WTO' },
+    { id: 'all_time', label: 'Toàn Bộ (25 Năm)', shortLabel: '25N', desc: 'Toàn cảnh từ ngày lập sàn HOSE' },
+  ];
+
+  const activeWin = market.windows?.[valuationWindow] || market.windows?.ten_year || null;
+  const peStats = activeWin?.pe || null;
+  const pbStats = activeWin?.pb || null;
+  const peXpbStats = activeWin?.peXpb || null;
+  const roeStats = activeWin?.roeProxy || null;
+  const compSignal = activeWin?.compositeSignal || null;
+  const derivedMetrics = market.derivedMetrics || {};
+  const pePos = peStats?.percentile != null ? Math.min(96, Math.max(4, peStats.percentile)) : 35;
 
   return (
     <div className="space-y-6 pb-12">
@@ -130,7 +155,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
 
       {/* ── 2. HERO STATUS BAR: PHA CHU KỲ & KHẨU VỊ RỦI RO ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Pha Kinh Tế */}
+        {/* Card 1: Pha Kinh Tế & Macro Clock */}
         <div className="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-2">
           <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pha Chu Kỳ Vĩ Mô</div>
           <div className="flex items-center justify-between">
@@ -144,23 +169,41 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
           <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
             {regime.description || 'Hoạt động kinh tế tăng trưởng vững chắc, tín dụng và sản xuất mở rộng.'}
           </p>
+          {macroClock?.quadrant && (
+            <div className="flex items-center justify-between pt-1.5 text-[11px] border-t border-gray-100 dark:border-gray-700/60">
+              <span className="text-gray-400">Macro Clock:</span>
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">{macroClock.titleVi || macroClock.quadrant}</span>
+            </div>
+          )}
         </div>
 
-        {/* Card 2: Khẩu Vị Rủi Ro */}
+        {/* Card 2: Khẩu Vị Thị Trường & Lead-Lag */}
         <div className="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-2">
           <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Khẩu Vị Thị Trường</div>
-          <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
-            {leading.stance || 'Risk-On Nhẹ'}
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+              {leading.stance || 'Risk-On Nhẹ'}
+            </div>
+            {leadLag?.signal && (
+              <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${leadLag.divergence > 15 ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'}`}>
+                {leadLag.signal}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
             <span>Tín hiệu tích cực: <b className="text-emerald-600">{leading.bullishCount || 3}</b></span>
             <span>•</span>
             <span>Cảnh báo: <b className="text-rose-600">{leading.bearishCount || 1}</b></span>
           </div>
-          <div className="text-xs text-gray-400">Dòng tiền ưu tiên tài sản rủi ro và tăng trưởng</div>
+          <div className="flex items-center justify-between pt-1.5 text-[11px] border-t border-gray-100 dark:border-gray-700/60">
+            <span className="text-gray-400">Độ lệch Sớm-Trễ:</span>
+            <span className={`font-bold ${leadLag?.divergence > 15 ? 'text-amber-500' : 'text-emerald-500'}`}>
+              {leadLag?.divergence > 0 ? `+${leadLag.divergence}` : (leadLag?.divergence ?? 0)}%
+            </span>
+          </div>
         </div>
 
-        {/* Card 3: Thước Đo Rủi Ro Vĩ Mô */}
+        {/* Card 3: Thước Đo Rủi Ro Vĩ Mô & Model Confidence */}
         <div className="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-2">
           <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Điểm Rủi Ro Vĩ Mô (Risk Score)</div>
           <div className="flex items-baseline gap-2">
@@ -178,7 +221,12 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
               style={{ width: `${Math.min(100, Math.max(0, risk.riskScore || 44))}%` }}
             />
           </div>
-          <div className="text-[11px] text-gray-400 truncate">{risk.riskBucketLabel || 'Trung Bình (Theo dõi)'}</div>
+          <div className="flex items-center justify-between pt-1.5 text-[11px] border-t border-gray-100 dark:border-gray-700/60">
+            <span className="text-gray-400">Độ tin cậy:</span>
+            <span className={`font-bold ${confidence?.label === 'HIGH' ? 'text-emerald-500' : confidence?.label === 'MEDIUM' ? 'text-amber-500' : 'text-rose-500'}`}>
+              {confidence?.overall || 80}% ({confidence?.labelVi || confidence?.label || 'Cao'})
+            </span>
+          </div>
         </div>
 
         {/* Card 4: Nhiệt Kế Định Giá VN-Index */}
@@ -194,7 +242,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
             </span>
             <span className="text-xs text-gray-400">Z-Score: {market.zScore || -0.5}</span>
           </div>
-          <div className="text-[11px] text-gray-400">Khuyến nghị: {assetAlloc.stance || '80% Cổ phiếu / 20% Tiền'}</div>
+          <div className="text-[11px] text-gray-400 truncate">Khuyến nghị: {assetAlloc.stance || '80% Cổ phiếu / 20% Tiền'}</div>
         </div>
       </div>
 
@@ -232,61 +280,226 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
           {/* 1. Biểu đồ chỉ số trực tuyến & intraday DNSE */}
           <MarketIndexLiveChart />
 
-          {/* 2. Card Định giá VN-Index P/E Bands 5 Năm */}
+          {/* 2. Card Định Giá VN-Index Đa Chu Kỳ (Vietstock 2000 - Hiện Tại) */}
           <div className="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-lg border border-white/10 space-y-6">
+            {/* Cảnh báo độ lệch chuẩn cực đoan (|z| > 2) */}
+            {market.extremeAlert && market.extremeAlertText && (
+              <div className="flex items-center gap-3 p-4 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs sm:text-sm font-bold animate-pulse">
+                <span className="text-xl shrink-0">🚨</span>
+                <span className="leading-relaxed">{market.extremeAlertText}</span>
+              </div>
+            )}
+
+            {/* Header: Tên chỉ số, Band nhãn & Composite Signal */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
               <div>
-                <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
-                  Nhiệt Kế Thị Trường Chứng Khoán Việt Nam
-                </span>
-                <h3 className="text-2xl font-black mt-1 flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
+                    Nhiệt Kế Định Giá VN-Index (Vietstock 2000–Hiện Tại)
+                  </span>
+                  {derivedMetrics.dataDate && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-gray-300">
+                      Chốt tháng: {derivedMetrics.dataDate}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-2xl font-black mt-1 flex flex-wrap items-center gap-3">
                   {market.name || 'Chỉ Số VN-Index'}
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                    {market.bandText || 'Rẻ (Vùng định giá hấp dẫn)'}
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${peStats?.bandBadge || 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'}`}>
+                    P/E {activeWin?.label || '10N'}: {peStats?.band || market.bandText || 'Rất rẻ'}
                   </span>
                 </h3>
               </div>
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6">
-                <div>
-                  <div className="text-xs text-gray-400">P/E Thị trường</div>
-                  <div className="text-2xl font-black text-emerald-400">{market.currentPE}x</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400">P/B Thị trường</div>
-                  <div className="text-2xl font-black text-white">{market.currentPB}x</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400">Z-Score 5 Năm</div>
-                  <div className="text-2xl font-black text-indigo-300">{market.zScore}</div>
+
+              {/* Tín hiệu định giá tổng hợp (Composite Valuation Signal) */}
+              <div className="flex flex-col sm:items-end gap-1 bg-white/5 p-3 rounded-2xl border border-white/10">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Tín Hiệu Định Giá Tổng Hợp
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase ${compSignal?.badge || 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'}`}>
+                    {compSignal?.signal || 'MUA TÍCH LŨY'}
+                  </span>
+                  <span className="text-lg font-black text-white">
+                    {compSignal?.score ?? 50}<span className="text-xs text-gray-400 font-normal">/100</span>
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Thanh đo dải P/E Bands */}
-            <div className="space-y-2">
+            {/* Thanh chuyển đổi 4 Cửa Sổ Chu Kỳ Thống Kê */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 p-1 bg-white/5 rounded-2xl border border-white/10 shrink-0">
+                {VALUATION_WINDOWS.map((win) => {
+                  const isSelected = valuationWindow === win.id;
+                  return (
+                    <button
+                      key={win.id}
+                      type="button"
+                      onClick={() => setValuationWindow(win.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'text-gray-300 hover:text-white hover:bg-white/10'
+                      }`}
+                      title={win.desc}
+                    >
+                      <span className="hidden sm:inline">{win.label}</span>
+                      <span className="sm:hidden">{win.shortLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="text-xs text-gray-300 flex items-center gap-2 flex-wrap">
+                <span>Chu kỳ: <b className="text-indigo-300">{activeWin?.label || '10 Năm'}</b></span>
+                <span>•</span>
+                <span>{activeWin?.dateFrom} → {activeWin?.dateTo}</span>
+                <span className="text-gray-400">({activeWin?.nObs || 0} kỳ tháng)</span>
+              </div>
+            </div>
+
+            {/* Grid 4 Chỉ Số Thống Kê Sâu */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {/* Cột 1: P/E */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                <div className="text-xs text-gray-400 flex items-center justify-between">
+                  <span>P/E Thị Trường</span>
+                  <span className={`text-[10px] font-bold ${peStats?.vsMedianPct <= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {peStats?.vsMedianPct > 0 ? `+${peStats?.vsMedianPct}` : peStats?.vsMedianPct}% vs Med
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-emerald-400">{market.currentPE}x</div>
+                <div className="text-[11px] text-gray-300 space-y-0.5 pt-1 border-t border-white/5">
+                  <div className="flex justify-between">
+                    <span>Trung bình:</span>
+                    <b className="text-white">{peStats?.mean}x</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Trung vị:</span>
+                    <b className="text-white">{peStats?.median}x</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Z-Score / Phân vị:</span>
+                    <b className="text-indigo-300">{peStats?.zscore > 0 ? `+${peStats?.zscore}` : peStats?.zscore}σ · {peStats?.percentile}%</b>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cột 2: P/B */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                <div className="text-xs text-gray-400 flex items-center justify-between">
+                  <span>P/B Thị Trường</span>
+                  <span className={`text-[10px] font-bold ${pbStats?.vsMedianPct <= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {pbStats?.vsMedianPct > 0 ? `+${pbStats?.vsMedianPct}` : pbStats?.vsMedianPct}% vs Med
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-white">{market.currentPB}x</div>
+                <div className="text-[11px] text-gray-300 space-y-0.5 pt-1 border-t border-white/5">
+                  <div className="flex justify-between">
+                    <span>Trung bình:</span>
+                    <b className="text-white">{pbStats?.mean}x</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Trung vị:</span>
+                    <b className="text-white">{pbStats?.median}x</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Z-Score / Phân vị:</span>
+                    <b className="text-indigo-300">{pbStats?.zscore > 0 ? `+${pbStats?.zscore}` : pbStats?.zscore}σ · {pbStats?.percentile}%</b>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cột 3: Tích số P/E * P/B (Graham Test) */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                <div className="text-xs text-gray-400 flex items-center justify-between">
+                  <span>P/E × P/B (Graham)</span>
+                  <span className={`text-[10px] font-bold ${(derivedMetrics.peXpb || 0) <= 22.5 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {(derivedMetrics.peXpb || 0) <= 22.5 ? '≤ 22.5 (Đạt)' : '> 22.5'}
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-indigo-300">{derivedMetrics.peXpb || peXpbStats?.current || '-'}x</div>
+                <div className="text-[11px] text-gray-300 space-y-0.5 pt-1 border-t border-white/5">
+                  <div className="flex justify-between">
+                    <span>Ngưỡng Graham:</span>
+                    <b className="text-white">&lt; 22.5x</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Trung bình chu kỳ:</span>
+                    <b className="text-white">{peXpbStats?.mean}x</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Z-Score / Phân vị:</span>
+                    <b className="text-indigo-300">{peXpbStats?.zscore > 0 ? `+${peXpbStats?.zscore}` : peXpbStats?.zscore}σ · {peXpbStats?.percentile}%</b>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cột 4: ROE Proxy */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                <div className="text-xs text-gray-400 flex items-center justify-between">
+                  <span>ROE Thị Trường (Proxy)</span>
+                  <span className="text-[10px] font-bold text-indigo-300">P/B ÷ P/E</span>
+                </div>
+                <div className="text-2xl font-black text-cyan-300">{derivedMetrics.roeProxy || roeStats?.current || '-'}%</div>
+                <div className="text-[11px] text-gray-300 space-y-0.5 pt-1 border-t border-white/5">
+                  <div className="flex justify-between">
+                    <span>Trung bình chu kỳ:</span>
+                    <b className="text-white">{roeStats?.mean}%</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Trung vị chu kỳ:</span>
+                    <b className="text-white">{roeStats?.median}%</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Z-Score / Phân vị:</span>
+                    <b className="text-indigo-300">{roeStats?.zscore > 0 ? `+${roeStats?.zscore}` : roeStats?.zscore}σ · {roeStats?.percentile}%</b>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Thanh đo dải P/E Bands Động theo Cửa Sổ Được Chọn */}
+            <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between text-xs text-gray-300 font-medium">
-                <span>Dải định giá P/E: Rất rẻ (&lt;11.5x)</span>
-                <span>Trung bình chu kỳ 5 năm: 14.2x</span>
-                <span>Rất đắt (&gt;18.0x)</span>
+                <span>Rất rẻ (&le; {peStats?.p10}x)</span>
+                <span>Rẻ ({peStats?.p10}–{peStats?.p25}x)</span>
+                <span>Trung vị ({peStats?.median}x)</span>
+                <span>Mắc ({peStats?.p75}–{peStats?.p90}x)</span>
+                <span>Rất mắc (&gt; {peStats?.p90}x)</span>
               </div>
-              <div className="w-full h-4 bg-gray-800 rounded-full overflow-hidden p-0.5 flex gap-1 border border-white/10">
-                <div className="flex-1 bg-emerald-500 rounded-l-full" title="Rất rẻ: <= 11.5x" />
-                <div className="flex-1 bg-emerald-400 relative" title="Rẻ: 11.5 - 13.5x">
-                  <div className="absolute top-1/2 -translate-y-1/2 left-3/4 w-3.5 h-3.5 bg-white rounded-full border-2 border-indigo-900 shadow-lg animate-pulse" />
-                </div>
-                <div className="flex-1 bg-blue-500" title="Hợp lý: 13.5 - 16.0x" />
-                <div className="flex-1 bg-amber-500" title="Đắt: 16.0 - 18.0x" />
-                <div className="flex-1 bg-rose-500 rounded-r-full" title="Rất đắt: > 18.0x" />
+              <div className="w-full h-4 bg-gray-800 rounded-full overflow-hidden p-0.5 flex gap-1 border border-white/10 relative">
+                <div className="flex-1 bg-emerald-500 rounded-l-full" title={`Rất rẻ: <= ${peStats?.p10}x`} />
+                <div className="flex-1 bg-teal-500" title={`Rẻ: ${peStats?.p10}x - ${peStats?.p25}x`} />
+                <div className="flex-2 bg-blue-500" title={`Hợp lý: ${peStats?.p25}x - ${peStats?.p75}x`} />
+                <div className="flex-1 bg-amber-500" title={`Mắc: ${peStats?.p75}x - ${peStats?.p90}x`} />
+                <div className="flex-1 bg-rose-500 rounded-r-full" title={`Rất mắc: > ${peStats?.p90}x`} />
+
+                {/* Kim chỉ thị động theo percentile thực tế */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full border-2 border-indigo-900 shadow-xl animate-pulse z-10"
+                  style={{ left: `${pePos}%` }}
+                  title={`P/E hiện tại ${market.currentPE}x (Phân vị ${peStats?.percentile}%)`}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-gray-400">
+                <span>P10: {peStats?.p10}x</span>
+                <span>P25: {peStats?.p25}x</span>
+                <span className="text-indigo-300 font-bold">Vị thế hiện tại: {market.currentPE}x ({peStats?.percentile}%)</span>
+                <span>P75: {peStats?.p75}x</span>
+                <span>P90: {peStats?.p90}x</span>
               </div>
             </div>
 
-            {/* Khuyến nghị phân bổ vốn */}
+            {/* Khuyến nghị phân bổ vốn & Tín hiệu vĩ mô */}
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">
                   Khuyến Nghị Vị Thế Vốn: {assetAlloc.stance}
                 </span>
-                <p className="text-xs text-gray-300 mt-1">{assetAlloc.rationale}</p>
+                <p className="text-xs text-gray-300 mt-1">
+                  {compSignal?.description || assetAlloc.rationale}
+                </p>
               </div>
               <div className="flex items-center gap-2 text-lg font-black shrink-0">
                 <span className="text-emerald-400">{assetAlloc.recommendedEquityPct}% Cổ phiếu</span>
@@ -298,6 +511,118 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
 
           {/* 3. Lịch Sử Định Giá Thị Trường Đa Chu Kỳ (Google Sheets Simply Wall St) */}
           <MarketValuationHistoryChart />
+
+          {/* 3.1. Phân Tích Đường Cong Lợi Suất & Thị Trường Nợ (Yield Curve & Debt Market Stress) */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
+              <div>
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                  Thị Trường Nợ & Cấu Trúc Lãi Suất (Yield Curve Analysis)
+                </span>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">
+                  Đường Cong Lợi Suất & Chỉ Số Căng Thẳng Nợ: <span className="text-indigo-600 dark:text-indigo-400">{yieldCurve.ycRegimeVi || yieldCurve.ycRegime || 'Bình Thường'}</span>
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${yieldCurve.regimeBadge || 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                  {yieldCurve.ycRegime || 'Normal'}
+                </span>
+                <span className="text-xs text-gray-400">Stress: <b className="text-rose-500 font-bold">{yieldCurve.ycStressIndex || 0}/100</b></span>
+              </div>
+            </div>
+
+            {/* Inversion Alert if triggered */}
+            {yieldCurve.inversionWarning && (
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">⚠️</span>
+                <div className="space-y-1">
+                  <div className="uppercase tracking-wider">Cảnh Báo Đảo Ngược Kỳ Hạn (Long-Short Inversion: LSS &lt; 0)</div>
+                  <div className="text-[11px] font-normal leading-relaxed text-amber-800 dark:text-amber-300">
+                    Lợi suất TPCP 10Y ({yieldCurve.vn10y}%) hiện đang thấp hơn Lãi suất tái cấp vốn SBV ({yieldCurve.sbvRefinancingRate}%).
+                    Độ lệch dốc LSS = <b className="font-mono font-bold text-amber-900 dark:text-amber-100">{yieldCurve.longShortSpread}%</b>.
+                    Đây là tín hiệu cảnh báo thanh khoản tiền đồng thắt chặt trong ngắn hạn hoặc kỳ vọng kinh tế hạ nhiệt.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4 Metric cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* LSS */}
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 space-y-1">
+                <div className="text-[11px] font-bold text-gray-400 uppercase">Long-Short Spread (LSS)</div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-2xl font-black ${(yieldCurve.longShortSpread ?? 0) < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                    {(yieldCurve.longShortSpread ?? 0) > 0 ? `+${yieldCurve.longShortSpread}` : yieldCurve.longShortSpread}%
+                  </span>
+                </div>
+                <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                  VN 10Y ({yieldCurve.vn10y}%) – SBV ({yieldCurve.sbvRefinancingRate}%)
+                </div>
+                <div className={`text-[10px] font-bold ${(yieldCurve.longShortSpread ?? 0) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                  {(yieldCurve.longShortSpread ?? 0) < 0 ? '⚠️ Đường cong đảo ngược' : '✓ Đường cong bình thường'}
+                </div>
+              </div>
+
+              {/* Cross Country */}
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 space-y-1">
+                <div className="text-[11px] font-bold text-gray-400 uppercase">Chênh Lệch Quốc Tế (Cross-Country)</div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-2xl font-black ${(yieldCurve.crossCountrySpread ?? 0) < 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                    {(yieldCurve.crossCountrySpread ?? 0) > 0 ? `+${yieldCurve.crossCountrySpread}` : yieldCurve.crossCountrySpread}%
+                  </span>
+                </div>
+                <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                  VN 10Y ({yieldCurve.vn10y}%) – US 10Y ({yieldCurve.us10y}%)
+                </div>
+                <div className={`text-[10px] font-bold ${(yieldCurve.crossCountrySpread ?? 0) < 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {(yieldCurve.crossCountrySpread ?? 0) < 0 ? '⚠️ Áp lực tỷ giá & rút ròng vốn' : '✓ Cân bằng dòng vốn ngoại'}
+                </div>
+              </div>
+
+              {/* TPCP 10Y */}
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 space-y-1">
+                <div className="text-[11px] font-bold text-gray-400 uppercase">Lợi Suất TPCP VN 10Y</div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{yieldCurve.vn10y}%</span>
+                </div>
+                <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                  Chu kỳ lãi suất chuẩn thị trường
+                </div>
+                <div className="text-[10px] font-bold text-gray-400">
+                  LS Qua đêm: {macro.interbankOvernight}%
+                </div>
+              </div>
+
+              {/* Debt Stress Index */}
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 space-y-1">
+                <div className="text-[11px] font-bold text-gray-400 uppercase">Chỉ Số Căng Thẳng Nợ (YC Stress)</div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-2xl font-black ${(yieldCurve.ycStressIndex ?? 0) > 60 ? 'text-rose-500' : (yieldCurve.ycStressIndex ?? 0) > 40 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                    {yieldCurve.ycStressIndex ?? 0}
+                  </span>
+                  <span className="text-xs font-bold text-gray-400">/ 100</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-600 h-1.5 rounded-full overflow-hidden mt-1">
+                  <div
+                    className={`h-full ${(yieldCurve.ycStressIndex ?? 0) > 60 ? 'bg-rose-500' : (yieldCurve.ycStressIndex ?? 0) > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                    style={{ width: `${Math.min(100, Math.max(0, yieldCurve.ycStressIndex ?? 0))}%` }}
+                  />
+                </div>
+                <div className="text-[10px] font-bold text-gray-400 mt-1">
+                  Mức độ: {(yieldCurve.ycStressIndex ?? 0) > 60 ? 'Căng thẳng cao' : (yieldCurve.ycStressIndex ?? 0) > 40 ? 'Trung bình' : 'Ổn định'}
+                </div>
+              </div>
+            </div>
+
+            {/* Assessment rationale */}
+            {yieldCurve.assessment && (
+              <div className="p-3.5 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl border border-indigo-100/60 dark:border-indigo-800/30 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                <span className="font-bold text-indigo-600 dark:text-indigo-400 mr-1.5">Nhận định chuyên sâu:</span>
+                {yieldCurve.assessment}
+              </div>
+            )}
+          </div>
 
           {/* 4. Grid Chỉ Số Tài Sản Thực & Lãi Suất */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -325,6 +650,338 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
       {/* ── 5. PHÂN HỆ 2: CHU KỲ 5 PHA & RADAR DẪN DẮT ── */}
       {activeTab === 'regime' && (
         <div className="space-y-6">
+          {/* Cảnh báo Tail-Risks Kích Hoạt */}
+          {hasActiveTailRisk && tailRisks?.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="animate-ping inline-flex h-2 w-2 rounded-full bg-rose-400 opacity-75" />
+                  🚨 Cảnh Báo Rủi Ro Đuôi Kích Hoạt (Active Tail-Risks Triggers)
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold">
+                  {tailRisks.length} cảnh báo đang mở
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {tailRisks.map((tr) => (
+                  <div
+                    key={tr.id}
+                    className="p-4 rounded-2xl bg-gradient-to-r from-rose-500/10 via-amber-500/5 to-transparent border border-rose-500/30 space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>⚡</span> {tr.name}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black border ${tr.badge || 'bg-rose-500/20 text-rose-300 border-rose-500/40'}`}>
+                        {tr.severity || 'HIGH'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-rose-700 dark:text-rose-300 font-medium">
+                      <span className="font-bold">Ngưỡng kích hoạt:</span> {tr.trigger}
+                    </div>
+                    <div className="text-[11px] text-gray-600 dark:text-gray-400">
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">Tác động thị trường:</span> {tr.impact}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Card Ma Trận 3 Kịch Bản Thị Trường (Scenario Matrix) */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
+              <div>
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                  Dự Phóng Vĩ Mô & Định Lượng Kịch Bản (Scenario Matrix)
+                </span>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">
+                  3 Kịch Bản Định Giá VN-Index & Phân Bổ Ngành
+                </h3>
+              </div>
+              <div className="text-xs text-gray-400">
+                Mô hình phân bổ xác suất: <b className="text-indigo-600 dark:text-indigo-400">55% Base · 25% Bull · 20% Bear</b>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Base Case */}
+              {scenarioMatrix?.base && (
+                <div className="p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/40 space-y-3 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase text-blue-700 dark:text-blue-300">
+                        {scenarioMatrix.base.name}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-xs font-black">
+                        {scenarioMatrix.base.probability}%
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-blue-900 dark:text-blue-100">
+                        {scenarioMatrix.base.vnIndexRange}
+                      </div>
+                      <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                        Dải điểm kỳ vọng VN-Index
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.base.conditions}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.base.narrative}
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-blue-200/60 dark:border-blue-800/40 space-y-1.5">
+                    <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <span>✓ Ưu tiên:</span>
+                      <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.base.sectorBenefit?.join(', ')}</span>
+                    </div>
+                    <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
+                      <span>✕ Thận trọng:</span>
+                      <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.base.sectorImpacted?.join(', ')}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Bull Case */}
+              {scenarioMatrix?.bull && (
+                <div className="p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 space-y-3 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase text-emerald-700 dark:text-emerald-300">
+                        {scenarioMatrix.bull.name}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-black">
+                        {scenarioMatrix.bull.probability}%
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-emerald-900 dark:text-emerald-100">
+                        {scenarioMatrix.bull.vnIndexRange}
+                      </div>
+                      <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                        Dải điểm kỳ vọng VN-Index
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.bull.conditions}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.bull.narrative}
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-emerald-200/60 dark:border-emerald-800/40 space-y-1.5">
+                    <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <span>✓ Ưu tiên:</span>
+                      <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bull.sectorBenefit?.join(', ')}</span>
+                    </div>
+                    <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
+                      <span>✕ Thận trọng:</span>
+                      <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bull.sectorImpacted?.join(', ')}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Bear Case */}
+              {scenarioMatrix?.bear && (
+                <div className="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 space-y-3 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase text-rose-700 dark:text-rose-300">
+                        {scenarioMatrix.bear.name}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-black">
+                        {scenarioMatrix.bear.probability}%
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-rose-900 dark:text-rose-100">
+                        {scenarioMatrix.bear.vnIndexRange}
+                      </div>
+                      <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 mt-0.5">
+                        Dải điểm kỳ vọng VN-Index
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.bear.conditions}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.bear.narrative}
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-rose-200/60 dark:border-rose-800/40 space-y-1.5">
+                    <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <span>✓ Phòng vệ:</span>
+                      <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bear.sectorBenefit?.join(', ')}</span>
+                    </div>
+                    <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
+                      <span>✕ Thận trọng:</span>
+                      <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bear.sectorImpacted?.join(', ')}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Card Đồng Hồ Vĩ Mô 4 Góc Phần Tư (Macro Clock 4-Quadrant) */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
+              <div>
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                  Đồng Hồ Kinh Tế Vĩ Mô (Macro Clock 4-Quadrant)
+                </span>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">
+                  Tương Quan Tăng Trưởng GDP × Chu Kỳ Lạm Phát CPI
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">Góc hiện tại:</span>
+                <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 text-xs font-bold">
+                  {macroClock?.quadrant || 'OVERHEATING'}
+                </span>
+              </div>
+            </div>
+
+            {/* 2x2 Quadrant Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Q1: Goldilocks */}
+              <div
+                className={`p-5 rounded-2xl border transition ${
+                  macroClock?.quadrantKey === 'goldilocks'
+                    ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 shadow-xs'
+                    : 'bg-gray-50/50 dark:bg-gray-700/20 border-gray-200/60 dark:border-gray-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🌟</span>
+                    <span className="font-black text-sm text-gray-900 dark:text-white">Tăng Trưởng Vàng (Goldilocks)</span>
+                  </div>
+                  {macroClock?.quadrantKey === 'goldilocks' && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase">
+                      Đang Ở Đây
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-2">
+                  GDP Tăng Trưởng Cao &bull; Lạm Phát Thấp/Ổn Định
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                  Môi trường hoàn hảo cho thị trường chứng khoán. Doanh nghiệp tăng trưởng mạnh mẽ mà không chịu áp lực lãi suất.
+                </p>
+                <div className="mt-3 pt-2 border-t border-gray-100 dark:border-gray-700/60 text-[11px] text-emerald-700 dark:text-emerald-300">
+                  <b>Ngành hưởng lợi:</b> Ngân hàng, Chứng khoán, Bán lẻ, Công nghệ
+                </div>
+              </div>
+
+              {/* Q2: Overheating */}
+              <div
+                className={`p-5 rounded-2xl border transition ${
+                  macroClock?.quadrantKey === 'overheating'
+                    ? 'bg-amber-50/70 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xs'
+                    : 'bg-gray-50/50 dark:bg-gray-700/20 border-gray-200/60 dark:border-gray-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🔥</span>
+                    <span className="font-black text-sm text-gray-900 dark:text-white">Mở Rộng Tăng Tốc / Quá Nhiệt (Overheating)</span>
+                  </div>
+                  {macroClock?.quadrantKey === 'overheating' && (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-[10px] font-black uppercase">
+                      Đang Ở Đây
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs font-bold text-amber-600 dark:text-amber-400 mt-2">
+                  GDP Tăng Trưởng Tốt &bull; Lạm Phát Gia Tăng
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                  Sản xuất và tiêu dùng sôi động nhưng chi phí vốn bắt đầu tăng. Lợi nhuận phân hóa mạnh giữa các nhóm ngành.
+                </p>
+                <div className="mt-3 pt-2 border-t border-gray-100 dark:border-gray-700/60 text-[11px] text-amber-700 dark:text-amber-300">
+                  <b>Ngành hưởng lợi:</b> Bất động sản, Thép, Hóa chất, Năng lượng
+                </div>
+              </div>
+
+              {/* Q3: Stagflation */}
+              <div
+                className={`p-5 rounded-2xl border transition ${
+                  macroClock?.quadrantKey === 'stagflation'
+                    ? 'bg-rose-50/70 dark:bg-rose-950/30 border-2 border-rose-500 shadow-xs'
+                    : 'bg-gray-50/50 dark:bg-gray-700/20 border-gray-200/60 dark:border-gray-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">⚠️</span>
+                    <span className="font-black text-sm text-gray-900 dark:text-white">Đình Lạm (Stagflation)</span>
+                  </div>
+                  {macroClock?.quadrantKey === 'stagflation' && (
+                    <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black uppercase">
+                      Đang Ở Đây
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs font-bold text-rose-600 dark:text-rose-400 mt-2">
+                  GDP Tăng Chậm Lại &bull; Lạm Phát Cao
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                  Kịch bản rủi ro nhất: chi phí đầu vào tăng cao làm xói mòn biên lợi nhuận trong khi sức mua sụt giảm.
+                </p>
+                <div className="mt-3 pt-2 border-t border-gray-100 dark:border-gray-700/60 text-[11px] text-rose-700 dark:text-rose-300">
+                  <b>Ngành phòng thủ:</b> Tiện ích, Dược phẩm, Tiền mặt, Vàng
+                </div>
+              </div>
+
+              {/* Q4: Reflation */}
+              <div
+                className={`p-5 rounded-2xl border transition ${
+                  macroClock?.quadrantKey === 'reflation'
+                    ? 'bg-blue-50/70 dark:bg-blue-950/30 border-2 border-blue-500 shadow-xs'
+                    : 'bg-gray-50/50 dark:bg-gray-700/20 border-gray-200/60 dark:border-gray-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🌱</span>
+                    <span className="font-black text-sm text-gray-900 dark:text-white">Phục Hồi / Bơm Tiền (Reflation)</span>
+                  </div>
+                  {macroClock?.quadrantKey === 'reflation' && (
+                    <span className="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase">
+                      Đang Ở Đây
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs font-bold text-blue-600 dark:text-blue-400 mt-2">
+                  GDP Bắt Đầu Tạo Đáy &bull; Lạm Phát Hạ Nhiệt
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                  Chính sách tiền tệ nới lỏng tạo thanh khoản dồi dào, định giá cổ phiếu phục hồi từ vùng trũng lịch sử.
+                </p>
+                <div className="mt-3 pt-2 border-t border-gray-100 dark:border-gray-700/60 text-[11px] text-blue-700 dark:text-blue-300">
+                  <b>Ngành hưởng lợi:</b> Chứng khoán, Công nghệ, Bán lẻ, Xây dựng
+                </div>
+              </div>
+            </div>
+
+            {/* Current Position Note */}
+            <div className="p-3.5 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="text-gray-600 dark:text-gray-300">
+                <span className="font-bold text-gray-900 dark:text-white">Vị thế hiện tại:</span> Tăng trưởng GDP thực tế{' '}
+                <b className="text-indigo-600 dark:text-indigo-400">{macroClock?.gdpValue}%</b> ({macroClock?.gdpPhaseVi}) &bull; Lạm phát CPI{' '}
+                <b className="text-amber-600 dark:text-amber-400">{macroClock?.cpiValue}%</b> ({macroClock?.inflationStateVi})
+              </div>
+              <div className="text-gray-400 text-[11px] shrink-0">
+                Khuyến nghị: {macroClock?.favoredSectors?.slice(0, 3).join(', ')}
+              </div>
+            </div>
+          </div>
+
           {/* Card Phân tích 5 pha kinh tế */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
@@ -457,6 +1114,105 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
               ))}
             </div>
           </div>
+
+          {/* Card Lead-Lag Divergence & Model Confidence */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Box Lead-Lag Divergence */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                    Độ Lệch Sớm - Trễ (Lead-Lag Divergence)
+                  </span>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                    Thị Trường Tài Chính vs Kinh Tế Thực
+                  </h3>
+                </div>
+                <span className={`px-2.5 py-1 rounded-xl text-xs font-black border ${leadLag?.badge || 'bg-amber-100 text-amber-700 border-amber-300'}`}>
+                  {leadLag?.signal || 'BALANCED'}
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-gray-600 dark:text-gray-300">Chỉ Báo Sớm (Leading: Lãi suất, Tỷ giá, Dầu, Vàng)</span>
+                    <span className="text-indigo-600 dark:text-indigo-400">{leadLag?.leadingPct || 50}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${leadLag?.leadingPct || 50}%` }} />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-gray-600 dark:text-gray-300">Chỉ Báo Trễ (Lagging: GDP, Lạm phát CPI, Bán lẻ)</span>
+                    <span className="text-blue-600 dark:text-blue-400">{leadLag?.laggingPct || 50}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${leadLag?.laggingPct || 50}%` }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 space-y-1">
+                <div className="flex items-center justify-between font-bold">
+                  <span>Chênh lệch độ lệch (Δ Divergence):</span>
+                  <span className={`${(leadLag?.divergence ?? 0) > 15 ? 'text-amber-500 font-black' : (leadLag?.divergence ?? 0) < -15 ? 'text-emerald-500 font-black' : 'text-gray-700 dark:text-gray-200'}`}>
+                    {(leadLag?.divergence ?? 0) > 0 ? `+${leadLag.divergence}` : (leadLag?.divergence ?? 0)}%
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                  {leadLag?.desc || 'Độ lệch đo lường sự khác biệt giữa phản ứng nhanh của thị trường tài chính và tốc độ phản ánh chậm của số liệu vĩ mô thực.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Box Model Confidence */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                    Độ Tin Cậy Mô Hình (Model Confidence)
+                  </span>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                    Điểm Số Độ Chuẩn Xác Thuật Toán
+                  </h3>
+                </div>
+                <span className={`px-2.5 py-1 rounded-xl text-xs font-black border ${confidence?.badge || 'bg-emerald-100 text-emerald-700 border-emerald-300'}`}>
+                  {confidence?.labelVi || confidence?.label || 'CAO'}
+                </span>
+              </div>
+
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-gray-900 dark:text-white">{confidence?.overall || 80.5}</span>
+                <span className="text-xs font-bold text-gray-400">/ 100</span>
+                <span className="text-xs text-gray-400 ml-auto">Xung đột tín hiệu: <b>0</b></span>
+              </div>
+
+              <div className="space-y-2.5">
+                {[
+                  { label: 'Chất Lượng Dữ Liệu Nguồn (Data Quality)', val: confidence?.dataQuality || 100, color: 'bg-emerald-500' },
+                  { label: 'Độ Ổn Định Chu Kỳ (Regime Stability)', val: confidence?.regimeStability || 75, color: 'bg-indigo-500' },
+                  { label: 'Độ Rõ Ràng Tín Hiệu (Signal Clarity)', val: confidence?.signalClarity || 70, color: 'bg-blue-500' },
+                ].map((item, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex justify-between text-[11px] font-bold">
+                      <span className="text-gray-600 dark:text-gray-400">{item.label}</span>
+                      <span className="text-gray-900 dark:text-white">{item.val}%</span>
+                    </div>
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                      <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.val}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-[11px] text-gray-400">
+                Mô hình tổng hợp 6 động lực vĩ mô chính và 95 chỉ số TradingEconomics để lượng hóa độ tin cậy của chu kỳ kinh tế hiện hành.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -484,29 +1240,94 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
 
             {/* Lưới 11 Nhóm Ngành */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {sectors.map((sec) => (
-                <div
-                  key={sec.key}
-                  className="p-5 rounded-2xl bg-gray-50/70 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-700 transition"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{sec.icon}</span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">{sec.name}</span>
+              {sectors.map((sec) => {
+                const isSelected = selectedSectorKey === sec.key;
+                const dec = sec.decomposition || {};
+                return (
+                  <div
+                    key={sec.key}
+                    className={`p-5 rounded-2xl border transition space-y-3 ${
+                      isSelected
+                        ? 'bg-indigo-50/50 dark:bg-indigo-950/30 border-2 border-indigo-500 shadow-xs'
+                        : 'bg-gray-50/70 dark:bg-gray-700/30 border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{sec.icon}</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white">{sec.name}</span>
+                      </div>
+                      <span className="text-xs font-black text-gray-400">#{sec.rank}</span>
                     </div>
-                    <span className="text-xs font-black text-gray-400">#{sec.rank}</span>
-                  </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <span className={`px-2.5 py-1 rounded-xl text-xs font-black border ${sec.colorClass}`}>
-                      {sec.action}
-                    </span>
-                    <span className="text-xs font-black text-gray-700 dark:text-gray-300">
-                      Net Score: {sec.netScore > 0 ? `+${sec.netScore}` : sec.netScore}
-                    </span>
+                    <div className="flex items-center justify-between pt-1">
+                      <span className={`px-2.5 py-1 rounded-xl text-xs font-black border ${sec.colorClass}`}>
+                        {sec.action}
+                      </span>
+                      <span className="text-xs font-black text-gray-700 dark:text-gray-300">
+                        Net Score: {sec.netScore > 0 ? `+${sec.netScore}` : sec.netScore}
+                      </span>
+                    </div>
+
+                    {/* Button Xem Chi Tiết Phân Rã */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSectorKey(isSelected ? null : sec.key)}
+                      className="w-full mt-2 py-1.5 px-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between cursor-pointer transition"
+                    >
+                      <span>{isSelected ? 'Thu gọn phân rã' : 'Xem 6 động lực vĩ mô'}</span>
+                      <span className="text-[10px]">{isSelected ? '▲' : '▼'}</span>
+                    </button>
+
+                    {/* Phân rã 6 Drivers khi được mở */}
+                    {isSelected && (
+                      <div className="pt-3 border-t border-gray-200/60 dark:border-gray-700 space-y-2 text-xs">
+                        <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                          Đóng góp của 6 Động Lực Vĩ Mô:
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <span className="text-gray-500">⚡ Liên ngân hàng:</span>
+                            <b className={(dec.interbank || 0) > 0 ? 'text-emerald-600' : (dec.interbank || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
+                              {(dec.interbank || 0) > 0 ? `+${dec.interbank}` : (dec.interbank || 0)}
+                            </b>
+                          </div>
+                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <span className="text-gray-500">🏦 Lãi suất SBV:</span>
+                            <b className={(dec.sbvRate || 0) > 0 ? 'text-emerald-600' : (dec.sbvRate || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
+                              {(dec.sbvRate || 0) > 0 ? `+${dec.sbvRate}` : (dec.sbvRate || 0)}
+                            </b>
+                          </div>
+                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <span className="text-gray-500">📈 Lạm phát CPI:</span>
+                            <b className={(dec.cpi || 0) > 0 ? 'text-emerald-600' : (dec.cpi || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
+                              {(dec.cpi || 0) > 0 ? `+${dec.cpi}` : (dec.cpi || 0)}
+                            </b>
+                          </div>
+                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <span className="text-gray-500">💵 Tỷ giá USD/VND:</span>
+                            <b className={(dec.usdVnd || 0) > 0 ? 'text-emerald-600' : (dec.usdVnd || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
+                              {(dec.usdVnd || 0) > 0 ? `+${dec.usdVnd}` : (dec.usdVnd || 0)}
+                            </b>
+                          </div>
+                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <span className="text-gray-500">🛢️ Giá dầu Brent:</span>
+                            <b className={(dec.oil || 0) > 0 ? 'text-emerald-600' : (dec.oil || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
+                              {(dec.oil || 0) > 0 ? `+${dec.oil}` : (dec.oil || 0)}
+                            </b>
+                          </div>
+                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <span className="text-gray-500">🏭 PMI Sản xuất:</span>
+                            <b className={(dec.pmi || 0) > 0 ? 'text-emerald-600' : (dec.pmi || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
+                              {(dec.pmi || 0) > 0 ? `+${dec.pmi}` : (dec.pmi || 0)}
+                            </b>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

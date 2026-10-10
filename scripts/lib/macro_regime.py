@@ -297,6 +297,15 @@ def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str,
             color_class = "text-rose-400 bg-rose-500/15 border-rose-500/30"
             badge = "bg-rose-500"
 
+        decomposition = {
+            "interbank": round(impacts[0], 2),
+            "sbvRate": round(impacts[1], 2),
+            "cpi": round(impacts[2], 2),
+            "usdVnd": round(impacts[3], 2),
+            "oil": round(impacts[4], 2),
+            "pmi": round(impacts[5], 2),
+        }
+
         results.append({
             "key": sector_key,
             "name": info["name"],
@@ -306,6 +315,7 @@ def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str,
             "actionTag": action_tag,
             "colorClass": color_class,
             "badgeColor": badge,
+            "decomposition": decomposition,
         })
 
     # Sort descending by net score
@@ -489,3 +499,427 @@ def recommend_gold(
         "sizeHint": size,
         "reason": reason
     }
+
+
+def analyze_macro_clock(macro: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Đồng hồ vĩ mô 4 góc phần tư (Macro Clock 4-Quadrant):
+    Kết hợp Trục Tăng trưởng GDP (Expansion / Slowdown / Stable) và Trục Lạm phát CPI (Cool / Hot / Stable).
+    """
+    gdp_val = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or 7.0)
+    cpi_val = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or 4.5)
+
+    if gdp_val > 6.5:
+        gdp_phase = "Expansion"
+        gdp_phase_vi = "Tăng Trưởng Cao (>6.5%)"
+    elif gdp_val < 5.5:
+        gdp_phase = "Slowdown"
+        gdp_phase_vi = "Tăng Trưởng Chậm (<5.5%)"
+    else:
+        gdp_phase = "Stable"
+        gdp_phase_vi = "Tăng Trưởng Cân Bằng (5.5 - 6.5%)"
+
+    if cpi_val > 5.5:
+        infl_state = "Hot"
+        infl_state_vi = "Lạm Phát Nóng (>5.5%)"
+    elif cpi_val < 3.5:
+        infl_state = "Cool"
+        infl_state_vi = "Lạm Phát Hạ Nhiệt (<3.5%)"
+    else:
+        infl_state = "Stable"
+        infl_state_vi = "Lạm Phát Trong Tầm Kiểm Soát (3.5 - 5.5%)"
+
+    clock_map = {
+        ("Expansion", "Cool"): {
+            "quadrant": "🟢 GOLDILOCKS",
+            "quadrantKey": "goldilocks",
+            "titleVi": "Vàng Kinh Tế (Goldilocks)",
+            "desc": "Tăng trưởng cao + Lạm phát hạ nhiệt • Môi trường lý tưởng nhất cho cổ phiếu",
+            "colorClass": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "favored": ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Bán Lẻ", "Công Nghệ"],
+            "avoided": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm", "Tiện Ích Điện Nước"]
+        },
+        ("Expansion", "Hot"): {
+            "quadrant": "🟠 OVERHEATING",
+            "quadrantKey": "overheating",
+            "titleVi": "Tăng Nhiệt Đỉnh Chu Kỳ (Overheating)",
+            "desc": "Tăng trưởng cao + Lạm phát nóng • Ưu tiên tài sản thực và nhóm hàng hóa",
+            "colorClass": "text-amber-400 bg-amber-500/20 border-amber-500/40",
+            "favored": ["Năng Lượng & Dầu Khí", "Thép & Vật Liệu", "Tiện Ích Điện Nước"],
+            "avoided": ["Ngân Hàng", "Bất Động Sản", "Chứng Khoán"]
+        },
+        ("Expansion", "Stable"): {
+            "quadrant": "🟠 OVERHEATING",
+            "quadrantKey": "overheating",
+            "titleVi": "Mở Rộng Tăng Tốc (Expansion)",
+            "desc": "Tăng trưởng mạnh + Lạm phát vừa phải • Chu kỳ mở rộng bùng nổ của doanh nghiệp",
+            "colorClass": "text-blue-400 bg-blue-500/20 border-blue-500/40",
+            "favored": ["Ngân Hàng", "Chứng Khoán", "Công Nghệ", "Bán Lẻ"],
+            "avoided": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm"]
+        },
+        ("Slowdown", "Hot"): {
+            "quadrant": "🔴 STAGFLATION",
+            "quadrantKey": "stagflation",
+            "titleVi": "Đình Lạm Rủi Ro (Stagflation)",
+            "desc": "Tăng trưởng chậm + Lạm phát cao • Nguy cơ chi phí đẩy, ưu tiên tiền mặt & vàng",
+            "colorClass": "text-rose-400 bg-rose-500/20 border-rose-500/40",
+            "favored": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm & Y Tế", "Vàng", "Tiền Mặt"],
+            "avoided": ["Chứng Khoán", "Bất Động Sản", "Ngân Hàng", "Xây Dựng"]
+        },
+        ("Slowdown", "Cool"): {
+            "quadrant": "🔵 REFLATION",
+            "quadrantKey": "reflation",
+            "titleVi": "Tái Nới Lỏng Kích Thích (Reflation)",
+            "desc": "Tăng trưởng chậm + Lạm phát hạ nhiệt • Dư địa nới lỏng chính sách, đón đầu phục hồi",
+            "colorClass": "text-cyan-400 bg-cyan-500/20 border-cyan-500/40",
+            "favored": ["Chứng Khoán", "Ngân Hàng", "Đầu Tư Công & Xây Dựng", "Công Nghệ"],
+            "avoided": ["FMCG", "Tiện Ích Điện Nước"]
+        },
+        ("Slowdown", "Stable"): {
+            "quadrant": "🔵 REFLATION",
+            "quadrantKey": "reflation",
+            "titleVi": "Tái Nới Lỏng Kích Thích (Reflation)",
+            "desc": "Tăng trưởng chậm lại + Lạm phát ổn định • Chu kỳ kích thích kinh tế dần hình thành",
+            "colorClass": "text-cyan-400 bg-cyan-500/20 border-cyan-500/40",
+            "favored": ["Chứng Khoán", "Ngân Hàng", "Đầu Tư Công"],
+            "avoided": ["FMCG", "Tiện Ích"]
+        },
+        ("Stable", "Hot"): {
+            "quadrant": "🟠 OVERHEATING",
+            "quadrantKey": "overheating",
+            "titleVi": "Tăng Nhiệt Thận Trọng",
+            "desc": "Tăng trưởng cân bằng + Lạm phát nhích cao • Đề phòng SBV hút tiền thanh khoản",
+            "colorClass": "text-amber-400 bg-amber-500/20 border-amber-500/40",
+            "favored": ["Năng Lượng", "Vật Liệu", "Tiện Ích"],
+            "avoided": ["BĐS Đầu Cơ", "Chứng Khoán"]
+        },
+        ("Stable", "Cool"): {
+            "quadrant": "🟢 GOLDILOCKS",
+            "quadrantKey": "goldilocks",
+            "titleVi": "Cân Bằng Thuận Lợi (Goldilocks)",
+            "desc": "Tăng trưởng ổn định + Lạm phát thấp • Tích lũy cổ phiếu giá trị có nền tảng vững chắc",
+            "colorClass": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "favored": ["Ngân Hàng", "Công Nghệ", "Bán Lẻ", "Chứng Khoán"],
+            "avoided": ["FMCG", "Y Tế"]
+        },
+        ("Stable", "Stable"): {
+            "quadrant": "⚪ TRANSITION",
+            "quadrantKey": "transition",
+            "titleVi": "Chuyển Giao Cân Bằng (Transition)",
+            "desc": "Tín hiệu vĩ mô trung tính • Phù hợp nắm giữ danh mục và chọn lọc kỹ lưỡng",
+            "colorClass": "text-gray-300 bg-gray-500/20 border-gray-500/40",
+            "favored": ["Ngân Hàng Lớn", "Công Nghệ (FPT)", "Bán Lẻ Đầu Ngành"],
+            "avoided": ["BĐS Đầu Cơ", "Cổ Phiếu Đòn Bẩy Cao"]
+        },
+    }
+
+    info = clock_map.get((gdp_phase, infl_state), clock_map[("Stable", "Stable")])
+    return {
+        "quadrant": info["quadrant"],
+        "quadrantKey": info["quadrantKey"],
+        "titleVi": info["titleVi"],
+        "desc": info["desc"],
+        "colorClass": info["colorClass"],
+        "gdpPhase": gdp_phase,
+        "gdpPhaseVi": gdp_phase_vi,
+        "gdpValue": round(gdp_val, 2),
+        "inflationState": infl_state,
+        "inflationStateVi": infl_state_vi,
+        "cpiValue": round(cpi_val, 2),
+        "favoredSectors": info["favored"],
+        "avoidedSectors": info["avoided"],
+    }
+
+
+def analyze_yield_curve_stress(macro: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Phân tích đường cong lợi suất TPCP Việt Nam & Chỉ số căng thẳng thị trường nợ:
+    - Long-Short Spread (LSS) = VN10Y - SBV Refinancing Rate.
+    - Cross-Country Spread = VN10Y - US10Y.
+    - Cảnh báo Inversion & Cảnh báo Recession Lead.
+    """
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
+    us10y = float(macro.get("us10yYield") or macro.get("us10y") or 4.3)
+    sbv_rate = float(macro.get("sbvRefinancingRate") or macro.get("sbv_refinancing_rate") or 4.5)
+
+    long_short_spread = round(vn10y - sbv_rate, 2)
+    cross_country_spread = round(vn10y - us10y, 2)
+
+    inversion_warning = long_short_spread < 0.0
+    recession_lead = long_short_spread < -0.5 and vn10y >= 3.6
+
+    if long_short_spread >= 0.5 and vn10y <= 3.5:
+        yc_regime = "Easing"
+        yc_regime_vi = "Nới Lỏng / Đường Cong Dốc Lên Khỏe Mạnh"
+        regime_badge = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+    elif long_short_spread < 0.0:
+        yc_regime = "Stress"
+        yc_regime_vi = "Căng Thẳng / Nguy Cơ Đảo Ngược Kỳ Hạn"
+        regime_badge = "bg-rose-500/20 text-rose-400 border-rose-500/30"
+    else:
+        yc_regime = "Neutral"
+        yc_regime_vi = "Cân Bằng Chu Kỳ"
+        regime_badge = "bg-blue-500/20 text-blue-400 border-blue-500/30"
+
+    # Chỉ số căng thẳng đường cong YC Stress (0 - 100)
+    stress_raw = 50.0 + (3.45 - vn10y) * (-15.0) + (-long_short_spread) * 20.0
+    yc_stress = round(max(0.0, min(100.0, stress_raw)), 1)
+
+    assessment = (
+        f"Lợi suất TPCP 10Y ({vn10y:.2f}%) so với lãi suất tái cấp vốn SBV ({sbv_rate:.2f}%) tạo độ dốc LSS = {long_short_spread:+.2f}%. "
+        f"Chênh lệch TPCP Việt Nam so với Mỹ 10Y là {cross_country_spread:+.2f}%. "
+        + ("⚠️ Cảnh báo: Lợi suất dài hạn đang thấp hơn lãi suất điều hành, cần theo dõi thanh khoản hệ thống." if inversion_warning else "Độ dốc đường cong duy trì trong trạng thái bình thường.")
+    )
+
+    return {
+        "vn10y": vn10y,
+        "us10y": us10y,
+        "sbvRefinancingRate": sbv_rate,
+        "longShortSpread": long_short_spread,
+        "crossCountrySpread": cross_country_spread,
+        "inversionWarning": inversion_warning,
+        "recessionLead": recession_lead,
+        "ycRegime": yc_regime,
+        "ycRegimeVi": yc_regime_vi,
+        "regimeBadge": regime_badge,
+        "ycStressIndex": yc_stress,
+        "assessment": assessment,
+    }
+
+
+def detect_scenarios_and_tail_risks(
+    macro: Dict[str, Any],
+    risk_score: float,
+    regime_phase: str,
+    current_vnindex: Optional[float] = None
+) -> Dict[str, Any]:
+    """
+    Ma trận 3 Kịch bản thị trường (Base / Bull / Bear) và 6 Named Tail-Risks tự động kiểm tra trigger thực tế.
+    """
+    cpi = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or 5.08)
+    sbv_rate = float(macro.get("sbvRefinancingRate") or macro.get("sbv_refinancing_rate") or 4.5)
+    interbank = float(macro.get("interbank_rate") or macro.get("vn_interbank_overnight_rate") or 6.47)
+    gdp = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or 7.0)
+    credit = float(macro.get("credit_growth_yoy") or 15.08)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
+    us10y = float(macro.get("us10yYield") or macro.get("us10y") or 4.3)
+
+    vn = current_vnindex if (current_vnindex and current_vnindex > 500) else 1280.0
+
+    # Phân bổ xác suất 3 kịch bản theo Risk Score
+    if risk_score <= 40.0:
+        base_p, bull_p, bear_p = 55, 30, 15
+    elif risk_score <= 60.0:
+        base_p, bull_p, bear_p = 55, 25, 20
+    else:
+        base_p, bull_p, bear_p = 50, 20, 30
+
+    scenarios = {
+        "base": {
+            "name": "Kịch Bản Cơ Sở (Base Case)",
+            "probability": base_p,
+            "badgeColor": "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+            "vnIndexRange": f"{int(vn - 25)} - {int(vn + 45)}",
+            "conditions": f"CPI duy trì quanh {cpi:.1f}%, PMI mở rộng trên 51 điểm, SBV giữ lãi suất điều hành {sbv_rate:.1f}%, tỷ giá ổn định trong biên độ quản lý.",
+            "sectorBenefit": ["Ngân Hàng", "Bán Lẻ", "Công Nghệ Thông Tin"],
+            "sectorImpacted": ["Hàng Tiêu Dùng Thiết Yếu", "Vật Liệu Nhạy Giá"],
+            "narrative": "Kinh tế tiếp tục quỹ đạo mở rộng vừa phải. Dòng tiền tập trung vào các cổ phiếu cơ bản có EPS tăng trưởng thực chất.",
+        },
+        "bull": {
+            "name": "Kịch Bản Tích Cực (Bull Case)",
+            "probability": bull_p,
+            "badgeColor": "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+            "vnIndexRange": f"{int(vn + 35)} - {int(vn + 110)}",
+            "conditions": "Fed tiếp tục chu kỳ hạ lãi suất, SBV nới lỏng room tín dụng, dòng vốn FDI & khối ngoại quay lại mua ròng, tỷ giá hạ nhiệt.",
+            "sectorBenefit": ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Công Nghệ"],
+            "sectorImpacted": ["Tiện Ích Điện Nước", "Dược Phẩm"],
+            "narrative": "Thanh khoản bùng nổ, hệ số định giá thị trường được nâng lên — các nhóm ngành High-Beta dẫn dắt đà tăng điểm.",
+        },
+        "bear": {
+            "name": "Kịch Bản Thận Trọng (Bear Case)",
+            "probability": bear_p,
+            "badgeColor": "bg-rose-500/20 text-rose-400 border border-rose-500/30",
+            "vnIndexRange": f"{int(vn - 100)} - {int(vn - 35)}",
+            "conditions": "Lạm phát thế giới và giá dầu tăng vọt, SBV buộc phải hút ròng thanh khoản tiền đồng hoặc tăng lãi suất, USD/VND vượt đỉnh.",
+            "sectorBenefit": ["Năng Lượng & Dầu Khí", "Hàng Tiêu Dùng Thiết Yếu", "Vàng"],
+            "sectorImpacted": ["Bất Động Sản", "Chứng Khoán", "Ngân Hàng"],
+            "narrative": "Lạm phát chi phí đẩy và thắt chặt thanh khoản ngắn hạn — ưu tiên nâng tỷ trọng tiền mặt và tài sản phòng vệ.",
+        },
+    }
+
+    # 6 Named Tail-Risks (Kiểm tra trigger thực tế)
+    active_tail_risks = []
+
+    # 1. Liquidity Crisis
+    if interbank > sbv_rate + 2.0:
+        active_tail_risks.append({
+            "id": "liquidity_crisis",
+            "name": "Khủng Hoảng Thanh Khoản (Liquidity Crisis)",
+            "signal": "STRONG SELL",
+            "badge": "bg-rose-500 text-white animate-pulse",
+            "severity": "CRITICAL",
+            "trigger": f"Lãi suất liên ngân hàng qua đêm ({interbank:.2f}%) vượt trần lãi suất SBV ({sbv_rate:.2f}%) + 2.0pp.",
+            "impact": "Áp lực thanh khoản hệ thống ngắn hạn căng thẳng, room tín dụng bị co hẹp, chi phí vốn ngân hàng tăng mạnh.",
+        })
+
+    # 2. Stagflation
+    if gdp < 4.0 and cpi > 5.5 and risk_score > 60:
+        active_tail_risks.append({
+            "id": "stagflation",
+            "name": "Đình Lạm (Stagflation Shock)",
+            "signal": "STRONG SELL",
+            "badge": "bg-rose-500 text-white animate-pulse",
+            "severity": "CRITICAL",
+            "trigger": f"GDP ({gdp:.2f}%) dưới 4% trong khi CPI ({cpi:.2f}%) vượt 5.5% và điểm rủi ro vĩ mô ở mức cao ({risk_score}/100).",
+            "impact": "Biên lợi nhuận của hầu hết doanh nghiệp niêm yết bị bào mòn bởi chi phí đầu vào, nguy cơ suy thoái tăng vọt.",
+        })
+
+    # 3. Credit Crunch
+    if credit < 10.0 and sbv_rate > 5.5:
+        active_tail_risks.append({
+            "id": "credit_crunch",
+            "name": "Thắt Chặt Tín Dụng (Credit Crunch)",
+            "signal": "SELL",
+            "badge": "bg-amber-500 text-white",
+            "severity": "HIGH",
+            "trigger": f"Tăng trưởng tín dụng thấp ({credit:.1f}%) trong bối cảnh lãi suất điều hành cao ({sbv_rate:.1f}%).",
+            "impact": "Dòng vốn lưu động doanh nghiệp bị nghẽn, áp lực nợ xấu và đảo nợ ngân hàng gia tăng.",
+        })
+
+    # 4. External Shock
+    if usdvnd > 25700 or (vn10y - us10y) < -1.0:
+        active_tail_risks.append({
+            "id": "external_shock",
+            "name": "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)",
+            "signal": "CAUTION",
+            "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
+            "severity": "MEDIUM",
+            "trigger": f"Tỷ giá USD/VND ({usdvnd:,.0f}) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu ({vn10y - us10y:.2f}%).",
+            "impact": "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng.",
+        })
+
+    # 5. Soft Landing
+    if risk_score < 50 and gdp >= 5.5 and cpi <= 5.0 and (vn10y - sbv_rate) >= -0.3:
+        active_tail_risks.append({
+            "id": "soft_landing",
+            "name": "Kinh Tế Hạ Cánh Mềm (Soft Landing)",
+            "signal": "BUY",
+            "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
+            "severity": "POSITIVE",
+            "trigger": f"Điểm rủi ro vĩ mô thấp ({risk_score}/100), GDP tăng trưởng tốt ({gdp:.2f}%), lạm phát trong tầm kiểm soát ({cpi:.2f}%).",
+            "impact": "Kinh tế hạ nhiệt an toàn, tạo nền tảng vững chắc cho chu kỳ tăng trưởng lợi nhuận doanh nghiệp.",
+        })
+
+    # 6. Bull Opportunity
+    if risk_score < 40 and gdp >= 6.5:
+        active_tail_risks.append({
+            "id": "bull_opportunity",
+            "name": "Cơ Hội Bùng Nổ Vĩ Mô (Bull Opportunity)",
+            "signal": "STRONG BUY",
+            "badge": "bg-emerald-500 text-white",
+            "severity": "POSITIVE",
+            "trigger": f"Môi trường vĩ mô mở rộng toàn diện: Điểm rủi ro rất thấp ({risk_score}/100) kết hợp GDP bùng nổ ({gdp:.2f}%).",
+            "impact": "Cơ hội vàng giải ngân tích lũy cổ phiếu giá trị và nhóm cổ phiếu dẫn dắt thị trường.",
+        })
+
+    return {
+        "scenarios": scenarios,
+        "tailRisks": active_tail_risks,
+        "hasActiveTailRisk": len(active_tail_risks) > 0,
+        "criticalTailRiskCount": sum(1 for t in active_tail_risks if t["severity"] == "CRITICAL"),
+    }
+
+
+def compute_lead_lag_divergence(macro: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Phân tích độ lệch pha giữa nhóm chỉ báo tài chính dẫn dắt (Leading) và kinh tế thực đi sau (Lagging).
+    """
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
+    interbank = float(macro.get("interbank_rate") or macro.get("vn_interbank_overnight_rate") or 6.47)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
+    cpi = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or 5.08)
+    gdp = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or 7.0)
+    credit = float(macro.get("credit_growth_yoy") or 15.08)
+
+    # 1. Nhóm Dẫn dắt (Financial Market & Liquidity)
+    s_curve = (3.45 - vn10y) / 1.0
+    s_ib = (interbank - 4.0) / 2.0
+    s_fx = (usdvnd - 25400.0) / 600.0
+    leading_z = (s_curve + s_ib + s_fx) / 3.0
+    leading_pct = round(max(0.0, min(100.0, 50.0 + leading_z * 20.0)), 1)
+
+    # 2. Nhóm Đi sau (Real Economy Lagging)
+    s_cpi = (cpi - 4.5) / 1.5
+    s_gdp = -(gdp - 6.5) / 1.5
+    s_credit = (credit - 14.0) / 2.5
+    lagging_z = (s_cpi + s_gdp + s_credit) / 3.0
+    lagging_pct = round(max(0.0, min(100.0, 50.0 + lagging_z * 20.0)), 1)
+
+    div = round(leading_pct - lagging_pct, 1)
+
+    if div > 15.0:
+        signal = "⚠️ LEADING WARNS"
+        signal_vi = "Chỉ Báo Sớm Báo Động (Leading Warns)"
+        badge = "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+        desc = "Thị trường tài chính & thanh khoản đang cảnh báo áp lực xấu hơn số liệu kinh tế vĩ mô công bố chậm."
+    elif div < -15.0:
+        signal = "📊 LAGGING CONFIRMS"
+        signal_vi = "Kinh Tế Thực Xác Nhận (Lagging Confirms)"
+        badge = "bg-blue-500/20 text-blue-300 border border-blue-500/40"
+        desc = "Các chỉ báo kinh tế thực đi sau xác nhận mức độ điều chỉnh của chu kỳ."
+    else:
+        signal = "➡️ ALIGNED"
+        signal_vi = "Đồng Pha Ổn Định (Aligned)"
+        badge = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+        desc = "Các chỉ báo sớm và số liệu kinh tế thực duy trì nhịp đồng pha cân bằng."
+
+    return {
+        "leadingPct": leading_pct,
+        "laggingPct": lagging_pct,
+        "divergence": div,
+        "signal": signal,
+        "signalVi": signal_vi,
+        "badge": badge,
+        "desc": desc,
+    }
+
+
+def compute_macro_confidence(macro: Dict[str, Any], n_conflicts: int = 0) -> Dict[str, Any]:
+    """
+    Đánh giá độ tin cậy của mô hình vĩ mô (0 - 100) & Phân hạng HIGH / MEDIUM / LOW.
+    """
+    required_keys = ["sbv_refinancing_rate", "cpi_yoy", "gdp_growth_yoy", "interbank_rate", "credit_growth_yoy", "pmi", "usdvnd", "vn10yYield"]
+    present = sum(1 for k in required_keys if (macro.get(k) is not None or macro.get(k.replace("Yield", "")) is not None))
+    data_quality = round((present / len(required_keys)) * 100.0, 1)
+
+    regime_stability = 75.0
+    clarity = 70.0
+    if n_conflicts >= 2:
+        clarity -= 15.0
+
+    overall = round(data_quality * 0.30 + regime_stability * 0.30 + clarity * 0.40, 1)
+
+    if overall >= 65.0:
+        label = "HIGH"
+        label_vi = "Độ Tin Cậy Cao"
+        badge = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+    elif overall >= 45.0:
+        label = "MEDIUM"
+        label_vi = "Độ Tin Cậy Vừa Phải"
+        badge = "bg-blue-500/20 text-blue-300 border border-blue-500/40"
+    else:
+        label = "LOW"
+        label_vi = "Cần Thận Trọng / Dữ Liệu Thiếu Hụt"
+        badge = "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+
+    return {
+        "overall": overall,
+        "label": label,
+        "labelVi": label_vi,
+        "badge": badge,
+        "dataQuality": data_quality,
+        "regimeStability": regime_stability,
+        "signalClarity": clarity,
+    }
+

@@ -28,16 +28,25 @@ from lib.macro_regime import (
     evaluate_leading_signals,
     calculate_4asset_allocation,
     recommend_gold,
+    analyze_macro_clock,
+    analyze_yield_curve_stress,
+    detect_scenarios_and_tail_risks,
+    compute_lead_lag_divergence,
+    compute_macro_confidence,
 )
 
 try:
     from fetchers.macro_fetcher import MacroFetcher
     from fetchers.tradingeconomics_fetcher import TradingEconomicsFetcher
     from fetchers.market_valuation_history_fetcher import MarketValuationHistoryFetcher
+    from fetchers.vietstock_valuation_fetcher import VietstockValuationFetcher
+    from lib.market_valuation_analyzer import analyze_market_valuation
 except ImportError:
     from scripts.fetchers.macro_fetcher import MacroFetcher
     from scripts.fetchers.tradingeconomics_fetcher import TradingEconomicsFetcher
     from scripts.fetchers.market_valuation_history_fetcher import MarketValuationHistoryFetcher
+    from scripts.fetchers.vietstock_valuation_fetcher import VietstockValuationFetcher
+    from scripts.lib.market_valuation_analyzer import analyze_market_valuation
 
 DATA_DIR = ROOT_DIR / "data"
 MACRO_FILE = DATA_DIR / "macro_valuation.json"
@@ -107,37 +116,87 @@ def fetch_and_save_macro():
         updated_at=pnj_update_date
     )
 
-    # 4. Định giá VN-Index
-    current_pe = 13.15
-    current_pb = 1.54
-    advisor_result = compute_pe_bands_and_zscore(current_pe, mean_pe=14.2, std_pe=2.1)
+    # 4. Định giá VN-Index: Thu thập dữ liệu lịch sử chuẩn xác từ Vietstock (316+ tháng)
+    vnindex_analysis = None
+    try:
+        vs_fetcher = VietstockValuationFetcher(cache_dir=str(DATA_DIR / "vnindex_valuation_cache"))
+        vn_df = vs_fetcher.fetch_vnindex_history()
+        if not vn_df.empty:
+            vnindex_analysis = analyze_market_valuation(vn_df)
+    except Exception as e:
+        print(f"⚠️ Không thể trích xuất định giá VN-Index từ Vietstock: {e}")
+
+    # Xác định giá trị hiện tại và thống kê mặc định (ưu tiên cửa sổ 10 Năm)
+    if vnindex_analysis and "current" in vnindex_analysis and vnindex_analysis["current"].get("pe") is not None:
+        current_pe = vnindex_analysis["current"]["pe"]
+        current_pb = vnindex_analysis["current"]["pb"]
+        ten_year_win = vnindex_analysis["windows"].get("ten_year") or {}
+        mean_pe = ten_year_win.get("pe", {}).get("mean", 14.2)
+        std_pe = ten_year_win.get("pe", {}).get("std", 2.1)
+        zscore_val = ten_year_win.get("pe", {}).get("zscore", 0.0)
+        pctl_val = ten_year_win.get("pe", {}).get("percentile", 50.0)
+    else:
+        current_pe = 13.15
+        current_pb = 1.54
+        mean_pe = 14.2
+        std_pe = 2.1
+        zscore_val = -0.5
+        pctl_val = 32.0
+
+    advisor_result = compute_pe_bands_and_zscore(current_pe, mean_pe=mean_pe, std_pe=std_pe)
+
+    market_index_data = {
+        "symbol": "VNINDEX",
+        "name": "Chỉ Số VN-Index",
+        "currentPE": advisor_result["currentPE"],
+        "currentPB": current_pb,
+        "historicalMeanPE": advisor_result["historicalMeanPE"],
+        "historicalStdPE": advisor_result["historicalStdPE"],
+        "zScore": advisor_result["zScore"],
+        "percentile": pctl_val,
+        "band": advisor_result["band"],
+        "bandText": advisor_result["bandText"],
+        "bandColor": advisor_result["bandColor"],
+        "bands": [
+            { "id": "DEEP_VALUE", "name": "Rất rẻ (Đáy lịch sử)", "min": 0, "max": 11.5, "color": "text-emerald-600 bg-emerald-50" },
+            { "id": "CHEAP", "name": "Rẻ (Vùng gom mua)", "min": 11.5, "max": 13.5, "color": "text-emerald-500 bg-emerald-50/60" },
+            { "id": "FAIR", "name": "Hợp lý (Cân bằng)", "min": 13.5, "max": 16.0, "color": "text-blue-600 bg-blue-50" },
+            { "id": "EXPENSIVE", "name": "Đắt (Chốt lời dần)", "min": 16.0, "max": 18.0, "color": "text-amber-600 bg-amber-50" },
+            { "id": "OVERHEATED", "name": "Rất đắt (Rủi ro)", "min": 18.0, "max": 30.0, "color": "text-rose-600 bg-rose-50" }
+        ],
+    }
+
+    if vnindex_analysis:
+        market_index_data["derivedMetrics"] = {
+            "peXpb": vnindex_analysis["current"].get("peXpb"),
+            "roeProxy": vnindex_analysis["current"].get("roeProxy"),
+            "dataDate": vnindex_analysis["current"].get("date"),
+        }
+        market_index_data["defaultWindow"] = vnindex_analysis.get("defaultWindow", "ten_year")
+        market_index_data["extremeAlert"] = vnindex_analysis.get("extremeAlert", False)
+        market_index_data["extremeAlertText"] = vnindex_analysis.get("extremeAlertText")
+        market_index_data["windows"] = vnindex_analysis.get("windows", {})
+
+    # 4. Phân tích nâng cao vĩ mô theo chuẩn ref-vn-macro-weekly:
+    # Macro Clock 4-Quadrant, Yield Curve Stress, Lead-Lag Divergence, Confidence & Scenarios
+    macro_clock_data = analyze_macro_clock(macro_combined)
+    yield_curve_data = analyze_yield_curve_stress(macro_combined)
+    lead_lag_div = compute_lead_lag_divergence(macro_combined)
+    confidence_data = compute_macro_confidence(macro_combined)
+    scenario_tail_risks = detect_scenarios_and_tail_risks(
+        macro=macro_combined,
+        risk_score=risk_info["riskScore"],
+        regime_phase=regime_phase["phase"],
+        current_vnindex=1285.0
+    )
 
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "source": "Vietstock, HNX, SBV & TradingEconomics Vietnam",
-            "version": "3.0"
+            "version": "3.2"
         },
-        "marketIndex": {
-            "symbol": "VNINDEX",
-            "name": "Chỉ Số VN-Index",
-            "currentPE": advisor_result["currentPE"],
-            "currentPB": current_pb,
-            "historicalMeanPE": advisor_result["historicalMeanPE"],
-            "historicalStdPE": advisor_result["historicalStdPE"],
-            "zScore": advisor_result["zScore"],
-            "percentile": 32.0,
-            "band": advisor_result["band"],
-            "bandText": advisor_result["bandText"],
-            "bandColor": advisor_result["bandColor"],
-            "bands": [
-                { "id": "DEEP_VALUE", "name": "Rất rẻ (Đáy lịch sử)", "min": 0, "max": 11.5, "color": "text-emerald-600 bg-emerald-50" },
-                { "id": "CHEAP", "name": "Rẻ (Vùng gom mua)", "min": 11.5, "max": 13.5, "color": "text-emerald-500 bg-emerald-50/60" },
-                { "id": "FAIR", "name": "Hợp lý (Cân bằng)", "min": 13.5, "max": 16.0, "color": "text-blue-600 bg-blue-50" },
-                { "id": "EXPENSIVE", "name": "Đắt (Chốt lời dần)", "min": 16.0, "max": 18.0, "color": "text-amber-600 bg-amber-50" },
-                { "id": "OVERHEATED", "name": "Rất đắt (Rủi ro)", "min": 18.0, "max": 30.0, "color": "text-rose-600 bg-rose-50" }
-            ]
-        },
+        "marketIndex": market_index_data,
         "macro": {
             "vn10yYield": vn10y,
             "sbvRefinancingRate": sbv_refinancing,
@@ -162,6 +221,14 @@ def fetch_and_save_macro():
             "govtDebtToGdp": te_core.get("govt_debt_to_gdp", 33.6),
         },
         "regime": regime_phase,
+        "macroClock": macro_clock_data,
+        "yieldCurveAnalysis": yield_curve_data,
+        "scenarioMatrix": scenario_tail_risks["scenarios"],
+        "tailRisks": scenario_tail_risks["tailRisks"],
+        "hasActiveTailRisk": scenario_tail_risks["hasActiveTailRisk"],
+        "criticalTailRiskCount": scenario_tail_risks["criticalTailRiskCount"],
+        "leadLagDivergence": lead_lag_div,
+        "confidence": confidence_data,
         "riskAssessment": risk_info,
         "sectorRotation": sector_rotation,
         "leadingSignals": leading_signals,

@@ -9,6 +9,8 @@ from .market_fetcher import MarketFetcher
 from .financial_fetcher import FinancialFetcher
 from .macro_fetcher import MacroFetcher
 from .tradingeconomics_fetcher import TradingEconomicsFetcher
+from .market_valuation_history_fetcher import MarketValuationHistoryFetcher
+from .vietstock_valuation_fetcher import VietstockValuationFetcher
 
 __all__ = [
     "BaseFetcher",
@@ -16,4 +18,6 @@ __all__ = [
     "FinancialFetcher",
     "MacroFetcher",
     "TradingEconomicsFetcher",
+    "MarketValuationHistoryFetcher",
+    "VietstockValuationFetcher",
 ]

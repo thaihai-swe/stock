@@ -1,20 +1,20 @@
 {
   "_meta": {
-    "updatedAt": "2026-10-10T15:19:30Z",
+    "updatedAt": "2026-10-10T16:25:39Z",
     "source": "Vietstock, HNX, SBV & TradingEconomics Vietnam",
-    "version": "3.0"
+    "version": "3.2"
   },
   "marketIndex": {
     "symbol": "VNINDEX",
     "name": "Chỉ Số VN-Index",
-    "currentPE": 13.15,
-    "currentPB": 1.54,
-    "historicalMeanPE": 14.2,
-    "historicalStdPE": 2.1,
-    "zScore": -0.5,
-    "percentile": 32.0,
-    "band": "CHEAP",
-    "bandText": "Rẻ (Vùng định giá hấp dẫn)",
+    "currentPE": 10.72,
+    "currentPB": 1.8,
+    "historicalMeanPE": 11.4,
+    "historicalStdPE": 2.25,
+    "zScore": -0.3,
+    "percentile": 39.7,
+    "band": "DEEP_VALUE",
+    "bandText": "Rất Rẻ (Vùng đáy lịch sử)",
     "bandColor": "emerald",
     "bands": [
       {
@@ -52,7 +52,381 @@
         "max": 30.0,
         "color": "text-rose-600 bg-rose-50"
       }
-    ]
+    ],
+    "derivedMetrics": {
+      "peXpb": 19.3,
+      "roeProxy": 16.79,
+      "dataDate": "2026-10-08"
+    },
+    "defaultWindow": "ten_year",
+    "extremeAlert": false,
+    "extremeAlertText": null,
+    "windows": {
+      "ten_year": {
+        "key": "ten_year",
+        "label": "10 Năm",
+        "desc": "Cửa sổ chuẩn mực vĩ mô (Khuyến nghị)",
+        "dateFrom": "2016-10-30",
+        "dateTo": "2026-10-08",
+        "nObs": 121,
+        "pe": {
+          "label": "P/E (10 Năm)",
+          "mean": 11.4,
+          "median": 11.69,
+          "std": 2.25,
+          "current": 10.72,
+          "zscore": -0.3,
+          "percentile": 39.7,
+          "p10": 8.4,
+          "p25": 9.8,
+          "p75": 13.25,
+          "p90": 14.01,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 121,
+          "vsMedianPct": -8.3,
+          "vsMeanPct": -6.0
+        },
+        "pb": {
+          "label": "P/B (10 Năm)",
+          "mean": 1.61,
+          "median": 1.57,
+          "std": 0.34,
+          "current": 1.8,
+          "zscore": 0.55,
+          "percentile": 72.7,
+          "p10": 1.16,
+          "p25": 1.43,
+          "p75": 1.84,
+          "p90": 2.07,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 121,
+          "vsMedianPct": 14.6,
+          "vsMeanPct": 11.6
+        },
+        "peXpb": {
+          "label": "P/E×P/B (10 Năm)",
+          "mean": 19.06,
+          "median": 18.99,
+          "std": 7.26,
+          "current": 19.3,
+          "zscore": 0.03,
+          "percentile": 54.5,
+          "p10": 9.85,
+          "p25": 14.03,
+          "p75": 23.32,
+          "p90": 28.61,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 121,
+          "vsMedianPct": 1.6,
+          "vsMeanPct": 1.2
+        },
+        "roeProxy": {
+          "label": "ROE (10 Năm)",
+          "mean": 14.18,
+          "median": 14.4,
+          "std": 1.24,
+          "current": 16.79,
+          "zscore": 2.1,
+          "percentile": 98.3,
+          "p10": 12.23,
+          "p25": 13.38,
+          "p75": 15.16,
+          "p90": 15.62,
+          "band": "Rất mắc",
+          "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
+          "bandColor": "#ef4444",
+          "nObs": 121,
+          "vsMedianPct": 16.6,
+          "vsMeanPct": 18.4
+        },
+        "compositeSignal": {
+          "score": 53.7,
+          "signal": "TRUNG LẬP / GIỮ (HOLD)",
+          "badge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "color": "#3b82f6",
+          "description": "Định giá cân bằng quanh mức trung bình dài hạn, nắm giữ danh mục và chọn lọc cổ phiếu có câu chuyện riêng."
+        }
+      },
+      "five_year": {
+        "key": "five_year",
+        "label": "5 Năm",
+        "desc": "Chu kỳ kinh tế & tiền tệ gần nhất",
+        "dateFrom": "2021-10-28",
+        "dateTo": "2026-10-08",
+        "nObs": 61,
+        "pe": {
+          "label": "P/E (5 Năm)",
+          "mean": 12.8,
+          "median": 12.88,
+          "std": 1.35,
+          "current": 10.72,
+          "zscore": -1.54,
+          "percentile": 6.6,
+          "p10": 11.17,
+          "p25": 11.74,
+          "p75": 13.65,
+          "p90": 14.29,
+          "band": "Rất rẻ",
+          "bandBadge": "bg-emerald-500/20 text-emerald-400 border border-emerald-400/40",
+          "bandColor": "#22c55e",
+          "nObs": 61,
+          "vsMedianPct": -16.8,
+          "vsMeanPct": -16.3
+        },
+        "pb": {
+          "label": "P/B (5 Năm)",
+          "mean": 1.78,
+          "median": 1.7,
+          "std": 0.27,
+          "current": 1.8,
+          "zscore": 0.06,
+          "percentile": 59.0,
+          "p10": 1.53,
+          "p25": 1.57,
+          "p75": 1.92,
+          "p90": 2.17,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 61,
+          "vsMedianPct": 5.9,
+          "vsMeanPct": 0.9
+        },
+        "peXpb": {
+          "label": "P/E×P/B (5 Năm)",
+          "mean": 23.07,
+          "median": 21.52,
+          "std": 5.59,
+          "current": 19.3,
+          "zscore": -0.68,
+          "percentile": 29.5,
+          "p10": 17.32,
+          "p25": 19.22,
+          "p75": 25.24,
+          "p90": 29.77,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 61,
+          "vsMedianPct": -10.3,
+          "vsMeanPct": -16.4
+        },
+        "roeProxy": {
+          "label": "ROE (5 Năm)",
+          "mean": 13.96,
+          "median": 13.56,
+          "std": 1.61,
+          "current": 16.79,
+          "zscore": 1.75,
+          "percentile": 96.7,
+          "p10": 12.04,
+          "p25": 12.41,
+          "p75": 15.48,
+          "p90": 15.86,
+          "band": "Rất mắc",
+          "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
+          "bandColor": "#ef4444",
+          "nObs": 61,
+          "vsMedianPct": 23.9,
+          "vsMeanPct": 20.2
+        },
+        "compositeSignal": {
+          "score": 35.7,
+          "signal": "MUA TÍCH LŨY (VALUE BUY)",
+          "badge": "bg-teal-500/20 text-teal-300 border border-teal-400/40",
+          "color": "#14b8a6",
+          "description": "Định giá thị trường đang ở vùng hấp dẫn dưới trung vị lịch sử, thích hợp giải ngân DCA theo lộ trình."
+        }
+      },
+      "modern": {
+        "key": "modern",
+        "label": "Từ 2007",
+        "desc": "Giai đoạn TTCK gia nhập WTO",
+        "dateFrom": "2007-01-30",
+        "dateTo": "2026-10-08",
+        "nObs": 238,
+        "pe": {
+          "label": "P/E (Từ 2007)",
+          "mean": 7.69,
+          "median": 7.11,
+          "std": 4.2,
+          "current": 10.72,
+          "zscore": 0.72,
+          "percentile": 69.3,
+          "p10": 2.88,
+          "p25": 3.73,
+          "p75": 11.7,
+          "p90": 13.49,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 238,
+          "vsMedianPct": 50.9,
+          "vsMeanPct": 39.3
+        },
+        "pb": {
+          "label": "P/B (Từ 2007)",
+          "mean": 1.1,
+          "median": 0.99,
+          "std": 0.59,
+          "current": 1.8,
+          "zscore": 1.19,
+          "percentile": 86.1,
+          "p10": 0.43,
+          "p25": 0.55,
+          "p75": 1.57,
+          "p90": 1.9,
+          "band": "Mắc",
+          "bandBadge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "bandColor": "#f59e0b",
+          "nObs": 238,
+          "vsMedianPct": 81.8,
+          "vsMeanPct": 63.3
+        },
+        "peXpb": {
+          "label": "P/E×P/B (Từ 2007)",
+          "mean": 10.89,
+          "median": 6.85,
+          "std": 9.85,
+          "current": 19.3,
+          "zscore": 0.85,
+          "percentile": 76.9,
+          "p10": 1.24,
+          "p25": 2.07,
+          "p75": 19.12,
+          "p90": 24.76,
+          "band": "Mắc",
+          "bandBadge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "bandColor": "#f59e0b",
+          "nObs": 238,
+          "vsMedianPct": 181.6,
+          "vsMeanPct": 77.2
+        },
+        "roeProxy": {
+          "label": "ROE (Từ 2007)",
+          "mean": 14.57,
+          "median": 14.75,
+          "std": 1.12,
+          "current": 16.79,
+          "zscore": 1.98,
+          "percentile": 98.7,
+          "p10": 12.99,
+          "p25": 14.21,
+          "p75": 15.31,
+          "p90": 15.64,
+          "band": "Rất mắc",
+          "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
+          "bandColor": "#ef4444",
+          "nObs": 238,
+          "vsMedianPct": 13.8,
+          "vsMeanPct": 15.3
+        },
+        "compositeSignal": {
+          "score": 70.6,
+          "signal": "HẠ TỶ TRỌNG (TRIM / CAUTION)",
+          "badge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "color": "#f59e0b",
+          "description": "Thị trường bước vào vùng định giá cao hơn trung bình, cân nhắc chốt lời từng phần và nâng tỷ trọng tiền mặt."
+        }
+      },
+      "all_time": {
+        "key": "all_time",
+        "label": "Toàn Bộ",
+        "desc": "Toàn cảnh 25 năm từ ngày lập sàn",
+        "dateFrom": "2005-07-28",
+        "dateTo": "2026-10-08",
+        "nObs": 256,
+        "pe": {
+          "label": "P/E (Toàn Bộ)",
+          "mean": 7.3,
+          "median": 5.91,
+          "std": 4.3,
+          "current": 10.72,
+          "zscore": 0.8,
+          "percentile": 71.5,
+          "p10": 2.54,
+          "p25": 3.15,
+          "p75": 11.37,
+          "p90": 13.43,
+          "band": "Trung bình",
+          "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "bandColor": "#3b82f6",
+          "nObs": 256,
+          "vsMedianPct": 81.4,
+          "vsMeanPct": 46.9
+        },
+        "pb": {
+          "label": "P/B (Toàn Bộ)",
+          "mean": 1.05,
+          "median": 0.86,
+          "std": 0.6,
+          "current": 1.8,
+          "zscore": 1.25,
+          "percentile": 87.1,
+          "p10": 0.4,
+          "p25": 0.49,
+          "p75": 1.56,
+          "p90": 1.89,
+          "band": "Mắc",
+          "bandBadge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "bandColor": "#f59e0b",
+          "nObs": 256,
+          "vsMedianPct": 109.3,
+          "vsMeanPct": 72.0
+        },
+        "peXpb": {
+          "label": "P/E×P/B (Toàn Bộ)",
+          "mean": 10.18,
+          "median": 5.1,
+          "std": 9.84,
+          "current": 19.3,
+          "zscore": 0.93,
+          "percentile": 78.5,
+          "p10": 1.05,
+          "p25": 1.54,
+          "p75": 18.73,
+          "p90": 24.64,
+          "band": "Mắc",
+          "bandBadge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "bandColor": "#f59e0b",
+          "nObs": 256,
+          "vsMedianPct": 278.7,
+          "vsMeanPct": 89.6
+        },
+        "roeProxy": {
+          "label": "ROE (Toàn Bộ)",
+          "mean": 14.56,
+          "median": 14.75,
+          "std": 1.37,
+          "current": 16.79,
+          "zscore": 1.63,
+          "percentile": 97.3,
+          "p10": 12.47,
+          "p25": 14.19,
+          "p75": 15.34,
+          "p90": 15.7,
+          "band": "Rất mắc",
+          "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
+          "bandColor": "#ef4444",
+          "nObs": 256,
+          "vsMedianPct": 13.9,
+          "vsMeanPct": 15.3
+        },
+        "compositeSignal": {
+          "score": 72.0,
+          "signal": "HẠ TỶ TRỌNG (TRIM / CAUTION)",
+          "badge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "color": "#f59e0b",
+          "description": "Thị trường bước vào vùng định giá cao hơn trung bình, cân nhắc chốt lời từng phần và nâng tỷ trọng tiền mặt."
+        }
+      }
+    }
   },
   "macro": {
     "vn10yYield": 3.45,
@@ -98,6 +472,129 @@
       "pmi=51.9"
     ]
   },
+  "macroClock": {
+    "quadrant": "🟠 OVERHEATING",
+    "quadrantKey": "overheating",
+    "titleVi": "Mở Rộng Tăng Tốc (Expansion)",
+    "desc": "Tăng trưởng mạnh + Lạm phát vừa phải • Chu kỳ mở rộng bùng nổ của doanh nghiệp",
+    "colorClass": "text-blue-400 bg-blue-500/20 border-blue-500/40",
+    "gdpPhase": "Expansion",
+    "gdpPhaseVi": "Tăng Trưởng Cao (>6.5%)",
+    "gdpValue": 9.95,
+    "inflationState": "Stable",
+    "inflationStateVi": "Lạm Phát Trong Tầm Kiểm Soát (3.5 - 5.5%)",
+    "cpiValue": 5.08,
+    "favoredSectors": [
+      "Ngân Hàng",
+      "Chứng Khoán",
+      "Công Nghệ",
+      "Bán Lẻ"
+    ],
+    "avoidedSectors": [
+      "Tiêu Dùng Thiết Yếu (FMCG)",
+      "Dược Phẩm"
+    ]
+  },
+  "yieldCurveAnalysis": {
+    "vn10y": 3.45,
+    "us10y": 5.24,
+    "sbvRefinancingRate": 4.5,
+    "longShortSpread": -1.05,
+    "crossCountrySpread": -1.79,
+    "inversionWarning": true,
+    "recessionLead": false,
+    "ycRegime": "Stress",
+    "ycRegimeVi": "Căng Thẳng / Nguy Cơ Đảo Ngược Kỳ Hạn",
+    "regimeBadge": "bg-rose-500/20 text-rose-400 border-rose-500/30",
+    "ycStressIndex": 71.0,
+    "assessment": "Lợi suất TPCP 10Y (3.45%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = -1.05%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -1.79%. ⚠️ Cảnh báo: Lợi suất dài hạn đang thấp hơn lãi suất điều hành, cần theo dõi thanh khoản hệ thống."
+  },
+  "scenarioMatrix": {
+    "base": {
+      "name": "Kịch Bản Cơ Sở (Base Case)",
+      "probability": 55,
+      "badgeColor": "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+      "vnIndexRange": "1260 - 1330",
+      "conditions": "CPI duy trì quanh 5.1%, PMI mở rộng trên 51 điểm, SBV giữ lãi suất điều hành 4.5%, tỷ giá ổn định trong biên độ quản lý.",
+      "sectorBenefit": [
+        "Ngân Hàng",
+        "Bán Lẻ",
+        "Công Nghệ Thông Tin"
+      ],
+      "sectorImpacted": [
+        "Hàng Tiêu Dùng Thiết Yếu",
+        "Vật Liệu Nhạy Giá"
+      ],
+      "narrative": "Kinh tế tiếp tục quỹ đạo mở rộng vừa phải. Dòng tiền tập trung vào các cổ phiếu cơ bản có EPS tăng trưởng thực chất."
+    },
+    "bull": {
+      "name": "Kịch Bản Tích Cực (Bull Case)",
+      "probability": 25,
+      "badgeColor": "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+      "vnIndexRange": "1320 - 1395",
+      "conditions": "Fed tiếp tục chu kỳ hạ lãi suất, SBV nới lỏng room tín dụng, dòng vốn FDI & khối ngoại quay lại mua ròng, tỷ giá hạ nhiệt.",
+      "sectorBenefit": [
+        "Chứng Khoán",
+        "Ngân Hàng",
+        "Bất Động Sản",
+        "Công Nghệ"
+      ],
+      "sectorImpacted": [
+        "Tiện Ích Điện Nước",
+        "Dược Phẩm"
+      ],
+      "narrative": "Thanh khoản bùng nổ, hệ số định giá thị trường được nâng lên — các nhóm ngành High-Beta dẫn dắt đà tăng điểm."
+    },
+    "bear": {
+      "name": "Kịch Bản Thận Trọng (Bear Case)",
+      "probability": 20,
+      "badgeColor": "bg-rose-500/20 text-rose-400 border border-rose-500/30",
+      "vnIndexRange": "1185 - 1250",
+      "conditions": "Lạm phát thế giới và giá dầu tăng vọt, SBV buộc phải hút ròng thanh khoản tiền đồng hoặc tăng lãi suất, USD/VND vượt đỉnh.",
+      "sectorBenefit": [
+        "Năng Lượng & Dầu Khí",
+        "Hàng Tiêu Dùng Thiết Yếu",
+        "Vàng"
+      ],
+      "sectorImpacted": [
+        "Bất Động Sản",
+        "Chứng Khoán",
+        "Ngân Hàng"
+      ],
+      "narrative": "Lạm phát chi phí đẩy và thắt chặt thanh khoản ngắn hạn — ưu tiên nâng tỷ trọng tiền mặt và tài sản phòng vệ."
+    }
+  },
+  "tailRisks": [
+    {
+      "id": "external_shock",
+      "name": "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)",
+      "signal": "CAUTION",
+      "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
+      "severity": "MEDIUM",
+      "trigger": "Tỷ giá USD/VND (25,879) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-1.79%).",
+      "impact": "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng."
+    }
+  ],
+  "hasActiveTailRisk": true,
+  "criticalTailRiskCount": 0,
+  "leadLagDivergence": {
+    "leadingPct": 63.6,
+    "laggingPct": 40.1,
+    "divergence": 23.5,
+    "signal": "⚠️ LEADING WARNS",
+    "signalVi": "Chỉ Báo Sớm Báo Động (Leading Warns)",
+    "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
+    "desc": "Thị trường tài chính & thanh khoản đang cảnh báo áp lực xấu hơn số liệu kinh tế vĩ mô công bố chậm."
+  },
+  "confidence": {
+    "overall": 80.5,
+    "label": "HIGH",
+    "labelVi": "Độ Tin Cậy Cao",
+    "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
+    "dataQuality": 100.0,
+    "regimeStability": 75.0,
+    "signalClarity": 70.0
+  },
   "riskAssessment": {
     "riskScore": 44.4,
     "riskBucket": "B2",
@@ -120,6 +617,14 @@
       "actionTag": "Overweight",
       "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
       "badgeColor": "bg-emerald-500",
+      "decomposition": {
+        "interbank": -1.0,
+        "sbvRate": 2.0,
+        "cpi": -0.0,
+        "usdVnd": -0.0,
+        "oil": 0.0,
+        "pmi": 1.0
+      },
       "rank": 1
     },
     {
@@ -131,6 +636,14 @@
       "actionTag": "Overweight",
       "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
       "badgeColor": "bg-emerald-500",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": 0.0,
+        "usdVnd": -0.0,
+        "oil": 0.0,
+        "pmi": 1.5
+      },
       "rank": 2
     },
     {
@@ -142,6 +655,14 @@
       "actionTag": "Overweight",
       "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
       "badgeColor": "bg-emerald-500",
+      "decomposition": {
+        "interbank": -1.0,
+        "sbvRate": 1.0,
+        "cpi": -0.0,
+        "usdVnd": -0.0,
+        "oil": -0.0,
+        "pmi": 1.5
+      },
       "rank": 3
     },
     {
@@ -153,6 +674,14 @@
       "actionTag": "Accumulate",
       "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
       "badgeColor": "bg-green-500",
+      "decomposition": {
+        "interbank": -1.5,
+        "sbvRate": 1.5,
+        "cpi": -0.0,
+        "usdVnd": -0.0,
+        "oil": 0.0,
+        "pmi": 1.0
+      },
       "rank": 4
     },
     {
@@ -164,6 +693,14 @@
       "actionTag": "Accumulate",
       "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
       "badgeColor": "bg-green-500",
+      "decomposition": {
+        "interbank": -2.0,
+        "sbvRate": 1.5,
+        "cpi": 0.0,
+        "usdVnd": -0.0,
+        "oil": 0.0,
+        "pmi": 1.5
+      },
       "rank": 5
     },
     {
@@ -175,6 +712,14 @@
       "actionTag": "Accumulate",
       "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
       "badgeColor": "bg-green-500",
+      "decomposition": {
+        "interbank": -0.5,
+        "sbvRate": 0.5,
+        "cpi": -0.0,
+        "usdVnd": 0.0,
+        "oil": 0.0,
+        "pmi": 1.0
+      },
       "rank": 6
     },
     {
@@ -186,6 +731,14 @@
       "actionTag": "Accumulate",
       "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
       "badgeColor": "bg-green-500",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": 0.0,
+        "usdVnd": 0.0,
+        "oil": 0.0,
+        "pmi": 1.0
+      },
       "rank": 7
     },
     {
@@ -197,6 +750,14 @@
       "actionTag": "Accumulate",
       "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
       "badgeColor": "bg-green-500",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": 0.0,
+        "usdVnd": 0.0,
+        "oil": 0.0,
+        "pmi": 0.5
+      },
       "rank": 8
     },
     {
@@ -208,6 +769,14 @@
       "actionTag": "Neutral",
       "colorClass": "text-gray-300 bg-gray-500/10 border-gray-500/20",
       "badgeColor": "bg-gray-400",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": -0.0,
+        "usdVnd": 0.0,
+        "oil": 0.0,
+        "pmi": 0.0
+      },
       "rank": 9
     },
     {
@@ -219,6 +788,14 @@
       "actionTag": "Neutral",
       "colorClass": "text-gray-300 bg-gray-500/10 border-gray-500/20",
       "badgeColor": "bg-gray-400",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": 0.0,
+        "usdVnd": 0.0,
+        "oil": 0.0,
+        "pmi": 0.0
+      },
       "rank": 10
     },
     {
@@ -230,6 +807,14 @@
       "actionTag": "Neutral",
       "colorClass": "text-gray-300 bg-gray-500/10 border-gray-500/20",
       "badgeColor": "bg-gray-400",
+      "decomposition": {
+        "interbank": -1.0,
+        "sbvRate": 1.0,
+        "cpi": 0.0,
+        "usdVnd": 0.0,
+        "oil": -0.0,
+        "pmi": -0.5
+      },
       "rank": 11
     }
   ],
@@ -285,10 +870,10 @@
     "badgeClass": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
   },
   "assetAllocation": {
-    "recommendedEquityPct": 80,
-    "recommendedCashPct": 20,
-    "stance": "TÍCH LŨY CỔ PHIẾU GIÁ TRỊ",
-    "rationale": "P/E VN-Index (13.15x) đang ở dải Rẻ so với trung bình chu kỳ 5 năm (14.2x). Khuyến nghị duy trì 80% cổ phiếu cơ bản và giữ 20% tiền mặt linh hoạt.",
+    "recommendedEquityPct": 85,
+    "recommendedCashPct": 15,
+    "stance": "MUA GOM MẠNH",
+    "rationale": "P/E thị trường ở mức chiết khấu cực sâu (<= 11.5x). Cơ hội vàng để gom cổ phiếu giá trị.",
     "fourAssets": {
       "equity": 50.0,
       "bond": 30.0,
@@ -1455,7 +2040,7 @@
   },
   "marketValuationHistory": {
     "_meta": {
-      "updatedAt": "2026-10-10T23:19:33.036872",
+      "updatedAt": "2026-10-11T00:25:42.623266",
       "sheetId": "1TdXzsXN_bMQKHLN0Zqc8t4lS-59us02Btr_SLc0AgpQ",
       "source": "Google Sheets (Simply Wall St Vietnam)",
       "periods": [
