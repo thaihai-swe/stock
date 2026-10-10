@@ -8,6 +8,7 @@ import Settings from './components/Settings.jsx';
 import StrategyAnalytics from './components/StrategyAnalytics.jsx';
 import TransactionHistory from './components/TransactionHistory.jsx';
 import Watchlist from './components/Watchlist.jsx';
+import ValuationDashboard from './components/ValuationDashboard.jsx';
 import UserNav from './components/UserNav.jsx';
 import LoginModal from './components/LoginModal.jsx';
 import {
@@ -21,6 +22,7 @@ import {
 
 const TABS = [
   { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊' },
+  { id: 'valuation', label: '🏢 Định Giá & Vĩ Mô', shortLabel: 'Định Giá', icon: '🏢' },
   { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜' },
   { id: 'buy', label: '🛒 Mua vào', shortLabel: 'Mua vào', icon: '🛒' },
   { id: 'sell', label: '💸 Bán ra', shortLabel: 'Bán ra', icon: '💸' },
@@ -36,6 +38,7 @@ const TAB_GROUPS = [
     groupTitle: 'Quản Trị Danh Mục & Phân Tích',
     items: [
       { id: 'dashboard', label: 'Tổng Quan (Dashboard)', icon: '📊', desc: 'Nắm giữ, lãi/lỗ & phân bổ vốn' },
+      { id: 'valuation', label: 'Định Giá & Vĩ Mô', icon: '🏢', desc: 'Mô hình Graham, DDM, BCTC & VN-Index' },
       { id: 'dca', label: 'Kế Hoạch DCA', icon: '🪜', desc: 'Mô phỏng & lộ trình mua gom đa tầng' },
       { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách' },
     ]
@@ -455,6 +458,13 @@ export default function App({ hasGoogleClientId = false }) {
                   setSellInitialSymbol(symbol || '');
                   setTab('sell');
                 }}
+              />
+            )}
+            {tab === 'valuation' && (
+              <ValuationDashboard
+                data={data}
+                refreshKey={refreshKey}
+                onSwitchTab={switchTab}
               />
             )}
             {tab === 'dca' && (

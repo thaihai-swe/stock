@@ -77,3 +77,10 @@ export const updateCashBalance = (cashBalance) =>
   request('/cash-balance', { method: 'POST', body: JSON.stringify({ cashBalance }) });
 export const fetchMarketIndex = (force = false) =>
   request(`/market-index?force=${force ? 'true' : 'false'}`);
+
+// Valuation & Local JSON APIs
+export const fetchValuationStocks = () => request('/valuation/stocks');
+export const fetchValuationMacro  = () => request('/valuation/macro');
+export const fetchStockFinancials = (symbol) => request(`/valuation/financials/${encodeURIComponent(symbol)}`);
+export const fetchRawJson         = (type, symbol = '') => request(`/valuation/raw-json/${type}?symbol=${encodeURIComponent(symbol)}`);
+export const triggerValuationSync = () => request('/valuation/sync', { method: 'POST' });
