@@ -180,9 +180,11 @@ stock/
 │   ├── fetch_financial_reports.py     # Controller trích xuất 122+ chỉ tiêu BCTC & 54 Ratios
 │   ├── fetch_macro_valuation.py       # Controller định giá vĩ mô & nhiệt kế VN-Index
 │   ├── run_full_pipeline.py           # Điều phối toàn bộ luồng dữ liệu tự động
+│   ├── test_valuation_engine.py       # Bộ Unit Test kiểm thử 11 test cases định giá
 │   └── lib/
+│       ├── valuation_engine.py        # Enterprise Stock Valuation Engine (Single Source of Truth)
+│       ├── valuation_models.py        # Backward Compatibility Bridge re-exporting engine
 │       ├── financial_taxonomy.py      # Từ điển chuẩn hóa chỉ tiêu BCTC Việt Nam
-│       ├── valuation_models.py        # Các mô hình định giá toán học (Graham, DDM, EV/EBITDA)
 │       ├── macro_regime.py            # Logic 5-pha Regime, Risk Score 4 tầng, Luân chuyển 11 ngành
 │       ├── macro_advisor.py           # Logic phân tích kinh tế vĩ mô & chu kỳ lãi suất
 │       └── rate_limiter.py            # Quản lý giới hạn tần suất gọi API

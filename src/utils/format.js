@@ -47,7 +47,6 @@ export const DEFAULT_TAGS = [
   'Bắt đáy',
   'Cơ bản',
   'Kỹ thuật',
-  'Theo sóng ngành',
   'Cổ tức',
 ];
 

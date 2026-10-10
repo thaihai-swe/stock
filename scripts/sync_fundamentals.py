@@ -111,210 +111,13 @@ def fetch_tradingview(symbols):
     fetcher = MarketFetcher()
     return fetcher.fetch_tradingview_raw(symbols)
 
-def compute_valuation_models(close, eps, pb, dps, revenue, net_income, total_assets, total_debt):
-    """
-    Tính toán các mô hình định giá:
-    1. BVPS & Graham Number = sqrt(22.5 * EPS * BVPS)
-    2. Chiết khấu cổ tức DDM (Gordon Growth) = DPS * (1 + g) / (r - g)
-    3. Giá hợp lý theo PE Mục tiêu ngành = EPS * 11.5
-    4. Giá trị hợp lý hội tụ (Fair Value) & Biên an toàn (Margin of Safety)
-    """
-    bvps = None
-    if close and pb and pb > 0:
-        bvps = round(close / pb)
-    elif total_assets and total_debt and total_assets > total_debt:
-        equity = total_assets - total_debt
-        # Ước lượng BVPS nếu có vốn chủ
-        bvps = round(equity / (total_assets / (close or 10000))) if close else None
+try:
+    from lib.valuation_engine import StockValuationEngine
+except ImportError:
+    from scripts.lib.valuation_engine import StockValuationEngine
 
-    # 1. Graham Number
-    graham_number = None
-    mos_graham = None
-    if eps and bvps and eps > 0 and bvps > 0:
-        try:
-            graham_number = round(math.sqrt(22.5 * eps * bvps))
-            if close and graham_number > 0:
-                mos_graham = round(((graham_number - close) / graham_number) * 100, 1)
-        except Exception:
-            graham_number = None
+engine = StockValuationEngine()
 
-    # 2. DDM Target Price: r = 11.5%, g = 3.5% -> (r - g) = 0.08
-    ddm_target = None
-    if dps and dps > 0:
-        r = 0.115
-        g = 0.035
-        ddm_target = round((dps * (1 + g)) / (r - g))
-
-    # 3. PE Target Price (Trung vị ngành 11.5x)
-    pe_target = None
-    if eps and eps > 0:
-        pe_target = round(eps * 11.5)
-
-    # 4. Fair Value Hội Tụ
-    candidates = []
-    if graham_number and graham_number > 0:
-        candidates.append(graham_number)
-    if pe_target and pe_target > 0:
-        candidates.append(pe_target)
-    if ddm_target and ddm_target > 0:
-        candidates.append(ddm_target)
-
-    fair_value = None
-    mos_fair_value = None
-    if candidates:
-        fair_value = round(sum(candidates) / len(candidates))
-        if close and fair_value > 0:
-            mos_fair_value = round(((fair_value - close) / fair_value) * 100, 1)
-
-    # Đánh giá mức độ đắt/rẻ (Valuation Rating)
-    rating = "NEUTRAL"
-    rating_text = "Đang cập nhật định giá"
-    rating_badge = "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-
-    if mos_fair_value is not None:
-        if mos_fair_value >= 20:
-            rating = "DEEP_VALUE"
-            rating_text = "Rất Rẻ (Biên an toàn > 20%)"
-            rating_badge = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
-        elif mos_fair_value >= 5:
-            rating = "ATTRACTIVE"
-            rating_text = "Hấp Dẫn (Vùng Mua 5 - 20%)"
-            rating_badge = "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-        elif mos_fair_value >= -5:
-            rating = "FAIR"
-            rating_text = "Hợp Lý (Định giá cân bằng)"
-            rating_badge = "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
-        elif mos_fair_value >= -20:
-            rating = "EXPENSIVE"
-            rating_text = "Định Giá Cao (-5% đến -20%)"
-            rating_badge = "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
-        else:
-            rating = "RISKY"
-            rating_text = "Rất Đắt / Rủi Ro (MoS < -20%)"
-            rating_badge = "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300"
-    elif mos_graham is not None:
-        if mos_graham >= 20:
-            rating = "DEEP_VALUE"
-            rating_text = "Rất Rẻ (Biên an toàn Graham > 20%)"
-            rating_badge = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
-        elif mos_graham >= 5:
-            rating = "ATTRACTIVE"
-            rating_text = "Hấp Dẫn (Theo Graham)"
-            rating_badge = "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-        elif mos_graham >= -10:
-            rating = "FAIR"
-            rating_text = "Hợp Lý (Theo Graham)"
-            rating_badge = "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
-        else:
-            rating = "EXPENSIVE"
-            rating_text = "Đắt (Cao hơn Graham Number)"
-            rating_badge = "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300"
-
-    return {
-        "bvps": bvps,
-        "grahamNumber": graham_number,
-        "marginOfSafetyGraham": mos_graham,
-        "ddmTarget": ddm_target,
-        "peTarget": pe_target,
-        "fairValue": fair_value,
-        "marginOfSafetyFairValue": mos_fair_value,
-        "valuationRating": rating,
-        "valuationRatingText": rating_text,
-        "valuationRatingBadge": rating_badge,
-    }
-
-def compute_dupont(net_margin, revenue, total_assets, total_debt, roe_val):
-    """
-    Phân rã DuPont 3 nhân tố:
-    ROE = Biên Lợi Nhuận Ròng (NPM) * Vòng Quay Tài Sản * Đòn Bẩy Tài Chính (Equity Multiplier)
-    """
-    npm = round(float(net_margin), 2) if net_margin is not None else None
-    asset_turnover = None
-    if revenue and total_assets and total_assets > 0:
-        asset_turnover = round(revenue / total_assets, 2)
-
-    equity_multiplier = None
-    if total_assets and total_debt and total_assets > total_debt:
-        equity = total_assets - total_debt
-        if equity > 0:
-            equity_multiplier = round(total_assets / equity, 2)
-
-    quality = "Dữ liệu đang được tổng hợp"
-    if roe_val is not None and npm is not None:
-        if npm > 12 and (equity_multiplier is None or equity_multiplier < 2.5):
-            quality = "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn."
-        elif npm < 5 and (equity_multiplier is not None and equity_multiplier > 3.0):
-            quality = "Cảnh báo rủi ro: ROE được thúc đẩy chủ yếu do đòn bẩy nợ vay cao trong khi biên lợi nhuận mỏng."
-        elif npm >= 8:
-            quality = "Ổn định: Biên lợi nhuận khá, hiệu quả sử dụng tài sản ở mức hợp lý."
-        else:
-            quality = "Trung bình: Cần theo dõi thêm sự cải thiện của biên lợi nhuận ròng."
-
-    return {
-        "roe": round(float(roe_val), 2) if roe_val is not None else None,
-        "netProfitMargin": npm,
-        "assetTurnover": asset_turnover,
-        "equityMultiplier": equity_multiplier,
-        "qualityAssessment": quality,
-    }
-
-def compute_tech_score(close, h52, l52, rec_score):
-    """
-    Chấm điểm xung lực kỹ thuật (-3 đến +3)
-    """
-    score = 0
-    factors = []
-
-    # 1. TradingView Recommendation Factor (-2 đến +2)
-    if rec_score is not None:
-        if rec_score >= 0.3:
-            score += 2
-            factors.append("Đồng thuận kỹ thuật TradingView: Tích cực")
-        elif rec_score > 0.05:
-            score += 1
-            factors.append("Đồng thuận kỹ thuật TradingView: Khá")
-        elif rec_score <= -0.3:
-            score -= 2
-            factors.append("Đồng thuận kỹ thuật TradingView: Tiêu cực")
-        elif rec_score < -0.05:
-            score -= 1
-            factors.append("Đồng thuận kỹ thuật TradingView: Yếu")
-
-    # 2. Vị thế giá 52 tuần (-1 đến +1)
-    if close is not None and h52 is not None and l52 is not None and h52 > l52:
-        pos = ((close - l52) / (h52 - l52)) * 100
-        if pos < 15:
-            score += 1
-            factors.append("Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)")
-        elif pos > 85:
-            score -= 1
-            factors.append("Thị giá tiệm cận đỉnh 52 tuần (Áp lực chốt lời lớn)")
-
-    # Giới hạn điểm trong dải [-3, +3]
-    score = max(-3, min(3, score))
-
-    if score >= 2:
-        verdict = "Tích cực (Bullish)"
-        color = "text-emerald-500 font-bold"
-    elif score == 1:
-        verdict = "Khá (Moderate Bullish)"
-        color = "text-green-500 font-semibold"
-    elif score == 0:
-        verdict = "Trung lập (Neutral)"
-        color = "text-gray-400"
-    elif score == -1:
-        verdict = "Kém (Moderate Bearish)"
-        color = "text-rose-400 font-semibold"
-    else:
-        verdict = "Tiêu cực (Bearish)"
-        color = "text-rose-500 font-bold"
-
-    return {
-        "techScore": score,
-        "techScoreVerdict": verdict,
-        "techScoreColor": color,
-        "factors": factors
-    }
 
 def normalize_row(row):
     d = {col: row["d"][i] if i < len(row["d"]) else None for i, col in enumerate(COLUMNS)}
@@ -354,10 +157,33 @@ def normalize_row(row):
     debt_val = round(float(d["total_debt_fq"])) if d.get("total_debt_fq") is not None else None
     net_margin_val = round(float(d["net_margin_ttm"]), 2) if d.get("net_margin_ttm") is not None else None
     roe_val = round(float(d["return_on_equity_fq"]), 2) if d.get("return_on_equity_fq") is not None else None
-    # Tính toán các mô hình định giá chuyên sâu
-    val_models = compute_valuation_models(close, eps_val, pb_val, dps_val, rev_val, ni_val, assets_val, debt_val)
-    dupont_models = compute_dupont(net_margin_val, rev_val, assets_val, debt_val, roe_val)
-    tech_eval = compute_tech_score(close, h52, l52, rec_score)
+    ebitda_val = round(float(d["ebitda_ttm"])) if d.get("ebitda_ttm") is not None else None
+    fcf_val = round(float(d["free_cash_flow_ttm"])) if d.get("free_cash_flow_ttm") is not None else None
+    shares_val = round(float(d["total_shares_outstanding_fundamental"])) if d.get("total_shares_outstanding_fundamental") is not None else None
+    beta_val = round(float(d["beta_1_year"]), 2) if d.get("beta_1_year") is not None else None
+
+    # Động cơ định giá doanh nghiệp tập trung (Enterprise Valuation Engine)
+    val_eval = engine.evaluate({
+        "close": close,
+        "eps": eps_val,
+        "pb": pb_val,
+        "dps": dps_val,
+        "revenue": rev_val,
+        "netIncome": ni_val,
+        "totalAssets": assets_val,
+        "totalDebt": debt_val,
+        "ebitda": ebitda_val,
+        "cfo": fcf_val,
+        "shares": shares_val,
+        "roe": roe_val,
+        "netMargin": net_margin_val,
+        "high52w": h52,
+        "low52w": l52,
+        "recommendScore": rec_score,
+        "beta": beta_val
+    })
+    dupont_models = val_eval["dupont"]
+    tech_eval = val_eval["technicals"]
 
     return {
         "symbol": sym,
@@ -375,7 +201,32 @@ def normalize_row(row):
             "pb": pb_val,
             "ps": round(float(d["price_sales_ratio"]), 2) if d.get("price_sales_ratio") is not None else None,
             "evEbitda": round(float(d["enterprise_value_to_ebitda_ratio"]), 2) if d.get("enterprise_value_to_ebitda_ratio") is not None else None,
-            **val_models
+            "bvps": val_eval["bvps"],
+            "grahamNumber": val_eval["grahamNumber"],
+            "marginOfSafetyGraham": val_eval["marginOfSafetyGraham"],
+            "grahamDiffPercent": val_eval.get("grahamDiffPercent"),
+            "ddmTarget": val_eval["ddmTarget"],
+            "ddmDiffPercent": val_eval.get("ddmDiffPercent"),
+            "peTarget": val_eval["peTarget"],
+            "peDiffPercent": val_eval.get("peDiffPercent"),
+            "pbTarget": val_eval["pbTarget"],
+            "pbDiffPercent": val_eval.get("pbDiffPercent"),
+            "evEbitdaFairPrice": val_eval["evEbitdaFairPrice"],
+            "evEbitdaDiffPercent": val_eval.get("evEbitdaDiffPercent"),
+            "pcfFairPrice": val_eval["pcfFairPrice"],
+            "pcfDiffPercent": val_eval.get("pcfDiffPercent"),
+            "psFairPrice": val_eval["psFairPrice"],
+            "psDiffPercent": val_eval.get("psDiffPercent"),
+            "fairValue": val_eval["fairValue"],
+            "consensusFairValue": val_eval["consensusFairValue"],
+            "marginOfSafety": val_eval["marginOfSafety"],
+            "marginOfSafetyFairValue": val_eval["marginOfSafetyFairValue"],
+            "upside": val_eval.get("upside"),
+            "consensusDiffPercent": val_eval.get("consensusDiffPercent"),
+            "valuationRating": val_eval["valuationRating"],
+            "valuationRatingText": val_eval["valuationRatingText"],
+            "valuationRatingBadge": val_eval["valuationRatingBadge"],
+            "validModelsCount": val_eval["validModelsCount"]
         },
         "profitability": {
             "roe": roe_val,
@@ -434,250 +285,9 @@ def normalize_row(row):
         "updatedAt": int(time.time() * 1000)
     }
 
-def generate_macro_valuation():
-    """
-    Tạo snapshot định giá thị trường VN-Index và vĩ mô:
-    - P/E VN-Index lịch sử trung bình 5 năm: 14.2x (Độ lệch chuẩn: 2.1)
-    - 5 Dải định giá: Rất Rẻ (<= 11.5), Rẻ (11.5 - 13.5), Hợp Lý (13.5 - 16.0), Đắt (16.0 - 18.0), Rất Đắt (> 18.0)
-    - Cố vấn tỷ trọng tiền mặt dựa trên định giá
-    """
-    current_pe = 13.15
-    current_pb = 1.54
-    mean_pe = 14.2
-    std_pe = 2.1
 
-    z_score = round((current_pe - mean_pe) / std_pe, 2)
-    percentile = 32.0
 
-    if current_pe <= 11.5:
-        band = "DEEP_VALUE"
-        band_text = "Rất Rẻ (Vùng đáy lịch sử)"
-        band_color = "emerald"
-        equity_pct = 85
-        cash_pct = 15
-        stance = "MUA GOM MẠNH"
-        rationale = "Thị trường định giá ở mức chiết khấu cực sâu (P/E <= 11.5x). Đây là cơ hội vàng để phân bổ tối đa tỷ trọng cổ phiếu dài hạn."
-    elif current_pe <= 13.5:
-        band = "CHEAP"
-        band_text = "Rẻ (Vùng định giá hấp dẫn)"
-        band_color = "emerald"
-        equity_pct = 80
-        cash_pct = 20
-        stance = "TÍCH LŨY"
-        rationale = f"P/E VN-Index ({current_pe}x) đang ở dải Rẻ so với trung bình 5 năm ({mean_pe}x). Lãi suất điều hành ổn định. Khuyến nghị duy trì 80% cổ phiếu cơ bản và giữ 20% tiền mặt linh hoạt."
-    elif current_pe <= 16.0:
-        band = "FAIR"
-        band_text = "Hợp Lý (Định giá cân bằng)"
-        band_color = "blue"
-        equity_pct = 65
-        cash_pct = 35
-        stance = "NẮM GIỮ / CHỌN LỌC"
-        rationale = f"P/E VN-Index ({current_pe}x) nằm trong dải trung vị hợp lý. Khuyến nghị phân bổ 65% cổ phiếu vào các mã có tăng trưởng EPS vượt trội, giữ 35% tiền mặt."
-    elif current_pe <= 18.0:
-        band = "EXPENSIVE"
-        band_text = "Đắt (Vùng chốt lời dần)"
-        band_color = "amber"
-        equity_pct = 45
-        cash_pct = 55
-        stance = "PHÒNG THỦ"
-        rationale = f"P/E VN-Index ({current_pe}x) đã vượt mức trung bình, bước vào vùng đắt. Khuyến nghị hạ bớt tỷ trọng, nâng tiền mặt lên 55% để bảo toàn lợi nhuận."
-    else:
-        band = "OVERHEATED"
-        band_text = "Rất Đắt / Hưng Phấn Cực Đại"
-        band_color = "rose"
-        equity_pct = 30
-        cash_pct = 70
-        stance = "QUẢN TRỊ RỦI RO CAO"
-        rationale = f"P/E VN-Index ({current_pe}x) vượt 18.0x, định giá rất đắt và tiềm ẩn nguy cơ điều chỉnh mạnh. Khuyến nghị giữ tối đa 70% tiền mặt phòng thủ."
 
-    return {
-        "_meta": {
-            "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "source": "Vietstock & Macro Analytics"
-        },
-        "marketIndex": {
-            "symbol": "VNINDEX",
-            "name": "Chỉ Số VN-Index",
-            "currentPE": current_pe,
-            "currentPB": current_pb,
-            "historicalMeanPE": mean_pe,
-            "historicalStdPE": std_pe,
-            "zScore": z_score,
-            "percentile": percentile,
-            "band": band,
-            "bandText": band_text,
-            "bandColor": band_color
-        },
-        "macro": {
-            "vn10yYield": 3.45,
-            "sbvRefinancingRate": 4.5,
-            "us10yYield": 4.02,
-            "usdVndRate": 25420
-        },
-        "assetAllocation": {
-            "recommendedEquityPct": equity_pct,
-            "recommendedCashPct": cash_pct,
-            "stance": stance,
-            "rationale": rationale
-        }
-    }
-
-def generate_stock_financials(sym, stock_data=None):
-    """
-    Tạo báo cáo tài chính chi tiết chuẩn hóa (8 quý & 5 năm) cho từng mã:
-    - Income Statement: Doanh thu, Giá vốn, Lợi nhuận gộp, CP QLDN, Lãi vay, LNST, EPS
-    - Balance Sheet: Tiền mặt, Phải thu, Tồn kho, TSCĐ, Nợ vay ngắn/dài, Vốn chủ
-    - Cash Flow: CFO, CapEx, CFI, CFF, FCF = CFO - CapEx
-    - Tăng trưởng CAGR 3Y & 5Y, Tỷ lệ dòng tiền CFO / LNST
-    Lưu thành file riêng: data/financials/<SYMBOL>.json (indent=2)
-    """
-    # Nếu là chứng chỉ quỹ ETF như FUEVFVND, E1VFVN30 thì tạo profile đặc thù quỹ
-    is_etf = sym.startswith("E1") or sym.startswith("FU") or "ETF" in sym
-    close = (stock_data or {}).get("close", 20000)
-    eps = (stock_data or {}).get("profitability", {}).get("eps", 2000)
-    rev = (stock_data or {}).get("scale", {}).get("revenue", 50000000000000)
-    ni = (stock_data or {}).get("scale", {}).get("netIncome", 5000000000000)
-    assets = (stock_data or {}).get("health", {}).get("totalAssets", 100000000000000)
-    debt = (stock_data or {}).get("health", {}).get("totalDebt", 30000000000000)
-
-    # Đơn vị trong BCTC hiển thị: Tỷ VND (Bn. VND)
-    scale_factor = 1_000_000_000
-
-    base_rev_bn = round(rev / scale_factor) if rev else 35000
-    base_ni_bn = round(ni / scale_factor) if ni else 3500
-    base_assets_bn = round(assets / scale_factor) if assets else 150000
-    base_debt_bn = round(debt / scale_factor) if debt else 50000
-    base_equity_bn = max(1000, base_assets_bn - base_debt_bn)
-
-    # Dựng chuỗi 8 quý gần nhất
-    quarters = ["2023-Q3", "2023-Q4", "2024-Q1", "2024-Q2", "2024-Q3", "2024-Q4", "2025-Q1", "2025-Q2"]
-    quarterly_data = []
-
-    # Hệ số biến thiên theo quý (đặc trưng tính mùa vụ kinh doanh)
-    seasonal_factors = [0.85, 0.92, 0.90, 0.98, 1.02, 1.15, 1.05, 1.12]
-    margin_factors = [0.08, 0.09, 0.085, 0.095, 0.10, 0.11, 0.105, 0.115]
-
-    for i, q in enumerate(quarters):
-        s_fac = seasonal_factors[i]
-        m_fac = margin_factors[i]
-
-        q_rev = round((base_rev_bn / 4) * s_fac)
-        q_ni = round(q_rev * m_fac)
-        q_gp = round(q_rev * 0.17)
-        q_cogs = q_rev - q_gp
-        q_opex = round(q_gp * 0.3)
-        q_interest = round(q_gp * 0.15)
-        q_pbt = q_gp - q_opex - q_interest
-        q_eps = round((q_ni * 1_000_000_000) / ((stock_data or {}).get("scale", {}).get("sharesOutstanding") or 5_000_000_000)) if not is_etf else 0
-
-        # Dòng tiền: CFO thường dao động quanh 1.1x - 1.4x LNST do có khấu hao lớn
-        q_cfo = round(q_ni * 1.25)
-        # CapEx (dấu âm vì là dòng tiền chi)
-        q_capex = -round(q_ni * 0.8)
-        q_fcf = q_cfo + q_capex
-
-        quarterly_data.append({
-            "period": q,
-            "revenue": q_rev,
-            "costOfGoodsSold": q_cogs,
-            "grossProfit": q_gp,
-            "operatingExpense": q_opex,
-            "interestExpense": q_interest,
-            "profitBeforeTax": q_pbt,
-            "netIncome": q_ni,
-            "eps": q_eps,
-            "cashAndEquivalents": round(base_assets_bn * 0.12 * (1 + (i * 0.02))),
-            "shortTermAssets": round(base_assets_bn * 0.45 * (1 + (i * 0.01))),
-            "totalAssets": round(base_assets_bn * (0.85 + (i * 0.025))),
-            "shortTermDebt": round(base_debt_bn * 0.65 * (0.95 + (i * 0.01))),
-            "longTermDebt": round(base_debt_bn * 0.35 * (0.95 + (i * 0.01))),
-            "totalDebt": round(base_debt_bn * (0.95 + (i * 0.01))),
-            "equity": round(base_equity_bn * (0.88 + (i * 0.02))),
-            "cfo": q_cfo,
-            "capex": q_capex,
-            "freeCashFlow": q_fcf,
-            "netMargin": round((q_ni / q_rev) * 100, 2) if q_rev else 0,
-            "cfoToNetIncome": round(q_cfo / q_ni, 2) if q_ni else 1.0,
-        })
-
-    # Dựng chuỗi 5 năm gần nhất
-    years = [2021, 2022, 2023, 2024, 2025]
-    annual_data = []
-    y_growth = [0.70, 0.82, 0.75, 0.95, 1.05]
-
-    for i, y in enumerate(years):
-        fac = y_growth[i]
-        y_rev = round(base_rev_bn * fac)
-        y_ni = round(base_ni_bn * fac)
-        y_cfo = round(y_ni * 1.28)
-        y_capex = -round(y_ni * 0.85)
-        y_fcf = y_cfo + y_capex
-
-        annual_data.append({
-            "year": y,
-            "revenue": y_rev,
-            "netIncome": y_ni,
-            "totalAssets": round(base_assets_bn * fac),
-            "totalDebt": round(base_debt_bn * fac),
-            "equity": round(base_equity_bn * fac),
-            "cfo": y_cfo,
-            "capex": y_capex,
-            "freeCashFlow": y_fcf,
-            "netMargin": round((y_ni / y_rev) * 100, 2) if y_rev else 0,
-            "roe": round((y_ni / (base_equity_bn * fac)) * 100, 2) if base_equity_bn else 0
-        })
-
-    # Tính toán tăng trưởng kép CAGR 3Y & 5Y
-    cagr_3y_rev = 0
-    cagr_3y_ni = 0
-    if len(annual_data) >= 3 and annual_data[-3]["revenue"] > 0:
-        cagr_3y_rev = round((math.pow(annual_data[-1]["revenue"] / annual_data[-3]["revenue"], 1 / 2) - 1) * 100, 1)
-        if annual_data[-3]["netIncome"] > 0:
-            cagr_3y_ni = round((math.pow(annual_data[-1]["netIncome"] / annual_data[-3]["netIncome"], 1 / 2) - 1) * 100, 1)
-
-    cagr_5y_rev = 0
-    cagr_5y_ni = 0
-    if len(annual_data) >= 5 and annual_data[0]["revenue"] > 0:
-        cagr_5y_rev = round((math.pow(annual_data[-1]["revenue"] / annual_data[0]["revenue"], 1 / 4) - 1) * 100, 1)
-        if annual_data[0]["netIncome"] > 0:
-            cagr_5y_ni = round((math.pow(annual_data[-1]["netIncome"] / annual_data[0]["netIncome"], 1 / 4) - 1) * 100, 1)
-
-    # Đánh giá sức khỏe dòng tiền
-    latest_cfo = quarterly_data[-1]["cfo"]
-    latest_fcf = quarterly_data[-1]["freeCashFlow"]
-    latest_ni = quarterly_data[-1]["netIncome"]
-    cfo_ratio = quarterly_data[-1]["cfoToNetIncome"]
-
-    cf_quality = "Tốt: Dòng tiền kinh doanh thặng dư, cao hơn lợi nhuận kế toán (CFO > LNST)."
-    if cfo_ratio < 0.5:
-        cf_quality = "Cảnh báo: Dòng tiền kinh doanh yếu so với lợi nhuận kế toán (bán chịu, đọng vốn)."
-    elif latest_fcf < 0:
-        cf_quality = "Chu kỳ đầu tư lớn: FCF âm do đang dồn tiền mở rộng CapEx xây dựng cơ bản."
-
-    return {
-        "_meta": {
-            "symbol": sym,
-            "companyName": (stock_data or {}).get("description", sym),
-            "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS",
-            "source": "Báo Cáo Tài Chính Chuẩn Hóa VCI / TCBS"
-        },
-        "cagr": {
-            "cagr3YRevenue": cagr_3y_rev,
-            "cagr3YNetIncome": cagr_3y_ni,
-            "cagr5YRevenue": cagr_5y_rev,
-            "cagr5YNetIncome": cagr_5y_ni,
-        },
-        "cashflowHealth": {
-            "latestCfo": latest_cfo,
-            "latestCapex": quarterly_data[-1]["capex"],
-            "latestFcf": latest_fcf,
-            "cfoVsNetIncomeRatio": cfo_ratio,
-            "qualityAssessment": cf_quality
-        },
-        "quarterly": quarterly_data,
-        "yearly": annual_data
-    }
 
 def sync_to_turso_http(cache_dict):
     turso_url = os.environ.get("TURSO_DATABASE_URL", "").strip()
@@ -825,32 +435,48 @@ def main():
     for s in symbols:
         if s not in new_cache and s in old_cache and not s.startswith("_"):
             item = old_cache[s]
-            # Bổ sung tính toán định giá nếu thiếu
-            close = item.get("close")
-            pb = item.get("valuation", {}).get("pb")
-            eps = item.get("profitability", {}).get("eps")
-            dps = item.get("dividends", {}).get("dps", 0)
-            rev = item.get("scale", {}).get("revenue")
-            ni = item.get("scale", {}).get("netIncome")
-            assets = item.get("health", {}).get("totalAssets")
-            debt = item.get("health", {}).get("totalDebt")
-            val_models = compute_valuation_models(close, eps, pb, dps, rev, ni, assets, debt)
-            item.setdefault("valuation", {}).update(val_models)
-
-            dupont = compute_dupont(
-                item.get("profitability", {}).get("netMargin"),
-                rev, assets, debt,
-                item.get("profitability", {}).get("roe")
-            )
-            item["dupont"] = dupont
-
-            techs = compute_tech_score(
-                close,
-                item.get("performance", {}).get("high52w"),
-                item.get("performance", {}).get("low52w"),
-                item.get("technicals", {}).get("recommendScore")
-            )
-            item.setdefault("technicals", {}).update(techs)
+            # Bổ sung tính toán định giá cập nhật
+            val_eval = engine.evaluate({
+                "close": item.get("close"),
+                "eps": item.get("profitability", {}).get("eps"),
+                "pb": item.get("valuation", {}).get("pb"),
+                "bvps": item.get("valuation", {}).get("bvps"),
+                "dps": item.get("dividends", {}).get("dps", 0),
+                "revenue": item.get("scale", {}).get("revenue"),
+                "netIncome": item.get("scale", {}).get("netIncome"),
+                "totalAssets": item.get("health", {}).get("totalAssets"),
+                "totalDebt": item.get("health", {}).get("totalDebt"),
+                "ebitda": item.get("health", {}).get("ebitda"),
+                "cfo": item.get("dividends", {}).get("fcf"),
+                "shares": item.get("scale", {}).get("sharesOutstanding"),
+                "roe": item.get("profitability", {}).get("roe"),
+                "netMargin": item.get("profitability", {}).get("netMargin"),
+                "high52w": item.get("performance", {}).get("high52w"),
+                "low52w": item.get("performance", {}).get("low52w"),
+                "recommendScore": item.get("technicals", {}).get("recommendScore"),
+                "beta": item.get("technicals", {}).get("beta")
+            })
+            item.setdefault("valuation", {}).update({
+                "bvps": val_eval["bvps"],
+                "grahamNumber": val_eval["grahamNumber"],
+                "marginOfSafetyGraham": val_eval["marginOfSafetyGraham"],
+                "ddmTarget": val_eval["ddmTarget"],
+                "peTarget": val_eval["peTarget"],
+                "pbTarget": val_eval["pbTarget"],
+                "evEbitdaFairPrice": val_eval["evEbitdaFairPrice"],
+                "pcfFairPrice": val_eval["pcfFairPrice"],
+                "psFairPrice": val_eval["psFairPrice"],
+                "fairValue": val_eval["fairValue"],
+                "consensusFairValue": val_eval["consensusFairValue"],
+                "marginOfSafety": val_eval["marginOfSafety"],
+                "marginOfSafetyFairValue": val_eval["marginOfSafetyFairValue"],
+                "valuationRating": val_eval["valuationRating"],
+                "valuationRatingText": val_eval["valuationRatingText"],
+                "valuationRatingBadge": val_eval["valuationRatingBadge"],
+                "validModelsCount": val_eval["validModelsCount"]
+            })
+            item["dupont"] = val_eval["dupont"]
+            item.setdefault("technicals", {}).update(val_eval["technicals"])
             item.get("technicals", {}).pop("rsi", None)
             item.get("technicals", {}).pop("macd", None)
             item.get("technicals", {}).pop("macdSignal", None)
@@ -898,27 +524,10 @@ def main():
         except Exception:
             pass
 
-    # 1. Ghi file data/fundamentals_cache.json
+    # Ghi file data/fundamentals_cache.json (Trách nhiệm duy nhất của sync_fundamentals)
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(new_cache, f, ensure_ascii=False, indent=2)
-    print(f"📁 [1/3] Đã ghi cache định giá: {CACHE_FILE}")
-
-    # 2. Ghi file data/macro_valuation.json
-    macro_data = generate_macro_valuation()
-    with open(MACRO_FILE, "w", encoding="utf-8") as f:
-        json.dump(macro_data, f, ensure_ascii=False, indent=2)
-    print(f"📁 [2/3] Đã ghi định giá vĩ mô VN-Index: {MACRO_FILE}")
-
-    # 3. Ghi file data/financials/<SYMBOL>.json cho từng mã
-    print(f"📁 [3/3] Đang cập nhật BCTC chi tiết cho {valid_count} mã vào thư mục data/financials/...")
-    for sym, stock_item in new_cache.items():
-        if sym.startswith("_"):
-            continue
-        fin_data = generate_stock_financials(sym, stock_item)
-        fin_path = FINANCIALS_DIR / f"{sym}.json"
-        with open(fin_path, "w", encoding="utf-8") as f:
-            json.dump(fin_data, f, ensure_ascii=False, indent=2)
-        print(f"   -> Đã tạo {fin_path.name}")
+    print(f"📁 Đã ghi cache định giá & xung lực kỹ thuật: {CACHE_FILE}")
 
     # Đồng bộ vào DB nếu được cấu hình
     db_mode = os.environ.get("DB_MODE", "").strip().lower()

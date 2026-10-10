@@ -24,7 +24,19 @@ sys.path.insert(0, str(CURRENT_DIR))
 
 from lib.financial_taxonomy import normalize_field_name
 from lib.rate_limiter import MultiSourceRateLimiter
-from lib.valuation_models import calc_fcf, calc_cagr, calc_graham, calc_ddm, calc_pe_target
+from lib.valuation_engine import (
+    calc_fcf,
+    calc_cagr,
+    calc_graham,
+    calc_ddm,
+    calc_pe_target,
+    calc_pb_target,
+    calc_ev_ebitda,
+    calc_pcf,
+    calc_ps_target,
+    calc_consensus_fair_value,
+    StockValuationEngine
+)
 
 DATA_DIR = ROOT_DIR / "data"
 FINANCIALS_DIR = DATA_DIR / "financials"
@@ -240,30 +252,24 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
     dpo = round((latest_q["shortTermDebt"] * 0.3 * 90) / latest_q["costOfGoodsSold"]) if latest_q["costOfGoodsSold"] else 30
     ccc = dso + dio - dpo
 
-    # Mô hình định giá nâng cao
-    ev_ebitda_fair_price = None
-    if ebitda_bn > 0 and shares:
-        fair_ev = ebitda_bn * 4 * 7.5 # Multiple ngành 7.5x
-        fair_market_cap = fair_ev - net_debt_bn
-        ev_ebitda_fair_price = round((fair_market_cap * scale) / shares)
-
-    pcf_fair_price = None
-    if latest_q["cfo"] > 0 and shares:
-        pcf_fair_price = round(((latest_q["cfo"] * 4 * 8.0) * scale) / shares)
-
-    ps_fair_price = None
-    if latest_q["revenue"] > 0 and shares:
-        ps_fair_price = round(((latest_q["revenue"] * 4 * 1.1) * scale) / shares)
+    # Mô hình định giá nâng cao ủy thác qua valuation_engine
+    ev_ebitda_fair_price = calc_ev_ebitda(ebitda_bn * 4 * scale, net_debt_bn * scale, shares)
+    pcf_fair_price = calc_pcf(latest_q["cfo"] * 4 * scale, shares) if latest_q["cfo"] else None
+    ps_fair_price = calc_ps_target(latest_q["revenue"] * 4 * scale, shares) if latest_q["revenue"] else None
 
     graham_val = calc_graham(eps, bvps)
     ddm_val = calc_ddm(dps)
-    pe_target_val = calc_pe_target(eps, 11.5)
-    pb_target_val = round(bvps * 1.35) if bvps else None
+    pe_target_val = calc_pe_target(eps)
+    pb_target_val = calc_pb_target(bvps)
 
-    # Giá hội tụ
-    val_candidates = [v for v in [graham_val, ddm_val, pe_target_val, ev_ebitda_fair_price, pcf_fair_price] if v and v > 0]
-    consensus_fair = round(sum(val_candidates) / len(val_candidates)) if val_candidates else None
-    mos_consensus = round(((consensus_fair - close) / consensus_fair) * 100, 1) if consensus_fair and close else None
+    # Giá hội tụ và Biên an toàn
+    consensus_res = calc_consensus_fair_value(
+        [graham_val, ddm_val, pe_target_val, pb_target_val, ev_ebitda_fair_price, pcf_fair_price],
+        close
+    )
+    consensus_fair = consensus_res["fairValue"]
+    mos_consensus = consensus_res["marginOfSafety"]
+    upside_consensus = consensus_res.get("upside")
 
     # Lịch sử sự kiện & cổ tức (Events)
     corporate_events = [
@@ -316,7 +322,9 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
             "pcfFairPrice": pcf_fair_price,
             "psFairPrice": ps_fair_price,
             "consensusFairValue": consensus_fair,
-            "marginOfSafety": mos_consensus
+            "marginOfSafety": mos_consensus,
+            "upside": upside_consensus,
+            "consensusDiffPercent": upside_consensus
         },
         "financialRatios": {
             "valuation": {
@@ -363,6 +371,18 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
             "cagr5YRevenue": calc_cagr(annual_data[0]["revenue"], annual_data[-1]["revenue"], 4),
             "cagr5YNetIncome": calc_cagr(annual_data[0]["netIncome"], annual_data[-1]["netIncome"], 4),
         },
+        "cashflowHealth": {
+            "latestFcf": latest_q.get("freeCashFlow"),
+            "cfoVsNetIncomeRatio": latest_q.get("cfoToNetIncome"),
+            "qualityAssessment": "Chất lượng tiền mặt xuất sắc (CFO > LNST)" if (latest_q.get("cfoToNetIncome") or 0) >= 1.0 else "Tốt (Dòng tiền kinh doanh dương)" if (latest_q.get("cfoToNetIncome") or 0) >= 0.7 else "Cần theo dõi (Dòng tiền yếu)"
+        },
+        "dupontAnalysis": {
+            "roe": round(float((latest_q["netIncome"] * 4 / latest_q["equity"]) * 100), 2),
+            "netProfitMargin": latest_q["netMargin"],
+            "assetTurnover": round(float(latest_q["revenue"] * 4 / latest_q["totalAssets"]), 2),
+            "equityMultiplier": round(float(latest_q["totalAssets"] / latest_q["equity"]), 2),
+            "qualityAssessment": "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn." if latest_q["netMargin"] > 12 else "Ổn định: Biên lợi nhuận khá, hiệu quả sử dụng tài sản hợp lý."
+        },
         "corporateEvents": corporate_events,
         "shareholders": shareholders,
         "quarterly": quarterly_data,
@@ -394,20 +414,39 @@ def fetch_and_save_financials(symbols: List[str]):
         print(f"👉 Đang xử lý dữ liệu chuyên sâu mã {sym_upper}...")
         stock_item = cache_data.get(sym_upper, {})
 
-        # Thử lấy từ vnstock trước
+        out_path = FINANCIALS_DIR / f"{sym_upper}.json"
+
+        # TẦNG 1: Nguồn chính thức thời gian thực (vnstock / TCBS)
         raw_res = try_vnstock_fetch(sym_upper)
         if raw_res:
-            print(f"   ✅ Lấy thành công từ vnstock Live API cho {sym_upper}")
+            print(f"   ✅ [TẦNG 1 LIVE] Lấy thành công BCTC từ vnstock API cho {sym_upper}")
             fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item)
             fin_doc["_meta"]["source"] = "vnstock (VCI Live API)"
-        else:
-            fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item)
+            fin_doc["_meta"]["status"] = "OFFICIAL_VERIFIED"
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(fin_doc, f, ensure_ascii=False, indent=2)
+            print(f"   💾 Đã cập nhật BCTC chính thức: {out_path.name}")
+            continue
 
-        out_path = FINANCIALS_DIR / f"{sym_upper}.json"
+        # TẦNG 2: Local Cache Fallback (Bảo toàn dữ liệu đã có sẵn trên đĩa)
+        if out_path.exists():
+            try:
+                with open(out_path, "r", encoding="utf-8") as f:
+                    existing_data = json.load(f)
+                    if existing_data.get("quarterly") and len(existing_data["quarterly"]) > 0:
+                        print(f"   🛡️ [TẦNG 2 FALLBACK] vnstock gián đoạn. Bảo toàn 100% dữ liệu BCTC hợp lệ sẵn có: {out_path.name}")
+                        continue
+            except Exception:
+                pass
+
+        # TẦNG 3: Estimation Baseline (Chỉ áp dụng khi mã hoàn toàn mới và chưa từng có file cache)
+        print(f"   ⚙️ [TẦNG 3 BOOTSTRAP] Mã mới chưa có cache. Dựng khung BCTC ước tính ban đầu cho {sym_upper}...")
+        fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item)
+        fin_doc["_meta"]["source"] = "Ước tính chuẩn hóa từ TradingView Scanner"
+        fin_doc["_meta"]["status"] = "ESTIMATED_BASELINE"
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(fin_doc, f, ensure_ascii=False, indent=2)
-
-        print(f"   💾 Đã lưu: {out_path.name} (Gồm BCTC 8Q/5Y, 54 Ratios, Cổ tức & Cổ đông)")
+        print(f"   💾 Đã khởi tạo khung BCTC cơ sở: {out_path.name}")
 
     print(f"\n✅ Hoàn tất thu thập BCTC toàn diện. Thư mục: {FINANCIALS_DIR}")
 

@@ -341,3 +341,142 @@ scripts/
 | **Điều Phối Toàn Bộ Pipeline Tự Động** | Toàn bộ các Fetchers trên | `scripts/run_full_pipeline.py` | Toàn bộ thư mục `data/` |
 | **Sổ Lệnh Giao Dịch & Quản Trị Danh Mục** | Người dùng & Khớp lệnh FIFO | Server routes (`server/routes/`) | `data/stock.db` / Turso Cloud |
 
+---
+
+## 4. Ma Trận Single Source of Truth (SSOT) & Kiến Trúc Multi-Tier Fallback
+
+Để triệt tiêu hoàn toàn sự mâu thuẫn số liệu và xung đột ghi đè giữa các module, hệ thống áp dụng nguyên tắc **Single Source of Truth (Mỗi trường dữ liệu chỉ có 1 nguồn thẩm quyền duy nhất)** kết hợp cùng **Kiến Trúc Fallback 3 Tầng**:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                   MÔ HÌNH MULTI-TIER FALLBACK 3 TẦNG                   │
+├────────────────────────────────────────────────────────────────────────┤
+│ TẦNG 1: NGUỒN CHÍNH THỨC THỜI GIAN THỰC (Primary Official Live Source) │
+│ • Luôn ưu tiên gọi API trực tiếp khi chạy pipeline.                    │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ (Nếu API lỗi mạng / Timeout / Chặn IP)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ TẦNG 2: LOCAL CACHE GẦN NHẤT (Persistent Local Snapshot Cache)         │
+│ • BẢO TOÀN NGUYÊN VẸN file cache hợp lệ đã có trong data/             │
+│ • TUYỆT ĐỐI KHÔNG ghi đè dữ liệu rác, không tạo file rỗng.             │
+│ • Ghi log cảnh báo và tiếp tục vận hành bình thường.                   │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ (CHỈ KHI file cache chưa từng tồn tại)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ TẦNG 3: ESTIMATION BASELINE (Structured Synthetic Bootstrap)           │
+│ • CHỈ kích hoạt cho mã cổ phiếu HOÀN TOÀN MỚI chưa từng có trong data/ │
+│ • Đánh dấu minh bạch: _meta.status = "ESTIMATED_BASELINE"              │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Bảng Phân Định Single Source of Truth (SSOT):
+
+| Nhóm Trường Thông Tin | Single Source of Truth (SSOT) | Phân Hệ Tiêu Thụ | Fallback Khi Gián Đoạn |
+| :--- | :--- | :--- | :--- |
+| **Thị Giá Khớp Lệnh Realtime** (`price`, `change`, `changePct`) | **VPS Market Datafeed API** (`server/services/priceService.js`) | Dashboard Hero Card, Sổ Cái FIFO, Header Mã | DNSE Entrade 1m $\rightarrow$ TradingView Close $\rightarrow$ `prices_cache.json` |
+| **Thị Giá Đóng Cửa & 52 Chỉ Báo Kỹ Thuật TTM** | **TradingView Scanner API** (`scripts/fetchers/market_fetcher.py`) | Screener, Xung lực kỹ thuật, Lưới định giá nhanh | Snapshot hợp lệ trong `data/fundamentals_cache.json` |
+| **BCTC 122+ Chỉ Tiêu, 54 Ratios, Cổ Tức & Cổ Đông** | **`fetch_financial_reports.py`** (`vnstock/VCI`, `TCBS`) | Deep Dive BCTC 8Q/5Y, Phân rã DuPont, Lịch sử cổ tức | **Bảo toàn 100%** file `data/financials/<MÃ>.json` đã có. Chỉ dựng Baseline cho mã mới. |
+| **Giá Vàng SJC & Nhẫn PNJ 999.9** | **PNJ Official Edge API** (`scripts/fetchers/macro_fetcher.py`) | Tab Vĩ Mô: Tư vấn chênh lệch vàng (Gold Arbitrage) | Snapshot gần nhất trong `data/macro_valuation.json` (Sanity bounds: 50-300 Tr) |
+| **Lợi Suất TPCP 10Y (Lãi suất phi rủi ro $R_f$)** | **HNX Yield Curve Portal** (`scripts/fetchers/macro_fetcher.py`) | Mô hình Graham ($Y$), Gordon DDM ($r$), WACC | Cột 10Y TradingEconomics $\rightarrow$ Mặc định $3.45\%$ |
+| **Tỷ Giá USD/VND Liên Ngân Hàng** | **Yahoo Finance `USDVND=X`** (`scripts/fetchers/macro_fetcher.py`) | Quy đổi giá vàng thế giới, Phân rã rủi ro tỷ giá | Cột Currency TradingEconomics $\rightarrow$ Mặc định $25.879$ |
+| **Hàng Hóa Quốc Tế (Dầu Brent, Vàng TG)** | **Yahoo Finance `BZ=F`, `GC=F`** (`scripts/fetchers/macro_fetcher.py`) | Radar dẫn dắt vĩ mô, Arbitrage Vàng | Snapshot gần nhất trong `data/macro_valuation.json` |
+| **95 Chỉ Số Thống Kê Vĩ Mô Quốc Gia** | **TradingEconomics Vietnam** (`scripts/fetchers/tradingeconomics_fetcher.py`) | Thư viện 95 chỉ số 10 phân nhóm, Động cơ 5 Pha Regime | Snapshot `data/macro_indicators.json` (hoặc Local Raw HTML Cache) |
+| **Chuỗi Định Giá Lịch Sử 10 Năm (P/E, P/S, Cap)** | **Google Sheets (Simply Wall St)** (`scripts/fetchers/market_valuation_history_fetcher.py`) | Biểu đồ chu kỳ lịch sử VN-Index $\pm 1, 2$ SD (`MarketValuationHistoryChart.jsx`) | **Tầng 1**: `data/market_valuation_history.json`<br>**Tầng 2 (Zero-downtime Fallback)**: Bản nhúng trong `data/macro_valuation.json` |
+
+### Quy Chuẩn Phòng Tránh Trùng Lặp Dữ Liệu & Bảo Toàn Fallback:
+1. **Kiến trúc dữ liệu phân tầng & Fallback an toàn**:
+   - `data/market_valuation_history.json` là file chuyên trách độc lập cung cấp chuỗi dữ liệu 4 chu kỳ và 6 chỉ số qua endpoint `/api/valuation/market-history`.
+   - `data/macro_valuation.json` đồng thời duy trì một bản snapshot `marketValuationHistory` đóng vai trò là tầng fallback an toàn giúp giao diện UI luôn nạp được dữ liệu kể cả khi máy chủ backend chưa kịp khởi động lại hoặc khi mạng gián đoạn.
+2. **Một file - Một script sở hữu**:
+   - `data/fundamentals_cache.json` do `scripts/sync_fundamentals.py` sở hữu độc quyền.
+   - `data/financials/<MÃ>.json` do `scripts/fetch_financial_reports.py` sở hữu độc quyền. `sync_fundamentals.py` tuyệt đối không được ghi vào thư mục này.
+   - `data/macro_valuation.json` do `scripts/fetch_macro_valuation.py` sở hữu độc quyền.
+   - `data/market_valuation_history.json` do `MarketValuationHistoryFetcher` sở hữu độc quyền.
+3. **Phân biệt rõ mục đích sử dụng các chỉ số P/E**:
+   - **Trailing P/E (TTM Multiple)** từ `fundamentals_cache.json`: Dùng cho so sánh nhanh đa mã.
+   - **P/E BCTC từng kỳ** từ `financials/<MÃ>.json`: Dùng cho báo cáo lịch sử và DuPont.
+   - **Target P/E (Định giá nội tại)** từ `valuationMatrix`: Dùng làm mốc giá trị hợp lý trong mô hình định giá.
+
+---
+
+## 5. Hệ Thống Động Cơ Định Giá Doanh Nghiệp (Enterprise Valuation Engine — `scripts/lib/valuation_engine.py`)
+
+Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **Mô-đun Độc Lập Chuyên Biệt (Single Source of Truth thuần Python 3.11)**, loại bỏ hoàn toàn việc tính toán rải rác hoặc trùng lặp giữa các tầng hệ thống.
+
+### A. Kiến Trúc & Phân Định Trách Nhiệm:
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│             ENTERPRISE STOCK VALUATION ENGINE (PYTHON 3.11)            │
+│                    scripts/lib/valuation_engine.py                     │
+├────────────────────────────────────────────────────────────────────────┤
+│ 1. Pure Mathematical Models:                                           │
+│    • calc_graham(eps, bvps, multiplier=22.5)                           │
+│    • calc_ddm(dps, r=0.115, g=0.035)                                   │
+│    • calc_pe_target(eps, multiple=11.5)                                │
+│    • calc_pb_target(bvps, multiple=1.35)                               │
+│    • calc_ev_ebitda(ebitda, net_debt, shares, multiple=7.5)             │
+│    • calc_pcf(cfo, shares, multiple=8.0)                               │
+│    • calc_ps_target(revenue, shares, multiple=1.1)                      │
+│                                                                        │
+│ 2. Consensus & Margin of Safety:                                       │
+│    • calc_consensus_fair_value(candidates, close)                      │
+│      -> fairValue, marginOfSafety (MoS %), upside / diffPercent (%),    │
+│         valuationRating, ratingBadge                                   │
+│    • Individual Model Diff Percentages (So với thị giá close):          │
+│      -> grahamDiffPercent, ddmDiffPercent, peDiffPercent, pbDiffPercent,│
+│         evEbitdaDiffPercent, pcfDiffPercent, psDiffPercent              │
+│                                                                        │
+│ 3. Quality & Momentum Synthesis:                                       │
+│    • calc_dupont(net_income, revenue, total_assets, equity, roe)       │
+│    • calc_tech_score(close, high_52, low_52, rec_score, beta)           │
+│    • calc_fcf(cfo, capex) & calc_cagr(start_val, end_val, periods)     │
+│                                                                        │
+│ 4. Unified Engine Class:                                               │
+│    • StockValuationEngine.evaluate(stock_dict) -> Full Valuation Matrix│
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+        ┌──────────────────────────┴──────────────────────────┐
+        ▼                                                     ▼
+┌──────────────────────────────────────┐     ┌───────────────────────────────────┐
+│     scripts/sync_fundamentals.py     │     │  scripts/fetch_financial_reports  │
+│  (Đồng bộ TradingView + Valuation)   │     │   (Đồng bộ BCTC chi tiết 8Q & 5Y) │
+└──────────────────┬───────────────────┘     └─────────────────┬─────────────────┘
+                   │                                           │
+                   └─────────────────────┬─────────────────────┘
+                                         ▼
+                     ┌───────────────────────────────────────┐
+                     │  data/fundamentals_cache.json         │
+                     │  data/financials/<MÃ>.json            │
+                     └───────────────────┬───────────────────┘
+                                         ▼
+                     ┌───────────────────────────────────────┐
+                     │       Node.js Express REST API        │
+                     │  (Chỉ đọc JSON Cache, KHÔNG tự tính)  │
+                     └───────────────────────────────────────┘
+```
+
+### B. Bảng Đặc Tả 7 Mô Hình Định Giá Nội Tại:
+
+| Mô Hình Định Giá | Công Thức Toán Học | Tham Số Mặc Định VN | Điều Kiện Áp Dụng |
+| :--- | :--- | :--- | :--- |
+| **1. Benjamin Graham Number** | $V = \sqrt{22.5 \times EPS \times BVPS}$ | Hệ số kết hợp $22.5$ ($15 \times 1.5$) | $EPS > 0$ và $BVPS > 0$ |
+| **2. Gordon DDM** | $V = \frac{DPS \times (1 + g)}{r - g}$ | $r = 11.5\%$ (WACC), $g = 3.5\%$ (GDP thận trọng) | $DPS > 0$ và $r > g$ |
+| **3. P/E Mục Tiêu Ngành** | $V = EPS \times TargetPE$ | $TargetPE = 11.5x$ | $EPS > 0$ |
+| **4. P/B Mục Tiêu Ngành** | $V = BVPS \times TargetPB$ | $TargetPB = 1.35x$ | $BVPS > 0$ |
+| **5. EV / EBITDA Multiple** | $V = \frac{EBITDA \times Multiple - NetDebt}{Shares}$ | $Multiple = 7.5x$ | $EBITDA > 0$, $Shares > 0$ |
+| **6. Price / Cash Flow (P/CF)** | $V = \frac{CFO \times Multiple}{Shares}$ | $Multiple = 8.0x$ | $CFO > 0$, $Shares > 0$ |
+| **7. Price / Sales (P/S)** | $V = \frac{Revenue \times Multiple}{Shares}$ | $Multiple = 1.1x$ | $Revenue > 0$, $Shares > 0$ |
+
+### C. Thang Đánh Giá Khuyến Nghị Biên An Toàn (Margin of Safety - MoS %):
+* Công thức: $MoS = \frac{FairValue - Close}{FairValue} \times 100\%$
+* **Thang phân loại**:
+  * $MoS \ge 20\%$: `DEEP_VALUE` — **Rất Rẻ** (Biên an toàn $> 20\%$, màu xanh ngọc lục bảo `emerald`).
+  * $5\% \le MoS < 20\%$: `ATTRACTIVE` — **Hấp Dẫn** (Vùng Mua gom $5 - 20\%$, màu xanh lá `green`).
+  * $-5\% \le MoS < 5\%$: `FAIR` — **Hợp Lý** (Định giá cân bằng, màu xanh dương `blue`).
+  * $-20\% \le MoS < -5\%$: `EXPENSIVE` — **Định Giá Cao** (Biên an toàn âm nhẹ, màu hổ phách `amber`).
+  * $MoS < -20\%$: `RISKY` — **Rất Đắt / Rủi Ro** (Thị giá cao hơn giá trị nội tại $> 20\%$, màu đỏ hồng `rose`).
+
+### D. Kiểm Thử Đơn Vị Tự Động (Unit Testing):
+* Script thực thi: `scripts/test_valuation_engine.py` (bao phủ 11 test cases cho toàn bộ 7 mô hình toán học, các trường hợp biên âm/rỗng, DuPont, Tech Score và Engine class).
+* Lệnh chạy: `.venv/bin/python scripts/test_valuation_engine.py`.
+

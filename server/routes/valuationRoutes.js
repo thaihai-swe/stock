@@ -231,6 +231,12 @@ router.get('/valuation/raw-json/:type', (req, res) => {
     } else if (type === 'financials') {
       targetPath = path.join(FINANCIALS_DIR, `${symbol}.json`);
       fileName = `${symbol}.json`;
+    } else if (type === 'market-history' || type === 'market_valuation_history') {
+      targetPath = MARKET_HISTORY_FILE;
+      fileName = 'market_valuation_history.json';
+    } else if (type === 'indicators' || type === 'macro_indicators') {
+      targetPath = MACRO_INDICATORS_FILE;
+      fileName = 'macro_indicators.json';
     } else {
       targetPath = FUNDAMENTALS_FILE;
       fileName = 'fundamentals_cache.json';

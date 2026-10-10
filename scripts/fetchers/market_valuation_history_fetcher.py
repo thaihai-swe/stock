@@ -186,6 +186,15 @@ class MarketValuationHistoryFetcher(BaseFetcher):
             if data:
                 periods_data[p] = data
 
+        if not periods_data:
+            if OUTPUT_FILE.exists():
+                print(f"🛡️ [FALLBACK] Không tải được dữ liệu mới từ Google Sheets. Bảo toàn cache hiện có: {OUTPUT_FILE}")
+                try:
+                    with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception:
+                    pass
+
         result = {
             "_meta": {
                 "updatedAt": datetime.now().isoformat(),

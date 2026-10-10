@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import BuyForm from './components/BuyForm.jsx';
+import TradeOrderView from './components/TradeOrderView.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import DcaPlannerView from './components/DcaPlannerView.jsx';
 import DividendManager from './components/DividendManager.jsx';
-import SellForm from './components/SellForm.jsx';
 import Settings from './components/Settings.jsx';
 import StrategyAnalytics from './components/StrategyAnalytics.jsx';
 import TransactionHistory from './components/TransactionHistory.jsx';
@@ -26,8 +25,7 @@ const TABS = [
   { id: 'macro', label: '🌐 Vĩ Mô & VN-Index', shortLabel: 'Vĩ Mô', icon: '🌐' },
   { id: 'valuation', label: '🏢 Định Giá Cổ Phiếu', shortLabel: 'Định Giá', icon: '🏢' },
   { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜' },
-  { id: 'buy', label: '🛒 Mua vào', shortLabel: 'Mua vào', icon: '🛒' },
-  { id: 'sell', label: '💸 Bán ra', shortLabel: 'Bán ra', icon: '💸' },
+  { id: 'trade', label: '⚡ Mua / Bán', shortLabel: 'Mua / Bán', icon: '⚡' },
   { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋' },
   { id: 'dividend', label: '🎁 Cổ tức', shortLabel: 'Cổ tức', icon: '🎁' },
   { id: 'strategy', label: '🎯 Chiến lược', shortLabel: 'Chiến lược', icon: '🎯' },
@@ -49,8 +47,7 @@ const TAB_GROUPS = [
   {
     groupTitle: 'Lệnh & Giao Dịch',
     items: [
-      { id: 'buy', label: 'Mua Vào', icon: '🛒', desc: 'Đặt lệnh mua & tự động tính giá vốn' },
-      { id: 'sell', label: 'Bán Ra', icon: '💸', desc: 'Chốt lời/cắt lỗ theo nguyên tắc FIFO' },
+      { id: 'trade', label: 'Đặt Lệnh Mua / Bán', icon: '⚡', desc: 'Đặt lệnh mua mới hoặc bán chốt lời/cắt lỗ' },
       { id: 'history', label: 'Lịch Sử Giao Dịch', icon: '📋', desc: 'Nhật ký mua/bán, tìm kiếm & lọc' },
     ]
   },
@@ -66,6 +63,7 @@ const TAB_GROUPS = [
 
 export default function App({ hasGoogleClientId = false }) {
   const [tab, setTab] = useState('dashboard');
+  const [tradeType, setTradeType] = useState('buy'); // 'buy' | 'sell'
   const [buyInitial, setBuyInitial] = useState({ symbol: '', quantity: '', price: '' });
   const [sellInitialSymbol, setSellInitialSymbol] = useState('');
   const [dcaInitialStock, setDcaInitialStock] = useState(null);
@@ -257,16 +255,26 @@ export default function App({ hasGoogleClientId = false }) {
 
   const totalRealizedPL = (data.sellOrders || []).reduce((s, o) => s + (o.profitLoss || 0), 0);
 
-  function handleSelectBuy(symbol, quantity = '', price = '') {
-    setBuyInitial({ symbol, quantity, price });
-    setTab('buy');
+  function handleSelectBuy(symbolOrObj, quantity = '', price = '') {
+    if (typeof symbolOrObj === 'object' && symbolOrObj !== null) {
+      setBuyInitial({
+        symbol: symbolOrObj.symbol || '',
+        quantity: symbolOrObj.quantity || '',
+        price: symbolOrObj.price || '',
+      });
+    } else {
+      setBuyInitial({ symbol: symbolOrObj || '', quantity, price });
+    }
+    setTradeType('buy');
+    setTab('trade');
     setIsDrawerOpen(false);
     setIsTradeSheetOpen(false);
   }
 
   function handleSelectSell(symbol) {
-    setSellInitialSymbol(symbol);
-    setTab('sell');
+    setSellInitialSymbol(symbol || '');
+    setTradeType('sell');
+    setTab('trade');
     setIsDrawerOpen(false);
     setIsTradeSheetOpen(false);
   }
@@ -279,13 +287,23 @@ export default function App({ hasGoogleClientId = false }) {
   }
 
   function switchTab(targetTab, param) {
-    setTab(targetTab);
-    if (targetTab === 'valuation' && param) {
+    let finalTab = targetTab;
+    if (targetTab === 'buy') {
+      setTradeType('buy');
+      finalTab = 'trade';
+    } else if (targetTab === 'sell') {
+      setTradeType('sell');
+      finalTab = 'trade';
+    }
+    setTab(finalTab);
+    if (finalTab === 'valuation' && param) {
       setValuationInitialSymbol(param);
     }
-    if (targetTab !== 'buy') setBuyInitial({ symbol: '', quantity: '', price: '' });
-    if (targetTab !== 'sell') setSellInitialSymbol('');
-    if (targetTab !== 'dca') setDcaInitialStock(null);
+    if (finalTab !== 'trade') {
+      setBuyInitial({ symbol: '', quantity: '', price: '' });
+      setSellInitialSymbol('');
+    }
+    if (finalTab !== 'dca') setDcaInitialStock(null);
     setIsDrawerOpen(false);
     setIsTradeSheetOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -485,10 +503,7 @@ export default function App({ hasGoogleClientId = false }) {
                 onSuccess={loadData}
                 onNavigateBuy={handleSelectBuy}
                 onNavigateDca={handleSelectDca}
-                onNavigateSell={(symbol) => {
-                  setSellInitialSymbol(symbol || '');
-                  setTab('sell');
-                }}
+                onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
               />
             )}
@@ -513,39 +528,26 @@ export default function App({ hasGoogleClientId = false }) {
                 onNavigateBuy={handleSelectBuy}
               />
             )}
-            {tab === 'buy' && (
-              <BuyForm
+            {tab === 'trade' && (
+              <TradeOrderView
+                initialType={tradeType}
+                onTypeChange={setTradeType}
+                portfolio={data.portfolio || []}
+                buyInitial={buyInitial}
+                sellInitialSymbol={sellInitialSymbol}
                 onSuccess={() => {
                   setBuyInitial({ symbol: '', quantity: '', price: '' });
-                  loadData();
-                }}
-                initialSymbol={buyInitial.symbol}
-                initialQuantity={buyInitial.quantity}
-                initialPrice={buyInitial.price}
-              />
-            )}
-            {tab === 'sell' && (
-              <SellForm
-                onSuccess={() => {
                   setSellInitialSymbol('');
                   loadData();
                 }}
-                portfolio={data.portfolio || []}
-                initialSymbol={sellInitialSymbol}
               />
             )}
             {tab === 'history' && (
               <TransactionHistory
                 data={data}
                 onSuccess={loadData}
-                onNavigateBuy={(init) => {
-                  setBuyInitial(init || { symbol: '', quantity: '', price: '' });
-                  setTab('buy');
-                }}
-                onNavigateSell={(symbol) => {
-                  setSellInitialSymbol(symbol || '');
-                  setTab('sell');
-                }}
+                onNavigateBuy={handleSelectBuy}
+                onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
               />
             )}
@@ -658,14 +660,14 @@ export default function App({ hasGoogleClientId = false }) {
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['dividend', 'strategy', 'watchlist', 'settings', 'buy', 'sell'].includes(tab)
+            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['dividend', 'strategy', 'watchlist', 'settings', 'macro', 'valuation'].includes(tab)
                 ? 'text-indigo-600 font-bold'
                 : 'text-gray-400 hover:text-gray-600 font-medium'
               }`}
           >
             <span className="text-xl leading-none">☰</span>
             <span className="text-[10px] mt-1 tracking-tight">Thêm</span>
-            {['dividend', 'strategy', 'watchlist', 'settings', 'buy', 'sell'].includes(tab) && (
+            {['dividend', 'strategy', 'watchlist', 'settings', 'macro', 'valuation'].includes(tab) && (
               <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-0.5" />
             )}
           </button>

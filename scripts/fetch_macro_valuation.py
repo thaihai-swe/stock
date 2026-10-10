@@ -176,24 +176,24 @@ def fetch_and_save_macro():
         "tradingEconomics": te_data,
     }
 
-    # 5. Đồng bộ chuỗi lịch sử định giá thị trường (Google Sheets Simply Wall St)
-    history_data = None
+    # 5. Đồng bộ chuỗi lịch sử định giá thị trường vào file riêng data/market_valuation_history.json
+    # và nhúng làm tầng dự phòng an toàn (zero-downtime fallback) trong macro_valuation.json
+    val_data = None
     try:
         val_fetcher = MarketValuationHistoryFetcher()
-        history_data = val_fetcher.fetch_all_and_save()
+        val_data = val_fetcher.fetch_all_and_save()
     except Exception as e:
         print(f"⚠️ Không thể cập nhật lịch sử định giá thị trường: {e}")
+        history_file = DATA_DIR / "market_valuation_history.json"
+        if history_file.exists():
+            try:
+                with open(history_file, "r", encoding="utf-8") as f:
+                    val_data = json.load(f)
+            except Exception:
+                pass
 
-    # Fallback đọc từ file nếu vừa fail
-    if not history_data and (DATA_DIR / "market_valuation_history.json").exists():
-        try:
-            with open(DATA_DIR / "market_valuation_history.json", "r", encoding="utf-8") as f:
-                history_data = json.load(f)
-        except Exception:
-            history_data = None
-
-    if history_data:
-        macro_doc["marketValuationHistory"] = history_data
+    if val_data:
+        macro_doc["marketValuationHistory"] = val_data
 
     with open(MACRO_FILE, "w", encoding="utf-8") as f:
         json.dump(macro_doc, f, ensure_ascii=False, indent=2)

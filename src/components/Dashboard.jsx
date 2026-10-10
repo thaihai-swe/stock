@@ -625,7 +625,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           <div className="py-12 text-center text-gray-400">
             <p className="text-4xl mb-2">📭</p>
             <p className="font-medium text-gray-600">Danh mục hiện đang trống</p>
-            <p className="text-xs text-gray-400 mt-1">Chuyển sang tab "Mua vào" để thêm cổ phiếu mới</p>
+            <p className="text-xs text-gray-400 mt-1">Chuyển sang tab "Mua / Bán" để thêm cổ phiếu mới</p>
           </div>
         ) : displayedPortfolio.length === 0 ? (
           <div className="py-10 text-center text-gray-400">

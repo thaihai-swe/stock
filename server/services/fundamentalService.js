@@ -63,6 +63,19 @@ function normalizeFundamentalRow(row, columns) {
     }
   }
 
+  const peVal = d['price_earnings_ttm'] != null ? Number(d['price_earnings_ttm'].toFixed(2)) : null;
+  const pbVal = d['price_book_ratio'] != null ? Number(d['price_book_ratio'].toFixed(2)) : null;
+  const epsVal = d['earnings_per_share_basic_ttm'] != null ? Math.round(d['earnings_per_share_basic_ttm']) : null;
+  const dpsVal = d['dps_common_stock_prim_issue_fy'] != null ? Math.round(d['dps_common_stock_prim_issue_fy']) : 0;
+  const revVal = d['total_revenue_ttm'] != null ? Math.round(d['total_revenue_ttm']) : null;
+  const niVal = d['net_income_ttm'] != null ? Math.round(d['net_income_ttm']) : null;
+  const assetsVal = d['total_assets_fq'] != null ? Math.round(d['total_assets_fq']) : null;
+  const debtVal = d['total_debt_fq'] != null ? Math.round(d['total_debt_fq']) : null;
+  const netMarginVal = d['net_margin_ttm'] != null ? Number(d['net_margin_ttm'].toFixed(2)) : null;
+  const roeVal = d['return_on_equity_fq'] != null ? Number(d['return_on_equity_fq'].toFixed(2)) : null;
+
+  const beta = d['beta_1_year'] != null ? Number(d['beta_1_year'].toFixed(2)) : null;
+
   return {
     symbol: sym,
     exchange: row.s ? row.s.split(':')[0] : 'HOSE',
@@ -75,38 +88,47 @@ function normalizeFundamentalRow(row, columns) {
     sector: d['sector.tr'] || 'Khác',
     industry: d['industry.tr'] || 'Khác',
 
-    // 1. Valuation Multiples
+    // 1. Valuation Multiples & Raw Indicators (Toàn bộ mô hình do Python Valuation Engine phụ trách)
     valuation: {
-      pe: d['price_earnings_ttm'] != null ? Number(d['price_earnings_ttm'].toFixed(2)) : null,
-      pb: d['price_book_ratio'] != null ? Number(d['price_book_ratio'].toFixed(2)) : null,
+      pe: peVal,
+      pb: pbVal,
       ps: d['price_sales_ratio'] != null ? Number(d['price_sales_ratio'].toFixed(2)) : null,
       evEbitda: d['enterprise_value_to_ebitda_ratio'] != null ? Number(d['enterprise_value_to_ebitda_ratio'].toFixed(2)) : null,
     },
 
     // 2. Profitability & Returns
     profitability: {
-      roe: d['return_on_equity_fq'] != null ? Number(d['return_on_equity_fq'].toFixed(2)) : null,
+      roe: roeVal,
       roeFy: d['return_on_equity_fy'] != null ? Number(d['return_on_equity_fy'].toFixed(2)) : null,
       roa: d['return_on_assets_fq'] != null ? Number(d['return_on_assets_fq'].toFixed(2)) : null,
       roaFy: d['return_on_assets_fy'] != null ? Number(d['return_on_assets_fy'].toFixed(2)) : null,
-      eps: d['earnings_per_share_basic_ttm'] != null ? Math.round(d['earnings_per_share_basic_ttm']) : null,
+      eps: epsVal,
       grossMargin: d['gross_margin_ttm'] != null ? Number(d['gross_margin_ttm'].toFixed(2)) : null,
       operatingMargin: d['operating_margin_ttm'] != null ? Number(d['operating_margin_ttm'].toFixed(2)) : null,
-      netMargin: d['net_margin_ttm'] != null ? Number(d['net_margin_ttm'].toFixed(2)) : null,
+      netMargin: netMarginVal,
+    },
+
+    // 2b. DuPont 3 Factors
+    dupont: {
+      roe: roeVal,
+      netProfitMargin: netMarginVal,
+      assetTurnover: (revVal && assetsVal && assetsVal > 0) ? Number((revVal / assetsVal).toFixed(2)) : null,
+      equityMultiplier: (assetsVal && debtVal && assetsVal > debtVal) ? Number((assetsVal / (assetsVal - debtVal)).toFixed(2)) : null,
+      qualityAssessment: 'Dữ liệu được chuẩn hóa và tính toán từ Python Valuation Engine',
     },
 
     // 3. Dividends & Cash Flow
     dividends: {
       yield: d['dividends_yield'] != null ? Number(d['dividends_yield'].toFixed(2)) : null,
-      dps: d['dps_common_stock_prim_issue_fy'] != null ? Math.round(d['dps_common_stock_prim_issue_fy']) : 0,
+      dps: dpsVal,
       fcf: d['free_cash_flow_ttm'] != null ? Math.round(d['free_cash_flow_ttm']) : null,
       fcfMargin: d['free_cash_flow_margin_ttm'] != null ? Number(d['free_cash_flow_margin_ttm'].toFixed(2)) : null,
     },
 
     // 4. Financial Health & Balance Sheet
     health: {
-      totalDebt: d['total_debt_fq'] != null ? Math.round(d['total_debt_fq']) : null,
-      totalAssets: d['total_assets_fq'] != null ? Math.round(d['total_assets_fq']) : null,
+      totalDebt: debtVal,
+      totalAssets: assetsVal,
       debtToEquity: d['debt_to_equity_fq'] != null ? Number(d['debt_to_equity_fq'].toFixed(2)) : null,
       currentRatio: d['current_ratio_fq'] != null ? Number(d['current_ratio_fq'].toFixed(2)) : null,
       quickRatio: d['quick_ratio_fq'] != null ? Number(d['quick_ratio_fq'].toFixed(2)) : null,
@@ -115,8 +137,8 @@ function normalizeFundamentalRow(row, columns) {
 
     // 5. Scale & Revenue
     scale: {
-      revenue: d['total_revenue_ttm'] != null ? Math.round(d['total_revenue_ttm']) : null,
-      netIncome: d['net_income_ttm'] != null ? Math.round(d['net_income_ttm']) : null,
+      revenue: revVal,
+      netIncome: niVal,
       marketCap: d['market_cap_basic'] != null ? Math.round(d['market_cap_basic']) : null,
       sharesOutstanding: d['total_shares_outstanding_fundamental'] != null ? Math.round(d['total_shares_outstanding_fundamental']) : null,
     },
@@ -144,7 +166,7 @@ function normalizeFundamentalRow(row, columns) {
       recommendScore: recScore != null ? Number(recScore.toFixed(2)) : null,
       recommendText,
       recommendColor,
-      beta: d['beta_1_year'] != null ? Number(d['beta_1_year'].toFixed(2)) : null,
+      beta,
     },
 
     updatedAt: Date.now(),
@@ -226,6 +248,11 @@ export async function getMultipleFundamentals(symbols = [], force = false) {
   const cleanSymbols = [...new Set(symbols.map(s => (s || '').trim().toUpperCase()).filter(Boolean))];
   if (cleanSymbols.length === 0) return {};
 
+  // Luôn làm mới từ Local JSON (do Python cập nhật) nếu force hoặc cache trống
+  if (force || Object.keys(memoryFundamentalsCache).length === 0) {
+    memoryFundamentalsCache = loadFundamentalsCache();
+  }
+
   const now = Date.now();
   const resultMap = {};
   const symbolsToFetch = [];
@@ -267,8 +294,45 @@ export async function getMultipleFundamentals(symbols = [], force = false) {
 
       for (const sym of remainingToFetch) {
         if (fetchedMap[sym]) {
-          memoryFundamentalsCache[sym] = fetchedMap[sym];
-          resultMap[sym] = fetchedMap[sym];
+          const old = memoryFundamentalsCache[sym] || {};
+          const merged = {
+            ...old,
+            ...fetchedMap[sym],
+            valuation: {
+              ...(fetchedMap[sym].valuation || {}),
+              ...(old.valuation || {}), // Bảo toàn kết quả từ Python Valuation Engine
+            },
+            profitability: {
+              ...(old.profitability || {}),
+              ...(fetchedMap[sym].profitability || {}),
+            },
+            dupont: {
+              ...(fetchedMap[sym].dupont || {}),
+              ...(old.dupont || {}),
+            },
+            dividends: {
+              ...(old.dividends || {}),
+              ...(fetchedMap[sym].dividends || {}),
+            },
+            health: {
+              ...(old.health || {}),
+              ...(fetchedMap[sym].health || {}),
+            },
+            scale: {
+              ...(old.scale || {}),
+              ...(fetchedMap[sym].scale || {}),
+            },
+            performance: {
+              ...(old.performance || {}),
+              ...(fetchedMap[sym].performance || {}),
+            },
+            technicals: {
+              ...(old.technicals || {}),
+              ...(fetchedMap[sym].technicals || {}),
+            },
+          };
+          memoryFundamentalsCache[sym] = merged;
+          resultMap[sym] = merged;
           hasNewData = true;
         } else if (memoryFundamentalsCache[sym]) {
           // Nếu fetch không có (ví dụ mã OTC), dùng lại cache cũ nếu có
