@@ -11,6 +11,7 @@ import {
   loginGoogle,
   setAuthToken,
 } from './utils/api.js';
+import { parseUrlRoute, syncUrlRoute } from './utils/navigation.js';
 
 // Nạp lười (Code Splitting) các Tab nặng để tối ưu dung lượng Bundle ban đầu
 const ValuationDashboard = lazy(() => import('./components/ValuationDashboard.jsx'));
@@ -83,12 +84,24 @@ const TAB_GROUPS = [
 ];
 
 export default function App({ hasGoogleClientId = false }) {
-  const [tab, setTab] = useState('dashboard');
-  const [tradeType, setTradeType] = useState('buy'); // 'buy' | 'sell'
-  const [buyInitial, setBuyInitial] = useState({ symbol: '', quantity: '', price: '' });
-  const [sellInitialSymbol, setSellInitialSymbol] = useState('');
-  const [dcaInitialStock, setDcaInitialStock] = useState(null);
-  const [valuationInitialSymbol, setValuationInitialSymbol] = useState('');
+  // Khởi tạo trạng thái ban đầu từ URL (bảo lưu khi refresh F5 hoặc truy cập qua link)
+  const initialRoute = parseUrlRoute();
+  const [tab, setTab] = useState(initialRoute.tab);
+  const [tradeType, setTradeType] = useState(initialRoute.tradeType || 'buy');
+  const [buyInitial, setBuyInitial] = useState({
+    symbol: initialRoute.tab === 'trade' && initialRoute.tradeType === 'buy' ? initialRoute.symbol : '',
+    quantity: '',
+    price: '',
+  });
+  const [sellInitialSymbol, setSellInitialSymbol] = useState(
+    initialRoute.tab === 'trade' && initialRoute.tradeType === 'sell' ? initialRoute.symbol : ''
+  );
+  const [dcaInitialStock, setDcaInitialStock] = useState(
+    initialRoute.tab === 'dca' && initialRoute.symbol ? { symbol: initialRoute.symbol } : null
+  );
+  const [valuationInitialSymbol, setValuationInitialSymbol] = useState(
+    initialRoute.tab === 'valuation' ? initialRoute.symbol : ''
+  );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isTradeSheetOpen, setIsTradeSheetOpen] = useState(false);
 
@@ -117,6 +130,44 @@ export default function App({ hasGoogleClientId = false }) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isDrawerOpen]);
+
+  // Đảm bảo URL canonical chuẩn hóa khi tải trang lần đầu
+  useEffect(() => {
+    const route = parseUrlRoute();
+    syncUrlRoute(route.tab, {
+      symbol: route.symbol,
+      tradeType: route.tradeType,
+    }, true);
+  }, []);
+
+  // Lắng nghe sự kiện Back / Forward của trình duyệt để đổi tab tức thì (0ms)
+  useEffect(() => {
+    function handlePopState() {
+      const route = parseUrlRoute();
+      setTab(route.tab);
+      if (route.tab === 'valuation') {
+        if (route.symbol) setValuationInitialSymbol(route.symbol);
+      } else if (route.tab === 'trade') {
+        setTradeType(route.tradeType);
+        if (route.symbol) {
+          if (route.tradeType === 'buy') {
+            setBuyInitial({ symbol: route.symbol, quantity: '', price: '' });
+          } else if (route.tradeType === 'sell') {
+            setSellInitialSymbol(route.symbol);
+          }
+        }
+      } else if (route.tab === 'dca') {
+        if (route.symbol) {
+          setDcaInitialStock({ symbol: route.symbol });
+        }
+      }
+      setIsDrawerOpen(false);
+      setIsTradeSheetOpen(false);
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const toastTimerRef = useRef(null);
   const showToast = useCallback((message, type = 'info') => {
@@ -264,6 +315,9 @@ export default function App({ hasGoogleClientId = false }) {
   const totalRealizedPL = (data.sellOrders || []).reduce((s, o) => s + (o.profitLoss || 0), 0);
 
   function handleSelectBuy(symbolOrObj, quantity = '', price = '') {
+    const sym = typeof symbolOrObj === 'object' && symbolOrObj !== null
+      ? (symbolOrObj.symbol || '')
+      : (symbolOrObj || '');
     if (typeof symbolOrObj === 'object' && symbolOrObj !== null) {
       setBuyInitial({
         symbol: symbolOrObj.symbol || '',
@@ -275,41 +329,62 @@ export default function App({ hasGoogleClientId = false }) {
     }
     setTradeType('buy');
     setTab('trade');
+    syncUrlRoute('trade', { tradeType: 'buy', symbol: sym });
     setIsDrawerOpen(false);
     setIsTradeSheetOpen(false);
   }
 
   function handleSelectSell(symbol) {
-    setSellInitialSymbol(symbol || '');
+    const sym = symbol || '';
+    setSellInitialSymbol(sym);
     setTradeType('sell');
     setTab('trade');
+    syncUrlRoute('trade', { tradeType: 'sell', symbol: sym });
     setIsDrawerOpen(false);
     setIsTradeSheetOpen(false);
   }
 
   function handleSelectDca(stock) {
+    const sym = (typeof stock === 'string' ? stock : stock?.symbol) || '';
     setDcaInitialStock(stock);
     setTab('dca');
+    syncUrlRoute('dca', { symbol: sym });
     setIsDrawerOpen(false);
     setIsTradeSheetOpen(false);
   }
 
   function switchTab(targetTab, param) {
     let finalTab = targetTab;
+    let currentTradeType = tradeType;
     if (targetTab === 'buy') {
+      currentTradeType = 'buy';
       setTradeType('buy');
       finalTab = 'trade';
     } else if (targetTab === 'sell') {
+      currentTradeType = 'sell';
       setTradeType('sell');
       finalTab = 'trade';
     } else if (targetTab === 'dividend') {
+      currentTradeType = 'dividend';
       setTradeType('dividend');
       finalTab = 'trade';
     }
     setTab(finalTab);
+
+    const routeParams = {};
     if (finalTab === 'valuation' && param) {
       setValuationInitialSymbol(param);
+      routeParams.symbol = param;
+    } else if (finalTab === 'trade') {
+      routeParams.tradeType = currentTradeType;
+      if (param) routeParams.symbol = param;
+    } else if (finalTab === 'dca' && param) {
+      const sym = typeof param === 'string' ? param : param?.symbol;
+      if (sym) routeParams.symbol = sym;
     }
+
+    syncUrlRoute(finalTab, routeParams);
+
     if (finalTab !== 'trade') {
       setBuyInitial({ symbol: '', quantity: '', price: '' });
       setSellInitialSymbol('');

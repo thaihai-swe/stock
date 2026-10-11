@@ -6,6 +6,7 @@ import {
   triggerSingleFinancialSync,
   triggerValuationSync
 } from '../utils/api.js';
+import { syncUrlRoute } from '../utils/navigation.js';
 
 // Sub-components mới tách
 import StockCockpitHeader from './valuation/StockCockpitHeader.jsx';
@@ -149,6 +150,7 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     if (inspectorType === 'financials') {
       loadRawJson('financials', sym);
     }
+    syncUrlRoute('valuation', { symbol: sym }, true);
   };
 
   // Thay đổi loại file kiểm tra JSON
@@ -214,6 +216,7 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       const stocksRes = await fetchValuationStocks().catch(() => ({}));
       setValuationData(stocksRes || {});
       setSelectedSymbol(sym);
+      syncUrlRoute('valuation', { symbol: sym }, true);
       await loadFinancialsForSymbol(sym);
       if (inspectorType === 'financials') {
         loadRawJson('financials', sym);
@@ -230,10 +233,12 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     }
   };
 
-  // Tự động chuyển mã khi được điều hướng từ tab khác (như popup Sổ cái Lãi/Lỗ)
+  // Tự động chuyển mã khi được điều hướng từ tab khác (như popup Sổ cái Lãi/Lỗ hoặc URL)
   useEffect(() => {
     if (initialSymbol && initialSymbol !== selectedSymbol) {
       handleLookupSymbol(initialSymbol);
+    } else if (selectedSymbol) {
+      syncUrlRoute('valuation', { symbol: selectedSymbol }, true);
     }
   }, [initialSymbol]);
 
