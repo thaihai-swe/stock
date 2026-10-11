@@ -74,6 +74,7 @@ Hệ thống phân định rạch ròi dữ liệu thành 5 tầng độc lập 
    - `python scripts/db_manager.py status|export|import`: Quản lý sao lưu/phục hồi DB.
 
 > 📌 **Chi tiết toàn diện về schema, nguồn dữ liệu và ma trận trường thông tin:** Xem tại [`docs/DATA_CATALOG.md`](file:///Users/thaihai-swe/Desktop/stock/docs/DATA_CATALOG.md).
+> ⚙️ **Đặc tả luồng kỹ thuật tải dữ liệu nền & điều phối API:** Xem tại [`docs/BACKGROUND_DATA_PIPELINE.md`](file:///Users/thaihai-swe/Desktop/stock/docs/BACKGROUND_DATA_PIPELINE.md).
 
 
 

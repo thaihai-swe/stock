@@ -15,16 +15,16 @@ import StockDetailModal from './StockDetailModal.jsx';
 
 function StatCard({ label, value, sub, highlight }) {
   return (
-    <div className={`bg-white rounded-2xl shadow-sm p-3.5 sm:p-5 border border-gray-100 ${highlight || ''}`}>
-      <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 truncate">{label}</p>
-      <div className="text-lg sm:text-2xl font-bold text-gray-800 break-words leading-tight">{value}</div>
-      {sub && <div className="text-[10px] sm:text-xs text-gray-400 mt-1">{sub}</div>}
+    <div className={`bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-3.5 sm:p-5 border border-gray-100 dark:border-slate-800 ${highlight || ''}`}>
+      <p className="text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-1 truncate">{label}</p>
+      <div className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-slate-100 break-words leading-tight">{value}</div>
+      {sub && <div className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-500 mt-1">{sub}</div>}
     </div>
   );
 }
 
 export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess, refreshKey, onSwitchTab }) {
-  const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [] } = data;
+  const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [], watchlist = [] } = data;
 
   // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
   const [selectedSymbolModal, setSelectedSymbolModal] = useState(null);
@@ -33,6 +33,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
   const [pricesData, setPricesData] = useState({ session: null, prices: {} });
   const [loadingPrices, setLoadingPrices] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('');
+  const [dismissAlerts, setDismissAlerts] = useState(false);
 
   // State Tìm kiếm & Bộ lọc nhanh 1-Click
   const [symbolFilter, setSymbolFilter] = useState('');
@@ -126,6 +127,51 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
   const totalUnrealizedPLPct = holdingCost > 0
     ? parseFloat(((totalUnrealizedPL / holdingCost) * 100).toFixed(2))
     : 0;
+
+  // Tổng Lãi / Lỗ Tích Luỹ Toàn Thời Gian (Đã chốt + Tạm tính + Cổ tức tiền mặt)
+  const totalCumulativePL = realizedPL + totalUnrealizedPL + totalCashDividends;
+  const totalCumulativePLPct = totalInvested > 0
+    ? parseFloat(((totalCumulativePL / totalInvested) * 100).toFixed(2))
+    : 0;
+
+  // Cảnh báo mục tiêu Watchlist (khi có mã chạm vùng mua hoặc vùng bán)
+  const watchlistAlerts = useMemo(() => {
+    if (!watchlist || watchlist.length === 0) return [];
+    const alerts = [];
+    for (const w of watchlist) {
+      const sym = w.symbol?.toUpperCase();
+      const quote = pricesData?.prices?.[sym];
+      const curPrice = quote?.price;
+      if (!curPrice) continue;
+
+      const buyTarget = w.targetBuyPrice || w.targetPrice || null;
+      if (buyTarget && curPrice <= buyTarget * 1.02) {
+        alerts.push({
+          type: 'BUY',
+          symbol: sym,
+          currentPrice: curPrice,
+          targetPrice: buyTarget,
+          diffPct: (((curPrice - buyTarget) / buyTarget) * 100).toFixed(1),
+          message: `Đã vào vùng mua kỳ vọng (${fmtMoney(curPrice)}đ ≤ ${fmtMoney(buyTarget)}đ)`,
+        });
+      }
+
+      const sellTarget = w.targetSellPrice || null;
+      if (sellTarget && curPrice >= sellTarget * 0.98) {
+        const isHolding = portfolio.some(p => p.symbol === sym && p.totalQty > 0);
+        alerts.push({
+          type: 'SELL',
+          symbol: sym,
+          currentPrice: curPrice,
+          targetPrice: sellTarget,
+          isHolding,
+          diffPct: (((curPrice - sellTarget) / sellTarget) * 100).toFixed(1),
+          message: `Đã chạm vùng bán chốt lời (${fmtMoney(curPrice)}đ ≥ ${fmtMoney(sellTarget)}đ)`,
+        });
+      }
+    }
+    return alerts;
+  }, [watchlist, pricesData, portfolio]);
 
   // Quản lý số dư tiền mặt
   const [cashBalance, setCashBalance] = useState(data.settings?.cashBalance ?? 0);
@@ -384,6 +430,47 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
               </span>
             </div>
           </div>
+
+          {/* Thẻ Tổng Lãi / Lỗ Tích Luỹ Toàn Thời Gian */}
+          <div className="bg-white/10 dark:bg-slate-900/50 rounded-2xl p-3.5 sm:p-4 border border-white/10 backdrop-blur-xs mt-3.5">
+            <div className="flex items-center justify-between flex-wrap gap-2.5">
+              <div>
+                <span className="text-indigo-200 text-[11px] font-bold uppercase tracking-wider block">
+                  🏆 Tổng P&L Tích Luỹ Toàn Thời Gian
+                </span>
+                <div className="flex items-baseline gap-2 mt-1 flex-wrap">
+                  <span className={`text-xl sm:text-2xl font-black tracking-tight ${totalCumulativePL >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {totalCumulativePL >= 0 ? '+' : ''}{fmtMoney(totalCumulativePL)}đ
+                  </span>
+                  <span className={`text-xs sm:text-sm font-bold px-2 py-0.5 rounded-full ${
+                    totalCumulativePL >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  }`}>
+                    {totalCumulativePL >= 0 ? '▲ +' : '▼ '}{totalCumulativePLPct}% ROI
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-2.5 text-[11px] text-indigo-200/90 flex-wrap">
+                <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
+                  <span className="opacity-75">Đã chốt: </span>
+                  <b className={realizedPL >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+                    {realizedPL >= 0 ? '+' : ''}{fmtMoney(realizedPL)}đ
+                  </b>
+                </div>
+                <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
+                  <span className="opacity-75">Tạm tính: </span>
+                  <b className={totalUnrealizedPL >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+                    {totalUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(totalUnrealizedPL)}đ
+                  </b>
+                </div>
+                <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
+                  <span className="opacity-75">Cổ tức: </span>
+                  <b className="text-amber-300">
+                    +{fmtMoney(totalCashDividends)}đ
+                  </b>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Thanh đo phân bổ Tiền mặt / Cổ phiếu (Cash Allocation Gauge) */}
@@ -444,7 +531,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           value={`${fmtMoney(totalMarketValue)}đ`}
           sub={
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span>Vốn gốc: <b className="text-gray-600">{fmtMoney(holdingCost)}đ</b></span>
+              <span>Vốn gốc: <b className="text-gray-600 dark:text-slate-300">{fmtMoney(holdingCost)}đ</b></span>
               {holdingCost > 0 && (
                 <span className={`font-semibold ${plColor(totalUnrealizedPL)}`}>
                   • {totalUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(totalUnrealizedPL)}đ ({totalUnrealizedPLPct >= 0 ? '+' : ''}{totalUnrealizedPLPct}%)
@@ -465,7 +552,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         <StatCard
           label="Cổ tức thực nhận"
           value={
-            <span className="text-emerald-600">
+            <span className="text-emerald-600 dark:text-emerald-400">
               +{fmtMoney(totalCashDividends)}đ
             </span>
           }
@@ -478,8 +565,83 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         />
       </div>
 
+      {/* BẢNG CẢNH BÁO WATCHLIST (KHI CÓ CỔ PHIẾU ĐẠT MỤC TIÊU MUA / BÁN) */}
+      {watchlistAlerts.length > 0 && !dismissAlerts && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-emerald-500/10 dark:from-amber-500/20 dark:via-slate-900/60 dark:to-emerald-500/20 border border-amber-300/80 dark:border-amber-700/60 rounded-2xl p-4 shadow-sm animate-in fade-in duration-300">
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            <div className="flex items-center gap-2">
+              <span className="text-lg animate-bounce">🔔</span>
+              <h4 className="font-extrabold text-xs sm:text-sm text-gray-800 dark:text-gray-100 flex items-center gap-1.5">
+                <span>Tín Hiệu Mục Tiêu Watchlist</span>
+                <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                  {watchlistAlerts.length}
+                </span>
+              </h4>
+            </div>
+            <button
+              type="button"
+              onClick={() => setDismissAlerts(true)}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs px-2 py-0.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+              title="Tạm ẩn cảnh báo"
+            >
+              ✕ Đóng
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {watchlistAlerts.map((alt, idx) => (
+              <div
+                key={`${alt.symbol}-${alt.type}-${idx}`}
+                className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs ${
+                  alt.type === 'BUY'
+                    ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200'
+                    : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60 text-rose-900 dark:text-rose-200'
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-black text-sm">{alt.symbol}</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${
+                      alt.type === 'BUY' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                    }`}>
+                      {alt.type === 'BUY' ? '🛒 VÙNG MUA' : '💸 VÙNG BÁN'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] opacity-85 mt-0.5 truncate">{alt.message}</p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {alt.type === 'BUY' ? (
+                    <button
+                      type="button"
+                      onClick={() => onNavigateBuy && onNavigateBuy(alt.symbol, '', alt.currentPrice)}
+                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[11px] shadow-xs cursor-pointer transition-transform active:scale-95"
+                    >
+                      Mua ngay
+                    </button>
+                  ) : alt.isHolding ? (
+                    <button
+                      type="button"
+                      onClick={() => onNavigateSell && onNavigateSell(alt.symbol)}
+                      className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[11px] shadow-xs cursor-pointer transition-transform active:scale-95"
+                    >
+                      Chốt lời
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => onSwitchTab && onSwitchTab('watchlist')}
+                    className="text-[11px] text-gray-500 dark:text-gray-400 hover:underline px-1 cursor-pointer"
+                  >
+                    Xem
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* BẢNG DANH MỤC ĐANG NẮM GIỮ (HIỂN THỊ TRÊN CÙNG THEO YÊU CẦU) */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-gray-50/50 to-white dark:from-slate-900 dark:to-slate-900">
           <div className="flex items-center justify-between gap-2 flex-wrap w-full sm:w-auto">
             <div className="flex items-center gap-2">
@@ -530,16 +692,16 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
           <div className="flex items-center justify-between sm:justify-end gap-2 text-xs">
             {lastUpdated && (
-              <span className="text-gray-400 dark:text-slate-400 text-[11px]">Cập nhật: {lastUpdated}</span>
+              <span className="text-gray-400 dark:text-slate-400 text-[11px]">Vừa cập nhật: {lastUpdated}</span>
             )}
             <button
               onClick={() => loadMarketPrices(true)}
               disabled={loadingPrices}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-200 font-medium transition-colors disabled:opacity-50 cursor-pointer"
-              title="Làm mới giá thị trường từ sàn"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-200 font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-2xs text-xs"
+              title="Lấy thị giá khớp lệnh thời gian thực từ sàn HOSE/HNX (Bỏ qua bộ đệm 1h)"
             >
-              <span>{loadingPrices ? '⏳' : '🔄'}</span>
-              <span>{loadingPrices ? 'Đang tải...' : 'Cập nhật giá'}</span>
+              <span>{loadingPrices ? '⏳' : '⚡'}</span>
+              <span>{loadingPrices ? 'Đang tải giá...' : 'Cập nhật giá sàn'}</span>
             </button>
           </div>
         </div>
@@ -1165,35 +1327,35 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
       {/* Stat Cards - Hàng 2: Thống kê hiệu suất trading & Rủi ro danh mục */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
-        <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tỷ lệ thắng (Win Rate)</p>
-          <p className="text-2xl font-bold text-indigo-600 mt-1">{winRate}%</p>
-          <p className="text-xs text-gray-400 mt-1">{winCount} thắng / {lossCount} thua</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">Tỷ lệ thắng (Win Rate)</p>
+          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">{winRate}%</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{winCount} thắng / {lossCount} thua</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">TB lệnh lãi</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">+{fmtMoney(avgWin)}đ</p>
-          <p className="text-xs text-gray-400 mt-1">trên các lệnh chốt lời</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">TB lệnh lãi</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-emerald-400 mt-1">+{fmtMoney(avgWin)}đ</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">trên các lệnh chốt lời</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">TB lệnh lỗ</p>
-          <p className="text-2xl font-bold text-red-500 mt-1">-{fmtMoney(avgLoss)}đ</p>
-          <p className="text-xs text-gray-400 mt-1">trên các lệnh cắt lỗ</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">TB lệnh lỗ</p>
+          <p className="text-2xl font-bold text-red-500 dark:text-rose-400 mt-1">-{fmtMoney(avgLoss)}đ</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">trên các lệnh cắt lỗ</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Profit Factor</p>
-          <p className="text-2xl font-bold text-gray-800 mt-1">{profitFactor}</p>
-          <p className="text-xs text-gray-400 mt-1">tổng lãi / tổng lỗ</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">Profit Factor</p>
+          <p className="text-2xl font-bold text-gray-800 dark:text-slate-100 mt-1">{profitFactor}</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">tổng lãi / tổng lỗ</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Beta & Yield DM</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">Beta & Yield DM</p>
           <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-2xl font-bold text-indigo-700">
+            <span className="text-2xl font-bold text-indigo-700 dark:text-indigo-400">
               {portfolioBeta != null ? portfolioBeta : '—'}
             </span>
-            <span className="text-xs text-gray-400 font-medium">Beta</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500 font-medium">Beta</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
             {portfolioDividendYield != null ? `Cổ tức: +${portfolioDividendYield}%/năm` : 'Độ nhạy so với VN-Index'}
           </p>
         </div>
@@ -1202,12 +1364,12 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
       {/* Biểu Đồ Trực Quan - 3 Hàng Chuyên Sâu */}
       <div className="space-y-4">
         {/* Hàng 1: Phân Bổ Vốn Danh Mục (Toggle Theo Mã CP / Theo Nhóm Ngành) */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-700 text-sm flex items-center gap-1.5">
+            <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
               <span>🥧</span> Phân Bổ Vốn Danh Mục
             </h3>
-            <span className="text-xs text-gray-400">Theo giá trị nắm giữ</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Tỷ trọng vốn & thị giá</span>
           </div>
           <PortfolioChart
             portfolio={portfolio}
@@ -1217,23 +1379,23 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         </div>
 
         {/* Hàng 2: Lãi / Lỗ & Quỹ Đạo Vốn (Toggle Từng Tháng / Lũy Kế) */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-700 text-sm flex items-center gap-1.5">
+            <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
               <span>📊</span> Lãi / Lỗ & Quỹ Đạo Vốn
             </h3>
-            <span className="text-xs text-gray-400">Thực nhận sau phí</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Thực nhận sau phí</span>
           </div>
           <MonthlyPLChart sellOrders={sellOrders} dividends={dividends} />
         </div>
 
         {/* Hàng 3: Đóng Góp Hiệu Suất Từng Mã (Top Gainers vs Losers) */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-700 text-sm flex items-center gap-1.5">
+            <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
               <span>🎯</span> Đóng Góp Hiệu Suất Từng Mã (Top Gainers vs Losers)
             </h3>
-            <span className="text-xs text-gray-400">Xếp hạng lợi nhuận theo mã</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Xếp hạng lợi nhuận theo mã</span>
           </div>
           <StockContributionChart
             buyOrders={buyOrders}
@@ -1247,13 +1409,25 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
       {/* Lãi/Lỗ từng giao dịch bán gần nhất */}
       {sellOrders.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-700">💹 Giao Dịch Bán Gần Nhất</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
+              <span>💹</span> Giao Dịch Bán Gần Nhất
+            </h2>
+            {onSwitchTab && (
+              <button
+                type="button"
+                onClick={() => onSwitchTab('history')}
+                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <span>Xem tất cả ({sellOrders.length})</span>
+                <span>→</span>
+              </button>
+            )}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+              <thead className="bg-gray-50 dark:bg-slate-800/80 text-gray-500 dark:text-slate-400 text-xs uppercase">
                 <tr>
                   <th className="text-left px-6 py-3">Mã</th>
                   <th className="text-right px-6 py-3">SL</th>
@@ -1263,33 +1437,33 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   <th className="text-right px-6 py-3">%</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-slate-800/60">
                 {[...sellOrders].reverse().slice(0, 5).map((s) => {
                   const avgCost = s.totalCost / s.quantity;
                   return (
-                    <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={s.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-900/40">
                           {s.symbol}
                         </span>
                         {s.tags && s.tags.length > 0 && (
                           <div className="flex gap-1 mt-1">
                             {s.tags.slice(0, 2).map(t => (
-                              <span key={t} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.2 rounded">
+                              <span key={t} className="text-[10px] bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 px-1.5 py-0.2 rounded border border-gray-200 dark:border-slate-700">
                                 #{t}
                               </span>
                             ))}
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-right">{s.quantity.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right font-medium text-gray-800 dark:text-slate-200">{s.quantity.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-right text-gray-800 dark:text-slate-200">
                         <div>{fmtMoney(s.price)}đ</div>
-                        <div className="text-[11px] text-gray-400">({(s.price / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</div>
+                        <div className="text-[11px] text-gray-400 dark:text-slate-500">({(s.price / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</div>
                       </td>
-                      <td className="px-6 py-4 text-right text-gray-500">
-                        <div className="font-medium text-amber-800">{fmtMoney(avgCost)}đ</div>
-                        <div className="text-[11px] text-gray-400">({(avgCost / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</div>
+                      <td className="px-6 py-4 text-right">
+                        <div className="font-medium text-amber-800 dark:text-amber-400">{fmtMoney(avgCost)}đ</div>
+                        <div className="text-[11px] text-gray-400 dark:text-slate-500">({(avgCost / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</div>
                       </td>
                       <td className={`px-6 py-4 text-right font-semibold ${plColor(s.profitLoss)}`}>
                         {s.profitLoss >= 0 ? '+' : ''}{fmtMoney(s.profitLoss)}đ
@@ -1323,15 +1497,15 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
       {/* Modal Chỉnh Sửa Số Dư Tiền Mặt */}
       {isEditingCash && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
+              <h3 className="font-bold text-gray-800 dark:text-slate-100 text-base flex items-center gap-2">
                 <span>💵</span> Cập Nhật Số Dư Tiền Mặt
               </h3>
               <button
                 type="button"
                 onClick={() => setIsEditingCash(false)}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg text-lg cursor-pointer"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 p-1 rounded-lg text-lg cursor-pointer"
               >
                 ✕
               </button>
@@ -1339,7 +1513,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
             <form onSubmit={handleSaveCash} className="space-y-4 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
                   Nhập số dư tiền mặt hiện tại (VNĐ):
                 </label>
                 <div className="relative">
@@ -1350,13 +1524,13 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                     value={cashInput}
                     onChange={(e) => setCashInput(e.target.value)}
                     placeholder="VD: 50000000 (= 50.000.000đ)"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12"
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12"
                     autoFocus
                   />
-                  <span className="absolute right-3 top-2.5 text-xs text-gray-400 font-medium">VNĐ</span>
+                  <span className="absolute right-3 top-2.5 text-xs text-gray-400 dark:text-slate-500 font-medium">VNĐ</span>
                 </div>
                 {cashInput && !isNaN(Number(cashInput)) && (
-                  <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5">
                     💵 Quy đổi: {fmtMoney(Number(cashInput))} đồng
                   </p>
                 )}
@@ -1364,14 +1538,14 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
               {/* Phím bấm chọn nhanh */}
               <div>
-                <p className="text-[11px] text-gray-400 mb-1.5">Gợi ý mốc tiền nhanh:</p>
+                <p className="text-[11px] text-gray-400 dark:text-slate-500 mb-1.5">Gợi ý mốc tiền nhanh:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {[0, 10000000, 20000000, 50000000, 100000000, 200000000].map(amt => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => setCashInput(amt.toString())}
-                      className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer"
+                      className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer border border-transparent dark:border-slate-750"
                     >
                       {amt === 0 ? '0đ' : `${amt / 1000000} Triệu`}
                     </button>
@@ -1379,11 +1553,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-2 border-t border-gray-100">
+              <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsEditingCash(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs font-semibold cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
                 >
                   Hủy
                 </button>

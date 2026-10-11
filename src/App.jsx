@@ -418,13 +418,13 @@ export default function App({ hasGoogleClientId = false }) {
                 {theme === 'dark' ? '☀️' : '🌙'}
               </button>
 
-              {/* Nút Làm Mới (Reload) */}
+              {/* Nút Làm Mới Sổ Cái Database (Reload Local Ledger) */}
               <button
                 onClick={loadData}
                 disabled={loading}
                 className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 transition-colors cursor-pointer disabled:opacity-50"
-                title="Tải lại dữ liệu"
-                aria-label="Tải lại dữ liệu"
+                title="Tải lại sổ lệnh cá nhân từ Database (Lệnh mua/bán, Cổ tức, Tiền mặt)"
+                aria-label="Tải lại sổ lệnh cá nhân từ Database"
               >
                 <span className={`text-base ${loading ? 'animate-spin' : ''}`}>🔄</span>
               </button>

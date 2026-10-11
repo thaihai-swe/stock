@@ -300,9 +300,10 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
               onClick={handleTriggerSync}
               disabled={isSyncing}
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
+              title="Chạy Python trích xuất 50+ chỉ số cơ bản TradingView Scanner cho danh sách mã theo dõi (~5 giây)"
             >
               <span>{isSyncing ? '⏳' : '🔄'}</span>
-              <span>{isSyncing ? 'Đang đồng bộ nền...' : 'Đồng bộ ngay'}</span>
+              <span>{isSyncing ? 'Đang quét TradingView (~5s)...' : 'Đồng bộ EOD ngay (TradingView)'}</span>
             </button>
           </div>
         </div>

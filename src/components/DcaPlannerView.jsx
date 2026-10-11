@@ -40,11 +40,11 @@ export default function DcaPlannerView({
   }, [portfolio, selectedSymbol, initialStock]);
 
   // Tự động tải giá Live của mã được chọn
-  const loadPriceForSymbol = useCallback(async (sym) => {
+  const loadPriceForSymbol = useCallback(async (sym, force = false) => {
     if (!sym) return;
     setLoadingPrice(true);
     try {
-      const res = await fetchPrices([sym], false);
+      const res = await fetchPrices([sym], force);
       if (res?.prices) {
         setMarketPrices(prev => ({ ...prev, ...res.prices }));
       }
@@ -333,11 +333,12 @@ export default function DcaPlannerView({
 
               <button
                 type="button"
-                onClick={() => loadPriceForSymbol(selectedSymbol)}
-                className="text-gray-400 hover:text-indigo-600 transition-colors p-2 text-lg"
-                title="Làm mới giá thị trường"
+                onClick={() => loadPriceForSymbol(selectedSymbol, true)}
+                disabled={loadingPrice}
+                className="text-gray-400 hover:text-indigo-600 transition-colors p-2 text-base cursor-pointer disabled:opacity-50"
+                title={`Lấy thị giá khớp lệnh thời gian thực từ sàn cho mã ${selectedSymbol} (Bỏ qua bộ đệm 1h)`}
               >
-                🔄
+                {loadingPrice ? '⏳' : '⚡'}
               </button>
             </div>
           </div>

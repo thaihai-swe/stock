@@ -304,15 +304,16 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
 
           <button
             type="button"
-            onClick={handleTriggerSync}
-            disabled={syncing}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs ${syncing
-              ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed'
+            onClick={handleSyncSingleFinancials}
+            disabled={syncingSingle}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs ${syncingSingle
+              ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-400 cursor-not-allowed'
               : 'bg-indigo-600 hover:bg-indigo-700 text-white active:scale-95'
               }`}
+            title={`Kích hoạt Python tải lại BCTC 8 quý, 5 năm và định giá mới nhất cho mã ${selectedSymbol} (~3-5 giây)`}
           >
-            <span className={syncing ? 'animate-spin' : ''}>🔄</span>
-            {syncing ? 'Đang đồng bộ...' : 'Cập nhật định giá'}
+            <span className={syncingSingle ? 'animate-spin' : ''}>🔄</span>
+            {syncingSingle ? `Đang nạp ${selectedSymbol} (~3-5s)...` : `Cập nhật BCTC & Định Giá ${selectedSymbol}`}
           </button>
         </div>
       </div>
@@ -411,7 +412,7 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    {currentStock.industry ? `Ngành: ${currentStock.industry} • ` : ''}
+                    {currentStock.industry ? `Ngành: ${currentStock.industry}` : ''}
                   </p>
                 </div>
               </div>
@@ -435,8 +436,8 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                   type="button"
                   onClick={handleSyncSingleFinancials}
                   disabled={syncingSingle}
-                  className="p-2.5 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 text-xs transition cursor-pointer shadow-2xs"
-                  title={`Cập nhật lại dữ liệu mới nhất cho ${selectedSymbol}`}
+                  className="p-2.5 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 text-xs transition cursor-pointer shadow-2xs disabled:opacity-50"
+                  title={`Kích hoạt Python tải lại BCTC và định giá cho ${selectedSymbol} (~3-5s)`}
                 >
                   <span className={syncingSingle ? 'inline-block animate-spin' : ''}>🔄</span>
                 </button>
@@ -866,10 +867,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 onClick={handleSyncSingleFinancials}
                 disabled={syncingSingle}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors cursor-pointer disabled:opacity-50"
-                title={`Tải lại BCTC mới nhất cho ${selectedSymbol}`}
+                title={`Kích hoạt Python tải lại 122+ chỉ tiêu BCTC cho ${selectedSymbol} từ vnstock (~3-5s)`}
               >
                 <span className={syncingSingle ? 'inline-block animate-spin' : ''}>🔄</span>
-                <span>{syncingSingle ? `Đang nạp ${selectedSymbol}...` : `Tải lại BCTC ${selectedSymbol}`}</span>
+                <span>{syncingSingle ? `Đang nạp BCTC ${selectedSymbol}...` : `Tải lại BCTC ${selectedSymbol}`}</span>
               </button>
 
               <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700/60 p-1 rounded-xl">

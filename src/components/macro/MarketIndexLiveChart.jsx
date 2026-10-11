@@ -236,11 +236,11 @@ export default function MarketIndexLiveChart() {
             <button
               onClick={handleRefresh}
               disabled={refreshing || loading}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition cursor-pointer"
-              title="Làm mới dữ liệu"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition cursor-pointer shadow-2xs"
+              title="Lấy lại chuỗi nến thời gian thực của chỉ số từ sàn DNSE"
             >
-              <span className={refreshing ? 'animate-spin' : ''}>🔄</span>
-              <span className="hidden sm:inline">Làm mới</span>
+              <span className={refreshing ? 'animate-spin' : ''}>⚡</span>
+              <span className="hidden sm:inline">{refreshing ? 'Đang tải...' : 'Làm mới nến Live'}</span>
             </button>
           </div>
         </div>

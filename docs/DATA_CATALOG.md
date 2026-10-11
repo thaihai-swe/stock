@@ -2,6 +2,8 @@
 
 Tài liệu này lưu trữ toàn bộ đặc tả chi tiết từng nhóm dữ liệu, từng chỉ tiêu tài chính, nguồn trích xuất gốc, endpoint API, phương thức lấy và vị trí lưu trữ trong hệ thống **Stock Portfolio Manager & Enterprise Valuation Engine**. Đây là cẩm nang kỹ thuật phục vụ cho toàn bộ các chức năng hiện tại và các tính năng mở rộng tiếp theo.
 
+> ⚙️ **Xem đặc tả luồng kỹ thuật tải dữ liệu nền và điều phối API tại:** [`docs/BACKGROUND_DATA_PIPELINE.md`](file:///Users/thaihai-swe/Desktop/stock/docs/BACKGROUND_DATA_PIPELINE.md).
+
 ---
 
 ## 1. Tổng Quan Kiến Trúc & Quản Trị Dữ Liệu 5 Tầng (Data Governance & Storage Tiering)
@@ -36,6 +38,15 @@ python scripts/db_manager.py export --output data/backups/backup.json
 python scripts/db_manager.py import --input data/backups/backup.json
 ```
 
+
+### Quy Chuẩn 3 Cấp Độ Nút Làm Mới Trên Giao Diện (3-Tier UI Refresh Standard):
+Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đọc DB (0ms), lấy giá sàn (<0.5s) và cào Python (15-25s), toàn bộ giao diện tuân thủ 3 cấp độ:
+
+| Cấp Độ Nút | Biểu Tượng & Tên Nút Chuẩn | API Endpoint | Phạm Vi & Thao Tác Kỹ Thuật | Tầng Dữ Liệu Tác Động |
+| :--- | :--- | :--- | :--- | :--- |
+| **CẤP 1: Sổ Cái Nội Bộ** | 🔄 *(Header)*<br>`Tải lại sổ lệnh cá nhân từ Database` | `GET /api/data` | Đọc lại SQLite `stock.db` (lệnh mua/bán, cổ tức, ví tiền). Phản hồi ~50ms. | **Tầng 1 (ACID DB)** |
+| **CẤP 2: Thị Giá Live Sàn** | ⚡ **Cập nhật giá sàn** / **Làm mới nến Live** | `GET /api/prices?force=true`<br>`GET /api/valuation/dnse-ohlc` | Bỏ qua cache 1h, lấy giá khớp lệnh thời gian thực từ sàn HOSE/HNX (VPS/DNSE). Phản hồi ~300ms. | **Tầng 2 (Ephemeral Cache)** |
+| **CẤP 3: Python Pipeline** | 🔄 **Cập nhật BCTC & Định Giá [MÃ]** (3-5s)<br>🔄 **Đồng Bộ Vĩ Mô (Python)** (~20s)<br>🔄 **Đồng bộ EOD ngay** (~5s) | `POST /api/valuation/sync-single/:sym`<br>`POST /api/valuation/sync`<br>`POST /api/fundamentals/sync` | Kích hoạt Python crawler (TradingView, vnstock, BCTC 8Q&5Y, Yield TPCP, Vàng, Ngoại tệ). Có thông báo thời gian rõ ràng. | **Tầng 3, 4, 5 (JSON Repositories)** |
 
 ---
 

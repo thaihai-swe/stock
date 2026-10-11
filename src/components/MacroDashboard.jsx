@@ -148,9 +148,10 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
             onClick={handleSync}
             disabled={syncing}
             className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold text-white transition border border-white/20 shadow-xs cursor-pointer disabled:opacity-50"
+            title="Kích hoạt Python thu thập lợi suất TPCP, tỷ giá, vàng SJC/PNJ, P/E VN-Index và 10 ngành GICS (~15-25 giây)"
           >
             <span className={syncing ? 'animate-spin' : ''}>🔄</span>
-            <span>{syncing ? 'Đang đồng bộ...' : 'Đồng Bộ Dữ Liệu'}</span>
+            <span>{syncing ? 'Đang chạy Python (~20s)...' : 'Đồng Bộ Vĩ Mô (Python)'}</span>
           </button>
         </div>
       </div>
