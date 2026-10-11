@@ -11,7 +11,10 @@ import {
 import MonthlyPLChart from './charts/MonthlyPLChart.jsx';
 import PortfolioChart from './charts/PortfolioChart.jsx';
 import StockContributionChart from './charts/StockContributionChart.jsx';
+import WaterfallReturnChart from './charts/WaterfallReturnChart.jsx';
+import OpportunityCostCard from './OpportunityCostCard.jsx';
 import StockDetailModal from './StockDetailModal.jsx';
+import { computeRiskAdjustedRatios } from '../utils/stockAnalytics.js';
 
 function StatCard({ label, value, sub, highlight }) {
   return (
@@ -239,6 +242,18 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
     return { portfolioBeta: beta, portfolioDividendYield: yieldPct };
   }, [portfolio, pricesData, totalMarketValue, fundamentalsMap]);
+
+  // Bộ Chỉ Số Sharpe & Sortino Đo Lường Tỷ Suất Sinh Lời Vượt Trội / Rủi Ro
+  const riskRatios = useMemo(() => {
+    return computeRiskAdjustedRatios(
+      buyOrders,
+      sellOrders,
+      portfolio,
+      dividends,
+      pricesData?.prices || {},
+      fundamentalsMap
+    );
+  }, [buyOrders, sellOrders, portfolio, dividends, pricesData, fundamentalsMap]);
 
   // 2. Thống kê hiệu suất (Performance metrics)
   const wins = sellOrders.filter(s => s.profitLoss > 0);
@@ -564,6 +579,12 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           sub={`${totalHolding.toLocaleString()} đang giữ`}
         />
       </div>
+
+      {/* SO KÈO CHI PHÍ CƠ HỘI (CHỨNG KHOÁN VS TIẾT KIỆM NGÂN HÀNG) */}
+      <OpportunityCostCard
+        buyOrders={buyOrders}
+        totalCumulativePL={totalCumulativePL}
+      />
 
       {/* BẢNG CẢNH BÁO WATCHLIST (KHI CÓ CỔ PHIẾU ĐẠT MỤC TIÊU MUA / BÁN) */}
       {watchlistAlerts.length > 0 && !dismissAlerts && (
@@ -1326,7 +1347,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
       </div>
 
       {/* Stat Cards - Hàng 2: Thống kê hiệu suất trading & Rủi ro danh mục */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3.5">
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
           <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">Tỷ lệ thắng (Win Rate)</p>
           <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">{winRate}%</p>
@@ -1357,6 +1378,21 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           </div>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
             {portfolioDividendYield != null ? `Cổ tức: +${portfolioDividendYield}%/năm` : 'Độ nhạy so với VN-Index'}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">Sharpe & Sortino</p>
+          <div className="flex items-baseline gap-1.5 mt-1">
+            <span className="text-2xl font-bold text-indigo-700 dark:text-indigo-400" title="Chỉ số Sharpe: Tỷ suất sinh lời vượt trội trên tổng biến động">
+              {riskRatios.sharpe}
+            </span>
+            <span className="text-xs text-gray-400 dark:text-slate-500 font-medium">/</span>
+            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400" title="Chỉ số Sortino: Tỷ suất sinh lời vượt trội trên biến động giảm (downside risk)">
+              {riskRatios.sortino}
+            </span>
+          </div>
+          <p className={`text-xs font-semibold mt-1 truncate ${riskRatios.ratingColor}`}>
+            {riskRatios.ratingText}
           </p>
         </div>
       </div>
@@ -1403,6 +1439,23 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
             dividends={dividends}
             marketPrices={pricesData?.prices || {}}
             onSelectSymbol={setSelectedSymbolModal}
+          />
+        </div>
+
+        {/* Hàng 4: Biểu Đồ Thác Nước Hiệu Suất (Waterfall Return Bridge) */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
+              <span>🌊</span> Biểu Đồ Thác Nước Hiệu Suất (Waterfall Return Bridge)
+            </h3>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Dòng chảy vốn & lãi/lỗ</span>
+          </div>
+          <WaterfallReturnChart
+            buyOrders={buyOrders}
+            sellOrders={sellOrders}
+            portfolio={portfolio}
+            dividends={dividends}
+            marketPrices={pricesData?.prices || {}}
           />
         </div>
       </div>
