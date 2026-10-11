@@ -70,12 +70,14 @@ class VietstockValuationFetcher:
         token = token_match.group(1) if token_match else ""
         return session, token
 
-    def fetch_vnindex_history(self, duration: str = "ALL", force_refresh: bool = False) -> pd.DataFrame:
+    def fetch_index_history(self, stock_code: str = "VNINDEX", duration: str = "ALL", force_refresh: bool = False) -> pd.DataFrame:
         """
-        Lấy chuỗi dữ liệu lịch sử P/E và P/B của VN-Index từ Vietstock.
+        Lấy chuỗi dữ liệu lịch sử P/E và P/B của bất kỳ chỉ số nào từ Vietstock.
+        Hỗ trợ: VNINDEX, VN30, HNXINDEX, HNX30, UPCOMINDEX...
         Trả về DataFrame với các cột: [trading_date, pe, pb].
         """
-        cache_path = self.cache_dir / f"vnindex_valuation_{duration}.json"
+        code = stock_code.strip().upper()
+        cache_path = self.cache_dir / f"valuation_{code}_{duration}.json"
 
         # 1. Đọc từ cache nếu chưa quá hạn TTL
         if not force_refresh and cache_path.exists():
@@ -87,19 +89,19 @@ class VietstockValuationFetcher:
                     if not df.empty:
                         df["trading_date"] = pd.to_datetime(df["trading_date"])
                         df = df.sort_values("trading_date").reset_index(drop=True)
-                        print(f"  [Vietstock] Nạp thành công {len(df)} bản ghi VN-Index từ cache cục bộ.")
+                        print(f"  [Vietstock] Nạp thành công {len(df)} bản ghi {code} từ cache cục bộ.")
                         return df
             except Exception as e:
-                print(f"  ⚠️ Lỗi đọc cache Vietstock: {e}")
+                print(f"  ⚠️ Lỗi đọc cache Vietstock cho {code}: {e}")
 
         # 2. Gọi trực tiếp API Vietstock
         try:
-            print("  🌐 Đang kết nối Vietstock API lấy dữ liệu định giá VN-Index...")
+            print(f"  🌐 Đang kết nối Vietstock API lấy dữ liệu định giá {code} ({duration})...")
             session, token = self._get_session()
             r = session.post(
                 CHART_ENDPOINT,
                 data={
-                    "stockCode": "VNINDEX",
+                    "stockCode": code,
                     "duration": duration,
                     "__RequestVerificationToken": token,
                 },
@@ -126,7 +128,7 @@ class VietstockValuationFetcher:
 
             df = pd.DataFrame(rows)
             if df.empty:
-                print("  ⚠️ Vietstock trả về danh sách rỗng.")
+                print(f"  ⚠️ Vietstock trả về danh sách rỗng cho {code}.")
                 return self._fallback_from_cache(cache_path)
 
             df = (
@@ -145,15 +147,33 @@ class VietstockValuationFetcher:
                         "pb": None if pd.isna(row.get("pb")) else float(row["pb"]),
                     })
                 cache_path.write_text(json.dumps(_clean_nan(records), ensure_ascii=False, indent=2), encoding="utf-8")
-                print(f"  ✅ Đã lưu {len(df)} bản ghi VN-Index vào {cache_path.name}")
+                print(f"  ✅ Đã lưu {len(df)} bản ghi {code} vào {cache_path.name}")
             except Exception as e:
                 print(f"  ⚠️ Không thể ghi cache Vietstock: {e}")
 
             return df
 
         except Exception as e:
-            print(f"  ⚠️ Kết nối Vietstock thất bại: {e}")
+            print(f"  ⚠️ Kết nối Vietstock thất bại cho {code}: {e}")
             return self._fallback_from_cache(cache_path)
+
+    def fetch_vnindex_history(self, duration: str = "ALL", force_refresh: bool = False) -> pd.DataFrame:
+        """Backward-compatible helper cho VN-Index."""
+        return self.fetch_index_history("VNINDEX", duration=duration, force_refresh=force_refresh)
+
+    def fetch_vn30_history(self, duration: str = "ALL", force_refresh: bool = False) -> pd.DataFrame:
+        """Helper lấy lịch sử định giá VN30."""
+        return self.fetch_index_history("VN30", duration=duration, force_refresh=force_refresh)
+
+    def fetch_all_key_indices(self, duration: str = "ALL") -> Dict[str, pd.DataFrame]:
+        """Lấy tất cả các chỉ số chính: VNINDEX, VN30, HNXINDEX, HNX30, UPCOMINDEX."""
+        codes = ["VNINDEX", "VN30", "HNXINDEX", "HNX30", "UPCOMINDEX"]
+        result = {}
+        for code in codes:
+            df = self.fetch_index_history(code, duration=duration)
+            if not df.empty:
+                result[code] = df
+        return result
 
     def _fallback_from_cache(self, cache_path: Path) -> pd.DataFrame:
         """Fallback về cache cũ nếu mạng gặp lỗi."""
@@ -171,7 +191,12 @@ class VietstockValuationFetcher:
 
 if __name__ == "__main__":
     fetcher = VietstockValuationFetcher()
-    df = fetcher.fetch_vnindex_history()
-    print("Tổng số dòng:", len(df))
-    if not df.empty:
-        print("Dòng mới nhất:", df.iloc[-1].to_dict())
+    df_vn = fetcher.fetch_vnindex_history()
+    print("VN-Index Tổng số dòng:", len(df_vn))
+    if not df_vn.empty:
+        print("Dòng mới nhất VN-Index:", df_vn.iloc[-1].to_dict())
+
+    df_vn30 = fetcher.fetch_vn30_history()
+    print("VN30 Tổng số dòng:", len(df_vn30))
+    if not df_vn30.empty:
+        print("Dòng mới nhất VN30:", df_vn30.iloc[-1].to_dict())

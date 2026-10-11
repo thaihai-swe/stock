@@ -2,6 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { fetchValuationMacro, fetchMacroIndicators, triggerValuationSync } from '../utils/api.js';
 import MarketIndexLiveChart from './macro/MarketIndexLiveChart.jsx';
 import MarketValuationHistoryChart from './macro/MarketValuationHistoryChart.jsx';
+import StyleValuationComparison from './macro/StyleValuationComparison.jsx';
+import ExecutiveSummaryCard from './macro/ExecutiveSummaryCard.jsx';
+import ScenarioAllocationMatrix from './macro/ScenarioAllocationMatrix.jsx';
+import SectorValuationHeatmap from './macro/SectorValuationHeatmap.jsx';
 
 export default function MacroDashboard({ refreshKey, onSwitchTab }) {
   const [macroData, setMacroData] = useState(null);
@@ -512,7 +516,14 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
           {/* 3. Lịch Sử Định Giá Thị Trường Đa Chu Kỳ (Google Sheets Simply Wall St) */}
           <MarketValuationHistoryChart />
 
-          {/* 3.1. Phân Tích Đường Cong Lợi Suất & Thị Trường Nợ (Yield Curve & Debt Market Stress) */}
+          {/* 3.1. So Sánh Định Giá & Dòng Tiền 4 Phân Khúc (VN-Index, VN30, Diamond, Midcap) */}
+          <StyleValuationComparison
+            styleIndices={macroData?.styleIndices}
+            vnindexPE={market.currentPE || peStats?.current || 10.72}
+            vnindexPB={market.currentPB || pbStats?.current || 1.8}
+          />
+
+          {/* 3.2. Phân Tích Đường Cong Lợi Suất & Thị Trường Nợ (Yield Curve & Debt Market Stress) */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
               <div>
@@ -650,6 +661,9 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
       {/* ── 5. PHÂN HỆ 2: CHU KỲ 5 PHA & RADAR DẪN DẮT ── */}
       {activeTab === 'regime' && (
         <div className="space-y-6">
+          {/* Báo Cáo Điều Hành Trọng Yếu (Executive Summary: Key Risks, Catalysts & Takeaways) */}
+          <ExecutiveSummaryCard executiveSummary={macroData?.executiveSummary} />
+
           {/* Cảnh báo Tail-Risks Kích Hoạt */}
           {hasActiveTailRisk && tailRisks?.length > 0 && (
             <div className="space-y-3">
@@ -1219,6 +1233,13 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
       {/* ── 6. PHÂN HỆ 3: BẢN ĐỒ XOAY VÒNG 11 NHÓM NGÀNH HOSE ── */}
       {activeTab === 'sectors' && (
         <div className="space-y-6">
+          {/* 1. Bản Đồ Nhiệt 10 Ngành (GICS Vietnam) & Ma Trận Thiên Thời Hội Tụ (Dual Sweet Spot) */}
+          <SectorValuationHeatmap
+            dualMatrix={macroData?.dualMatrix}
+            sectorValuations={macroData?.sectorValuations}
+            vnindexPE={market.currentPE || peStats?.current || 10.72}
+          />
+
           <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
               <div>
@@ -1336,6 +1357,12 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
       {/* ── 7. PHÂN HỆ 4: PHÂN BỔ 4 TÀI SẢN & VÀNG SJC ── */}
       {activeTab === 'allocation' && (
         <div className="space-y-6">
+          {/* Ma Trận Phân Bổ 4 Lớp Tài Sản Đa Kịch Bản & Khẩu Vị Rủi Ro (Base/Bull/Bear Matrix) */}
+          <ScenarioAllocationMatrix
+            scenarioAllocation={macroData?.scenarioAllocation}
+            currentBucket={macroData?.scenarioAllocation?.currentBucket || assetAlloc.riskBucket || regime.bucket || 'B2'}
+          />
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Box 1: Phân bổ 4 Lớp Tài Sản Động */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-5">

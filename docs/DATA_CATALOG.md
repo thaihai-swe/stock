@@ -306,12 +306,83 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
       * `signalClarity`: Điểm độ rõ nét của các tín hiệu định hướng.
 15. **Phân Rã 6 Động Lực Vĩ Mô Cho 11 Nhóm Ngành Niêm Yết (`decomposition`)**:
     * Trong mỗi đối tượng ngành của `sectorRotation`, trường `decomposition` bóc tách chi tiết đóng góp điểm ròng từ:
-      * `interbank`: Lãi suất liên ngân hàng qua đêm.
-      * `sbvRate`: Lãi suất điều hành tái cấp vốn SBV.
-      * `cpi`: Lạm phát CPI theo năm.
-      * `usdVnd`: Tỷ giá thị trường liên ngân hàng USD/VND.
-      * `oil`: Giá dầu thô Brent thế giới.
-      * `pmi`: Chỉ số Nhà quản trị mua hàng PMI sản xuất.
+          * `interbank`: Lãi suất liên ngân hàng qua đêm.
+          * `sbvRate`: Lãi suất điều hành tái cấp vốn SBV.
+          * `cpi`: Lạm phát CPI theo năm.
+          * `usdVnd`: Tỷ giá thị trường liên ngân hàng USD/VND.
+          * `oil`: Giá dầu thô Brent thế giới.
+          * `pmi`: Chỉ số Nhà quản trị mua hàng PMI sản xuất.
+    16. **Chỉ Số Định Giá Phân Khúc & Phong Cách Đầu Tư (`styleIndices` & `vn30Valuation`)**:
+        * *Nguồn trích xuất*: Endpoint định giá lịch sử Vietstock (`Valuation_GetRatiosMarketIndexForChart` cho `VNINDEX`, `VN30`), dữ liệu quỹ ETF DCVFM / Dragon Capital (`FUEVFVND`, `FUEDCMID`) và động cơ tính toán định lượng `scripts/lib/macro_regime.py`.
+        * *Phân khúc theo dõi*:
+          * `VNINDEX`: Toàn thị trường HOSE (Broad Market, Beta 1.0).
+          * `VN30`: Nhóm 30 cổ phiếu vốn hóa lớn nhất (Large-Cap Core, Beta 0.95), có chuỗi lịch sử P/E và P/B 17 năm độc lập từ Vietstock.
+          * `VNDIAMOND`: Chỉ số các cổ phiếu kim cương hết room ngoại (Quality / Foreign Room, Beta 1.12), proxy qua ETF `FUEVFVND`.
+          * `VNMIDCAP`: Chỉ số nhóm cổ phiếu vốn hóa trung bình (Growth / High Beta, Beta 1.28), proxy qua ETF `FUEDCMID`.
+        * *Trường dữ liệu chi tiết*:
+          * `code`, `name`, `etfProxy`: Mã định danh, tên phân khúc, mã chứng chỉ quỹ ETF đại diện.
+          * `pe`, `pb`: P/E và P/B hiện tại của từng phân khúc.
+          * `grahamIndex`: Tích số Benjamin Graham ($P/E \times P/B \le 22.5$).
+          * `roeProxy`: Tỷ suất sinh lời vốn chủ sở hữu ngụ ý ($\frac{P/B}{P/E} \times 100\%$).
+          * `beta`: Hệ số biến động Beta tương quan thị trường.
+          * `yieldDiv`: Tỷ suất cổ tức bình quân phân khúc (%).
+          * `style`: Phong cách đầu tư đặc trưng (*Toàn thị trường*, *Large-Cap Core*, *Chất lượng cao & Kín room*, *Tăng trưởng & Beta cao*).
+          * `character`: Đặc tính vận động dòng vốn.
+          * `verdict`: Nhận định định lượng & khuyến nghị.
+        * *Định giá chuyên sâu VN30 (`vn30Valuation`)*: Mô hình phân tích thống kê 4 cửa sổ thời gian (5Y, 10Y, 2007, All-time), dải phân vị, z-score và composite signal tương tự VN-Index.
+    17. **Báo Cáo Điều Hành Trọng Yếu (`executiveSummary`)**:
+        * *Nguồn tham chiếu & chuẩn hóa*: Lấy cảm hứng từ cấu trúc phân tích điều hành chuyên nghiệp trong `ref-vn-macro-markets`.
+        * *Trường dữ liệu*:
+          * `keyRisks`: Danh sách 3 rủi ro cốt lõi của chu kỳ kinh tế hiện tại (`risk`, `level`, `mitigation`).
+          * `catalysts`: Danh sách 3 động lực tăng trưởng thúc đẩy thị trường (`driver`, `timeline`, `impact`).
+          * `keyTakeaways`: Danh sách 3 điểm nhấn điều hành then chốt, trong đó có `⭐ Insight Tổng Hợp` kết hợp định giá, thanh khoản và tâm lý vĩ mô.
+    18. **Ma Trận Phân Bổ Đa Kịch Bản & Khẩu Vị Rủi Ro (`scenarioAllocation`)**:
+        * *Nguyên lý*: Mở rộng mô hình phân bổ 4 tài sản truyền thống thành ma trận 4×3 tương thích với 3 kịch bản thị trường (Cơ sở, Tích cực, Thận trọng) kết hợp tùy biến theo Khẩu vị rủi ro và Khung thời gian đầu tư của nhà đầu tư.
+        * *Trường dữ liệu*:
+          * `base`, `bull`, `bear`: Tỷ trọng phân bổ tài sản cơ sở (Cổ phiếu, Trái phiếu, Tiền mặt, Vàng) theo từng kịch bản.
+          * `profiles`: Ma trận điều chỉnh theo khẩu vị rủi ro:
+            * `conservative`: Thận trọng (giảm tỷ trọng CP, tăng tiền/trái phiếu).
+            * `balanced`: Cân bằng (giữ nguyên tỷ trọng chu kỳ).
+            * `aggressive`: Tăng trưởng / Chấp nhận rủi ro (tăng tỷ trọng CP).
+          * `horizons`: Ma trận điều chỉnh theo thời gian nắm giữ:
+            * `short`: Ngắn hạn (<1 năm).
+            * `medium`: Trung hạn (1-5 năm).
+            * `long`: Dài hạn (>5 năm).
+          * `currentBucket`: Risk Bucket vĩ mô hiện tại.
+    19. **DNSE Multi-Index Intraday & OHLC Gateway**:
+        * *Endpoint Backend*: `GET /api/valuation/dnse-ohlc?symbol=<CODE>&resolution=<1|D>`
+        * *Nguồn cung cấp*: DNSE Charting API (`services.entrade.com.vn/chart-api/v2/ohlcs`).
+        * *Khả năng chuyển đổi động*:
+          * Chỉ số chuẩn: `VNINDEX`, `VN30`, `VN100`, `HNX`, `UPCOM`.
+          * ETF / Phân khúc: Chuyển đổi mã ảo `VNDIAMOND` $\to$ mã ETF `FUEVFVND`, và `VNMIDCAP` $\to$ mã ETF `FUEDCMID` để nạp dữ liệu nến intraday và lịch sử chuẩn xác.
+    20. **Dữ Liệu Định Giá 10 Ngành Thực Tế & Ma Trận Thiên Thời Hội Tụ (`sectorValuations` & `dualMatrix`)**:
+        * *Nguồn trích xuất chính thức*: Cổng dữ liệu phân ngành chuẩn hóa quốc tế GICS Vietnam (`https://simplize.vn/co-phieu/nganh`) qua module độc lập `SectorValuationFetcher` (`scripts/fetchers/sector_valuation_fetcher.py`).
+        * *Quy mô bao phủ*: Hơn 2.000 cổ phiếu trên cả 3 sàn (HOSE, HNX, UPCoM), tuyệt đối không lấy mẫu hay ngoại suy từ vài cổ phiếu lẻ.
+        * *10 Nhóm ngành chuẩn GICS*:
+          1. `VNFIN` (Tài chính - Ngân hàng, Chứng khoán, Bảo hiểm): 87 mã, Vốn hóa 3,17 triệu tỷ VNĐ.
+          2. `VNREAL` (Bất động sản & KCN): 129 mã, Vốn hóa 2,75 triệu tỷ VNĐ.
+          3. `VNIND` (Công nghiệp & Xây dựng): 457 mã, Vốn hóa 850.422 tỷ VNĐ.
+          4. `VNCONS` (Tiêu dùng thiết yếu): 186 mã, Vốn hóa 735.421 tỷ VNĐ.
+          5. `VNDISCR` (Tiêu dùng không thiết yếu & Bán lẻ): 196 mã, Vốn hóa 701.808 tỷ VNĐ.
+          6. `VNENE` (Năng lượng & Dầu khí): 82 mã, Vốn hóa 501.213 tỷ VNĐ.
+          7. `VNMAT` (Nguyên vật liệu & Thép): 259 mã, Vốn hóa 493.107 tỷ VNĐ.
+          8. `VNIT` (Công nghệ thông tin): 36 mã, Vốn hóa 417.174 tỷ VNĐ.
+          9. `VNUT` (Tiện ích Điện, Nước, Khí): 107 mã, Vốn hóa 253.328 tỷ VNĐ.
+          10. `VNHEAL` (Y tế & Dược phẩm): 57 mã, Vốn hóa 61.022 tỷ VNĐ.
+        * *Trường dữ liệu định lượng (`sectorValuations`)*:
+          * `pe`, `pb`: P/E và P/B thực tế toàn ngành.
+          * `divYield`: Tỷ suất cổ tức bình quân ngành (%).
+          * `marketCapBn`: Tổng vốn hóa thị trường của ngành (Tỷ VNĐ).
+          * `totalTickers`: Tổng số lượng mã cổ phiếu niêm yết trong ngành.
+          * `netIncomeLtmGrowth`, `netIncomeEstGrowth`: Tốc độ tăng trưởng LNST trailing và dự phóng (%).
+          * `pricePctChgYtd`, `pricePctChg1y`, `pricePctChg3y`, `pricePctChg5y`: Hiệu suất giá ngành theo các chu kỳ.
+          * `valuationBand`, `valuationBadge`: Dải định giá ngành so với tương quan VN-Index (*Rất rẻ*, *Rẻ*, *Hợp lý*, *Hơi đắt*, *Đắt đỏ*).
+        * *Ma Trận Thiên Thời Hội Tụ 4 Góc Phần Tư (`dualMatrix`)*:
+          * Kết hợp Trục Hoành (P/E ngành so với VN-Index) và Trục Tung (Net Impact Score từ 6 biến số vĩ mô).
+          * `sweetSpot` (💎 Vùng Vàng Gom Mua): Vĩ mô ủng hộ ($Net > 0$) $\times$ Định giá rẻ ($P/E \le 11.5x$).
+          * `valueTrap` (⚠️ Vùng Bẫy Giá Rẻ): Định giá rẻ nhưng vĩ mô bất lợi ($Net < 0$).
+          * `momentum` (🔥 Vùng Quá Nhiệt): Vĩ mô mạnh mẽ nhưng định giá đắt ($P/E \ge 13.5x$).
+          * `defense` (🛡️ Vùng Phòng Thủ / Tránh Né): Vĩ mô bất lợi và định giá không hấp dẫn.
 
 ---
 
@@ -408,7 +479,10 @@ scripts/
 | **Vĩ Mô Tổng Quan, TPCP 10Y HNX, SBV & Vàng SJC/PNJ** | `scripts/fetchers/macro_fetcher.py` (`MacroFetcher`) | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Kho 95 Chỉ Số Kinh Tế Vĩ Mô 10 Nhóm** | `scripts/fetchers/tradingeconomics_fetcher.py` (`TradingEconomicsFetcher`) | `scripts/fetch_macro_valuation.py` | `data/macro_indicators.json` |
 | **Lịch Sử Định Giá 10 Năm (P/E, P/S, Vốn Hóa Google Sheets)** | `scripts/fetchers/market_valuation_history_fetcher.py` | `scripts/fetch_macro_valuation.py` | `data/market_valuation_history.json` |
-| **Nến Intraday 1 Phút & Nến Ngày 11 Chỉ Số (DNSE Live API)** | `DNSE Chart API` (`api.dnse.com.vn/chart-api/v2/ohlcs`) | Express Proxy (`/api/valuation/dnse-ohlc`) | In-memory Cache & Live React Chart |
+| **Nến Intraday 1 Phút & Nến Ngày Đa Chỉ Số (DNSE Live API: VNINDEX, VN30, VNDIAMOND, VNMIDCAP...)** | `DNSE Chart API` (`services.entrade.com.vn/chart-api/v2/ohlcs`) | Express Proxy (`/api/valuation/dnse-ohlc`) | In-memory Cache & Live React Chart |
+| **Định Giá Phân Khúc (VN30, Diamond, Midcap) & 4x3 Ma Trận** | `scripts/lib/macro_regime.py` & Vietstock (`VN30`) | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
+| **Định Giá 10 Ngành Thực Tế & Ma Trận Thiên Thời (GICS)** | `scripts/fetchers/sector_valuation_fetcher.py` (`SectorValuationFetcher`) | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` & `data/sector_valuation_cache.json` |
+| **Báo Cáo Điều Hành Trọng Yếu (Executive Summary)** | `scripts/lib/macro_regime.py` | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Mô Hình 5 Pha Chu Kỳ, 11 Nhóm Ngành & Vàng Arbitrage** | `scripts/lib/macro_regime.py` | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Điều Phối Toàn Bộ Pipeline Tự Động** | Toàn bộ các Fetchers trên | `scripts/run_full_pipeline.py` | Toàn bộ thư mục `data/` |
 | **Sổ Lệnh Giao Dịch & Quản Trị Danh Mục** | Người dùng & Khớp lệnh FIFO | Server routes (`server/routes/`) | `data/stock.db` / Turso Cloud |

@@ -27,12 +27,16 @@ from lib.macro_regime import (
     compute_sector_rotation,
     evaluate_leading_signals,
     calculate_4asset_allocation,
+    calculate_scenario_allocation_matrix,
+    generate_executive_summary,
+    calculate_style_indices,
     recommend_gold,
     analyze_macro_clock,
     analyze_yield_curve_stress,
     detect_scenarios_and_tail_risks,
     compute_lead_lag_divergence,
     compute_macro_confidence,
+    calculate_dual_sweet_spot_matrix,
 )
 
 try:
@@ -40,12 +44,14 @@ try:
     from fetchers.tradingeconomics_fetcher import TradingEconomicsFetcher
     from fetchers.market_valuation_history_fetcher import MarketValuationHistoryFetcher
     from fetchers.vietstock_valuation_fetcher import VietstockValuationFetcher
+    from fetchers.sector_valuation_fetcher import SectorValuationFetcher
     from lib.market_valuation_analyzer import analyze_market_valuation
 except ImportError:
     from scripts.fetchers.macro_fetcher import MacroFetcher
     from scripts.fetchers.tradingeconomics_fetcher import TradingEconomicsFetcher
     from scripts.fetchers.market_valuation_history_fetcher import MarketValuationHistoryFetcher
     from scripts.fetchers.vietstock_valuation_fetcher import VietstockValuationFetcher
+    from scripts.fetchers.sector_valuation_fetcher import SectorValuationFetcher
     from scripts.lib.market_valuation_analyzer import analyze_market_valuation
 
 DATA_DIR = ROOT_DIR / "data"
@@ -116,15 +122,20 @@ def fetch_and_save_macro():
         updated_at=pnj_update_date
     )
 
-    # 4. Định giá VN-Index: Thu thập dữ liệu lịch sử chuẩn xác từ Vietstock (316+ tháng)
+    # 4. Định giá VN-Index & VN30: Thu thập dữ liệu lịch sử chuẩn xác từ Vietstock (316+ tháng)
     vnindex_analysis = None
+    vn30_analysis = None
     try:
         vs_fetcher = VietstockValuationFetcher(cache_dir=str(DATA_DIR / "vnindex_valuation_cache"))
         vn_df = vs_fetcher.fetch_vnindex_history()
         if not vn_df.empty:
             vnindex_analysis = analyze_market_valuation(vn_df)
+
+        vn30_df = vs_fetcher.fetch_vn30_history()
+        if not vn30_df.empty:
+            vn30_analysis = analyze_market_valuation(vn30_df)
     except Exception as e:
-        print(f"⚠️ Không thể trích xuất định giá VN-Index từ Vietstock: {e}")
+        print(f"⚠️ Không thể trích xuất định giá VN-Index / VN30 từ Vietstock: {e}")
 
     # Xác định giá trị hiện tại và thống kê mặc định (ưu tiên cửa sổ 10 Năm)
     if vnindex_analysis and "current" in vnindex_analysis and vnindex_analysis["current"].get("pe") is not None:
@@ -142,6 +153,9 @@ def fetch_and_save_macro():
         std_pe = 2.1
         zscore_val = -0.5
         pctl_val = 32.0
+
+    vn30_pe = vn30_analysis["current"]["pe"] if (vn30_analysis and "current" in vn30_analysis and vn30_analysis["current"].get("pe")) else 11.08
+    vn30_pb = vn30_analysis["current"]["pb"] if (vn30_analysis and "current" in vn30_analysis and vn30_analysis["current"].get("pb")) else 2.19
 
     advisor_result = compute_pe_bands_and_zscore(current_pe, mean_pe=mean_pe, std_pe=std_pe)
 
@@ -177,7 +191,7 @@ def fetch_and_save_macro():
         market_index_data["extremeAlertText"] = vnindex_analysis.get("extremeAlertText")
         market_index_data["windows"] = vnindex_analysis.get("windows", {})
 
-    # 4. Phân tích nâng cao vĩ mô theo chuẩn ref-vn-macro-weekly:
+    # 4. Phân tích nâng cao vĩ mô theo chuẩn ref-vn-macro-weekly & ref-vn-macro-markets:
     # Macro Clock 4-Quadrant, Yield Curve Stress, Lead-Lag Divergence, Confidence & Scenarios
     macro_clock_data = analyze_macro_clock(macro_combined)
     yield_curve_data = analyze_yield_curve_stress(macro_combined)
@@ -190,13 +204,55 @@ def fetch_and_save_macro():
         current_vnindex=1285.0
     )
 
+    # 4b. Tạo Ma trận phân bổ 4x3 đa kịch bản (Base / Bull / Bear)
+    scenario_alloc_matrix = calculate_scenario_allocation_matrix(risk_info["riskBucket"], risk_info["layers"])
+
+    # 4c. Tạo Khối điều hành chiến lược Executive Summary (Key Risks, Catalysts, Key Takeaways)
+    exec_summary = generate_executive_summary(
+        macro=macro_combined,
+        risk_info=risk_info,
+        regime=regime_phase,
+        scenarios=scenario_tail_risks["scenarios"],
+        active_tail_risks=scenario_tail_risks["tailRisks"],
+        market_pe=current_pe
+    )
+
+    # 4d. Tạo Danh mục phân khúc phong cách đầu tư (VN-Index, VN30, VN Diamond, VN Midcap, VN100)
+    style_indices = calculate_style_indices(
+        macro=macro_combined,
+        vnindex_pe=current_pe,
+        vnindex_pb=current_pb,
+        vn30_pe=vn30_pe,
+        vn30_pb=vn30_pb
+    )
+
+    # 4e. Cào Dữ Liệu Định Giá 10 Nhóm Ngành Thực Tế & Tính Ma Trận Thiên Thời Hội Tụ (Dual Sweet Spot Matrix)
+    sector_valuations = []
+    dual_matrix = {}
+    try:
+        sector_fetcher = SectorValuationFetcher()
+        sector_valuations = sector_fetcher.fetch_and_cache_sectors(vnindex_pe=current_pe)
+        dual_matrix = calculate_dual_sweet_spot_matrix(
+            sector_valuations=sector_valuations,
+            sector_rotations=sector_rotation,
+            vnindex_pe=current_pe
+        )
+    except Exception as e:
+        print(f"⚠️ Lỗi fetch dữ liệu định giá ngành: {e}")
+
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "source": "Vietstock, HNX, SBV & TradingEconomics Vietnam",
-            "version": "3.2"
+            "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
+            "version": "3.4"
         },
         "marketIndex": market_index_data,
+        "vn30Valuation": vn30_analysis,
+        "styleIndices": style_indices,
+        "sectorValuations": sector_valuations,
+        "dualMatrix": dual_matrix,
+        "executiveSummary": exec_summary,
+        "scenarioAllocation": scenario_alloc_matrix,
         "macro": {
             "vn10yYield": vn10y,
             "sbvRefinancingRate": sbv_refinancing,
@@ -238,6 +294,7 @@ def fetch_and_save_macro():
             "stance": advisor_result["stance"],
             "rationale": advisor_result["rationale"],
             "fourAssets": four_asset_alloc,
+            "scenarioMatrix": scenario_alloc_matrix,
         },
         "goldAdvisor": gold_rec,
         "tradingEconomics": te_data,

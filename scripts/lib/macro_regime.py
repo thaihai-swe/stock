@@ -923,3 +923,394 @@ def compute_macro_confidence(macro: Dict[str, Any], n_conflicts: int = 0) -> Dic
         "signalClarity": clarity,
     }
 
+
+def calculate_scenario_allocation_matrix(risk_bucket: str, layer_scores: Dict[str, float]) -> Dict[str, Any]:
+    """
+    Tạo Ma Trận Phân Bổ 4x3 (3 Kịch Bản: Base, Bull, Bear) x (4 Lớp Tài Sản) theo chuẩn ref-vn-macro-markets.
+    Kèm các bộ điều chỉnh theo Khẩu vị Rủi ro và Chân trời Đầu tư.
+    """
+    # 1. Kịch bản Cơ Sở (Base Case)
+    base_alloc = calculate_4asset_allocation(risk_bucket, layer_scores)
+
+    # 2. Kịch bản Tích Cực (Bull Case) - Tăng tỷ trọng cổ phiếu, hạ tiền mặt
+    bull_alloc = {
+        "equity": min(85.0, base_alloc["equity"] + 15.0),
+        "bond": max(10.0, base_alloc["bond"] - 5.0),
+        "cash": max(5.0, base_alloc["cash"] - 8.0),
+        "gold": max(2.5, base_alloc["gold"] - 2.0),
+    }
+    tot_bull = sum(bull_alloc.values())
+    bull_alloc = {k: round(v / tot_bull * 100, 1) for k, v in bull_alloc.items()}
+
+    # 3. Kịch bản Thận Trọng (Bear Case) - Nâng tiền mặt và vàng, hạ cổ phiếu
+    bear_alloc = {
+        "equity": max(15.0, base_alloc["equity"] - 20.0),
+        "bond": min(45.0, base_alloc["bond"] + 5.0),
+        "cash": min(50.0, base_alloc["cash"] + 12.0),
+        "gold": min(15.0, base_alloc["gold"] + 3.0),
+    }
+    tot_bear = sum(bear_alloc.values())
+    bear_alloc = {k: round(v / tot_bear * 100, 1) for k, v in bear_alloc.items()}
+
+    return {
+        "base": base_alloc,
+        "bull": bull_alloc,
+        "bear": bear_alloc,
+        "profiles": {
+            "conservative": {"equityAdj": -10, "cashAdj": +10, "label": "Bảo Thủ"},
+            "balanced":     {"equityAdj": 0,   "cashAdj": 0,   "label": "Cân Bằng"},
+            "aggressive":   {"equityAdj": +10, "cashAdj": -10, "label": "Tiến Thủ"},
+        },
+        "horizons": {
+            "short":  {"equityAdj": -10, "cashAdj": +10, "label": "Ngắn Hạn (< 1 Năm)"},
+            "medium": {"equityAdj": 0,   "cashAdj": 0,   "label": "Trung Hạn (1 - 5 Năm)"},
+            "long":   {"equityAdj": +10, "cashAdj": -10, "label": "Dài Hạn (> 5 Năm)"},
+        }
+    }
+
+
+def generate_executive_summary(
+    macro: Dict[str, Any],
+    risk_info: Dict[str, Any],
+    regime: Dict[str, Any],
+    scenarios: Dict[str, Any],
+    active_tail_risks: List[Dict[str, Any]],
+    market_pe: float = 10.72
+) -> Dict[str, Any]:
+    """
+    Tổng hợp báo cáo điều hành cấp cao:
+    - 3-5 Rủi ro trọng yếu (Key Risks)
+    - 3-5 Động lực tăng trưởng (Growth Catalysts)
+    - 3 Key Takeaways có gắn ⭐ Insight tổng hợp
+    """
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
+    interbank = float(macro.get("interbank_rate") or 6.47)
+    cpi = float(macro.get("cpi_yoy") or 5.08)
+    pmi = float(macro.get("pmi") or 51.9)
+    gdp = float(macro.get("gdp_growth_yoy") or 7.0)
+    risk_score = risk_info.get("riskScore", 50.0)
+
+    # 1. Key Risks (Sắp xếp theo mức độ nghiêm trọng)
+    key_risks = []
+    if usdvnd > 25600:
+        key_risks.append({
+            "level": "Rất cao" if usdvnd > 25900 else "Cao",
+            "title": "Áp Lực Tỷ Giá USD/VND & Can Thiệp Tiền Tệ",
+            "risk": f"Tỷ giá USD/VND neo cao ở mức {usdvnd:,.0f} đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
+            "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
+        })
+    if interbank > 5.0:
+        key_risks.append({
+            "level": "Cao" if interbank > 6.5 else "Trung bình",
+            "title": "Lãi Suất Liên Ngân Hàng Tăng Nhiệt",
+            "risk": f"Lãi suất liên ngân hàng qua đêm đạt {interbank:.2f}%, báo hiệu thanh khoản cục bộ của hệ thống ngân hàng bị thắt chặt.",
+            "color": "text-amber-400 bg-amber-500/10 border-amber-500/30"
+        })
+    if cpi > 4.5:
+        key_risks.append({
+            "level": "Cao",
+            "title": "Lạm Phát CPI Vượt Ngưỡng Mục Tiêu",
+            "risk": f"CPI tăng {cpi:.2f}% YoY vượt trần kiểm soát 4.5%, thu hẹp dư địa nới lỏng chính sách tiền tệ của SBV.",
+            "color": "text-orange-400 bg-orange-500/10 border-orange-500/30"
+        })
+
+    # Bổ sung rủi ro từ tail risks nếu có
+    for tr in active_tail_risks[:2]:
+        if not any(r["title"] == tr["name"] for r in key_risks):
+            key_risks.append({
+                "level": "Rất cao" if tr.get("severity") == "CRITICAL" else "Cao",
+                "title": tr["name"],
+                "risk": tr["trigger"] + " " + tr["impact"],
+                "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
+            })
+
+    if not key_risks:
+        key_risks.append({
+            "level": "Trung bình",
+            "title": "Biến Động Địa Chính Trị Toàn Cầu",
+            "risk": "Biến động giá dầu thô Brent và chính sách lãi suất neo cao của Fed tạo rủi ro nhập khẩu lạm phát.",
+            "color": "text-blue-400 bg-blue-500/10 border-blue-500/30"
+        })
+
+    # 2. Catalysts (Động lực tích cực)
+    catalysts = []
+    if gdp >= 6.0:
+        catalysts.append({
+            "level": "Cao",
+            "title": "Tăng Trưởng GDP Phục Hồi Mạnh Mẽ",
+            "desc": f"Tăng trưởng kinh tế đạt {gdp:.2f}% YoY, tạo bệ phóng vững chắc cho lợi nhuận sau thuế của các doanh nghiệp niêm yết.",
+            "color": "text-emerald-400 bg-emerald-500/10 border-emerald-500/30"
+        })
+    if pmi >= 50.0:
+        catalysts.append({
+            "level": "Cao",
+            "title": "Khu Vực Sản Xuất Duy Trì Đà Mở Rộng",
+            "desc": f"Chỉ số PMI đạt {pmi:.1f} điểm, phản ánh lượng đơn hàng mới và sản lượng xuất khẩu tiếp tục tăng trưởng khả quan.",
+            "color": "text-teal-400 bg-teal-500/10 border-teal-500/30"
+        })
+    if market_pe < 13.5:
+        catalysts.append({
+            "level": "Cao",
+            "title": "Định Giá Thị Trường Chiết Khấu Hấp Dẫn",
+            "desc": f"P/E VN-Index ở mức {market_pe:.2f}x (dưới trung vị 10 năm), tạo biên an toàn lớn cho chiến lược đầu tư giá trị và tích sản dài hạn.",
+            "color": "text-cyan-400 bg-cyan-500/10 border-cyan-500/30"
+        })
+    catalysts.append({
+        "level": "Trung bình",
+        "title": "Kỳ Vọng Nâng Hạng Thị Trường FTSE / MSCI",
+        "desc": "Quy định Non-Pre-funding (Thông tư 68) đi vào thực thi tháo gỡ nút thắt lớn nhất cho dòng vốn ngoại tổ chức giải ngân.",
+        "color": "text-indigo-400 bg-indigo-500/10 border-indigo-500/30"
+    })
+
+    # 3. Key Takeaways
+    regime_name = regime.get("titleVi", "Mở Rộng Tăng Trưởng")
+    stance_text = "Ưu tiên tích lũy cổ phiếu giá trị" if risk_score < 55 else "Duy trì vị thế cân bằng phòng thủ"
+
+    key_takeaways = [
+        f"⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha '{regime_name}' với điểm rủi ro vĩ mô {risk_score}/100. P/E thị trường {market_pe:.2f}x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
+        f"Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND ({usdvnd:,.0f}) và thanh khoản liên ngân hàng ({interbank:.2f}%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
+        f"Cơ hội lớn nhất: {stance_text}, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
+    ]
+
+    return {
+        "keyRisks": key_risks[:4],
+        "catalysts": catalysts[:4],
+        "keyTakeaways": key_takeaways,
+    }
+
+
+def calculate_style_indices(
+    macro: Dict[str, Any],
+    vnindex_pe: float = 10.72,
+    vnindex_pb: float = 1.80,
+    vn30_pe: float = 11.08,
+    vn30_pb: float = 2.19
+) -> List[Dict[str, Any]]:
+    """
+    Tính toán và định chuẩn ma trận so sánh 4 phân khúc phong cách đầu tư:
+    1. VN-Index (Toàn thị trường)
+    2. VN30 (Large-cap Blue-chip)
+    3. VN Diamond (Chất lượng cao & Kín room ngoại - FUEVFVND)
+    4. VN Midcap (Tăng trưởng vốn hóa vừa - FUEDCMID)
+    5. VN100 (Hợp nhất VN30 + VN Midcap)
+    """
+    # VN Diamond có P/E chiết khấu hơn VN30 khoảng 15-20% do tỷ trọng Bank/Bán lẻ lớn và room ngoại kín
+    diamond_pe = round(vn30_pe * 0.82, 2)
+    diamond_pb = round(vn30_pb * 0.88, 2)
+
+    # VN Midcap có P/E cao hơn VN-Index khoảng 15-20% do beta cao và định giá kỳ vọng tăng trưởng
+    midcap_pe = round(vnindex_pe * 1.18, 2)
+    midcap_pb = round(vnindex_pb * 0.92, 2)
+
+    vn100_pe = round((vn30_pe * 0.75 + midcap_pe * 0.25), 2)
+    vn100_pb = round((vn30_pb * 0.75 + midcap_pb * 0.25), 2)
+
+    return [
+        {
+            "code": "VNINDEX",
+            "name": "VN-Index (Toàn Thị Trường)",
+            "proxy": "VNINDEX",
+            "icon": "🏛️",
+            "type": "Broad Market",
+            "pe": vnindex_pe,
+            "pb": vnindex_pb,
+            "beta": 1.00,
+            "peBand": "Rất Rẻ" if vnindex_pe < 11.5 else ("Rẻ" if vnindex_pe < 13.5 else "Hợp Lý"),
+            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "flowCharacter": "Dòng tiền toàn thị trường, phản ánh tổng thể chu kỳ kinh tế",
+            "strategy": "Tích lũy DCA dài hạn theo nhịp điều chỉnh của chỉ số",
+            "weightAdvice": "Benchmark chuẩn mực"
+        },
+        {
+            "code": "VN30",
+            "name": "VN30 (Top 30 Blue-Chips)",
+            "proxy": "E1VFVN30",
+            "icon": "🏢",
+            "type": "Large-Cap",
+            "pe": vn30_pe,
+            "pb": vn30_pb,
+            "beta": 0.95,
+            "peBand": "Rất Rẻ" if vn30_pe < 11.5 else ("Rẻ" if vn30_pe < 13.5 else "Hợp Lý"),
+            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "flowCharacter": "Trụ đỡ thị trường, nơi dòng vốn ETF và tổ chức nước ngoài giải ngân đầu tiên",
+            "strategy": "Phòng thủ vững chắc, hưởng lợi khi thị trường nâng hạng FTSE",
+            "weightAdvice": "Chiếm 40 - 50% tỷ trọng cổ phiếu"
+        },
+        {
+            "code": "VNDIAMOND",
+            "name": "VN Diamond (Cổ Phiếu Kim Cương)",
+            "proxy": "FUEVFVND",
+            "icon": "💎",
+            "type": "Quality & Foreign Room",
+            "pe": diamond_pe,
+            "pb": diamond_pb,
+            "beta": 1.08,
+            "peBand": "Siêu Hấp Dẫn" if diamond_pe < 10.0 else "Rất Rẻ",
+            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40 animate-pulse",
+            "flowCharacter": "Nhóm cổ phiếu kín room ngoại (FPT, MWG, PNJ, REE, TCB...), thanh khoản chất lượng",
+            "strategy": "Định giá rẻ vượt trội so với chất lượng doanh nghiệp, điểm trúng dòng vốn ngoại",
+            "weightAdvice": "Chiếm 25 - 35% tỷ trọng cổ phiếu"
+        },
+        {
+            "code": "VNMIDCAP",
+            "name": "VN Midcap (Top 70 Vốn Hóa Vừa)",
+            "proxy": "FUEDCMID",
+            "icon": "🚀",
+            "type": "High Beta Growth",
+            "pe": midcap_pe,
+            "pb": midcap_pb,
+            "beta": 1.32,
+            "peBand": "Hấp Dẫn" if midcap_pe < 13.5 else "Cân Bằng",
+            "peBandColor": "text-teal-400 bg-teal-500/20 border-teal-500/40",
+            "flowCharacter": "Tập trung BĐS, Thép, Chứng khoán, dòng tiền cá nhân ưa chuộng, sóng tăng bốc nhất",
+            "strategy": "Gia tăng tỷ trọng khi chu kỳ nới lỏng tiền tệ mở rộng để tối đa hóa hiệu suất",
+            "weightAdvice": "Chiếm 20 - 30% tỷ trọng cổ phiếu"
+        },
+        {
+            "code": "VN100",
+            "name": "VN100 (Hợp Nhất VN30 + Midcap)",
+            "proxy": "FUEVN100",
+            "icon": "🌐",
+            "type": "Large & Mid Composite",
+            "pe": vn100_pe,
+            "pb": vn100_pb,
+            "beta": 1.05,
+            "peBand": "Rất Rẻ" if vn100_pe < 12.0 else "Rẻ",
+            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "flowCharacter": "Bao phủ 100 cổ phiếu hàng đầu chiếm hơn 90% vốn hóa thị trường",
+            "strategy": "Cân bằng hoàn hảo giữa sức mạnh Blue-chip và tiềm năng bứt phá của Midcap",
+            "weightAdvice": "Lựa chọn ETF toàn diện"
+        }
+    ]
+
+
+def calculate_dual_sweet_spot_matrix(
+    sector_valuations: List[Dict[str, Any]],
+    sector_rotations: List[Dict[str, Any]],
+    vnindex_pe: float = 10.72
+) -> Dict[str, Any]:
+    """
+    Tính toán Ma Trận Thiên Thời Hội Tụ (Dual Sweet Spot Matrix):
+    Kết hợp Trục Hoành (Định Giá Thực Tế 10 Ngành) x Trục Tung (Động Lực Vĩ Mô Net Impact Score).
+    Phân loại vào 4 góc phần tư:
+      - sweet_spot: Vùng Vàng Gom Mua (Vĩ mô thuận lợi + Định giá rẻ)
+      - value_trap: Vùng Bẫy Giá Rẻ (Định giá rẻ nhưng vĩ mô bất lợi)
+      - momentum: Vùng Quá Nhiệt / Đà Tăng (Vĩ mô mạnh nhưng định giá đắt)
+      - defense: Vùng Phòng Thủ / Tránh Né (Vĩ mô bất lợi và định giá đắt)
+    """
+    if not sector_valuations:
+        return {"items": [], "quadrants": {}, "stats": {}}
+
+    # Bản đồ ánh xạ GICS code -> macro sector keys
+    ROTATION_KEY_MAP = {
+        "VNFIN": ["banking", "securities"],
+        "VNREAL": ["realestate"],
+        "VNIND": ["construction"],
+        "VNCONS": ["fmcg"],
+        "VNDISCR": ["retail"],
+        "VNENE": ["energy"],
+        "VNMAT": ["materials"],
+        "VNIT": ["tech"],
+        "VNUT": ["utilities"],
+        "VNHEAL": ["healthcare"],
+    }
+
+    rot_dict = {s["key"]: s for s in sector_rotations}
+
+    items = []
+    sweet_spot = []
+    value_trap = []
+    momentum = []
+    defense = []
+
+    for sec in sector_valuations:
+        code = sec.get("code")
+        rot_keys = ROTATION_KEY_MAP.get(code, [])
+        
+        if rot_keys:
+            scores = [rot_dict[k]["netScore"] for k in rot_keys if k in rot_dict]
+            macro_score = round(sum(scores) / len(scores), 1) if scores else 0.0
+            macro_actions = [rot_dict[k]["action"] for k in rot_keys if k in rot_dict]
+            macro_action = macro_actions[0] if macro_actions else "TRUNG LẬP"
+        else:
+            macro_score = 0.0
+            macro_action = "TRUNG LẬP"
+
+        pe = sec.get("pe") if sec.get("pe") is not None else 12.0
+        pb = sec.get("pb") if sec.get("pb") is not None else 2.0
+
+        is_valuation_cheap = pe <= vnindex_pe or pe <= 11.5
+        is_valuation_expensive = pe >= 13.5
+        is_macro_favorable = macro_score >= 0.0
+
+        if is_macro_favorable and is_valuation_cheap:
+            quadrant_key = "sweet_spot"
+            quadrant_title = "Vùng Vàng Gom Mua (Sweet Spot)"
+            quadrant_icon = "💎"
+            quadrant_badge = "bg-emerald-500/20 text-emerald-400 border-emerald-400/40"
+            recommendation = "Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động."
+        elif not is_macro_favorable and is_valuation_cheap:
+            quadrant_key = "value_trap"
+            quadrant_title = "Vùng Bẫy Giá Rẻ (Value Trap)"
+            quadrant_icon = "⚠️"
+            quadrant_badge = "bg-amber-500/20 text-amber-400 border-amber-400/40"
+            recommendation = "Định giá rất rẻ nhưng chịu áp lực vĩ mô. Chia nhỏ tỷ trọng, gom từng phần hoặc chờ đảo chiều."
+        elif is_macro_favorable and is_valuation_expensive:
+            quadrant_key = "momentum"
+            quadrant_title = "Vùng Quá Nhiệt (Momentum)"
+            quadrant_icon = "🔥"
+            quadrant_badge = "bg-purple-500/20 text-purple-400 border-purple-400/40"
+            recommendation = "Động lực vĩ mô mạnh nhưng định giá cao. Phù hợp lướt sóng theo dòng tiền, quản trị rủi ro chặt chẽ."
+        else:
+            quadrant_key = "defense"
+            quadrant_title = "Vùng Phòng Thủ (Defense)"
+            quadrant_icon = "🛡️"
+            quadrant_badge = "bg-rose-500/20 text-rose-400 border-rose-400/40"
+            recommendation = "Vĩ mô bất lợi và định giá không hấp dẫn. Khuyến nghị đứng ngoài hoặc hạ tỷ trọng."
+
+        item_data = {
+            **sec,
+            "macroScore": macro_score,
+            "macroAction": macro_action,
+            "quadrantKey": quadrant_key,
+            "quadrantTitle": quadrant_title,
+            "quadrantIcon": quadrant_icon,
+            "quadrantBadge": quadrant_badge,
+            "recommendation": recommendation,
+        }
+        items.append(item_data)
+
+        if quadrant_key == "sweet_spot":
+            sweet_spot.append(item_data)
+        elif quadrant_key == "value_trap":
+            value_trap.append(item_data)
+        elif quadrant_key == "momentum":
+            momentum.append(item_data)
+        else:
+            defense.append(item_data)
+
+    items.sort(key=lambda x: (x["quadrantKey"] != "sweet_spot", -x["macroScore"], x["pe"] or 99))
+
+    return {
+        "items": items,
+        "quadrants": {
+            "sweetSpot": sweet_spot,
+            "valueTrap": value_trap,
+            "momentum": momentum,
+            "defense": defense,
+        },
+        "stats": {
+            "totalSectors": len(items),
+            "sweetSpotCount": len(sweet_spot),
+            "valueTrapCount": len(value_trap),
+            "momentumCount": len(momentum),
+            "defenseCount": len(defense),
+            "avgSectorPE": round(sum(i["pe"] for i in items if i.get("pe")) / max(1, len([i for i in items if i.get("pe")])), 2),
+            "avgSectorPB": round(sum(i["pb"] for i in items if i.get("pb")) / max(1, len([i for i in items if i.get("pb")])), 2),
+            "cheapestSector": min(items, key=lambda x: x["pe"] or 99)["name"] if items else None,
+            "mostExpensiveSector": max(items, key=lambda x: x["pe"] or 0)["name"] if items else None,
+        }
+    }
+
+
+

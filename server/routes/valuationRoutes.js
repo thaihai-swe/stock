@@ -82,10 +82,25 @@ router.get('/valuation/macro-indicators', (req, res) => {
  * Query: symbol, resolution, from, to
  */
 router.get('/valuation/dnse-ohlc', async (req, res) => {
-  const symbol = (req.query.symbol || 'VNINDEX').trim().toUpperCase();
+  const rawSymbol = (req.query.symbol || 'VNINDEX').trim().toUpperCase();
   const resolution = (req.query.resolution || '1D').trim();
   const from = req.query.from ? String(req.query.from).trim() : '';
   const to = req.query.to ? String(req.query.to).trim() : '';
+
+  // Ánh xạ symbol nếu là chỉ số chuyên đề dùng ETF mô phỏng
+  let symbol = rawSymbol;
+  let isProxy = false;
+  let proxyLabel = '';
+
+  if (rawSymbol === 'VNDIAMOND') {
+    symbol = 'FUEVFVND';
+    isProxy = true;
+    proxyLabel = 'DCVFMVN Diamond ETF';
+  } else if (rawSymbol === 'VNMIDCAP' || rawSymbol === 'VNMID') {
+    symbol = 'FUEDCMID';
+    isProxy = true;
+    proxyLabel = 'DCVFMVN Midcap ETF';
+  }
 
   // Phân định loại symbol: index, derivative, hay stock
   const INDEX_SYMBOLS = ['VNINDEX', 'VN30', 'HNX', 'HNX30', 'UPCOM', 'VN100', 'VNXALLSHARE', 'VNDIVIDEND', 'VNMITECH', 'VN50GROWTH'];
@@ -144,7 +159,10 @@ router.get('/valuation/dnse-ohlc', async (req, res) => {
     let changePercent = (prevPrice && prevPrice > 0) ? +((change / prevPrice) * 100).toFixed(2) : 0;
 
     const enriched = {
-      symbol,
+      symbol: rawSymbol,
+      underlyingSymbol: symbol,
+      isProxy,
+      proxyLabel,
       type,
       resolution,
       count: n,
