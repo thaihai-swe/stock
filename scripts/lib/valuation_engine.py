@@ -174,11 +174,13 @@ def calc_dcf_fcff(
     net_debt: Optional[float] = 0.0,
     shares: Optional[float] = 1.0,
     growth_rates: Optional[List[float]] = None,
-    projection_years: int = 5
+    projection_years: int = 5,
+    historical_cagr: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Định giá Chiết khấu Dòng tiền Tự do Doanh nghiệp DCF (FCFF) với 3 Kịch Bản (Base, Bull, Bear).
     Sanity Check (Học từ LC-005): Nếu base_fcff <= 0, gắn cờ 'NEGATIVE_FCF' và không xuất giá âm.
+    Lộ trình tăng trưởng động: Tự động điều chỉnh theo CAGR lịch sử thực tế của doanh nghiệp.
     """
     if base_fcff is None or shares is None or shares <= 0:
         return {
@@ -207,8 +209,20 @@ def calc_dcf_fcff(
             "note": "FCF0 âm — Khuyến nghị dùng phương pháp định giá EV/EBITDA hoặc P/B thay thế."
         }
 
-    # Giả định tăng trưởng 5 năm mặc định: giảm dần từ 12% về 5%
-    base_growths = growth_rates if (growth_rates and len(growth_rates) >= projection_years) else [0.12, 0.10, 0.08, 0.06, 0.05]
+    # Lộ trình tăng trưởng động: Neo vào CAGR lịch sử thực tế nếu có, hoặc suy giảm tiệm cận về terminal_g
+    if growth_rates and len(growth_rates) >= projection_years:
+        base_growths = growth_rates[:projection_years]
+    elif historical_cagr is not None and not math.isnan(historical_cagr):
+        # Kẹp CAGR trong ngưỡng an toàn hợp lý [3%, 25%]
+        start_g = max(0.03, min(0.25, float(historical_cagr)))
+        base_growths = [
+            round(start_g - (start_g - terminal_g) * (i / max(1, projection_years)), 4)
+            for i in range(projection_years)
+        ]
+    else:
+        # Mặc định suy giảm hợp lý theo tăng trưởng GDP tiềm năng (10% về 4.5%)
+        base_growths = [0.10, 0.085, 0.07, 0.055, 0.045][:projection_years]
+
 
     def _compute_single_scenario(sc_growths: List[float], sc_wacc: float, sc_g: float) -> Optional[int]:
         if sc_wacc <= sc_g:
@@ -294,11 +308,14 @@ def calc_dcf_sensitivity_matrix(
     net_debt: Optional[float] = 0.0,
     shares: Optional[float] = 1.0,
     wacc_list: Optional[List[float]] = None,
-    g_list: Optional[List[float]] = None
+    g_list: Optional[List[float]] = None,
+    growth_rates: Optional[List[float]] = None,
+    historical_cagr: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Tính bảng phân tích độ nhạy cảm 2 chiều (2D Sensitivity Matrix) cho DCF:
     WACC (Rows: 10.0%, 10.5%, 11.0%, 12.0%) vs Terminal g (Cols: 2.0%, 3.0%, 4.0%).
+    Lộ trình tăng trưởng động theo CAGR lịch sử thực tế của doanh nghiệp.
     """
     waccs = wacc_list or [0.100, 0.105, 0.110, 0.120]
     gs = g_list or [0.020, 0.030, 0.040]
@@ -312,7 +329,15 @@ def calc_dcf_sensitivity_matrix(
 
     debt = float(net_debt) if net_debt is not None else 0.0
     matrix = []
-    default_growths = [0.10, 0.08, 0.07, 0.06, 0.05]
+
+    if growth_rates and len(growth_rates) >= 5:
+        default_growths = growth_rates[:5]
+    elif historical_cagr is not None and not math.isnan(historical_cagr):
+        start_g = max(0.03, min(0.25, float(historical_cagr)))
+        default_growths = [round(start_g - (start_g - 0.03) * (i / 5.0), 4) for i in range(5)]
+    else:
+        default_growths = [0.10, 0.085, 0.07, 0.055, 0.045]
+
 
     for w in waccs:
         row = []

@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import TradeOrderView from './components/TradeOrderView.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import DcaPlannerView from './components/DcaPlannerView.jsx';
-import DividendManager from './components/DividendManager.jsx';
 import Settings from './components/Settings.jsx';
 import StrategyAnalytics from './components/StrategyAnalytics.jsx';
 import TransactionHistory from './components/TransactionHistory.jsx';
@@ -21,42 +20,45 @@ import {
 } from './utils/api.js';
 
 const TABS = [
-  { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊' },
-  { id: 'macro', label: '🌐 Vĩ Mô & VN-Index', shortLabel: 'Vĩ Mô', icon: '🌐' },
-  { id: 'valuation', label: '🏢 Định Giá Cổ Phiếu', shortLabel: 'Định Giá', icon: '🏢' },
-  { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜' },
-  { id: 'trade', label: '⚡ Mua / Bán', shortLabel: 'Mua / Bán', icon: '⚡' },
-  { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋' },
-  { id: 'dividend', label: '🎁 Cổ tức', shortLabel: 'Cổ tức', icon: '🎁' },
-  { id: 'strategy', label: '🎯 Chiến lược', shortLabel: 'Chiến lược', icon: '🎯' },
-  { id: 'watchlist', label: '👁️ Theo dõi', shortLabel: 'Theo dõi', icon: '👁️' },
-  { id: 'settings', label: '⚙️ Cài đặt & Báo cáo', shortLabel: 'Cài đặt', icon: '⚙️' },
+  // Cụm 1: Quản Trị Danh Mục & Giao Dịch
+  { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊', group: 'portfolio' },
+  { id: 'trade', label: '⚡ Đặt Lệnh & Cổ Tức', shortLabel: 'Đặt Lệnh', icon: '⚡', group: 'portfolio' },
+  { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋', group: 'portfolio' },
+
+  // Cụm 2: Định Giá & Phân Tích Chuyên Sâu
+  { id: 'valuation', label: '🏢 Định Giá Cổ Phiếu', shortLabel: 'Định Giá', icon: '🏢', group: 'research' },
+  { id: 'macro', label: '🌐 Vĩ Mô & VN-Index', shortLabel: 'Vĩ Mô', icon: '🌐', group: 'research' },
+  { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜', group: 'research' },
+  { id: 'strategy', label: '🎯 Chiến lược', shortLabel: 'Chiến lược', icon: '🎯', group: 'research' },
+
+  // Cụm 3: Tiện Ích & Cấu Hình Hệ Thống
+  { id: 'watchlist', label: '👁️ Theo dõi', shortLabel: 'Theo dõi', icon: '👁️', group: 'tools' },
+  { id: 'settings', label: '⚙️ Cài đặt & Báo cáo', shortLabel: 'Cài đặt', icon: '⚙️', group: 'tools' },
 ];
 
 const TAB_GROUPS = [
   {
-    groupTitle: 'Quản Trị Danh Mục & Phân Tích',
+    groupTitle: 'Quản Trị Danh Mục & Giao Dịch',
     items: [
       { id: 'dashboard', label: 'Tổng Quan (Dashboard)', icon: '📊', desc: 'Nắm giữ, lãi/lỗ & phân bổ vốn' },
-      { id: 'macro', label: 'Vĩ Mô & VN-Index', icon: '🌐', desc: 'Regime chu kỳ, nhiệt kế định giá & 11 ngành' },
-      { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: 'Mô hình Graham, DDM, EV/EBITDA & BCTC' },
+      { id: 'trade', label: 'Sổ Lệnh & Cổ Tức', icon: '⚡', desc: 'Đặt lệnh mua/bán & ghi nhận cổ tức tiền mặt/cổ phiếu' },
+      { id: 'history', label: 'Lịch Sử Giao Dịch', icon: '📋', desc: 'Nhật ký mua/bán & sổ hiệu suất theo mã' },
+    ]
+  },
+  {
+    groupTitle: 'Định Giá & Phân Tích Chuyên Sâu',
+    items: [
+      { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: '6 mô hình Graham, DDM, multiples & BCTC 122+ chỉ tiêu' },
+      { id: 'macro', label: 'Vĩ Mô & VN-Index', icon: '🌐', desc: 'Regime chu kỳ, nhiệt kế định giá & 10 nhóm ngành' },
       { id: 'dca', label: 'Kế Hoạch DCA', icon: '🪜', desc: 'Mô phỏng & lộ trình mua gom đa tầng' },
-      { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách' },
+      { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách & kỷ luật' },
     ]
   },
   {
-    groupTitle: 'Lệnh & Giao Dịch',
+    groupTitle: 'Tiện Ích & Cấu Hình Hệ Thống',
     items: [
-      { id: 'trade', label: 'Đặt Lệnh Mua / Bán', icon: '⚡', desc: 'Đặt lệnh mua mới hoặc bán chốt lời/cắt lỗ' },
-      { id: 'history', label: 'Lịch Sử Giao Dịch', icon: '📋', desc: 'Nhật ký mua/bán, tìm kiếm & lọc' },
-    ]
-  },
-  {
-    groupTitle: 'Mở Rộng & Cấu Hình',
-    items: [
-      { id: 'dividend', label: 'Cổ Tức & Quyền', icon: '🎁', desc: 'Cổ tức tiền mặt & cổ phiếu thưởng' },
       { id: 'watchlist', label: 'Danh Sách Theo Dõi', icon: '👁️', desc: 'Cảnh báo mốc giá mua/bán mục tiêu' },
-      { id: 'settings', label: 'Cài Đặt & Sao Lưu', icon: '⚙️', desc: 'Báo cáo thuế, backup JSON & database' },
+      { id: 'settings', label: 'Cài Đặt & Báo Cáo', icon: '⚙️', desc: 'Báo cáo thuế, backup JSON & database' },
     ]
   }
 ];
@@ -294,6 +296,9 @@ export default function App({ hasGoogleClientId = false }) {
     } else if (targetTab === 'sell') {
       setTradeType('sell');
       finalTab = 'trade';
+    } else if (targetTab === 'dividend') {
+      setTradeType('dividend');
+      finalTab = 'trade';
     }
     setTab(finalTab);
     if (finalTab === 'valuation' && param) {
@@ -440,26 +445,35 @@ export default function App({ hasGoogleClientId = false }) {
 
           {/* 2. DESKTOP TAB BAR (hidden md:flex) - Hiển thị ngang cao cấp trên màn hình lớn */}
           <nav className="hidden md:flex items-center gap-1 -mb-px overflow-x-auto no-scrollbar pt-1">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => switchTab(t.id)}
-                className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${tab === t.id
-                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-t-lg'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50/80 dark:hover:bg-slate-800/60 rounded-t-lg'
-                  }`}
-              >
-                <span>{t.icon}</span>
-                <span>{t.label.replace(/^.*? /, '')}</span>
-              </button>
-            ))}
+            {TABS.map((t, idx) => {
+              const prevTab = TABS[idx - 1];
+              const showDivider = prevTab && prevTab.group !== t.group;
+              return (
+                <Fragment key={t.id}>
+                  {showDivider && (
+                    <div className="h-4 w-px bg-gray-200 dark:bg-slate-700 mx-1 shrink-0 select-none self-center" />
+                  )}
+                  <button
+                    onClick={() => switchTab(t.id)}
+                    className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${tab === t.id
+                        ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-t-lg'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50/80 dark:hover:bg-slate-800/60 rounded-t-lg'
+                      }`}
+                  >
+                    <span>{t.icon}</span>
+                    <span>{t.label.replace(/^.*? /, '')}</span>
+                  </button>
+                </Fragment>
+              );
+            })}
 
-            {/* Nút Mở Toàn Bộ Danh Mục ở cuối thanh Tab Desktop */}
+            {/* Vách ngăn trước nút Tất Cả */}
+            <div className="h-4 w-px bg-gray-200 dark:bg-slate-700 mx-1 shrink-0 select-none self-center" />
             <button
               type="button"
               onClick={() => setIsDrawerOpen(true)}
-              className="px-3 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 rounded-t-lg transition flex items-center gap-1.5 shrink-0 border-b-2 border-transparent cursor-pointer ml-1"
-              title="Xem toàn bộ 11 chức năng được phân nhóm"
+              className="px-3 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 rounded-t-lg transition flex items-center gap-1.5 shrink-0 border-b-2 border-transparent cursor-pointer ml-0.5"
+              title="Xem toàn bộ 10 chức năng được phân nhóm"
             >
               <span className="text-sm">📑</span>
               <span>Tất Cả</span>
@@ -533,6 +547,7 @@ export default function App({ hasGoogleClientId = false }) {
                 initialType={tradeType}
                 onTypeChange={setTradeType}
                 portfolio={data.portfolio || []}
+                dividends={data.dividends || []}
                 buyInitial={buyInitial}
                 sellInitialSymbol={sellInitialSymbol}
                 onSuccess={() => {
@@ -549,13 +564,6 @@ export default function App({ hasGoogleClientId = false }) {
                 onNavigateBuy={handleSelectBuy}
                 onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
-              />
-            )}
-            {tab === 'dividend' && (
-              <DividendManager
-                dividends={data.dividends || []}
-                portfolio={data.portfolio || []}
-                onSuccess={loadData}
               />
             )}
             {tab === 'strategy' && (
@@ -610,18 +618,18 @@ export default function App({ hasGoogleClientId = false }) {
             )}
           </button>
 
-          {/* Nút 2: Kế hoạch DCA */}
+          {/* Nút 2: Định giá */}
           <button
             type="button"
-            onClick={() => switchTab('dca')}
-            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${tab === 'dca'
+            onClick={() => switchTab('valuation')}
+            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${tab === 'valuation'
                 ? 'text-indigo-600 font-bold'
                 : 'text-gray-400 hover:text-gray-600 font-medium'
               }`}
           >
-            <span className="text-xl leading-none">🪜</span>
-            <span className="text-[10px] mt-1 tracking-tight">DCA</span>
-            {tab === 'dca' && (
+            <span className="text-xl leading-none">🏢</span>
+            <span className="text-[10px] mt-1 tracking-tight">Định giá</span>
+            {tab === 'valuation' && (
               <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-0.5" />
             )}
           </button>
@@ -656,18 +664,18 @@ export default function App({ hasGoogleClientId = false }) {
             )}
           </button>
 
-          {/* Nút 5: Thêm (Mở Full Drawer) */}
+          {/* Nút 5: Menu Tính Năng (Mở Full Drawer) */}
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['dividend', 'strategy', 'watchlist', 'settings', 'macro', 'valuation'].includes(tab)
+            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['trade', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab)
                 ? 'text-indigo-600 font-bold'
                 : 'text-gray-400 hover:text-gray-600 font-medium'
               }`}
           >
             <span className="text-xl leading-none">☰</span>
-            <span className="text-[10px] mt-1 tracking-tight">Thêm</span>
-            {['dividend', 'strategy', 'watchlist', 'settings', 'macro', 'valuation'].includes(tab) && (
+            <span className="text-[10px] mt-1 tracking-tight">Menu</span>
+            {['trade', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab) && (
               <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-0.5" />
             )}
           </button>
@@ -684,41 +692,51 @@ export default function App({ hasGoogleClientId = false }) {
           />
 
           {/* Sheet Box */}
-          <div className="relative bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 z-10 shadow-2xl animate-in slide-in-from-bottom-6 duration-200">
-            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden" />
-            <h3 className="font-extrabold text-gray-800 text-lg mb-1 flex items-center gap-2">
+          <div className="relative bg-white dark:bg-slate-900 w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 z-10 shadow-2xl animate-in slide-in-from-bottom-6 duration-200 border border-gray-100 dark:border-slate-800">
+            <div className="w-12 h-1 bg-gray-200 dark:bg-slate-700 rounded-full mx-auto mb-4 sm:hidden" />
+            <h3 className="font-extrabold text-gray-800 dark:text-white text-lg mb-1 flex items-center gap-2">
               <span>⚡</span> Chọn Loại Giao Dịch
             </h3>
-            <p className="text-xs text-gray-400 mb-5">
-              Khớp lệnh thông minh và tự động tính toán giá vốn
+            <p className="text-xs text-gray-400 dark:text-gray-400 mb-5">
+              Khớp lệnh thông minh hoặc ghi nhận cổ tức tiền mặt / thưởng
             </p>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => switchTab('buy')}
-                className="p-4 rounded-2xl border-2 border-emerald-100 bg-emerald-50/60 hover:bg-emerald-50 text-emerald-800 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer shadow-2xs"
+                className="p-3 rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/60 dark:bg-emerald-950/30 hover:bg-emerald-50 text-emerald-800 dark:text-emerald-300 flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-2xs text-center"
               >
-                <span className="text-3xl">🛒</span>
-                <span className="font-extrabold text-sm">Mua Vào</span>
-                <span className="text-[10px] text-emerald-600">Thêm vị thế mới</span>
+                <span className="text-2xl">🛒</span>
+                <span className="font-extrabold text-xs sm:text-sm">Mua Vào</span>
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400">Thêm vị thế</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => switchTab('sell')}
-                className="p-4 rounded-2xl border-2 border-red-100 bg-red-50/60 hover:bg-red-50 text-red-700 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer shadow-2xs"
+                className="p-3 rounded-2xl border-2 border-rose-100 dark:border-rose-900/50 bg-rose-50/60 dark:bg-rose-950/30 hover:bg-rose-50 text-rose-700 dark:text-rose-300 flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-2xs text-center"
               >
-                <span className="text-3xl">💸</span>
-                <span className="font-extrabold text-sm">Bán Ra</span>
-                <span className="text-[10px] text-red-500">Chốt lời / Cắt lỗ</span>
+                <span className="text-2xl">💸</span>
+                <span className="font-extrabold text-xs sm:text-sm">Bán Ra</span>
+                <span className="text-[9px] text-rose-500 dark:text-rose-400">Chốt lời / Lỗ</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => switchTab('dividend')}
+                className="p-3 rounded-2xl border-2 border-amber-100 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/30 hover:bg-amber-50 text-amber-800 dark:text-amber-300 flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-2xs text-center"
+              >
+                <span className="text-2xl">🎁</span>
+                <span className="font-extrabold text-xs sm:text-sm">Cổ Tức</span>
+                <span className="text-[9px] text-amber-600 dark:text-amber-400">Tiền & Thưởng</span>
               </button>
             </div>
 
             <button
               type="button"
               onClick={() => setIsTradeSheetOpen(false)}
-              className="w-full mt-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold rounded-xl text-xs transition-colors cursor-pointer"
+              className="w-full mt-4 py-3 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 font-semibold rounded-xl text-xs transition-colors cursor-pointer"
             >
               Đóng
             </button>

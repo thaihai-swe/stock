@@ -41,28 +41,10 @@ def run_step(step_name: str, script_name: str, args: list = None):
         return False
 
 def main():
-    print("\n==================================================================")
-    print("🌟 CHƯƠNG TRÌNH ĐỒNG BỘ TOÀN DIỆN DỮ LIỆU ĐỊNH GIÁ & TÀI CHÍNH")
-    print("   Lưu trữ Local JSON First (Zero Latency - Dễ Dàng Kiểm Tra)")
-    print("==================================================================")
-    start_total = time.time()
-
-    # Bước 1: Đồng bộ chỉ số cơ bản & định giá tổng hợp
-    run_step("1. Đồng Bộ Chỉ Số Cơ Bản & Định Giá", "sync_fundamentals.py")
-
-    # Bước 2: Thu thập Báo Cáo Tài Chính (3 Báo Cáo Cốt Lõi)
-    run_step("2. Thu Thập Báo Cáo Tài Chính (Income, Balance, Cash Flow)", "fetch_financial_reports.py")
-
-    # Bước 3: Định giá vĩ mô VN-Index & Cố vấn phân bổ tài sản
-    run_step("3. Định Giá Vĩ Mô & Nhiệt Kế VN-Index", "fetch_macro_valuation.py")
-
-    total_elapsed = round(time.time() - start_total, 2)
-    print("\n==================================================================")
-    print(f"✨ TẤT CẢ CÁC BƯỚC ĐÃ HOÀN TẤT TRONG {total_elapsed}s!")
-    print(f"📁 Dữ liệu định giá: {DATA_DIR / 'fundamentals_cache.json'}")
-    print(f"🌐 Dữ liệu vĩ mô:    {DATA_DIR / 'macro_valuation.json'}")
-    print(f"📊 Thư mục BCTC:    {DATA_DIR / 'financials/'}")
-    print("==================================================================\n")
+    import run_pipeline
+    sys.argv = [sys.argv[0], "--cadence", "all"]
+    run_pipeline.main()
 
 if __name__ == "__main__":
     main()
+

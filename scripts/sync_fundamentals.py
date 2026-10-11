@@ -97,7 +97,17 @@ def load_symbols():
             print(f"⚠️ Không đọc được supported_stocks.json: {e}")
 
     if not symbols:
-        symbols = ["FUEVFVND", "HPG", "PNJ", "DXG", "E1VFVN30"]
+        # Tự động quét từ data/financials/*.json hoặc keys từ fundamentals_cache.json
+        if FINANCIALS_DIR.exists():
+            symbols = sorted([p.stem.upper() for p in FINANCIALS_DIR.glob("*.json") if p.stem and not p.stem.startswith(".")])
+        if not symbols and CACHE_FILE.exists():
+            try:
+                with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                    symbols = sorted(list(json.load(f).keys()))
+            except Exception:
+                pass
+        if not symbols:
+            symbols = ["HPG", "FPT", "VNM", "MWG", "MBB", "TCB", "VCB", "SSI", "VIC", "VHM"]
 
     return symbols
 

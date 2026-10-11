@@ -12,10 +12,11 @@ const MACRO_INDICATORS_FILE = path.join(DATA_DIR, 'macro_indicators.json');
 const MARKET_HISTORY_FILE = path.join(DATA_DIR, 'market_valuation_history.json');
 const FINANCIALS_DIR = path.join(DATA_DIR, 'financials');
 
-// In-memory cache cho DNSE OHLC proxy
+// In-memory cache cho DNSE OHLC proxy (TTL 1 giờ)
 const dnseCache = new Map();
-const CACHE_TTL_INTRADAY = 30 * 1000; // 30 giây
-const CACHE_TTL_DAILY = 5 * 60 * 1000; // 5 phút
+const CACHE_TTL_INTRADAY = 60 * 60 * 1000; // 1 giờ (60 phút)
+const CACHE_TTL_DAILY = 60 * 60 * 1000; // 1 giờ (60 phút)
+
 
 // Ưu tiên sử dụng môi trường ảo uv (.venv/bin/python) nếu tồn tại
 const VENV_PYTHON = path.join(ROOT_DIR, '.venv', 'bin', 'python');
@@ -49,9 +50,9 @@ router.get('/valuation/macro', (req, res) => {
       return res.json(JSON.parse(raw));
     }
     return res.json({
-      marketIndex: { currentPE: 13.2, currentPB: 1.55, band: 'CHEAP', bandText: 'Rẻ' },
-      macro: { vn10yYield: 3.45, sbvRefinancingRate: 4.5 },
-      assetAllocation: { recommendedEquityPct: 80, recommendedCashPct: 20, stance: 'TÍCH LŨY' }
+      marketIndex: null,
+      macro: null,
+      assetAllocation: null
     });
   } catch (error) {
     console.error('Lỗi đọc macro_valuation.json:', error);

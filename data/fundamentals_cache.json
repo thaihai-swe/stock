@@ -68,7 +68,7 @@
       "recommendColor": "text-rose-400 font-medium",
       "beta": 0.68
     },
-    "updatedAt": 1791692008405,
+    "updatedAt": 1791698451754,
     "dupont": {
       "roe": null,
       "netProfitMargin": null,
@@ -92,7 +92,33 @@
       "pe": 57.53,
       "pb": 0.87,
       "ps": 2.8,
-      "evEbitda": null
+      "evEbitda": null,
+      "bvps": 11207,
+      "grahamNumber": 6528,
+      "marginOfSafetyGraham": -49.4,
+      "grahamDiffPercent": -33,
+      "ddmTarget": null,
+      "ddmDiffPercent": null,
+      "peTarget": 1944,
+      "peDiffPercent": -80.1,
+      "pbTarget": 15129,
+      "pbDiffPercent": 55.2,
+      "evEbitdaFairPrice": 28,
+      "evEbitdaDiffPercent": -99.7,
+      "pcfFairPrice": 5158,
+      "pcfDiffPercent": -47.1,
+      "psFairPrice": 4030,
+      "psDiffPercent": -58.7,
+      "fairValue": 5757,
+      "consensusFairValue": 5757,
+      "marginOfSafety": -69.4,
+      "marginOfSafetyFairValue": -69.4,
+      "upside": -41,
+      "consensusDiffPercent": -41,
+      "valuationRating": "RISKY",
+      "valuationRatingText": "Rất Đắt / Rủi Ro (MoS < -20%)",
+      "valuationRatingBadge": "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
+      "validModelsCount": 5
     },
     "profitability": {
       "roe": 1.42,
@@ -103,6 +129,13 @@
       "grossMargin": 51.59,
       "operatingMargin": 13.54,
       "netMargin": 4.09
+    },
+    "dupont": {
+      "roe": 1.42,
+      "netProfitMargin": 4.09,
+      "assetTurnover": 0.12,
+      "equityMultiplier": 1.15,
+      "qualityAssessment": "Trung bình: Cần theo dõi thêm sự cải thiện của biên lợi nhuận ròng."
     },
     "dividends": {
       "yield": null,
@@ -144,16 +177,17 @@
       "recommendScore": -0.35,
       "recommendText": "Bán",
       "recommendColor": "text-rose-400 font-medium",
-      "beta": 0.85
+      "beta": 0.85,
+      "techScore": 0,
+      "techScoreVerdict": "Trung lập (Neutral)",
+      "techScoreColor": "text-gray-400",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
+        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)",
+        "Hệ số Beta ổn định (0.85x)"
+      ]
     },
-    "updatedAt": 1791692008405,
-    "dupont": {
-      "roe": 1.42,
-      "netProfitMargin": 4.09,
-      "assetTurnover": 0.12,
-      "equityMultiplier": 1.15,
-      "qualityAssessment": "Dữ liệu được chuẩn hóa và tính toán từ Python Valuation Engine"
-    }
+    "updatedAt": 1791698451754
   },
   "E1VFVN30": {
     "symbol": "E1VFVN30",
@@ -338,7 +372,7 @@
         "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
       ]
     },
-    "updatedAt": 1791692008405
+    "updatedAt": 1791698451754
   },
   "PNJ": {
     "symbol": "PNJ",
@@ -355,7 +389,33 @@
       "pe": 3.44,
       "pb": 0.75,
       "ps": 0.28,
-      "evEbitda": null
+      "evEbitda": null,
+      "bvps": 26000,
+      "grahamNumber": 57618,
+      "marginOfSafetyGraham": 66.2,
+      "grahamDiffPercent": 195.5,
+      "ddmTarget": null,
+      "ddmDiffPercent": null,
+      "peTarget": 65262,
+      "peDiffPercent": 234.7,
+      "pbTarget": 35100,
+      "pbDiffPercent": 80,
+      "evEbitdaFairPrice": 48025,
+      "evEbitdaDiffPercent": 146.3,
+      "pcfFairPrice": 33188,
+      "pcfDiffPercent": 70.2,
+      "psFairPrice": 93481,
+      "psDiffPercent": 379.4,
+      "fairValue": 47839,
+      "consensusFairValue": 47839,
+      "marginOfSafety": 59.2,
+      "marginOfSafetyFairValue": 59.2,
+      "upside": 145.3,
+      "consensusDiffPercent": 145.3,
+      "valuationRating": "DEEP_VALUE",
+      "valuationRatingText": "Rất Rẻ (Biên an toàn > 20%)",
+      "valuationRatingBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+      "validModelsCount": 5
     },
     "profitability": {
       "roe": 22.41,
@@ -366,6 +426,13 @@
       "grossMargin": 20.64,
       "operatingMargin": 8.58,
       "netMargin": 6.67
+    },
+    "dupont": {
+      "roe": 22.41,
+      "netProfitMargin": 6.67,
+      "assetTurnover": 2.07,
+      "equityMultiplier": 1.23,
+      "qualityAssessment": "Trung bình: Cần theo dõi thêm sự cải thiện của biên lợi nhuận ròng."
     },
     "dividends": {
       "yield": 3.42,
@@ -407,20 +474,243 @@
       "recommendScore": -0.26,
       "recommendText": "Bán",
       "recommendColor": "text-rose-400 font-medium",
-      "beta": 1.47
+      "beta": 1.47,
+      "techScore": 0,
+      "techScoreVerdict": "Trung lập (Neutral)",
+      "techScoreColor": "text-gray-400",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Yếu",
+        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
+      ]
     },
-    "updatedAt": 1791692008405,
-    "dupont": {
-      "roe": 22.41,
-      "netProfitMargin": 6.67,
-      "assetTurnover": 2.07,
-      "equityMultiplier": 1.23,
-      "qualityAssessment": "Dữ liệu được chuẩn hóa và tính toán từ Python Valuation Engine"
-    }
+    "updatedAt": 1791698045380
   },
   "_meta": {
-    "lastSyncedAt": "2026-10-11T03:56:33Z",
-    "syncedCount": 5,
-    "symbolsCount": 5
+    "lastSyncedAt": "2026-10-11T05:54:05Z",
+    "syncedCount": 7,
+    "symbolsCount": 7
+  },
+  "VND": {
+    "symbol": "VND",
+    "exchange": "HOSE",
+    "name": "VND",
+    "description": "VNDirect Securities Corp.",
+    "close": 13200,
+    "change": 0.76,
+    "changeAbs": 100,
+    "volume": 17622512,
+    "sector": "Finance",
+    "industry": "Investment banks/brokers",
+    "valuation": {
+      "pe": 7.45,
+      "pb": 0.96,
+      "ps": 3.94,
+      "evEbitda": null,
+      "bvps": 13750,
+      "grahamNumber": 23421,
+      "marginOfSafetyGraham": 43.6,
+      "grahamDiffPercent": 77.4,
+      "ddmTarget": 6469,
+      "ddmDiffPercent": -51,
+      "peTarget": 20390,
+      "peDiffPercent": 54.5,
+      "pbTarget": 18562,
+      "pbDiffPercent": 40.6,
+      "evEbitdaFairPrice": 4178,
+      "evEbitdaDiffPercent": -68.3,
+      "pcfFairPrice": 28628,
+      "pcfDiffPercent": 116.9,
+      "psFairPrice": 3947,
+      "psDiffPercent": -70.1,
+      "fairValue": 16941,
+      "consensusFairValue": 16941,
+      "marginOfSafety": 22.1,
+      "marginOfSafetyFairValue": 22.1,
+      "upside": 28.3,
+      "consensusDiffPercent": 28.3,
+      "valuationRating": "DEEP_VALUE",
+      "valuationRatingText": "Rất Rẻ (Biên an toàn > 20%)",
+      "valuationRatingBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+      "validModelsCount": 6
+    },
+    "profitability": {
+      "roe": 13.15,
+      "roeFy": 9.96,
+      "roa": 5.52,
+      "roaFy": 4.22,
+      "eps": 1773,
+      "grossMargin": 83.23,
+      "operatingMargin": 85.28,
+      "netMargin": 49.41
+    },
+    "dupont": {
+      "roe": 13.15,
+      "netProfitMargin": 49.41,
+      "assetTurnover": 0.11,
+      "equityMultiplier": 2.08,
+      "qualityAssessment": "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn."
+    },
+    "dividends": {
+      "yield": 3.79,
+      "dps": 500,
+      "fcf": 5447588892080,
+      "fcfMargin": 99.72
+    },
+    "health": {
+      "totalDebt": 25893350321484,
+      "totalAssets": 49866116931034,
+      "debtToEquity": 1.21,
+      "currentRatio": 1.35,
+      "quickRatio": 1.35,
+      "ebitda": 4300432148800
+    },
+    "scale": {
+      "revenue": 5462727457717,
+      "netIncome": 2698932822085,
+      "marketCap": 20094359033203,
+      "sharesOutstanding": 1522300000
+    },
+    "performance": {
+      "w1": -4.35,
+      "m1": -17.76,
+      "m3": -27.87,
+      "m6": -22.81,
+      "ytd": -32.13,
+      "y1": -45,
+      "y5": -27.54,
+      "high52w": 24550,
+      "low52w": 12600,
+      "range52wPercent": 5,
+      "avgVol10d": 11553953,
+      "avgVol30d": 11908138,
+      "volatilityW": 4.62,
+      "volatilityM": 4.01
+    },
+    "technicals": {
+      "recommendScore": -0.51,
+      "recommendText": "Bán mạnh",
+      "recommendColor": "text-rose-500 font-bold",
+      "beta": 1.07,
+      "techScore": 0,
+      "techScoreVerdict": "Trung lập (Neutral)",
+      "techScoreColor": "text-gray-400",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
+        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)",
+        "Hệ số Beta ổn định (1.07x)"
+      ]
+    },
+    "updatedAt": 1791698045380
+  },
+  "MBB": {
+    "symbol": "MBB",
+    "exchange": "HOSE",
+    "name": "MBB",
+    "description": "Military Commercial Joint Stock Bank",
+    "close": 19050,
+    "change": 0.79,
+    "changeAbs": 150,
+    "volume": 14145209,
+    "sector": "Finance",
+    "industry": "Regional banks",
+    "valuation": {
+      "pe": 6.12,
+      "pb": 1.35,
+      "ps": 2.47,
+      "evEbitda": null,
+      "bvps": 14111,
+      "grahamNumber": 31423,
+      "marginOfSafetyGraham": 39.4,
+      "grahamDiffPercent": 65,
+      "ddmTarget": 10777,
+      "ddmDiffPercent": -43.4,
+      "peTarget": 35765,
+      "peDiffPercent": 87.7,
+      "pbTarget": 19050,
+      "pbDiffPercent": 0,
+      "evEbitdaFairPrice": null,
+      "evEbitdaDiffPercent": null,
+      "pcfFairPrice": 22750,
+      "pcfDiffPercent": 19.4,
+      "psFairPrice": 16122,
+      "psDiffPercent": -15.4,
+      "fairValue": 23953,
+      "consensusFairValue": 23953,
+      "marginOfSafety": 20.5,
+      "marginOfSafetyFairValue": 20.5,
+      "upside": 25.7,
+      "consensusDiffPercent": 25.7,
+      "valuationRating": "DEEP_VALUE",
+      "valuationRatingText": "Rất Rẻ (Biên an toàn > 20%)",
+      "valuationRatingBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+      "validModelsCount": 5
+    },
+    "profitability": {
+      "roe": 22.12,
+      "roeFy": 21.57,
+      "roa": 1.99,
+      "roaFy": 1.95,
+      "eps": 3110,
+      "grossMargin": null,
+      "operatingMargin": 44.13,
+      "netMargin": 35.92
+    },
+    "dupont": {
+      "roe": 22.12,
+      "netProfitMargin": 35.92,
+      "assetTurnover": 0.08,
+      "equityMultiplier": 1.46,
+      "qualityAssessment": "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn."
+    },
+    "dividends": {
+      "yield": 4.56,
+      "dps": 833,
+      "fcf": 26342356000000,
+      "fcfMargin": 19.4
+    },
+    "health": {
+      "totalDebt": 543974312000000,
+      "totalAssets": 1733012662000000,
+      "debtToEquity": 3.64,
+      "currentRatio": 0.49,
+      "quickRatio": null,
+      "ebitda": null
+    },
+    "scale": {
+      "revenue": 135764880000000,
+      "netIncome": 30078169000000,
+      "marketCap": 176464912500000,
+      "sharesOutstanding": 9263250000
+    },
+    "performance": {
+      "w1": -2.56,
+      "m1": -5.46,
+      "m3": -7.07,
+      "m6": -14.7,
+      "ytd": -9.82,
+      "y1": -15.33,
+      "y5": 73.19,
+      "high52w": 24583.333235,
+      "low52w": 17791.6665955,
+      "range52wPercent": 19,
+      "avgVol10d": 11026576,
+      "avgVol30d": 12059259,
+      "volatilityW": 1.59,
+      "volatilityM": 1.87
+    },
+    "technicals": {
+      "recommendScore": -0.35,
+      "recommendText": "Bán",
+      "recommendColor": "text-rose-400 font-medium",
+      "beta": 0.82,
+      "techScore": -1,
+      "techScoreVerdict": "Kém (Moderate Bearish)",
+      "techScoreColor": "text-rose-400 font-semibold",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
+        "Hệ số Beta ổn định (0.82x)"
+      ]
+    },
+    "updatedAt": 1791698045380
   }
 }

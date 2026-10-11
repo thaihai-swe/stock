@@ -4,14 +4,38 @@ Tài liệu này lưu trữ toàn bộ đặc tả chi tiết từng nhóm dữ 
 
 ---
 
-## 1. Tổng Quan Kiến Trúc Lưu Trữ: "Local JSON First"
+## 1. Tổng Quan Kiến Trúc & Quản Trị Dữ Liệu 5 Tầng (Data Governance & Storage Tiering)
 
-Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý **Local JSON First**:
-1. **Thu thập từ nguồn gốc**: Python pipeline (`uv`) gọi trực tiếp các API chuẩn từ `vnstock`, TradingView, Yahoo Finance, HNX, SBV, TCBS.
-2. **Làm sạch & Chuẩn hóa Taxonomy**: Đưa về đơn vị thống nhất (Tỷ VNĐ cho giá trị tuyệt đối, Triệu CP cho khối lượng, đ/cp cho EPS/BVPS/Thị giá).
-3. **Lưu trữ Structured JSON trong `data/`**: Tạo các bản snapshot hoàn chỉnh, có thể đọc, sao lưu và kiểm tra trực tiếp mà không phụ thuộc vào database.
-4. **Đồng bộ vào SQLite Database (`data/stock.db` / Turso Cloud)**: Lưu trữ các dữ liệu biến động như sổ lệnh giao dịch, danh mục tài khoản, nhật ký cổ tức.
-5. **Cung cấp cho Frontend SPA**: React 18 tiêu thụ dữ liệu qua Express REST API.
+Toàn bộ hệ thống được phân định rạch ròi theo triết lý **Hybrid Storage 5 Tầng (Relational DB vs Local JSON vs Ephemeral Cache)**:
+
+| Tầng Dữ Liệu | Đối Tượng Dữ Liệu | File / DB Lưu Trữ | Trạng Thái Git | Chu Kỳ Cập Nhật & Trigger | Mục Đích Sử Dụng |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TẦNG 1: ACID Relational Database** | Sổ lệnh Mua/Bán (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, cấu hình | `data/stock.db` (Local) / Turso Cloud (Vercel) | **GITIGNORED (100%)** | Realtime khi user thao tác. Sao lưu/khôi phục qua `scripts/db_manager.py`. | Đảm bảo toàn vẹn giao dịch (ACID), bảo mật thông tin cá nhân. |
+| **TẦNG 2: Ephemeral Intraday Cache** | Thị giá khớp lệnh realtime, điểm số VNINDEX & VN30 trong phiên | RAM Node.js + `data/prices_cache.json` | **GITIGNORED (100%)** | Trong phiên (9:00 - 15:00 T2-T6). Cache TTL 1h (`priceService.js`). | Phục vụ realtime UI mà không gây ô nhiễm lịch sử Git. |
+| **TẦNG 3: Daily EOD Snapshot JSON** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` (`run_pipeline.py --cadence daily`). | Đảm bảo web Vercel có số liệu EOD mới nhất mà không cần crawler. |
+| **TẦNG 4: Weekly Macro & Sector JSON** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS Vietstock, Lịch sử Simply Wall St, Tin tức 30 ngày | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` (`run_pipeline.py --cadence weekly`). | Cung cấp dữ liệu vĩ mô và luân chuyển ngành 1 tuần/lần. |
+| **TẦNG 5: Quarterly BCTC Repository** | 122+ chỉ tiêu BCTC 8 quý & 5 năm, 54 Ratios, Extended DuPont, DCF 3 kịch bản, Cổ đông | `data/financials/<MÃ>.json`, `data/vnindex_valuation_cache/` | **COMMIT VỀ GIT** | **Quarterly (Mùa BCTC)** hoặc **On-demand**: `run_pipeline.py --cadence quarterly`. | Kho tri thức phân tích chuyên sâu doanh nghiệp cho từng mã. |
+
+### Bộ Điều Phối Dữ Liệu Thống Nhất (`scripts/run_pipeline.py`):
+```bash
+# 1. Chạy tác vụ EOD hằng ngày (10s)
+python scripts/run_pipeline.py --cadence daily
+
+# 2. Chạy tác vụ vĩ mô & ngành hằng tuần (10s)
+python scripts/run_pipeline.py --cadence weekly
+
+# 3. Chạy toàn bộ BCTC & DCF hằng quý (25s)
+python scripts/run_pipeline.py --cadence quarterly
+
+# 4. Chạy toàn diện hệ thống
+python scripts/run_pipeline.py --cadence all
+
+# 5. Quản lý sao lưu/phục hồi Database SQLite
+python scripts/db_manager.py status
+python scripts/db_manager.py export --output data/backups/backup.json
+python scripts/db_manager.py import --input data/backups/backup.json
+```
+
 
 ---
 
@@ -21,7 +45,7 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
 
 ### PHÂN HỆ 1: BÁO CÁO TÀI CHÍNH (FINANCIAL STATEMENTS)
 * **Nguồn cung cấp chính**: Thư viện Python `vnstock` (`vnstock.api.financial.Finance(source='VCI')`) & TCBS API (`apipubaws.tcbs.com.vn`).
-* **Thời gian/Kỳ báo cáo**: 8 Quý gần nhất (`2023-Q3` → `2025-Q2`) và 5 Năm gần nhất (`2020` → `2024`).
+* **Thời gian/Kỳ báo cáo**: Chuỗi trượt động (Rolling Quarters & Years) gồm 8 Quý gần nhất (`2024-Q4` → `2026-Q3`) và 5 Năm gần nhất (`2021` → `2025`), tự động cập nhật theo lịch tài chính hiện hành.
 * **Đơn vị chuẩn hóa**: **Tỷ đồng (Bn. VND)** đối với số tuyệt đối; **đồng/cổ phiếu** đối với EPS/BVPS.
 * **Vị trí lưu trữ**: `data/financials/<MÃ>.json` (trong mảng `quarterly` và `yearly`).
 
@@ -227,15 +251,18 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
   * **Reverse DCF (Tốc độ tăng trưởng ngụ ý)**:
     - Thuật toán Binary Search tìm $g_{\text{implied}}$ sao cho $PV(FCFF, g, WACC) = \text{EV hiện tại}$.
     - Đưa ra góc nhìn trực quan: thị trường đang bi quan thái quá ($g_{\text{implied}} < 6\%$) hay kỳ vọng quá cao ($g_{\text{implied}} > 18\%$).
+  * **Lộ Trình Tăng Trưởng Động (Dynamic Growth Fade)**:
+    - Thay vì áp đặt danh sách tỷ lệ tăng trưởng cố định, động cơ tự động tính toán CAGR doanh thu thực tế 3-5 năm của doanh nghiệp từ chuỗi BCTC (`yearly`), kẹp trong biên độ an toàn $[3.0\%, 25.0\%]$ và phân rã suy giảm đều đặn về $g_{\text{terminal}} = 3.0\%$ qua 5 năm dự phóng.
   * **Bảng Độ Nhạy Cảm 2 Chiều (Sensitivity Matrix)**:
-    - Ma trận 4 mức WACC ($10.0\%, 10.5\%, 11.0\%, 12.0\%$) $\times$ 3 mức Terminal Growth ($2.0\%, 3.0\%, 4.0\%$).
+    - Ma trận 4 mức WACC ($10.0\%, 10.5\%, 11.0\%, 12.0\%$) $\times$ 3 mức Terminal Growth ($2.0\%, 3.0\%, 4.0\%$) liên kết động với tốc độ tăng trưởng thực tế.
   * **WACC Chuẩn Theo Ngành**:
     - Ngân hàng: $10.0\%$, Thép/SX: $10.5\%$, BĐS: $11.5\%$, Bán lẻ: $9.0\%$, Công nghệ: $9.0\%$, Dầu khí: $10.0\%$. Hiệu chỉnh theo Beta: $WACC = WACC_{\text{base}} + (\beta - 1.0) \times 1.5\%$.
 
 #### Hồ Sơ Hành Vi Thị Trường Định Lượng & Wyckoff VAP (Quantitative Market Profile):
 * **Key trong JSON**: `data/financials/<MÃ>.json` trong object `marketProfile`.
+* **Nguồn Dữ Liệu Nến Phiên Thật**: Thu thập trực tiếp từ DNSE Historical Chart API (`https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?resolution=1D`) kết hợp dự phòng cấp 2 qua Yahoo Finance (`<SYMBOL>.VN`). Đảm bảo 100% nến ngày (OHLCV) từ các phiên giao dịch thực tế của HOSE, HNX, UPCoM — triệt để loại bỏ dữ liệu giả lập sóng sin.
 * **5 Nhóm Phân Tích Định Lượng (15-Block Methodology)**:
-  1. **Volume at Price (VAP / Volume Profile)**: 10 dải giá với tổng khối lượng giao dịch tích lũy, xác định **Point of Control (POC)** (vùng kiểm soát thanh khoản lớn nhất), **HVN** (hỗ trợ/kháng cự cứng) và **LVN** (vùng trượt giá).
+  1. **Volume at Price (VAP / Volume Profile)**: 10 dải giá với tổng khối lượng giao dịch tích lũy thực tế, xác định **Point of Control (POC)** (vùng kiểm soát thanh khoản lớn nhất), **HVN** (hỗ trợ/kháng cự cứng) và **LVN** (vùng trượt giá).
   2. **Xác Nhận Khối Lượng VPCI & Dòng Tiền**:
      - `vpci`: So sánh Vol ngắn hạn 5 phiên vs dài hạn 20 phiên ($VPCI > 1.05$: khối lượng xác nhận xu hướng).
      - `cmf`: Chaikin Money Flow ($CMF \ge 0.05$: tích lũy gom hàng; $CMF \le -0.05$: phân phối xả hàng).
@@ -250,8 +277,13 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
 
 #### Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (Corporate News Digest & Sentiment):
 * **Key trong JSON**: `data/financials/<MÃ>.json` trong object `newsDigest`.
+* **Nguồn cung cấp sống**: Google News RSS đa truy vấn (Cổ tức & ĐHĐCĐ, KQKD & Lợi nhuận, Cổ phiếu & Thị trường) kết hợp `curl_cffi` (Chrome 120 TLS fingerprint impersonation) lấy tin tức tài chính thời gian thực từ CafeF, VnEconomy, Vietstock, Báo Tuổi Trẻ, Đầu Tư Chứng Khoán.
+* **Động cơ khử trùng lặp (NLP Cross-source Deduplication)**:
+  - Làm sạch tiêu đề: Gỡ bỏ hậu tố tòa soạn (` - CafeF`, ` - VnEconomy`), chuẩn hóa lowercase & ký tự đặc biệt.
+  - Thuật toán đo độ tương đồng từ khóa: Token-set Jaccard Similarity ($\ge 0.65$ coi là bài báo dẫn lại nguồn, tự động lọc bỏ).
+  - Khử trùng theo URL liên kết trực tiếp, bảo đảm 100% không có bài viết trùng lặp.
 * **Đặc tả cấu trúc**:
-  * `items`: 50 tin tức được phân loại vào 5 nhóm chức năng:
+  * `items`: 50 tin tức thực tế mới nhất (cập nhật theo ngày hiện hành) được phân loại vào 5 nhóm chức năng:
     - `biz`: Kết quả kinh doanh, doanh thu, lợi nhuận, sản lượng.
     - `sector`: Ngành nghề, đối thủ cạnh tranh, giá nguyên vật liệu, dự án.
     - `macro`: Vĩ mô, thuế, tỷ giá, chính sách Ngân hàng Nhà nước.
@@ -266,15 +298,16 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
 ---
 
 ### PHÂN HỆ 3: CỔ TỨC, CỔ ĐÔNG & BAN LÃNH ĐẠO (CORPORATE PROFILE)
-* **Nguồn cung cấp**: Thư viện `vnstock` qua 2 sub-brokers `VCI` và `KBS`:
-  * `c = Company(symbol='HPG', source='VCI')`
-  * `c_kbs = Company(symbol='HPG', source='KBS')`
+* **Nguồn cung cấp**: 
+  * *Tầng 1 (Live Real-time Extraction)*: Tự động trích xuất các sự kiện cổ tức tiền mặt, cổ tức cổ phiếu, họp ĐHĐCĐ, giao dịch mua/bán của cổ đông lớn từ feed tin tức thời gian thực của doanh nghiệp qua NLP Event Extractor (`scripts/lib/news_sentiment_engine.py`).
+  * *Tầng 2 (vnstock / VCI / KBS)*: Báo cáo công bố thông tin doanh nghiệp chính thức.
+  * *Tầng 3 (Dynamic Annual Milestones)*: Các mốc sự kiện động năm hiện hành (VD: 2026), cam kết không tồn tại ngày cũ 2023–2024.
 * **Vị trí lưu trữ**: `data/financials/<MÃ>.json` trong `corporateEvents` và `shareholders`.
 
 | Nhóm Dữ Liệu | Lệnh Gọi Code | Các Trường Thông Tin Chi Tiết |
 | :--- | :--- | :--- |
-| **Lịch Sử Cổ Tức & Sự Kiện** | `c.events()` | • `event_title`: Tên sự kiện (Trả cổ tức đợt 1 năm 2024 bằng tiền)<br>• `public_date`: Ngày công bố thông tin<br>• `record_date`: Ngày đăng ký cuối cùng<br>• `exright_date`: Ngày giao dịch không hưởng quyền (GDKHQ)<br>• `value`: Số tiền cổ tức (VD: 1.000 đ/cp)<br>• `ratio`: Tỷ lệ trả cổ phiếu thưởng (VD: 10:1) |
-| **Cơ Cấu Cổ Đông Lớn** | `c_kbs.shareholders()` | • `share_holder`: Tên cá nhân hoặc tổ chức (Trần Đình Long, Dragon Capital...)<br>• `quantity`: Số lượng cổ phiếu sở hữu<br>• `share_own_percent`: Tỷ lệ sở hữu phần trăm (%)<br>• `update_date`: Ngày cập nhật danh sách |
+| **Lịch Sử Cổ Tức & Sự Kiện** | `extract_corporate_events_from_news()` / `c.events()` | • `date`: Ngày sự kiện thực tế (ISO YYYY-MM-DD)<br>• `type`: Phân loại sự kiện (Cổ tức tiền mặt, Cổ tức cổ phiếu, ĐHĐCĐ, Giao dịch nội bộ, Phát hành)<br>• `content`: Tiêu đề / nội dung công bố thông tin<br>• `ratio`: Tỷ lệ chi trả (10%, 15%...)<br>• `value`: Giá trị tiền mặt (đ/cp)<br>• `source` & `link`: Nguồn báo / link bài viết gốc |
+| **Cơ Cấu Cổ Đông Lớn** | `c_kbs.shareholders()` / FinancialFetcher | • `name`: Tên cá nhân hoặc tổ chức (Nội bộ, Ngoại khối, Quỹ, Đại chúng)<br>• `percentage`: Tỷ lệ sở hữu phần trăm (%)<br>• `type`: Phân loại cổ đông (Nội bộ, Nước ngoài, Tổ chức, Cá nhân)<br>• `update_date`: Ngày cập nhật kỳ báo cáo gần nhất của năm hiện hành |
 | **Ban Lãnh Đạo & HĐQT** | `c.officers()` | • `officer_name`: Họ tên lãnh đạo<br>• `officer_position`: Chức vụ (Chủ tịch HĐQT, Tổng Giám đốc)<br>• `officer_own_percent`: Tỷ lệ sở hữu cổ phần của lãnh đạo |
 | **Công Ty Con & Liên Kết** | `c.subsidiaries()` | • `organ_name`: Tên công ty con<br>• `ownership_percent`: Tỷ lệ biểu quyết / Tỷ lệ sở hữu vốn (%) |
 | **Lịch Sử Tăng Vốn Điều Lệ** | `c_kbs.capital_history()`| • `date`: Ngày có hiệu lực<br>• `charter_capital`: Vốn điều lệ sau khi tăng (đồng) |

@@ -770,7 +770,16 @@ def detect_scenarios_and_tail_risks(
     vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
     us10y = float(macro.get("us10yYield") or macro.get("us10y") or 4.3)
 
-    vn = current_vnindex if (current_vnindex and current_vnindex > 500) else 1735.0
+    vn_candidate = current_vnindex or macro.get("vnindex") or macro.get("currentPoint") or macro.get("stock_index")
+    if not vn_candidate or float(vn_candidate) <= 500:
+        try:
+            cache_p = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
+            if cache_p.exists():
+                with open(cache_p, "r", encoding="utf-8") as f:
+                    vn_candidate = float(json.load(f).get("marketIndex", {}).get("currentPoint") or 0.0)
+        except Exception:
+            pass
+    vn = float(vn_candidate) if (vn_candidate and float(vn_candidate) > 500) else 1250.0
 
     # Phân bổ xác suất 3 kịch bản theo Risk Score
     if risk_score <= 40.0:

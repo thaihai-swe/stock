@@ -138,6 +138,17 @@ def fetch_and_save_macro():
         print(f"⚠️ Không thể trích xuất định giá VN-Index / VN30 từ Vietstock: {e}")
 
     # Xác định giá trị hiện tại và thống kê mặc định (ưu tiên cửa sổ 10 Năm)
+    prev_m = {}
+    prev_vn30 = {}
+    if MACRO_FILE.exists():
+        try:
+            with open(MACRO_FILE, "r", encoding="utf-8") as f:
+                prev_cached_doc = json.load(f)
+                prev_m = prev_cached_doc.get("marketIndex", {})
+                prev_vn30 = prev_cached_doc.get("vn30", {})
+        except Exception:
+            pass
+
     if vnindex_analysis and "current" in vnindex_analysis and vnindex_analysis["current"].get("pe") is not None:
         current_pe = vnindex_analysis["current"]["pe"]
         current_pb = vnindex_analysis["current"]["pb"]
@@ -147,22 +158,23 @@ def fetch_and_save_macro():
         zscore_val = ten_year_win.get("pe", {}).get("zscore", 0.0)
         pctl_val = ten_year_win.get("pe", {}).get("percentile", 50.0)
     else:
-        current_pe = 13.15
-        current_pb = 1.54
-        mean_pe = 14.2
-        std_pe = 2.1
-        zscore_val = -0.5
-        pctl_val = 32.0
+        # Tầng dự phòng: Kế thừa snapshot gần nhất từ macro_valuation.json thay vì gán hằng số
+        current_pe = float(prev_m.get("currentPE") or 13.5)
+        current_pb = float(prev_m.get("currentPB") or 1.6)
+        mean_pe = float(prev_m.get("historicalMeanPE") or 14.2)
+        std_pe = float(prev_m.get("historicalStdPE") or 2.1)
+        zscore_val = float(prev_m.get("peZScore") or 0.0)
+        pctl_val = float(prev_m.get("percentileRank") or 50.0)
 
-    vn30_pe = vn30_analysis["current"]["pe"] if (vn30_analysis and "current" in vn30_analysis and vn30_analysis["current"].get("pe")) else 11.08
-    vn30_pb = vn30_analysis["current"]["pb"] if (vn30_analysis and "current" in vn30_analysis and vn30_analysis["current"].get("pb")) else 2.19
+    vn30_pe = vn30_analysis["current"]["pe"] if (vn30_analysis and "current" in vn30_analysis and vn30_analysis["current"].get("pe")) else float(prev_vn30.get("pe") or 11.5)
+    vn30_pb = vn30_analysis["current"]["pb"] if (vn30_analysis and "current" in vn30_analysis and vn30_analysis["current"].get("pb")) else float(prev_vn30.get("pb") or 1.8)
 
     advisor_result = compute_pe_bands_and_zscore(current_pe, mean_pe=mean_pe, std_pe=std_pe)
 
     # Thu thập thị giá đóng cửa và biến động thời gian thực của VN-Index và VN30 từ DNSE Live API
     live_vnindex = macro_fetcher.fetch_live_index_quote("VNINDEX")
     live_vn30 = macro_fetcher.fetch_live_index_quote("VN30")
-    current_vnindex_point = float(live_vnindex.get("point") or 1735.09)
+    current_vnindex_point = float(live_vnindex.get("point") or prev_m.get("currentPoint") or 0.0)
 
     market_index_data = {
         "symbol": "VNINDEX",

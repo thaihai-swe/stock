@@ -215,6 +215,17 @@ class TradingEconomicsFetcher(BaseFetcher):
             for it in cat_info.get("items", []):
                 headline_map[it["name"]] = it["value"]
 
+        # Fallback động cho stock_index từ snapshot macro cache
+        cached_stock_idx = 0.0
+        try:
+            macro_cache_path = DATA_DIR / "macro_valuation.json"
+            if macro_cache_path.exists():
+                with open(macro_cache_path, "r", encoding="utf-8") as f:
+                    mc = json.load(f)
+                    cached_stock_idx = float(mc.get("marketIndex", {}).get("currentPoint") or 0.0)
+        except Exception:
+            pass
+
         # Trích xuất các macro driver chính
         macro_core = {
             "gdp_growth_yoy": headline_map.get("GDP Annual Growth Rate", 9.95),
@@ -230,7 +241,7 @@ class TradingEconomicsFetcher(BaseFetcher):
             "trade_balance_bn_usd": headline_map.get("Balance of Trade", 1.27),
             "govt_debt_to_gdp": headline_map.get("Government Debt to GDP", 33.6),
             "usdvnd": headline_map.get("Currency", 25881.0),
-            "stock_index": headline_map.get("Stock Market", 1735.0),
+            "stock_index": headline_map.get("Stock Market", cached_stock_idx),
         }
 
         total_indicators = sum(c["count"] for c in categories.values())

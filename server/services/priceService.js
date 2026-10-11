@@ -299,16 +299,17 @@ export async function getMarketIndexData(force = false) {
     return { session, index: baseline };
   }
 
-  // 5. Fallback an toàn cuối cùng
+  // 5. Fallback an toàn cuối cùng từ snapshot bộ nhớ
+  const lastKnown = memoryPriceCache['VNINDEX'] || null;
   const fallback = {
     symbol: 'VNINDEX',
     name: 'VN-Index',
-    point: 1735.09,
-    prevPoint: 1730.0,
-    change: 5.09,
-    changePct: 0.29,
-    updatedAt: now,
-    source: 'ESTIMATED',
+    point: lastKnown?.point || 0,
+    prevPoint: lastKnown?.prevPoint || 0,
+    change: lastKnown?.change || 0,
+    changePct: lastKnown?.changePct || 0,
+    updatedAt: lastKnown?.updatedAt || now,
+    source: lastKnown ? 'PREVIOUS_CACHE' : 'UNAVAILABLE',
   };
   return { session, index: fallback };
 }

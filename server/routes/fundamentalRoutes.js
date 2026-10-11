@@ -4,7 +4,7 @@ import { execFile } from 'child_process';
 import path from 'path';
 import { ROOT_DIR } from '../config/constants.js';
 import { getMultipleFundamentals } from '../services/fundamentalService.js';
-import { loadSupportedStocks, saveSupportedStocks, readData } from '../storage/jsonStore.js';
+import { loadSupportedStocks, saveSupportedStocks } from '../storage/jsonStore.js';
 
 const router = express.Router();
 

@@ -51,22 +51,30 @@ Dự án là nền tảng quản trị danh mục đầu tư chứng khoán cá 
 
 ---
 
-## 3. Triết Lý Lưu Trữ Dữ Liệu: "Local JSON First"
+## 3. Quy Chuẩn Kiến Trúc & Quản Trị Dữ Liệu 5 Tầng (Data Governance & Storage Tiering)
 
-Toàn bộ dữ liệu tài chính, định giá và thị trường đều được thu thập và lưu trữ dưới dạng **JSON có cấu trúc tại thư mục `data/`** trước khi đồng bộ vào cơ sở dữ liệu SQLite (`data/stock.db` hoặc Turso Cloud):
+Hệ thống phân định rạch ròi dữ liệu thành 5 tầng độc lập nhằm bảo đảm tính toàn vẹn, bảo mật và tốc độ truy vấn 0ms:
 
-| File Dữ Liệu | Mục Đích & Nội Dung |
-| :--- | :--- |
-| `data/fundamentals_cache.json` | Snapshot định giá cơ bản, chỉ số P/E, P/B, ROE, Beta, Tech Score của tất cả các mã. |
-| `data/macro_valuation.json` | Dữ liệu vĩ mô: VN-Index, 5-Phase Regime, Risk Score 4 tầng, Phân bổ 4 tài sản, Cố vấn vàng SJC. |
-| `data/macro_indicators.json` | 95 chỉ số vĩ mô TradingEconomics theo 10 phân nhóm (GDP, Lạm phát, Lao động, Tiền tệ, Cán cân...). |
-| `data/market_valuation_history.json` | Chuỗi dữ liệu định giá lịch sử thị trường 4 chu kỳ (1Y, 3Y, 5Y, 10Y): Absolute P/E, P/E, P/S, Vốn hóa, Doanh thu, Lợi nhuận từ Google Sheets Simply Wall St. |
-| `data/financials/<SYMBOL>.json` | Dữ liệu BCTC chi tiết 8 quý & 5 năm (122+ chỉ tiêu), 54 chỉ số Ratios, DuPont 3 nhân tố, Cổ tức & Cổ đông. |
-| `data/supported_stocks.json` | Danh sách các mã cổ phiếu được cấu hình theo dõi định giá. |
-| `data/prices_cache.json` | Cache thị giá khớp lệnh thời gian thực. |
-| `data/stock.db` | SQLite Database lưu trữ sổ lệnh mua/bán, danh mục nắm giữ, lịch sử nhận cổ tức và tài khoản. |
+| Tầng Dữ Liệu | Đối Tượng & Nội Dung | Vị Trí Lưu Trữ | Trạng Thái Git | Chu Kỳ & Bộ Điều Phối |
+| :--- | :--- | :--- | :--- | :--- |
+| **TẦNG 1: ACID Database** | Sổ lệnh mua/bán FIFO (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, cấu hình. | `data/stock.db` (Local) / Turso Cloud (Prod) | **GITIGNORED (100%)** *(Tuyệt đối không commit)* | Realtime khi user thao tác. Quản lý backup qua `scripts/db_manager.py`. |
+| **TẦNG 2: Ephemeral Cache** | Thị giá khớp lệnh realtime (VPS/TCBS), điểm số VNINDEX/VN30 trong phiên. | RAM Node.js + `data/prices_cache.json` | **GITIGNORED (100%)** *(Tránh git diff bẩn)* | Trong phiên (9:00 - 15:00 T2-T6). Cache TTL 1h (`priceService.js`). |
+| **TẦNG 3: Daily EOD Snapshot** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE. | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` hoặc `scripts/run_pipeline.py --cadence daily`. |
+| **TẦNG 4: Weekly Macro & Sector** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS, Lịch sử Simply Wall St, Tin tức 30 ngày. | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` hoặc `scripts/run_pipeline.py --cadence weekly`. |
+| **TẦNG 5: Quarterly BCTC Repository** | 122+ chỉ tiêu BCTC 8Q & 5Y, 54 Ratios, Extended DuPont, DCF 3 kịch bản, Cổ đông. | `data/financials/<MÃ>.json`, `data/vnindex_valuation_cache/` | **COMMIT VỀ GIT** | **Quarterly (Mùa BCTC)** hoặc **On-demand**: `scripts/run_pipeline.py --cadence quarterly`. |
+
+### Quy Tắc Vận Hành Pipeline Dữ Liệu:
+1. **Tuyệt đối không lưu dữ liệu giao dịch người dùng vào file JSON**: Toàn bộ nghiệp vụ lệnh mua/bán phải qua SQLite (`stock.db` / Turso). File `transactions.json` cũ chỉ đóng vai trò seed/backup tại `data/backups/`.
+2. **Tuyệt đối không lưu dữ liệu phân tích vĩ mô/BCTC vào SQLite**: Toàn bộ dữ liệu thị trường tuân thủ "Local JSON First" để React đọc trực tiếp 0ms.
+3. **Bộ Điều Phối Thống Nhất (`scripts/run_pipeline.py`)**:
+   - `python scripts/run_pipeline.py --cadence daily`: Chạy tác vụ EOD (10s).
+   - `python scripts/run_pipeline.py --cadence weekly`: Chạy tác vụ vĩ mô & ngành (10s).
+   - `python scripts/run_pipeline.py --cadence quarterly`: Chạy toàn bộ BCTC & DCF (25s).
+   - `python scripts/run_pipeline.py --cadence all`: Chạy toàn diện hệ thống.
+   - `python scripts/db_manager.py status|export|import`: Quản lý sao lưu/phục hồi DB.
 
 > 📌 **Chi tiết toàn diện về schema, nguồn dữ liệu và ma trận trường thông tin:** Xem tại [`docs/DATA_CATALOG.md`](file:///Users/thaihai-swe/Desktop/stock/docs/DATA_CATALOG.md).
+
 
 
 ---

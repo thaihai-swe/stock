@@ -1,7 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
-import { fmtMoney, plColor, plBg, getStockColor, fmtBillion, fmtPercent } from '../utils/format.js';
+import { useState, useMemo } from 'react';
+import { fmtMoney, plColor, plBg, getStockColor } from '../utils/format.js';
 import { computeStockPerformance } from '../utils/stockAnalytics.js';
-import { fetchFundamentals } from '../utils/api.js';
 
 export default function StockPerformanceTable({
   data = {},
@@ -10,17 +9,12 @@ export default function StockPerformanceTable({
 }) {
   const { buyOrders = [], sellOrders = [], dividends = [] } = data;
 
-  const [viewMode, setViewMode] = useState('performance'); // 'performance' | 'valuation'
   const [textSearch, setTextSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'holding' | 'closed'
   const [pnlFilter, setPnlFilter] = useState('all'); // 'all' | 'profit' | 'loss'
   const [sortField, setSortField] = useState('cumulativePL');
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' | 'desc'
   const [mobileViewMode, setMobileViewMode] = useState('card'); // 'card' | 'table'
-
-  // Fundamental data map
-  const [fundamentalsMap, setFundamentalsMap] = useState({});
-  const [loadingFundamentals, setLoadingFundamentals] = useState(false);
 
   // Tính toán toàn bộ chỉ số từ engine
   const performanceData = useMemo(() => {
@@ -33,43 +27,17 @@ export default function StockPerformanceTable({
     topLossStock,
     topDividendStock,
     totalAllCumulativePL,
-    totalAllRealizedPL,
-    totalAllCashDividends,
-    totalAllUnrealizedPL,
     overallWinRate,
     holdingSymbolsCount,
     closedSymbolsCount,
   } = performanceData;
 
-  // Lấy dữ liệu cơ bản cho tất cả mã trong danh mục
-  useEffect(() => {
-    if (stockList.length === 0) return;
-    const symbols = stockList.map(s => s.symbol);
-    let isMounted = true;
-    setLoadingFundamentals(true);
-
-    fetchFundamentals(symbols, false)
-      .then(map => {
-        if (isMounted && map) setFundamentalsMap(map);
-      })
-      .catch(err => console.warn('Lỗi lấy dữ liệu cơ bản cho danh mục:', err))
-      .finally(() => {
-        if (isMounted) setLoadingFundamentals(false);
-      });
-
-    return () => { isMounted = false; };
-  }, [stockList]);
-
   // Lọc dữ liệu
   const filtered = useMemo(() => {
     return stockList.filter(s => {
-      // Tìm kiếm theo mã hoặc ngành
+      // Tìm kiếm theo mã cổ phiếu
       const sym = s.symbol.toUpperCase();
-      const fund = fundamentalsMap[sym];
-      const matchSearch = !textSearch || 
-        sym.includes(textSearch.trim().toUpperCase()) ||
-        (fund?.sector && fund.sector.toLowerCase().includes(textSearch.trim().toLowerCase())) ||
-        (fund?.industry && fund.industry.toLowerCase().includes(textSearch.trim().toLowerCase()));
+      const matchSearch = !textSearch || sym.includes(textSearch.trim().toUpperCase());
 
       if (!matchSearch) return false;
 
@@ -83,22 +51,12 @@ export default function StockPerformanceTable({
 
       return true;
     });
-  }, [stockList, textSearch, statusFilter, pnlFilter, fundamentalsMap]);
+  }, [stockList, textSearch, statusFilter, pnlFilter]);
 
   // Sắp xếp
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
       let valA, valB;
-      const fundA = fundamentalsMap[a.symbol];
-      const fundB = fundamentalsMap[b.symbol];
-
-      // Tính YoC nếu có
-      const yocA = (a.isHolding && a.avgCost > 0 && fundA?.dividends?.dps)
-        ? (fundA.dividends.dps / a.avgCost) * 100
-        : 0;
-      const yocB = (b.isHolding && b.avgCost > 0 && fundB?.dividends?.dps)
-        ? (fundB.dividends.dps / b.avgCost) * 100
-        : 0;
 
       switch (sortField) {
         case 'symbol':
@@ -133,39 +91,6 @@ export default function StockPerformanceTable({
           valA = a.winRate;
           valB = b.winRate;
           break;
-        // Các trường Định Giá (Valuation)
-        case 'pe':
-          valA = fundA?.valuation?.pe ?? 9999;
-          valB = fundB?.valuation?.pe ?? 9999;
-          break;
-        case 'pb':
-          valA = fundA?.valuation?.pb ?? 9999;
-          valB = fundB?.valuation?.pb ?? 9999;
-          break;
-        case 'roe':
-          valA = fundA?.profitability?.roe ?? -9999;
-          valB = fundB?.profitability?.roe ?? -9999;
-          break;
-        case 'dividendYield':
-          valA = fundA?.dividends?.yield ?? -9999;
-          valB = fundB?.dividends?.yield ?? -9999;
-          break;
-        case 'yoc':
-          valA = yocA;
-          valB = yocB;
-          break;
-        case 'marketCap':
-          valA = fundA?.scale?.marketCap ?? 0;
-          valB = fundB?.scale?.marketCap ?? 0;
-          break;
-        case 'beta':
-          valA = fundA?.technicals?.beta ?? 1;
-          valB = fundB?.technicals?.beta ?? 1;
-          break;
-        case 'range52w':
-          valA = fundA?.performance?.range52wPercent ?? 0;
-          valB = fundB?.performance?.range52wPercent ?? 0;
-          break;
         case 'cumulativePL':
         default:
           valA = a.cumulativePL;
@@ -178,15 +103,14 @@ export default function StockPerformanceTable({
       }
       return sortDirection === 'asc' ? valA - valB : valB - valA;
     });
-  }, [filtered, sortField, sortDirection, fundamentalsMap]);
+  }, [filtered, sortField, sortDirection]);
 
   function handleSort(field) {
     if (sortField === field) {
       setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortField(field);
-      // P/E mặc định asc (thấp nhất là rẻ nhất), còn lại desc
-      setSortDirection(field === 'pe' ? 'asc' : 'desc');
+      setSortDirection('desc');
     }
   }
 
@@ -200,16 +124,6 @@ export default function StockPerformanceTable({
       </span>
     );
   }
-
-  // Tổng kết các mã đang được lọc
-  const summaryFiltered = useMemo(() => {
-    const totalInvested = sorted.reduce((sum, s) => sum + s.totalInvested, 0);
-    const realizedPL = sorted.reduce((sum, s) => sum + s.realizedPL, 0);
-    const unrealizedPL = sorted.reduce((sum, s) => sum + s.unrealizedPL, 0);
-    const cashDividends = sorted.reduce((sum, s) => sum + s.cashDividends, 0);
-    const cumulativePL = sorted.reduce((sum, s) => sum + s.cumulativePL, 0);
-    return { totalInvested, realizedPL, unrealizedPL, cashDividends, cumulativePL };
-  }, [sorted]);
 
   if (stockList.length === 0) {
     return (
@@ -336,43 +250,14 @@ export default function StockPerformanceTable({
         </div>
       </div>
 
-      {/* 2. Thanh Công Cụ & Chuyển Đổi Chế Độ Xem (Toolbar & Mode Switcher) */}
+      {/* 2. Thanh Công Cụ & Bộ Lọc Dữ Liệu (Toolbar & Filters) */}
       <div className="bg-white rounded-2xl p-4 border border-gray-200/80 shadow-2xs space-y-3">
-        {/* Hàng 1: Switcher Chế độ xem & Search */}
+        {/* Hàng 1: Tiêu đề & Ô Tìm Kiếm */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* View Mode Toggle: Lãi/Lỗ vs Định Giá */}
-          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200/60">
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('performance');
-                setSortField('cumulativePL');
-                setSortDirection('desc');
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === 'performance'
-                  ? 'bg-white text-indigo-700 shadow-2xs'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              <span>🎯</span> Lãi/Lỗ Tích Luỹ
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('valuation');
-                setSortField('pe');
-                setSortDirection('asc');
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === 'valuation'
-                  ? 'bg-white text-indigo-700 shadow-2xs'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              <span>💡</span> Bảng Định Giá Cơ Bản
-              {loadingFundamentals && <span className="animate-spin text-[10px]">🔄</span>}
-            </button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
+              <span>🎯</span> Sổ Hiệu Suất Theo Mã (FIFO Cumulative P&L)
+            </span>
           </div>
 
           {/* Ô Tìm Kiếm */}
@@ -381,7 +266,7 @@ export default function StockPerformanceTable({
               type="text"
               value={textSearch}
               onChange={e => setTextSearch(e.target.value)}
-              placeholder="🔍 Tìm mã hoặc ngành..."
+              placeholder="🔍 Tìm mã cổ phiếu..."
               className="px-3 py-1.5 pl-8 border border-gray-200 rounded-xl text-xs uppercase font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 w-44 sm:w-56"
             />
             <span className="absolute left-2.5 top-1.5 text-xs text-gray-400">🔍</span>
@@ -389,7 +274,7 @@ export default function StockPerformanceTable({
               <button
                 type="button"
                 onClick={() => setTextSearch('')}
-                className="absolute right-2 top-1.5 text-xs text-gray-400 hover:text-gray-600 font-bold"
+                className="absolute right-2 top-1.5 text-xs text-gray-400 hover:text-gray-600 font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -397,7 +282,7 @@ export default function StockPerformanceTable({
           </div>
         </div>
 
-        {/* Hàng 2: Bộ lọc trạng thái & Chuyển đổi Card/Table mobile */}
+        {/* Hàng 2: Bộ lọc trạng thái, P&L & Chuyển đổi Card/Table mobile */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100">
           <div className="flex flex-wrap items-center gap-2">
             {/* Lọc Trạng Thái */}
@@ -431,38 +316,36 @@ export default function StockPerformanceTable({
               </button>
             </div>
 
-            {/* Lọc Lãi / Lỗ (chỉ hiện khi ở tab performance) */}
-            {viewMode === 'performance' && (
-              <div className="flex items-center gap-1 bg-gray-100 p-0.5 rounded-xl text-xs">
-                <button
-                  type="button"
-                  onClick={() => setPnlFilter('all')}
-                  className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
-                    pnlFilter === 'all' ? 'bg-white text-gray-900 shadow-2xs font-bold' : 'text-gray-500 hover:text-gray-800 font-medium'
-                  }`}
-                >
-                  Toàn bộ P&L
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPnlFilter('profit')}
-                  className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
-                    pnlFilter === 'profit' ? 'bg-white text-emerald-700 shadow-2xs font-bold' : 'text-gray-500 hover:text-gray-800 font-medium'
-                  }`}
-                >
-                  Có lời (+)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPnlFilter('loss')}
-                  className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
-                    pnlFilter === 'loss' ? 'bg-white text-rose-700 shadow-2xs font-bold' : 'text-gray-500 hover:text-gray-800 font-medium'
-                  }`}
-                >
-                  Thua lỗ (-)
-                </button>
-              </div>
-            )}
+            {/* Lọc Lãi / Lỗ */}
+            <div className="flex items-center gap-1 bg-gray-100 p-0.5 rounded-xl text-xs">
+              <button
+                type="button"
+                onClick={() => setPnlFilter('all')}
+                className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+                  pnlFilter === 'all' ? 'bg-white text-gray-900 shadow-2xs font-bold' : 'text-gray-500 hover:text-gray-800 font-medium'
+                }`}
+              >
+                Toàn bộ P&L
+              </button>
+              <button
+                type="button"
+                onClick={() => setPnlFilter('profit')}
+                className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+                  pnlFilter === 'profit' ? 'bg-white text-emerald-700 shadow-2xs font-bold' : 'text-gray-500 hover:text-gray-800 font-medium'
+                }`}
+              >
+                Có lời (+)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPnlFilter('loss')}
+                className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+                  pnlFilter === 'loss' ? 'bg-white text-rose-700 shadow-2xs font-bold' : 'text-gray-500 hover:text-gray-800 font-medium'
+                }`}
+              >
+                Thua lỗ (-)
+              </button>
+            </div>
           </div>
 
           {/* Toggle Thẻ / Bảng cho Mobile */}
@@ -499,475 +382,213 @@ export default function StockPerformanceTable({
         </div>
       </div>
 
-      {/* 3. Chế Độ Xem 1: HIỆU SUẤT GIAO DỊCH (LÃI LỖ TÍCH LUỸ) */}
-      {viewMode === 'performance' && (
-        <>
-          {/* Mobile Card View */}
-          <div className={`sm:hidden space-y-3 ${mobileViewMode === 'card' ? 'block' : 'hidden'}`}>
-            {sorted.map(s => {
-              const stockColor = getStockColor(s.symbol, stockList);
-              const isProfit = s.cumulativePL >= 0;
+      {/* 3. BẢNG HIỆU SUẤT GIAO DỊCH (LÃI LỖ TÍCH LUỸ THEO CHUẨN FIFO) */}
+      {/* Mobile Card View */}
+      <div className={`sm:hidden space-y-3 ${mobileViewMode === 'card' ? 'block' : 'hidden'}`}>
+        {sorted.map(s => {
+          const stockColor = getStockColor(s.symbol, stockList);
+          const isProfit = s.cumulativePL >= 0;
 
-              return (
-                <div
-                  key={`perf-card-${s.symbol}`}
-                  onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
-                  className="bg-white rounded-2xl p-4 border border-gray-200/80 shadow-2xs hover:border-indigo-300 transition-all cursor-pointer space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
-                        style={{
-                          backgroundColor: `${stockColor}15`,
-                          borderColor: `${stockColor}40`,
-                          color: stockColor,
-                        }}
-                      >
+          return (
+            <div
+              key={`perf-card-${s.symbol}`}
+              onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
+              className="bg-white rounded-2xl p-4 border border-gray-200/80 shadow-2xs hover:border-indigo-300 transition-all cursor-pointer space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
+                    style={{
+                      backgroundColor: `${stockColor}15`,
+                      borderColor: `${stockColor}40`,
+                      color: stockColor,
+                    }}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full mr-1.5 shrink-0"
+                      style={{ backgroundColor: stockColor }}
+                    />
+                    {s.symbol}
+                  </span>
+
+                  {s.isHolding ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      🟢 Giữ {s.holdingQty.toLocaleString()} cp
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">
+                      ⚪ Đã tất toán
+                    </span>
+                  )}
+                </div>
+
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${plBg(s.cumulativePL)}`}>
+                  {isProfit ? '▲ +' : '▼ '}{s.roiPct}% ROI
+                </span>
+              </div>
+
+              <div className="flex items-baseline justify-between pt-1 border-t border-gray-100">
+                <span className="text-xs text-gray-400 font-medium">Lãi / Lỗ Tích Luỹ:</span>
+                <span className={`text-lg font-extrabold ${plColor(s.cumulativePL)}`}>
+                  {isProfit ? '+' : ''}{fmtMoney(s.cumulativePL)}đ
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-[11px] bg-gray-50/80 p-2.5 rounded-xl border border-gray-100">
+                <div>
+                  <span className="text-gray-400 block text-[10px]">Đã chốt</span>
+                  <span className={`font-bold ${plColor(s.realizedPL)}`}>
+                    {s.realizedPL >= 0 ? '+' : ''}{fmtMoney(s.realizedPL)}đ
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block text-[10px]">Tạm tính</span>
+                  {s.isHolding ? (
+                    <span className={`font-bold ${plColor(s.unrealizedPL)}`}>
+                      {s.unrealizedPL >= 0 ? '+' : ''}{fmtMoney(s.unrealizedPL)}đ
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 font-medium">—</span>
+                  )}
+                </div>
+                <div>
+                  <span className="text-gray-400 block text-[10px]">Cổ tức</span>
+                  <span className="font-bold text-amber-700">
+                    +{fmtMoney(s.cashDividends)}đ
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead className="bg-gray-50/80 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100 select-none">
+              <tr>
+                <th onClick={() => handleSort('symbol')} className="px-5 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">Mã CP {renderSortIcon('symbol')}</span>
+                </th>
+                <th onClick={() => handleSort('status')} className="text-center px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">Trạng thái {renderSortIcon('status')}</span>
+                </th>
+                <th onClick={() => handleSort('totalInvested')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">Tổng vốn mua {renderSortIcon('totalInvested')}</span>
+                </th>
+                <th onClick={() => handleSort('realizedPL')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">Lãi đã chốt {renderSortIcon('realizedPL')}</span>
+                </th>
+                <th onClick={() => handleSort('unrealizedPL')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">Lãi tạm tính {renderSortIcon('unrealizedPL')}</span>
+                </th>
+                <th onClick={() => handleSort('cashDividends')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">Cổ tức nhận {renderSortIcon('cashDividends')}</span>
+                </th>
+                <th onClick={() => handleSort('cumulativePL')} className="text-right px-5 py-3.5 font-extrabold text-indigo-900 bg-indigo-50/50 cursor-pointer group hover:bg-indigo-100/60">
+                  <span className="inline-flex items-center">🎯 Lãi Tích Luỹ {renderSortIcon('cumulativePL')}</span>
+                </th>
+                <th onClick={() => handleSort('roiPct')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                  <span className="inline-flex items-center">ROI {renderSortIcon('roiPct')}</span>
+                </th>
+                <th className="text-center px-4 py-3.5 text-gray-400 font-normal">Sổ cái</th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-gray-100">
+              {sorted.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="py-12 text-center text-gray-400 text-xs">
+                    Không tìm thấy mã cổ phiếu nào phù hợp với bộ lọc.
+                  </td>
+                </tr>
+              ) : (
+                sorted.map(s => {
+                  const stockColor = getStockColor(s.symbol, stockList);
+                  const isProfit = s.cumulativePL >= 0;
+
+                  return (
+                    <tr
+                      key={s.symbol}
+                      onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
+                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
+                    >
+                      <td className="px-5 py-4">
                         <span
-                          className="w-2 h-2 rounded-full mr-1.5 shrink-0"
-                          style={{ backgroundColor: stockColor }}
-                        />
-                        {s.symbol}
-                      </span>
-
-                      {s.isHolding ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          🟢 Giữ {s.holdingQty.toLocaleString()} cp
+                          className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border transition-transform group-hover:scale-105"
+                          style={{
+                            backgroundColor: `${stockColor}15`,
+                            borderColor: `${stockColor}40`,
+                            color: stockColor,
+                          }}
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full mr-1.5 shrink-0"
+                            style={{ backgroundColor: stockColor }}
+                          />
+                          {s.symbol}
                         </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">
-                          ⚪ Đã tất toán
-                        </span>
-                      )}
-                    </div>
+                      </td>
 
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${plBg(s.cumulativePL)}`}>
-                      {isProfit ? '▲ +' : '▼ '}{s.roiPct}% ROI
-                    </span>
-                  </div>
+                      <td className="px-4 py-4 text-center">
+                        {s.isHolding ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Giữ {s.holdingQty.toLocaleString()} cp
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
+                            Đã tất toán
+                          </span>
+                        )}
+                      </td>
 
-                  <div className="flex items-baseline justify-between pt-1 border-t border-gray-100">
-                    <span className="text-xs text-gray-400 font-medium">Lãi / Lỗ Tích Luỹ:</span>
-                    <span className={`text-lg font-extrabold ${plColor(s.cumulativePL)}`}>
-                      {isProfit ? '+' : ''}{fmtMoney(s.cumulativePL)}đ
-                    </span>
-                  </div>
+                      <td className="px-4 py-4 text-right font-semibold text-gray-800">
+                        {fmtMoney(s.totalInvested)}đ
+                      </td>
 
-                  <div className="grid grid-cols-3 gap-2 text-[11px] bg-gray-50/80 p-2.5 rounded-xl border border-gray-100">
-                    <div>
-                      <span className="text-gray-400 block text-[10px]">Đã chốt</span>
-                      <span className={`font-bold ${plColor(s.realizedPL)}`}>
+                      <td className={`px-4 py-4 text-right font-bold ${plColor(s.realizedPL)}`}>
                         {s.realizedPL >= 0 ? '+' : ''}{fmtMoney(s.realizedPL)}đ
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 block text-[10px]">Tạm tính</span>
-                      {s.isHolding ? (
-                        <span className={`font-bold ${plColor(s.unrealizedPL)}`}>
-                          {s.unrealizedPL >= 0 ? '+' : ''}{fmtMoney(s.unrealizedPL)}đ
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 font-medium">—</span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-gray-400 block text-[10px]">Cổ tức</span>
-                      <span className="font-bold text-amber-700">
+                      </td>
+
+                      <td className="px-4 py-4 text-right">
+                        {s.isHolding ? (
+                          <span className={`font-bold ${plColor(s.unrealizedPL)}`}>
+                            {s.unrealizedPL >= 0 ? '+' : ''}{fmtMoney(s.unrealizedPL)}đ
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-4 text-right font-bold text-amber-700">
                         +{fmtMoney(s.cashDividends)}đ
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                      </td>
 
-          {/* Desktop Table View */}
-          <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-gray-50/80 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100 select-none">
-                  <tr>
-                    <th onClick={() => handleSort('symbol')} className="px-5 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Mã CP {renderSortIcon('symbol')}</span>
-                    </th>
-                    <th onClick={() => handleSort('status')} className="text-center px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Trạng thái {renderSortIcon('status')}</span>
-                    </th>
-                    <th onClick={() => handleSort('totalInvested')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Tổng vốn mua {renderSortIcon('totalInvested')}</span>
-                    </th>
-                    <th onClick={() => handleSort('realizedPL')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Lãi đã chốt {renderSortIcon('realizedPL')}</span>
-                    </th>
-                    <th onClick={() => handleSort('unrealizedPL')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Lãi tạm tính {renderSortIcon('unrealizedPL')}</span>
-                    </th>
-                    <th onClick={() => handleSort('cashDividends')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Cổ tức nhận {renderSortIcon('cashDividends')}</span>
-                    </th>
-                    <th onClick={() => handleSort('cumulativePL')} className="text-right px-5 py-3.5 font-extrabold text-indigo-900 bg-indigo-50/50 cursor-pointer group hover:bg-indigo-100/60">
-                      <span className="inline-flex items-center">🎯 Lãi Tích Luỹ {renderSortIcon('cumulativePL')}</span>
-                    </th>
-                    <th onClick={() => handleSort('roiPct')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">ROI {renderSortIcon('roiPct')}</span>
-                    </th>
-                    <th className="text-center px-4 py-3.5 text-gray-400 font-normal">Sổ cái</th>
-                  </tr>
-                </thead>
+                      <td className={`px-5 py-4 text-right font-black text-sm bg-indigo-50/30 ${plColor(s.cumulativePL)}`}>
+                        {isProfit ? '+' : ''}{fmtMoney(s.cumulativePL)}đ
+                      </td>
 
-                <tbody className="divide-y divide-gray-100">
-                  {sorted.length === 0 ? (
-                    <tr>
-                      <td colSpan="9" className="py-12 text-center text-gray-400 text-xs">
-                        Không tìm thấy mã cổ phiếu nào phù hợp với bộ lọc.
+                      <td className="px-4 py-4 text-right">
+                        <span className={`inline-block px-2 py-0.5 rounded-md font-bold text-[11px] ${plBg(s.cumulativePL)}`}>
+                          {isProfit ? '▲ +' : '▼ '}{s.roiPct}%
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4 text-center text-gray-400 group-hover:text-indigo-600">
+                        📖
                       </td>
                     </tr>
-                  ) : (
-                    sorted.map(s => {
-                      const stockColor = getStockColor(s.symbol, stockList);
-                      const isProfit = s.cumulativePL >= 0;
-
-                      return (
-                        <tr
-                          key={s.symbol}
-                          onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
-                          className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
-                        >
-                          <td className="px-5 py-4">
-                            <span
-                              className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border transition-transform group-hover:scale-105"
-                              style={{
-                                backgroundColor: `${stockColor}15`,
-                                borderColor: `${stockColor}40`,
-                                color: stockColor,
-                              }}
-                            >
-                              <span
-                                className="w-2 h-2 rounded-full mr-1.5 shrink-0"
-                                style={{ backgroundColor: stockColor }}
-                              />
-                              {s.symbol}
-                            </span>
-                          </td>
-
-                          <td className="px-4 py-4 text-center">
-                            {s.isHolding ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                Giữ {s.holdingQty.toLocaleString()} cp
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
-                                Đã tất toán
-                              </span>
-                            )}
-                          </td>
-
-                          <td className="px-4 py-4 text-right font-semibold text-gray-800">
-                            {fmtMoney(s.totalInvested)}đ
-                          </td>
-
-                          <td className={`px-4 py-4 text-right font-bold ${plColor(s.realizedPL)}`}>
-                            {s.realizedPL >= 0 ? '+' : ''}{fmtMoney(s.realizedPL)}đ
-                          </td>
-
-                          <td className="px-4 py-4 text-right">
-                            {s.isHolding ? (
-                              <span className={`font-bold ${plColor(s.unrealizedPL)}`}>
-                                {s.unrealizedPL >= 0 ? '+' : ''}{fmtMoney(s.unrealizedPL)}đ
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">—</span>
-                            )}
-                          </td>
-
-                          <td className="px-4 py-4 text-right font-bold text-amber-700">
-                            +{fmtMoney(s.cashDividends)}đ
-                          </td>
-
-                          <td className={`px-5 py-4 text-right font-black text-sm bg-indigo-50/30 ${plColor(s.cumulativePL)}`}>
-                            {isProfit ? '+' : ''}{fmtMoney(s.cumulativePL)}đ
-                          </td>
-
-                          <td className="px-4 py-4 text-right">
-                            <span className={`inline-block px-2 py-0.5 rounded-md font-bold text-[11px] ${plBg(s.cumulativePL)}`}>
-                              {isProfit ? '▲ +' : '▼ '}{s.roiPct}%
-                            </span>
-                          </td>
-
-                          <td className="px-4 py-4 text-center text-gray-400 group-hover:text-indigo-600">
-                            📖
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* 4. Chế Độ Xem 2: BẢNG ĐỊNH GIÁ & CƠ BẢN DOANH NGHIỆP */}
-      {viewMode === 'valuation' && (
-        <>
-          {/* Mobile Card View for Valuation */}
-          <div className={`sm:hidden space-y-3 ${mobileViewMode === 'card' ? 'block' : 'hidden'}`}>
-            {sorted.map(s => {
-              const stockColor = getStockColor(s.symbol, stockList);
-              const fund = fundamentalsMap[s.symbol];
-              const pe = fund?.valuation?.pe;
-              const roe = fund?.profitability?.roe;
-              const yieldPct = fund?.dividends?.yield;
-              const yoc = (s.isHolding && s.avgCost > 0 && fund?.dividends?.dps)
-                ? Number(((fund.dividends.dps / s.avgCost) * 100).toFixed(2))
-                : null;
-
-              return (
-                <div
-                  key={`val-card-${s.symbol}`}
-                  onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
-                  className="bg-white rounded-2xl p-4 border border-gray-200/80 shadow-2xs hover:border-indigo-300 transition-all cursor-pointer space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
-                        style={{
-                          backgroundColor: `${stockColor}15`,
-                          borderColor: `${stockColor}40`,
-                          color: stockColor,
-                        }}
-                      >
-                        <span className="w-2 h-2 rounded-full mr-1.5 shrink-0" style={{ backgroundColor: stockColor }} />
-                        {s.symbol}
-                      </span>
-                      <span className="text-[11px] font-bold text-gray-700 truncate max-w-[140px]">
-                        {fund?.description || s.symbol}
-                      </span>
-                    </div>
-
-                    {fund?.technicals?.recommendText && (
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${fund.technicals.recommendColor}`}>
-                        {fund.technicals.recommendText}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Vốn hóa & Ngành */}
-                  <div className="text-[11px] text-gray-500 flex items-center justify-between">
-                    <span>🏢 {fund?.sector || '—'}</span>
-                    <span className="font-bold text-indigo-700">Vốn hóa: {fmtBillion(fund?.scale?.marketCap)}</span>
-                  </div>
-
-                  {/* Grid 4 Chỉ Số Cơ Bản */}
-                  <div className="grid grid-cols-4 gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-center">
-                    <div>
-                      <span className="text-[10px] text-gray-400 block font-semibold">P/E</span>
-                      <span className="text-xs font-black text-indigo-950 block mt-0.5">
-                        {pe != null ? `${pe}x` : '—'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-gray-400 block font-semibold">P/B</span>
-                      <span className="text-xs font-black text-blue-950 block mt-0.5">
-                        {fund?.valuation?.pb != null ? `${fund.valuation.pb}x` : '—'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-gray-400 block font-semibold">ROE</span>
-                      <span className={`text-xs font-black block mt-0.5 ${roe && roe >= 15 ? 'text-emerald-700' : 'text-gray-900'}`}>
-                        {roe != null ? `${roe}%` : '—'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-gray-400 block font-semibold">Yield %</span>
-                      <span className="text-xs font-black text-amber-700 block mt-0.5">
-                        {yieldPct != null ? `${yieldPct}%` : '—'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* YoC & Vị trí 52 tuần */}
-                  <div className="flex items-center justify-between text-[11px] pt-1 border-t border-gray-100">
-                    <span className="text-gray-500">
-                      💎 YoC của bạn: <b className="text-indigo-700">{yoc != null ? `${yoc}%` : '—'}</b>
-                    </span>
-                    <span className="text-gray-500">
-                      Chu kỳ 52w: <b className="text-gray-900">{fund?.performance?.range52wPercent != null ? `${fund.performance.range52wPercent}%` : '—'}</b>
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Desktop Table View for Valuation */}
-          <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-gray-50/80 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100 select-none">
-                  <tr>
-                    <th onClick={() => handleSort('symbol')} className="px-5 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Mã CP {renderSortIcon('symbol')}</span>
-                    </th>
-                    <th className="px-4 py-3.5 text-gray-500">
-                      Ngành nghề
-                    </th>
-                    <th onClick={() => handleSort('marketCap')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Vốn Hóa {renderSortIcon('marketCap')}</span>
-                    </th>
-                    <th onClick={() => handleSort('pe')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60 font-extrabold text-indigo-900 bg-indigo-50/40">
-                      <span className="inline-flex items-center">🏷️ P/E (TTM) {renderSortIcon('pe')}</span>
-                    </th>
-                    <th onClick={() => handleSort('pb')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">P/B {renderSortIcon('pb')}</span>
-                    </th>
-                    <th onClick={() => handleSort('roe')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60 font-extrabold text-emerald-900 bg-emerald-50/40">
-                      <span className="inline-flex items-center">⚡ ROE (%) {renderSortIcon('roe')}</span>
-                    </th>
-                    <th onClick={() => handleSort('dividendYield')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">🎁 Yield % {renderSortIcon('dividendYield')}</span>
-                    </th>
-                    <th onClick={() => handleSort('yoc')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60 font-bold text-amber-900 bg-amber-50/40">
-                      <span className="inline-flex items-center">💎 YoC (Bạn) {renderSortIcon('yoc')}</span>
-                    </th>
-                    <th onClick={() => handleSort('range52w')} className="px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60 text-center">
-                      <span className="inline-flex items-center">Vị trí 52w {renderSortIcon('range52w')}</span>
-                    </th>
-                    <th onClick={() => handleSort('beta')} className="text-right px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
-                      <span className="inline-flex items-center">Beta 1Y {renderSortIcon('beta')}</span>
-                    </th>
-                    <th className="text-center px-4 py-3.5 text-gray-500">
-                      Kỹ thuật
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100">
-                  {sorted.length === 0 ? (
-                    <tr>
-                      <td colSpan="11" className="py-12 text-center text-gray-400 text-xs">
-                        Không tìm thấy dữ liệu định giá phù hợp.
-                      </td>
-                    </tr>
-                  ) : (
-                    sorted.map(s => {
-                      const stockColor = getStockColor(s.symbol, stockList);
-                      const fund = fundamentalsMap[s.symbol];
-                      const pe = fund?.valuation?.pe;
-                      const pb = fund?.valuation?.pb;
-                      const roe = fund?.profitability?.roe;
-                      const yieldPct = fund?.dividends?.yield;
-                      const yoc = (s.isHolding && s.avgCost > 0 && fund?.dividends?.dps)
-                        ? Number(((fund.dividends.dps / s.avgCost) * 100).toFixed(2))
-                        : null;
-                      const range52w = fund?.performance?.range52wPercent;
-
-                      return (
-                        <tr
-                          key={`val-row-${s.symbol}`}
-                          onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
-                          className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
-                        >
-                          {/* 1. Mã CP */}
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border transition-transform group-hover:scale-105"
-                                style={{
-                                  backgroundColor: `${stockColor}15`,
-                                  borderColor: `${stockColor}40`,
-                                  color: stockColor,
-                                }}
-                              >
-                                <span className="w-2 h-2 rounded-full mr-1.5 shrink-0" style={{ backgroundColor: stockColor }} />
-                                {s.symbol}
-                              </span>
-                              <span className="text-[11px] text-gray-500 truncate max-w-[120px]" title={fund?.description}>
-                                {fund?.description || s.symbol}
-                              </span>
-                            </div>
-                          </td>
-
-                          {/* 2. Ngành */}
-                          <td className="px-4 py-4 text-gray-600 truncate max-w-[130px]" title={fund?.industry || fund?.sector}>
-                            {fund?.industry || fund?.sector || '—'}
-                          </td>
-
-                          {/* 3. Vốn hóa */}
-                          <td className="px-4 py-4 text-right font-semibold text-gray-800">
-                            {fmtBillion(fund?.scale?.marketCap)}
-                          </td>
-
-                          {/* 4. P/E */}
-                          <td className="px-4 py-4 text-right font-black text-indigo-950 bg-indigo-50/20">
-                            {pe != null ? `${pe}x` : '—'}
-                          </td>
-
-                          {/* 5. P/B */}
-                          <td className="px-4 py-4 text-right text-gray-800">
-                            {pb != null ? `${pb}x` : '—'}
-                          </td>
-
-                          {/* 6. ROE */}
-                          <td className="px-4 py-4 text-right bg-emerald-50/20">
-                            <span className={`font-bold ${roe && roe >= 15 ? 'text-emerald-700' : 'text-gray-800'}`}>
-                              {roe != null ? `${roe}%` : '—'}
-                            </span>
-                          </td>
-
-                          {/* 7. Yield % */}
-                          <td className="px-4 py-4 text-right font-bold text-amber-700">
-                            {yieldPct != null ? `${yieldPct}%` : '—'}
-                          </td>
-
-                          {/* 8. YoC của bạn */}
-                          <td className="px-4 py-4 text-right font-extrabold bg-amber-50/20 text-indigo-700">
-                            {yoc != null ? `${yoc}%` : <span className="text-gray-300 font-normal">—</span>}
-                          </td>
-
-                          {/* 9. Vị trí 52w */}
-                          <td className="px-4 py-4 text-center">
-                            {range52w != null ? (
-                              <div className="w-20 mx-auto">
-                                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full"
-                                    style={{ width: `${Math.max(5, range52w)}%` }}
-                                  />
-                                </div>
-                                <span className="text-[9px] text-gray-400 block mt-0.5">{range52w}% từ đáy</span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-300">—</span>
-                            )}
-                          </td>
-
-                          {/* 10. Beta */}
-                          <td className="px-4 py-4 text-right text-gray-600 font-medium">
-                            {fund?.technicals?.beta != null ? fund.technicals.beta : '—'}
-                          </td>
-
-                          {/* 11. Đánh giá */}
-                          <td className="px-4 py-4 text-center">
-                            <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${fund?.technicals?.recommendColor || 'text-gray-400'}`}>
-                              {fund?.technicals?.recommendText || '—'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

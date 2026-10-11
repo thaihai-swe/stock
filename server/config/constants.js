@@ -14,5 +14,6 @@ export const MACRO_VALUATION_FILE = path.join(DATA_DIR, 'macro_valuation.json');
 export const DIST_DIR = path.join(ROOT_DIR, 'dist');
 
 export const PORT = process.env.PORT || 3001;
-export const IN_SESSION_TTL_MS = 60 * 1000; // 60 giây trong phiên giao dịch
+export const IN_SESSION_TTL_MS = 60 * 60 * 1000; // 1 giờ (60 phút) trong phiên giao dịch
 export const FUNDAMENTALS_TTL_MS = 12 * 60 * 60 * 1000; // 12 giờ cho dữ liệu định giá cơ bản
+

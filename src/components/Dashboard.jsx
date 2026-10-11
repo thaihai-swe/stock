@@ -10,6 +10,7 @@ import {
 } from '../utils/format.js';
 import MonthlyPLChart from './charts/MonthlyPLChart.jsx';
 import PortfolioChart from './charts/PortfolioChart.jsx';
+import StockContributionChart from './charts/StockContributionChart.jsx';
 import StockDetailModal from './StockDetailModal.jsx';
 
 function StatCard({ label, value, sub, highlight }) {
@@ -1198,8 +1199,9 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         </div>
       </div>
 
-      {/* Biểu Đồ Trực Quan */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Biểu Đồ Trực Quan - 3 Hàng Chuyên Sâu */}
+      <div className="space-y-4">
+        {/* Hàng 1: Phân Bổ Vốn Danh Mục (Toggle Theo Mã CP / Theo Nhóm Ngành) */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-gray-700 text-sm flex items-center gap-1.5">
@@ -1207,17 +1209,39 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
             </h3>
             <span className="text-xs text-gray-400">Theo giá trị nắm giữ</span>
           </div>
-          <PortfolioChart portfolio={portfolio} />
+          <PortfolioChart
+            portfolio={portfolio}
+            fundamentalsMap={fundamentalsMap}
+            marketPrices={pricesData?.prices || {}}
+          />
         </div>
 
+        {/* Hàng 2: Lãi / Lỗ & Quỹ Đạo Vốn (Toggle Từng Tháng / Lũy Kế) */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-gray-700 text-sm flex items-center gap-1.5">
-              <span>📊</span> Lãi / Lỗ Theo Tháng
+              <span>📊</span> Lãi / Lỗ & Quỹ Đạo Vốn
             </h3>
             <span className="text-xs text-gray-400">Thực nhận sau phí</span>
           </div>
-          <MonthlyPLChart sellOrders={sellOrders} />
+          <MonthlyPLChart sellOrders={sellOrders} dividends={dividends} />
+        </div>
+
+        {/* Hàng 3: Đóng Góp Hiệu Suất Từng Mã (Top Gainers vs Losers) */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold text-gray-700 text-sm flex items-center gap-1.5">
+              <span>🎯</span> Đóng Góp Hiệu Suất Từng Mã (Top Gainers vs Losers)
+            </h3>
+            <span className="text-xs text-gray-400">Xếp hạng lợi nhuận theo mã</span>
+          </div>
+          <StockContributionChart
+            buyOrders={buyOrders}
+            sellOrders={sellOrders}
+            dividends={dividends}
+            marketPrices={pricesData?.prices || {}}
+            onSelectSymbol={setSelectedSymbolModal}
+          />
         </div>
       </div>
 

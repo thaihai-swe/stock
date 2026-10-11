@@ -81,57 +81,95 @@ class MacroFetcher(BaseFetcher):
         except Exception as e:
             print(f"  ⚠️ [MacroFetcher] Không thể lấy thị giá {code} từ DNSE: {e}")
 
-        # 2. Dự phòng cấp 2: Khôi phục từ cache gần nhất trong data/macro_valuation.json
+        # 2. Dự phòng cấp 2: Khôi phục từ cache gần nhất trong data/macro_valuation.json hoặc data/prices_cache.json
         try:
-            cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
-            if cache_file.exists():
-                with open(cache_file, "r", encoding="utf-8") as f:
+            data_dir = Path(__file__).resolve().parent.parent.parent / "data"
+            macro_cache = data_dir / "macro_valuation.json"
+            if macro_cache.exists():
+                with open(macro_cache, "r", encoding="utf-8") as f:
                     cdata = json.load(f)
                     m_idx = cdata.get("marketIndex", {})
+                    pt = None
                     if code == "VNINDEX" and m_idx.get("currentPoint"):
                         pt = float(m_idx["currentPoint"])
-                        if pt > 500:
-                            print(f"  ℹ️ [MacroFetcher] Dùng snapshot cache gần nhất cho {code}: {pt:.2f} điểm.")
-                            return {
-                                "symbol": code,
-                                "point": pt,
-                                "prevPoint": pt,
-                                "change": float(m_idx.get("change", 0.0)),
-                                "changePercent": float(m_idx.get("changePercent", 0.0)),
-                                "high": pt,
-                                "low": pt,
-                                "volume": 0,
-                                "source": "LOCAL_SNAPSHOT_CACHE"
-                            }
+                    elif code == "VN30":
+                        pt = float(cdata.get("vn30", {}).get("currentPoint") or m_idx.get("vn30Point") or 0.0)
+                    if pt and pt > 500:
+                        print(f"  ℹ️ [MacroFetcher] Dùng snapshot macro cache gần nhất cho {code}: {pt:.2f} điểm.")
+                        return {
+                            "symbol": code,
+                            "point": pt,
+                            "prevPoint": pt,
+                            "change": float(m_idx.get("change", 0.0)),
+                            "changePercent": float(m_idx.get("changePercent", 0.0)),
+                            "high": pt,
+                            "low": pt,
+                            "volume": 0,
+                            "source": "LOCAL_SNAPSHOT_CACHE"
+                        }
+            prices_cache = data_dir / "prices_cache.json"
+            if prices_cache.exists():
+                with open(prices_cache, "r", encoding="utf-8") as f:
+                    pdata = json.load(f)
+                    item = pdata.get(code, {})
+                    if item.get("point") and float(item["point"]) > 500:
+                        pt = float(item["point"])
+                        print(f"  ℹ️ [MacroFetcher] Dùng prices cache gần nhất cho {code}: {pt:.2f} điểm.")
+                        return {
+                            "symbol": code,
+                            "point": pt,
+                            "prevPoint": float(item.get("prevPoint", pt)),
+                            "change": float(item.get("change", 0.0)),
+                            "changePercent": float(item.get("changePct", item.get("changePercent", 0.0))),
+                            "high": float(item.get("high", pt)),
+                            "low": float(item.get("low", pt)),
+                            "volume": int(item.get("volume", 0)),
+                            "source": "LOCAL_PRICES_CACHE"
+                        }
         except Exception:
             pass
 
-        # 3. Giá trị fallback an toàn hợp lý hiện tại (quanh 1735 cho VNINDEX, 1870 cho VN30)
-        default_pt = 1735.09 if code == "VNINDEX" else 1873.43
-        print(f"  ⚠️ [MacroFetcher] Dùng fallback mặc định cho {code}: {default_pt:.2f} điểm.")
+        # 3. Giá trị fallback an toàn nếu hệ thống hoàn toàn mới
+        print(f"  ⚠️ [MacroFetcher] Không có cache sẵn có cho {code}, trả về trạng thái UNAVAILABLE.")
         return {
             "symbol": code,
-            "point": default_pt,
-            "prevPoint": default_pt,
+            "point": 0.0,
+            "prevPoint": 0.0,
             "change": 0.0,
             "changePercent": 0.0,
-            "high": default_pt,
-            "low": default_pt,
+            "high": 0.0,
+            "low": 0.0,
             "volume": 0,
-            "source": "DEFAULT_FALLBACK"
+            "source": "UNAVAILABLE"
         }
 
     def fetch_global_commodities_fx(self) -> Dict[str, float]:
         """
         Lấy tỷ giá USD/VND, Lợi suất US 10Y, Dầu Brent, Vàng thế giới và DXY qua Yahoo Finance.
+        Khởi tạo động từ snapshot macro cache gần nhất thay vì hằng số fix cứng.
         """
-        result = {
-            "goldWorld": 2650.5,
-            "oilBrent": 74.2,
-            "us10yYield": 4.02,
-            "dxy": 104.2,
-            "usdVndRate": 25420.0,
-        }
+        result = {}
+        try:
+            cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
+            if cache_file.exists():
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cdata = json.load(f)
+                    m_prev = cdata.get("macro", {})
+                    if m_prev:
+                        if m_prev.get("goldWorld"): result["goldWorld"] = float(m_prev["goldWorld"])
+                        if m_prev.get("oilBrent"): result["oilBrent"] = float(m_prev["oilBrent"])
+                        if m_prev.get("us10yYield"): result["us10yYield"] = float(m_prev["us10yYield"])
+                        if m_prev.get("dxy"): result["dxy"] = float(m_prev["dxy"])
+                        if m_prev.get("usdVndRate"): result["usdVndRate"] = float(m_prev["usdVndRate"])
+        except Exception:
+            pass
+
+        # Đảm bảo các chỉ số có giá trị hợp lý nếu khởi chạy lần đầu tiên
+        result.setdefault("goldWorld", 2700.0)
+        result.setdefault("oilBrent", 75.0)
+        result.setdefault("us10yYield", 4.0)
+        result.setdefault("dxy", 103.0)
+        result.setdefault("usdVndRate", 25500.0)
 
         if yf is None:
             return result
