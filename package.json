@@ -9,7 +9,8 @@
     "build": "vite build",
     "start": "node server.js",
     "db:test": "node scripts/test-db.js",
-    "db:sync": "node scripts/sync-to-turso.js"
+    "db:sync": "node scripts/sync-to-turso.js",
+    "sync:fundamentals": "python3 scripts/sync_fundamentals.py"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",

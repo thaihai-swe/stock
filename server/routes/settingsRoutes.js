@@ -22,7 +22,7 @@ router.get(['/cash-balance', '/settings/cash-balance'], async (req, res) => {
   }
 });
 
-// Cập nhật số dư tiền mặt
+// Cập nhật số dư tiền mặt (hỗ trợ cả /cash-balance và /settings/cash-balance)
 router.post(['/cash-balance', '/settings/cash-balance'], async (req, res) => {
   const { cashBalance } = req.body;
   const val = Math.max(0, parseFloat(cashBalance) || 0);

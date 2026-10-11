@@ -221,21 +221,22 @@ export default function DcaSimulatorModal({
 
   // Bảng màu nhẹ cho các tầng gom khối lượng
   const CLUSTER_BG_COLORS = [
-    'hover:bg-blue-50/40',
-    'bg-sky-50/20 hover:bg-sky-50/50',
-    'bg-indigo-50/20 hover:bg-indigo-50/50',
-    'bg-purple-50/20 hover:bg-purple-50/50',
-    'bg-pink-50/20 hover:bg-pink-50/50',
-    'bg-amber-50/20 hover:bg-amber-50/50',
-    'bg-emerald-50/20 hover:bg-emerald-50/50',
-    'bg-cyan-50/20 hover:bg-cyan-50/50',
+    'hover:bg-blue-50/40 dark:hover:bg-blue-950/30',
+    'bg-sky-50/20 dark:bg-sky-950/20 hover:bg-sky-50/50 dark:hover:bg-sky-950/40',
+    'bg-indigo-50/20 dark:bg-indigo-950/20 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/40',
+    'bg-purple-50/20 dark:bg-purple-950/20 hover:bg-purple-50/50 dark:hover:bg-purple-950/40',
+    'bg-pink-50/20 dark:bg-pink-950/20 hover:bg-pink-50/50 dark:hover:bg-pink-950/40',
+    'bg-amber-50/20 dark:bg-amber-950/20 hover:bg-amber-50/50 dark:hover:bg-amber-950/40',
+    'bg-emerald-50/20 dark:bg-emerald-950/20 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/40',
+    'bg-cyan-50/20 dark:bg-cyan-950/20 hover:bg-cyan-50/50 dark:hover:bg-cyan-950/40',
   ];
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div className="modal-backdrop" onClick={onClose} />
+      <div className="modal-dialog max-w-5xl max-h-[92vh] flex flex-col">
         
         {/* --- Header & Tabs Switcher --- */}
         <div className="bg-gradient-to-r from-indigo-700 via-blue-700 to-indigo-800 p-5 sm:p-6 text-white shrink-0">
@@ -296,17 +297,17 @@ export default function DcaSimulatorModal({
         {/* --- Body (Scrollable) --- */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
           {/* Thanh chọn cổ phiếu dùng chung */}
-          <div className="bg-gray-50/80 p-4 rounded-2xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-gray-50/80 dark:bg-gray-900/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">
                   Cổ phiếu áp dụng
                 </label>
                 <div className="flex items-center gap-2">
                   <select
                     value={selectedSymbol}
                     onChange={e => setSelectedSymbol(e.target.value)}
-                    className="bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-xs"
+                    className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-xs"
                   >
                     {portfolio.map(p => (
                       <option key={p.symbol} value={p.symbol}>
@@ -323,33 +324,33 @@ export default function DcaSimulatorModal({
                     placeholder="Nhập mã khác..."
                     value={selectedSymbol}
                     onChange={e => setSelectedSymbol(e.target.value.toUpperCase())}
-                    className="w-28 uppercase bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-xs"
+                    className="w-28 uppercase bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-2.5 py-1.5 text-sm font-bold text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-xs"
                   />
                 </div>
               </div>
             </div>
 
             {/* Thông tin hiện tại của cổ phiếu */}
-            <div className="flex items-center gap-4 text-xs bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-2xs">
+            <div className="flex items-center gap-4 text-xs bg-white dark:bg-gray-800 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs">
               <div>
                 <span className="text-gray-400 block">Giá sàn hiện tại:</span>
-                <span className="font-bold text-sm text-blue-600">
+                <span className="font-bold text-sm text-blue-600 dark:text-blue-400">
                   {livePrice > 0 ? `${fmtMoney(livePrice)}đ` : '---'}
                 </span>
               </div>
               {currentStock && (
                 <>
-                  <div className="h-6 w-px bg-gray-200" />
+                  <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
                   <div>
                     <span className="text-gray-400 block">Đang nắm giữ:</span>
-                    <span className="font-bold text-sm text-gray-800">
+                    <span className="font-bold text-sm text-gray-800 dark:text-gray-100">
                       {currentQty.toLocaleString()} cp
                     </span>
                   </div>
-                  <div className="h-6 w-px bg-gray-200" />
+                  <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
                   <div>
                     <span className="text-gray-400 block">Giá vốn hiện tại:</span>
-                    <span className="font-bold text-sm text-amber-700">
+                    <span className="font-bold text-sm text-amber-700 dark:text-amber-400">
                       {fmtMoney(currentAvgCost)}đ
                     </span>
                   </div>
@@ -364,13 +365,13 @@ export default function DcaSimulatorModal({
           {tabMode === 'grid' && (
             <div className="space-y-6">
               {/* Form Tùy Biến Tham Số Kế Hoạch */}
-              <div className="bg-indigo-50/40 p-5 rounded-2xl border border-indigo-100 shadow-2xs space-y-4">
+              <div className="bg-indigo-50/40 dark:bg-indigo-950/20 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 shadow-2xs space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <h4 className="text-xs font-bold text-indigo-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wide flex items-center gap-1.5">
                     <span>⚙️</span> Thiết Lập Thông Số Chiến Dịch Mua Gom
                   </h4>
                   {currentQty > 0 && (
-                    <label className="flex items-center gap-2 text-xs font-semibold text-indigo-900 bg-white px-3 py-1.5 rounded-xl border border-indigo-200 cursor-pointer shadow-2xs hover:bg-indigo-50/50 transition-colors">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-indigo-900 dark:text-indigo-200 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 cursor-pointer shadow-2xs hover:bg-indigo-50/50 dark:hover:bg-indigo-950/40 transition-colors">
                       <input
                         type="checkbox"
                         checked={includeCurrentHoldings}
@@ -386,7 +387,7 @@ export default function DcaSimulatorModal({
                   {/* Giá khởi điểm P0 */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-700">
+                      <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         Giá khởi điểm P₀ (x1.000đ)
                       </label>
                       <div className="flex items-center gap-1.5">
@@ -394,7 +395,7 @@ export default function DcaSimulatorModal({
                           <button
                             type="button"
                             onClick={() => setGridBasePriceK(String(livePrice / 1000))}
-                            className="text-[10px] text-blue-600 font-semibold hover:underline"
+                            className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline"
                             title="Lấy giá sàn hiện tại"
                           >
                             ⚡ Giá Live
@@ -404,7 +405,7 @@ export default function DcaSimulatorModal({
                           <button
                             type="button"
                             onClick={() => setGridBasePriceK(String(Math.round(currentStock.avgCost / 1000)))}
-                            className="text-[10px] text-amber-700 font-semibold hover:underline"
+                            className="text-[10px] text-amber-700 dark:text-amber-400 font-semibold hover:underline"
                             title="Lấy giá vốn hiện tại"
                           >
                             🎯 Giá vốn
@@ -419,16 +420,16 @@ export default function DcaSimulatorModal({
                         value={gridBasePriceK}
                         onChange={e => setGridBasePriceK(e.target.value)}
                         placeholder="VD: 34.5"
-                        className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-16 shadow-2xs"
+                        className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-16 shadow-2xs"
                       />
-                      <span className="absolute right-2 top-2 text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                      <span className="absolute right-2 top-2 text-[10px] font-medium text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 rounded">
                         × 1.000đ
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-1 flex items-center justify-between">
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 flex items-center justify-between">
                       <span>= <b>{fmtMoney(P0)}đ</b></span>
                       {livePrice > 0 && Math.abs(P0 - livePrice) < 50 && (
-                        <span className="text-[10px] text-blue-600 font-semibold bg-blue-50 px-1.5 py-0.2 rounded">Mặc định: Giá Live</span>
+                        <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.2 rounded">Mặc định: Giá Live</span>
                       )}
                     </p>
                   </div>
@@ -436,10 +437,10 @@ export default function DcaSimulatorModal({
                   {/* Bước giá giảm mỗi đợt */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-700">
+                      <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         Bước giá giảm mỗi đợt
                       </label>
-                      <span className="text-[10px] text-red-600 font-bold">-{gridDropPct}%</span>
+                      <span className="text-[10px] text-red-600 dark:text-red-400 font-bold">-{gridDropPct}%</span>
                     </div>
                     <div className="flex items-center gap-1">
                       {[-2, -3, -5, -7].map(val => (
@@ -450,7 +451,7 @@ export default function DcaSimulatorModal({
                           className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${
                             gridDropPct === Math.abs(val)
                               ? 'bg-red-600 text-white shadow-2xs'
-                              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                           }`}
                         >
                           {val}%
@@ -463,20 +464,20 @@ export default function DcaSimulatorModal({
                         step="0.5"
                         value={gridDropPct}
                         onChange={e => setGridDropPct(Math.max(0.5, parseFloat(e.target.value) || 1))}
-                        className="w-14 bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-bold text-center focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                        className="w-14 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 text-xs font-bold text-center text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                         title="Tự nhập %"
                       />
                     </div>
-                    <p className="text-[11px] text-gray-400 mt-1">Mỗi đợt giảm {gridDropPct}%</p>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-400 mt-1">Mỗi đợt giảm {gridDropPct}%</p>
                   </div>
 
                   {/* Số đợt gom (Steps) */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-700">
+                      <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         Số đợt gom kế hoạch
                       </label>
-                      <span className="text-[10px] text-indigo-600 font-bold">{totalSteps} lần</span>
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">{totalSteps} lần</span>
                     </div>
                     <div className="flex items-center gap-1">
                       {[5, 10, 15, 20].map(val => (
@@ -487,7 +488,7 @@ export default function DcaSimulatorModal({
                           className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${
                             totalSteps === val
                               ? 'bg-indigo-600 text-white shadow-2xs'
-                              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                           }`}
                         >
                           {val}
@@ -499,20 +500,20 @@ export default function DcaSimulatorModal({
                         max="30"
                         value={totalSteps}
                         onChange={e => setGridSteps(Math.min(30, Math.max(2, parseInt(e.target.value) || 5)))}
-                        className="w-14 bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-bold text-center focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                        className="w-14 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 text-xs font-bold text-center text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                         title="Tự nhập số đợt"
                       />
                     </div>
-                    <p className="text-[11px] text-gray-400 mt-1">Mặc định: 20 lần gom</p>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-400 mt-1">Mặc định: 20 lần gom</p>
                   </div>
 
                   {/* Lô cơ sở (Base Lot) */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-700">
+                      <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         Lô cơ sở (Đợt 1)
                       </label>
-                      <span className="text-[10px] text-gray-500">{baseLot.toLocaleString()} cp</span>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400">{baseLot.toLocaleString()} cp</span>
                     </div>
                     <div className="flex items-center gap-1">
                       {[100, 200, 500, 1000].map(val => (
@@ -523,20 +524,20 @@ export default function DcaSimulatorModal({
                           className={`text-xs px-2 py-1.5 rounded-lg font-semibold transition-all ${
                             baseLot === val
                               ? 'bg-indigo-600 text-white shadow-2xs scale-102'
-                              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                           }`}
                         >
                           {val}
                         </button>
                       ))}
                     </div>
-                    <p className="text-[11px] text-gray-400 mt-1">1 lô chuẩn sàn HOSE / HNX</p>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-400 mt-1">1 lô chuẩn sàn HOSE (100 CP)</p>
                   </div>
                 </div>
 
                 {/* Chiến lược phân bổ khối lượng */}
-                <div className="pt-2 border-t border-indigo-100/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="text-xs font-semibold text-gray-700">
+                <div className="pt-2 border-t border-indigo-100/70 dark:border-indigo-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                     Quy tắc phân bổ khối lượng:
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -546,13 +547,13 @@ export default function DcaSimulatorModal({
                       className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
                         gridVolumeStrategy === 'cluster3'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       <div className="font-bold flex items-center gap-1">
                         <span>🌟 Kim tự tháp x2 mỗi 3 đợt</span>
                       </div>
-                      <div className={`text-[10px] ${gridVolumeStrategy === 'cluster3' ? 'text-indigo-100' : 'text-gray-400'}`}>
+                      <div className={`text-[10px] ${gridVolumeStrategy === 'cluster3' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
                         100 → 100 → 100 → 200... (Chuẩn mẫu)
                       </div>
                     </button>
@@ -563,11 +564,11 @@ export default function DcaSimulatorModal({
                       className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
                         gridVolumeStrategy === 'fixed'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       <div className="font-bold">📐 Khối lượng đều</div>
-                      <div className={`text-[10px] ${gridVolumeStrategy === 'fixed' ? 'text-indigo-100' : 'text-gray-400'}`}>
+                      <div className={`text-[10px] ${gridVolumeStrategy === 'fixed' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
                         100 → 100 → 100 → 100...
                       </div>
                     </button>
@@ -578,11 +579,11 @@ export default function DcaSimulatorModal({
                       className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
                         gridVolumeStrategy === 'linear'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       <div className="font-bold">📈 Tăng dần đều</div>
-                      <div className={`text-[10px] ${gridVolumeStrategy === 'linear' ? 'text-indigo-100' : 'text-gray-400'}`}>
+                      <div className={`text-[10px] ${gridVolumeStrategy === 'linear' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
                         100 → 200 → 300 → 400...
                       </div>
                     </button>
@@ -593,11 +594,11 @@ export default function DcaSimulatorModal({
                       className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
                         gridVolumeStrategy === 'martingale'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       <div className="font-bold">🚀 Gấp đôi mỗi bước</div>
-                      <div className={`text-[10px] ${gridVolumeStrategy === 'martingale' ? 'text-indigo-100' : 'text-gray-400'}`}>
+                      <div className={`text-[10px] ${gridVolumeStrategy === 'martingale' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
                         100 → 200 → 400 → 800...
                       </div>
                     </button>
@@ -607,26 +608,26 @@ export default function DcaSimulatorModal({
 
               {/* Hộp Thống Kê Tổng Kết Kế Hoạch Gom (Campaign Summary) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-2xl border border-indigo-100 shadow-2xs">
-                  <div className="text-[11px] font-semibold text-indigo-700 uppercase tracking-wider flex items-center gap-1">
+                <div className="bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-white dark:to-gray-800 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 shadow-2xs">
+                  <div className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider flex items-center gap-1">
                     <span>💰</span> Vốn Gom Thêm Dự Trù
                   </div>
-                  <div className="text-lg sm:text-xl font-black text-gray-900 mt-1">
+                  <div className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100 mt-1">
                     {fmtMoney(newCampaignCapital)}đ
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                     Dự trù giải ngân đủ {totalSteps} đợt gom
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-2xl border border-blue-100 shadow-2xs">
-                  <div className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider flex items-center gap-1">
+                <div className="bg-gradient-to-br from-blue-50 dark:from-blue-950/40 to-white dark:to-gray-800 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/40 shadow-2xs">
+                  <div className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wider flex items-center gap-1">
                     <span>💼</span> Tổng Vốn Toàn Bộ
                   </div>
-                  <div className="text-lg sm:text-xl font-black text-blue-900 mt-1">
+                  <div className="text-lg sm:text-xl font-black text-blue-900 dark:text-blue-200 mt-1">
                     {fmtMoney(finalTotalCapital)}đ
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                     {initialQty > 0 ? (
                       <span>{fmtMoney(initialTotalCost)}đ gốc + {fmtMoney(newCampaignCapital)}đ gom</span>
                     ) : (
@@ -635,14 +636,14 @@ export default function DcaSimulatorModal({
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-emerald-50 to-white p-4 rounded-2xl border border-emerald-100 shadow-2xs">
-                  <div className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider flex items-center gap-1">
+                <div className="bg-gradient-to-br from-emerald-50 dark:from-emerald-950/40 to-white dark:to-gray-800 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 shadow-2xs">
+                  <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1">
                     <span>📦</span> Tổng SL Sau Cùng
                   </div>
-                  <div className="text-lg sm:text-xl font-black text-emerald-800 mt-1">
-                    {finalTotalShares.toLocaleString()} <span className="text-xs font-normal text-gray-600">cp</span>
+                  <div className="text-lg sm:text-xl font-black text-emerald-800 dark:text-emerald-200 mt-1">
+                    {finalTotalShares.toLocaleString()} <span className="text-xs font-normal text-gray-600 dark:text-gray-400">cp</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                     {initialQty > 0 ? (
                       <span>{initialQty.toLocaleString()} gốc + {newCampaignShares.toLocaleString()} gom</span>
                     ) : (
@@ -651,54 +652,54 @@ export default function DcaSimulatorModal({
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-amber-50 to-white p-4 rounded-2xl border border-amber-100 shadow-2xs">
-                  <div className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider flex items-center gap-1">
+                <div className="bg-gradient-to-br from-amber-50 dark:from-amber-950/40 to-white dark:to-gray-800 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/40 shadow-2xs">
+                  <div className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wider flex items-center gap-1">
                     <span>🎯</span> Kéo Hạ Giá Vốn TB
                   </div>
-                  <div className="text-lg sm:text-xl font-black text-amber-900 mt-1">
+                  <div className="text-lg sm:text-xl font-black text-amber-900 dark:text-amber-200 mt-1">
                     {fmtMoney(finalAvgCost)}đ
                   </div>
-                  <div className="text-[11px] text-emerald-600 font-semibold mt-0.5">
+                  <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
                     Hạ -{finalDiscountPct}% so với vốn ban đầu ({fmtMoney(initialAvgCost)}đ)
                   </div>
                 </div>
               </div>
 
               {/* So sánh mục tiêu về bờ tại đáy */}
-              <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="bg-amber-50/70 dark:bg-amber-950/30 p-3.5 rounded-2xl border border-amber-200/80 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                 <div className="flex items-center gap-2">
                   <span className="text-base">🚀</span>
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 dark:text-gray-300">
                     Tại mức giá đáy <b>{fmtMoney(lastStepPrice)}đ</b>: Cổ phiếu chỉ cần hồi phục{' '}
-                    <span className="font-extrabold text-emerald-700 text-sm">+{finalReqGain}%</span> là hòa vốn toàn bộ danh mục!
+                    <span className="font-extrabold text-emerald-700 dark:text-emerald-400 text-sm">+{finalReqGain}%</span> là hòa vốn toàn bộ danh mục!
                   </span>
                 </div>
                 {initialQty > 0 && (
-                  <div className="text-gray-500 sm:text-right">
-                    (Thay vì phải chờ tăng <span className="text-red-600 font-bold">+{naiveReqGain}%</span> nếu không DCA mà giữ nguyên vị thế cũ)
+                  <div className="text-gray-500 dark:text-gray-400 sm:text-right">
+                    (Thay vì phải chờ tăng <span className="text-red-600 dark:text-rose-400 font-bold">+{naiveReqGain}%</span> nếu không DCA mà giữ nguyên vị thế cũ)
                   </div>
                 )}
               </div>
 
               {/* Bảng Chi Tiết Lộ Trình Gom Đa Tầng (Interactive Grid Table) */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-2xs overflow-hidden">
-                <div className="px-5 py-3.5 bg-gray-50/90 border-b border-gray-200 flex items-center justify-between">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xs overflow-hidden">
+                <div className="px-5 py-3.5 bg-gray-50/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs uppercase text-gray-700 tracking-wider">
+                    <span className="font-bold text-xs uppercase text-gray-700 dark:text-gray-200 tracking-wider">
                       📋 Bảng Chi Tiết Lộ Trình Gom Từng Thời Điểm ({gridRows.length} đợt)
                     </span>
-                    <span className="text-[11px] text-gray-400">
+                    <span className="text-[11px] text-gray-400 dark:text-gray-400">
                       (Bao gồm số lượng cổ phiếu, giá trị vốn và định giá tại từng bước)
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500 font-medium hidden sm:block">
-                    Click <span className="font-bold text-indigo-600">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Đặt Lệnh
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium hidden sm:block">
+                    Click <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Đặt Lệnh
                   </div>
                 </div>
 
                 <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-gray-100/95 text-gray-600 uppercase font-bold text-[10px] sticky top-0 z-10 backdrop-blur-md shadow-2xs">
+                    <thead className="bg-gray-100/95 dark:bg-gray-900/95 text-gray-600 dark:text-gray-300 uppercase font-bold text-[10px] sticky top-0 z-10 backdrop-blur-md shadow-2xs">
                       <tr>
                         <th className="py-2.5 px-3 text-center">Đợt</th>
                         <th className="py-2.5 px-3 text-center">% Giảm</th>
@@ -712,51 +713,51 @@ export default function DcaSimulatorModal({
                         <th className="py-2.5 px-3 text-center">Thao Tác</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 font-medium text-gray-700">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700/60 font-medium text-gray-700 dark:text-gray-200">
                       {/* ĐỢT 0: VỊ THẾ BAN ĐẦU (HIỆN TẠI) NẾU CÓ NẮM GIỮ */}
                       {initialQty > 0 && (
-                        <tr className="bg-slate-50/90 border-b-2 border-indigo-200/80 font-medium text-slate-800">
+                        <tr className="bg-slate-50/90 dark:bg-slate-900/80 border-b-2 border-indigo-200/80 dark:border-indigo-900/60 font-medium text-slate-800 dark:text-slate-200">
                           <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200 text-slate-800 text-[10px] font-extrabold">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-[10px] font-extrabold">
                               <span>⚓</span> Đợt 0 (Hiện tại)
                             </span>
                           </td>
                           <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                            <span className="inline-block px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 text-slate-700">
+                            <span className="inline-block px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
                               0% (Gốc)
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-right font-bold text-blue-700 whitespace-nowrap">
-                            {fmtMoney(P0)}đ <span className="text-[10px] text-blue-500 font-normal block">(Giá Live)</span>
+                          <td className="py-2.5 px-3 text-right font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap">
+                            {fmtMoney(P0)}đ <span className="text-[10px] text-blue-500 dark:text-blue-300 font-normal block">(Giá Live)</span>
                           </td>
-                          <td className="py-2.5 px-3 text-right text-gray-500 whitespace-nowrap">
+                          <td className="py-2.5 px-3 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             <span className="italic text-[11px]">Vị thế ban đầu</span>
                           </td>
-                          <td className="py-2.5 px-3 text-right font-extrabold text-gray-900 whitespace-nowrap">
+                          <td className="py-2.5 px-3 text-right font-extrabold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             {initialQty.toLocaleString()} <span className="text-[10px] font-normal text-gray-400">cp</span>
                           </td>
-                          <td className="py-2.5 px-3 text-right font-bold text-gray-900 whitespace-nowrap">
+                          <td className="py-2.5 px-3 text-right font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             {fmtMoney(initialTotalCost)}đ
                           </td>
                           <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                            <div className="font-semibold text-gray-800">{fmtMoney(initialMarketVal)}đ</div>
-                            <div className={`text-[10px] font-bold ${initialPnL >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            <div className="font-semibold text-gray-800 dark:text-gray-200">{fmtMoney(initialMarketVal)}đ</div>
+                            <div className={`text-[10px] font-bold ${initialPnL >= 0 ? 'text-green-600 dark:text-emerald-400' : 'text-red-500 dark:text-rose-400'}`}>
                               {initialPnL >= 0 ? '+' : ''}{fmtMoney(initialPnL)}đ ({initialPnLPct}%)
                             </div>
                           </td>
                           <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                            <span className="font-black text-amber-800 text-xs sm:text-sm">
+                            <span className="font-black text-amber-800 dark:text-amber-300 text-xs sm:text-sm">
                               {fmtMoney(initialAvgCost)}đ
                             </span>
                             <span className="text-[10px] text-gray-400 block font-normal">(Giá vốn gốc)</span>
                           </td>
                           <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                               +{initialReqGain}%
                             </span>
                           </td>
                           <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                            <span className="text-[10px] bg-gray-200 text-gray-600 px-2 py-1 rounded-md font-semibold">
+                            <span className="text-[10px] bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md font-semibold">
                               Đang giữ
                             </span>
                           </td>
@@ -771,13 +772,13 @@ export default function DcaSimulatorModal({
                         return (
                           <tr key={row.step} className={`transition-colors ${bgClass}`}>
                             {/* Cột Đợt */}
-                            <td className="py-2.5 px-3 text-center font-bold text-gray-900 whitespace-nowrap">
+                            <td className="py-2.5 px-3 text-center font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                               <div className="inline-flex items-center gap-1">
-                                <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center text-[11px] font-extrabold">
+                                <span className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 flex items-center justify-center text-[11px] font-extrabold">
                                   {row.step}
                                 </span>
                                 {gridVolumeStrategy === 'cluster3' && isFirstInCluster && (
-                                  <span className="text-[9px] bg-indigo-50 border border-indigo-200 text-indigo-700 px-1 py-0.2 rounded font-semibold hidden md:inline">
+                                  <span className="text-[9px] bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 px-1 py-0.2 rounded font-semibold hidden md:inline">
                                     Tầng {row.clusterIndex + 1}
                                   </span>
                                 )}
@@ -789,8 +790,8 @@ export default function DcaSimulatorModal({
                               <span
                                 className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${
                                   row.dropRatio === 0
-                                    ? 'bg-gray-100 text-gray-600'
-                                    : 'bg-red-50 text-red-600 border border-red-100'
+                                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                                    : 'bg-red-50 dark:bg-rose-950/40 text-red-600 dark:text-rose-400 border border-red-100 dark:border-rose-900/40'
                                 }`}
                               >
                                 {row.dropPercentText}
@@ -798,23 +799,23 @@ export default function DcaSimulatorModal({
                             </td>
 
                             {/* Cột Mức Giá Mua */}
-                            <td className="py-2.5 px-3 text-right font-bold text-gray-900 whitespace-nowrap">
+                            <td className="py-2.5 px-3 text-right font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                               {fmtMoney(row.price)}đ
                             </td>
 
                             {/* Cột Mua Đợt Này (SL & Tiền đợt) */}
                             <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                              <div className="font-extrabold text-blue-700">
+                              <div className="font-extrabold text-blue-700 dark:text-blue-400">
                                 +{row.vol.toLocaleString()} <span className="text-[10px] font-normal text-gray-400">cp</span>
                               </div>
-                              <div className="text-[10px] text-gray-500 font-medium">
+                              <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
                                 +{fmtMoney(row.cost)}đ
                               </div>
                             </td>
 
                             {/* Cột Tổng SL Cổ Phiếu Tại Thời Điểm Đó */}
                             <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                              <div className="font-extrabold text-gray-900">
+                              <div className="font-extrabold text-gray-900 dark:text-gray-100">
                                 {row.cumVol.toLocaleString()} <span className="text-[10px] font-normal text-gray-400">cp</span>
                               </div>
                               {initialQty > 0 && (
@@ -825,25 +826,25 @@ export default function DcaSimulatorModal({
                             </td>
 
                             {/* Cột Tổng Vốn Đầu Tư Tại Thời Điểm Đó */}
-                            <td className="py-2.5 px-3 text-right whitespace-nowrap font-bold text-gray-900">
+                            <td className="py-2.5 px-3 text-right whitespace-nowrap font-bold text-gray-900 dark:text-gray-100">
                               <div>{fmtMoney(row.cumCost)}đ</div>
                             </td>
 
                             {/* Cột Định Giá & P&L Tại Thời Điểm Đó */}
                             <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                              <div className="font-semibold text-gray-800">{fmtMoney(row.marketVal)}đ</div>
-                              <div className={`text-[10px] font-bold ${row.pnl >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                              <div className="font-semibold text-gray-800 dark:text-gray-200">{fmtMoney(row.marketVal)}đ</div>
+                              <div className={`text-[10px] font-bold ${row.pnl >= 0 ? 'text-green-600 dark:text-emerald-400' : 'text-red-500 dark:text-rose-400'}`}>
                                 {row.pnl >= 0 ? '+' : ''}{fmtMoney(row.pnl)}đ ({row.pnlPct}%)
                               </div>
                             </td>
 
                             {/* Cột Giá Vốn TB Mới */}
                             <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                              <span className="font-black text-indigo-700 text-xs sm:text-sm">
+                              <span className="font-black text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm">
                                 {fmtMoney(row.avgCost)}đ
                               </span>
                               {row.costDiscountPct !== '0' && (
-                                <span className="text-[10px] text-emerald-600 font-semibold block">
+                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block">
                                   (Hạ -{row.costDiscountPct}%)
                                 </span>
                               )}
@@ -851,7 +852,7 @@ export default function DcaSimulatorModal({
 
                             {/* Cột Mục Tiêu Về Bờ */}
                             <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                 +{row.reqGainPct}%
                               </span>
                             </td>
@@ -862,7 +863,7 @@ export default function DcaSimulatorModal({
                                 <button
                                   type="button"
                                   onClick={() => handleGoBuyStep(row)}
-                                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-2.5 py-1 rounded-lg text-[11px] transition-all shadow-2xs hover:shadow-xs active:scale-95 inline-flex items-center gap-1"
+                                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-2.5 py-1 rounded-lg text-[11px] transition-all shadow-2xs hover:shadow-xs active:scale-95 inline-flex items-center gap-1 cursor-pointer"
                                   title={`Đặt mua ngay ${row.vol} cp @ ${fmtMoney(row.price)}đ`}
                                 >
                                   <span>🛒</span>
@@ -886,25 +887,25 @@ export default function DcaSimulatorModal({
           {tabMode === 'single' && (
             <div className="space-y-6">
               {/* Form nhập thông số dự kiến mua thêm */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 p-5 rounded-2xl border border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 dark:bg-gray-900/40 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
                 {/* Số lượng dự kiến mua thêm */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-semibold text-gray-700 uppercase">
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
                       SL dự kiến mua thêm (cp)
                     </label>
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => handleQuickQty('50pct')}
-                        className="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-1.5 py-0.5 rounded"
+                        className="text-[10px] bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-semibold px-1.5 py-0.5 rounded cursor-pointer"
                       >
                         +50%
                       </button>
                       <button
                         type="button"
                         onClick={() => handleQuickQty('100pct')}
-                        className="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-1.5 py-0.5 rounded"
+                        className="text-[10px] bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-semibold px-1.5 py-0.5 rounded cursor-pointer"
                       >
                         +100%
                       </button>
@@ -917,21 +918,21 @@ export default function DcaSimulatorModal({
                     value={addQty}
                     onChange={e => setAddQty(e.target.value)}
                     placeholder="100"
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   />
                 </div>
 
                 {/* Mức giá dự kiến mua */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-semibold text-gray-700 uppercase">
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
                       Mức giá mua (x1.000đ)
                     </label>
                     {livePrice > 0 && (
                       <button
                         type="button"
                         onClick={() => setAddPriceK(String(livePrice / 1000))}
-                        className="text-[10px] text-blue-600 hover:underline"
+                        className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                       >
                         Lấy giá sàn
                       </button>
@@ -944,14 +945,14 @@ export default function DcaSimulatorModal({
                       value={addPriceK}
                       onChange={e => setAddPriceK(e.target.value)}
                       placeholder="VD: 25.5"
-                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-16"
+                      className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-16"
                     />
-                    <span className="absolute right-2 top-2 text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                    <span className="absolute right-2 top-2 text-[10px] font-medium text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 rounded">
                       × 1.000đ
                     </span>
                   </div>
                   {plannedPrice > 0 && (
-                    <p className="text-[11px] text-gray-500 mt-1">
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                       = <b>{fmtMoney(plannedPrice)}đ</b> / cp
                     </p>
                   )}
@@ -959,88 +960,88 @@ export default function DcaSimulatorModal({
               </div>
 
               {/* Bảng đối chiếu so sánh: Hiện Tại vs Sau Khi Mua Thêm */}
-              <div className="bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/50 rounded-2xl p-5 border border-indigo-100 shadow-xs space-y-4">
-                <h4 className="text-xs font-bold text-indigo-900 uppercase tracking-wide flex items-center gap-1.5">
+              <div className="bg-gradient-to-br from-indigo-50/50 dark:from-indigo-950/30 via-white dark:via-gray-800 to-blue-50/50 dark:to-gray-800 rounded-2xl p-5 border border-indigo-100 dark:border-indigo-900/40 shadow-xs space-y-4">
+                <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wide flex items-center gap-1.5">
                   <span>📊</span> Kết Quả Mô Phỏng Thay Đổi Vị Thế (1 Đợt)
                 </h4>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {/* Cột Hiện Tại */}
-                  <div className="bg-white p-4 rounded-xl border border-gray-100 space-y-2">
+                  <div className="bg-white dark:bg-gray-800/90 p-4 rounded-xl border border-gray-100 dark:border-gray-700 space-y-2">
                     <div className="text-xs font-bold text-gray-400 uppercase">1. Hiện Tại</div>
                     <div>
-                      <span className="text-xs text-gray-500">Số lượng:</span>
-                      <div className="font-semibold text-gray-800">{currentQty.toLocaleString()} cp</div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Số lượng:</span>
+                      <div className="font-semibold text-gray-800 dark:text-gray-200">{currentQty.toLocaleString()} cp</div>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500">Giá vốn TB:</span>
-                      <div className="font-bold text-gray-900">{fmtMoney(currentAvgCost)}đ</div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Giá vốn TB:</span>
+                      <div className="font-bold text-gray-900 dark:text-gray-100">{fmtMoney(currentAvgCost)}đ</div>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500">Giá hòa vốn:</span>
-                      <div className="font-semibold text-emerald-700">{fmtMoney(currentBreakEven)}đ</div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Giá hòa vốn:</span>
+                      <div className="font-semibold text-emerald-700 dark:text-emerald-400">{fmtMoney(currentBreakEven)}đ</div>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500">Tổng vốn đã chi:</span>
-                      <div className="font-semibold text-gray-700">{fmtMoney(currentTotalCost)}đ</div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Tổng vốn đã chi:</span>
+                      <div className="font-semibold text-gray-700 dark:text-gray-300">{fmtMoney(currentTotalCost)}đ</div>
                     </div>
                   </div>
 
                   {/* Cột Sau Khi Mua Thêm */}
-                  <div className="bg-white p-4 rounded-xl border border-indigo-200 shadow-xs space-y-2 relative overflow-hidden">
+                  <div className="bg-white dark:bg-gray-800/90 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 shadow-xs space-y-2 relative overflow-hidden">
                     <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">
                       MÔ PHỎNG
                     </div>
-                    <div className="text-xs font-bold text-indigo-600 uppercase">2. Sau Khi Mua Thêm</div>
+                    <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">2. Sau Khi Mua Thêm</div>
                     <div>
-                      <span className="text-xs text-gray-500">Tổng SL mới:</span>
-                      <div className="font-bold text-indigo-900">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Tổng SL mới:</span>
+                      <div className="font-bold text-indigo-900 dark:text-indigo-200">
                         {simulatedQty.toLocaleString()} cp{' '}
-                        <span className="text-xs text-green-600 font-normal">
+                        <span className="text-xs text-green-600 dark:text-emerald-400 font-normal">
                           (+{plannedQty.toLocaleString()})
                         </span>
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500">Giá vốn TB mới:</span>
-                      <div className="font-bold text-indigo-600 text-base">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Giá vốn TB mới:</span>
+                      <div className="font-bold text-indigo-600 dark:text-indigo-400 text-base">
                         {fmtMoney(simulatedAvgCost)}đ
                         {costReduction > 0 && (
-                          <span className="text-xs text-green-600 font-normal ml-1">
+                          <span className="text-xs text-green-600 dark:text-emerald-400 font-normal ml-1">
                             (Hạ -{costReductionPct}%)
                           </span>
                         )}
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500">Giá hòa vốn mới:</span>
-                      <div className="font-bold text-emerald-700 text-base">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Giá hòa vốn mới:</span>
+                      <div className="font-bold text-emerald-700 dark:text-emerald-400 text-base">
                         {fmtMoney(simulatedBreakEven)}đ
                         {breakEvenReduction > 0 && (
-                          <span className="text-xs text-green-600 font-normal ml-1">
+                          <span className="text-xs text-green-600 dark:text-emerald-400 font-normal ml-1">
                             (-{fmtMoney(breakEvenReduction)}đ)
                           </span>
                         )}
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500">Tổng vốn mới:</span>
-                      <div className="font-bold text-gray-900">{fmtMoney(simulatedTotalCost)}đ</div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Tổng vốn mới:</span>
+                      <div className="font-bold text-gray-900 dark:text-gray-100">{fmtMoney(simulatedTotalCost)}đ</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Thông tin chiến lược */}
-                <div className="bg-white/80 p-3.5 rounded-xl border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="bg-white/80 dark:bg-gray-800/80 p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div>
-                    <span className="text-gray-500">💰 Số tiền cần chuẩn bị:</span>
-                    <span className="font-bold text-gray-900 text-sm ml-1.5">
+                    <span className="text-gray-500 dark:text-gray-400">💰 Số tiền cần chuẩn bị:</span>
+                    <span className="font-bold text-gray-900 dark:text-gray-100 text-sm ml-1.5">
                       {fmtMoney(additionalTotalCost)}đ
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500">🎯 Mục tiêu về bờ:</span>
-                    <span className="font-bold text-indigo-700 text-sm ml-1.5">
+                    <span className="text-gray-500 dark:text-gray-400">🎯 Mục tiêu về bờ:</span>
+                    <span className="font-bold text-indigo-700 dark:text-indigo-300 text-sm ml-1.5">
                       Cần tăng +{reqGainFromPlanned}% từ giá mua
                     </span>
                   </div>
@@ -1051,10 +1052,10 @@ export default function DcaSimulatorModal({
         </div>
 
         {/* --- Footer --- */}
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between shrink-0">
+        <div className="bg-slate-50 dark:bg-slate-900/90 px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+            className="btn-secondary !text-xs"
           >
             Đóng
           </button>
@@ -1063,7 +1064,7 @@ export default function DcaSimulatorModal({
             <button
               onClick={handleGoBuySingle}
               disabled={plannedQty <= 0 || plannedPrice <= 0}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium px-5 py-2 rounded-xl text-sm transition-colors shadow-xs flex items-center gap-1.5"
+              className="btn-primary !text-xs flex items-center gap-1.5"
             >
               <span>🛒</span>
               <span>Đi Đến Đặt Lệnh Mua Này</span>
@@ -1071,8 +1072,8 @@ export default function DcaSimulatorModal({
           )}
 
           {tabMode === 'grid' && (
-            <div className="text-xs text-gray-500">
-              💡 Bấm vào <span className="font-bold text-indigo-600">"🛒 Mua đợt này"</span> tại dòng bạn muốn giải ngân trong bảng
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              💡 Bấm vào <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> tại dòng bạn muốn giải ngân trong bảng
             </div>
           )}
         </div>

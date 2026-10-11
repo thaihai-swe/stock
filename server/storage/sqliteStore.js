@@ -46,6 +46,7 @@ function mapSellOrder(r) {
     profitLoss: Number(r.profit_loss),
     profitLossPct: Number(r.profit_loss_pct),
     matchedLots: safeJsonParse(r.matched_lots, []),
+    matchMethod: r.match_method || 'lowest',
     date: r.date,
     note: r.note || '',
     tags: safeJsonParse(r.tags, []),
@@ -198,8 +199,8 @@ export async function executeSellOrder(sellOrder, matchedLots, userId = 'demo') 
   const statements = [
     {
       sql: `INSERT INTO sell_orders
-            (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, date, note, tags, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, match_method, date, note, tags, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       args: [
         sellOrder.id,
         sellOrder.symbol,
@@ -215,6 +216,7 @@ export async function executeSellOrder(sellOrder, matchedLots, userId = 'demo') 
         sellOrder.profitLoss,
         sellOrder.profitLossPct,
         JSON.stringify(sellOrder.matchedLots || []),
+        sellOrder.matchMethod || 'lowest',
         sellOrder.date,
         sellOrder.note || '',
         JSON.stringify(sellOrder.tags || []),
@@ -457,7 +459,6 @@ export async function getCashBalance(userId = 'demo') {
   }
   return 0;
 }
-
 export async function updateGoal(goal, userId = 'demo') {
   await initDatabase();
   await db.execute({
@@ -507,8 +508,8 @@ export async function restoreAllData(fullJson, userId = 'demo') {
     for (const s of fullJson.sellOrders) {
       statements.push({
         sql: `INSERT INTO sell_orders
-              (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, date, note, tags, user_id)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+              (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, match_method, date, note, tags, user_id)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
         args: [
           s.id,
           s.symbol,
@@ -524,6 +525,7 @@ export async function restoreAllData(fullJson, userId = 'demo') {
           s.profitLoss,
           s.profitLossPct,
           JSON.stringify(s.matchedLots || []),
+          s.matchMethod || s.match_method || 'lowest',
           s.date,
           s.note || '',
           JSON.stringify(s.tags || []),

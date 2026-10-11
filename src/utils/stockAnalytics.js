@@ -134,3 +134,189 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
     closedSymbolsCount: stockList.filter(s => !s.isHolding).length,
   };
 }
+
+/**
+ * Tính toán Bộ Chỉ Số Sharpe & Sortino Đo Lường Tỷ Suất Sinh Lời Vượt Trội / Rủi Ro
+ * @param {Array} buyOrders
+ * @param {Array} sellOrders
+ * @param {Array} portfolio
+ * @param {Array} dividends
+ * @param {Object} marketPrices
+ * @param {Object} fundamentalsMap
+ * @param {Number} riskFreeRate - Lãi suất phi rủi ro / tiền gửi (mặc định 5.0%/năm)
+ */
+export function computeRiskAdjustedRatios(
+  buyOrders = [],
+  sellOrders = [],
+  portfolio = [],
+  dividends = [],
+  marketPrices = {},
+  fundamentalsMap = {},
+  riskFreeRate = 5.0
+) {
+  const totalInvested = buyOrders.reduce((s, o) => s + (o.totalCost || (o.quantity * o.price)), 0);
+  if (totalInvested <= 0) {
+    return {
+      sharpe: 0,
+      sortino: 0,
+      annualizedReturn: 0,
+      portfolioVolatility: 0,
+      downsideDeviation: 0,
+      ratingText: 'Chưa đủ dữ liệu',
+      ratingColor: 'text-gray-400',
+      riskFreeRate,
+    };
+  }
+
+  const realizedPL = sellOrders.reduce((s, o) => s + (o.profitLoss || 0), 0);
+  const holdingCost = buyOrders.reduce((s, o) => s + ((o.remainingQty || 0) * (o.costPerShare || o.price)), 0);
+  const totalMarketVal = portfolio.reduce((s, p) => {
+    const curP = marketPrices[p.symbol]?.price || p.avgCost;
+    return s + (p.totalQty * curP);
+  }, 0);
+  const unrealizedPL = totalMarketVal - holdingCost;
+  const cashDividends = (dividends || []).filter(d => d.type === 'CASH').reduce((s, d) => s + (d.netAmount || 0), 0);
+  const totalCumulativePL = realizedPL + unrealizedPL + cashDividends;
+  const roiPct = (totalCumulativePL / totalInvested) * 100;
+
+  // Xác định khoảng thời gian đầu tư
+  const dates = buyOrders.map(b => b.date).filter(Boolean).sort();
+  const firstDate = dates[0] ? new Date(dates[0]) : new Date();
+  const diffDays = Math.max(1, Math.round((new Date().getTime() - firstDate.getTime()) / (1000 * 86400)));
+  const holdingYears = Math.max(diffDays / 365, 0.08); // Tối thiểu ~1 tháng
+
+  // Tỷ suất sinh lời hàng năm (Annualized Return)
+  let annualizedReturn = 0;
+  if (holdingYears >= 1) {
+    const totalReturnFactor = 1 + (totalCumulativePL / totalInvested);
+    if (totalReturnFactor > 0) {
+      annualizedReturn = (Math.pow(totalReturnFactor, 1 / holdingYears) - 1) * 100;
+    } else {
+      annualizedReturn = -100;
+    }
+  } else {
+    annualizedReturn = (roiPct / holdingYears);
+  }
+  // Giới hạn biên độ hiển thị hợp lý
+  annualizedReturn = Math.max(-100, Math.min(annualizedReturn, 500));
+
+  // Tính độ biến động danh mục (Portfolio Volatility - Sigma)
+  let weightedBeta = 0;
+  let validBetaWeight = 0;
+  portfolio.forEach(p => {
+    const curP = marketPrices[p.symbol]?.price || p.avgCost;
+    const val = p.totalQty * curP;
+    const beta = fundamentalsMap[p.symbol]?.technicals?.beta;
+    if (beta != null && !isNaN(beta)) {
+      weightedBeta += val * beta;
+      validBetaWeight += val;
+    }
+  });
+
+  const avgBeta = validBetaWeight > 0 ? (weightedBeta / validBetaWeight) : 1.0;
+  // Biến động chuẩn VN-Index ~ 18.0%/năm
+  let portfolioVolatility = Math.max(5.0, avgBeta * 18.0);
+
+  // Tính độ lệch chuẩn giảm (Downside Deviation) cho Sortino
+  // Dựa trên tỷ lệ lệnh lỗ
+  const lossTrades = sellOrders.filter(s => (s.profitLoss || 0) < 0);
+  const lossRatio = sellOrders.length > 0 ? (lossTrades.length / sellOrders.length) : 0.3;
+  let downsideDeviation = Math.max(3.0, portfolioVolatility * Math.sqrt(Math.max(0.15, lossRatio)));
+
+  // Sharpe Ratio = (R_p - R_f) / Sigma
+  const excessReturn = annualizedReturn - riskFreeRate;
+  const sharpe = parseFloat((excessReturn / portfolioVolatility).toFixed(2));
+
+  // Sortino Ratio = (R_p - R_f) / Downside Sigma
+  const sortino = parseFloat((excessReturn / downsideDeviation).toFixed(2));
+
+  // Xếp hạng chất lượng đầu tư
+  let ratingText = 'Chưa đủ dữ liệu';
+  let ratingColor = 'text-gray-400';
+
+  if (sharpe >= 2.0) {
+    ratingText = 'Xuất sắc (Top-tier)';
+    ratingColor = 'text-emerald-600 dark:text-emerald-400';
+  } else if (sharpe >= 1.0) {
+    ratingText = 'Tốt (Đạt chuẩn)';
+    ratingColor = 'text-indigo-600 dark:text-indigo-400';
+  } else if (sharpe >= 0) {
+    ratingText = 'Khá (Bù đắp rủi ro)';
+    ratingColor = 'text-amber-600 dark:text-amber-400';
+  } else {
+    ratingText = 'Dưới lãi tiết kiệm';
+    ratingColor = 'text-rose-600 dark:text-rose-400';
+  }
+
+  return {
+    sharpe,
+    sortino,
+    annualizedReturn: parseFloat(annualizedReturn.toFixed(1)),
+    portfolioVolatility: parseFloat(portfolioVolatility.toFixed(1)),
+    downsideDeviation: parseFloat(downsideDeviation.toFixed(1)),
+    ratingText,
+    ratingColor,
+    riskFreeRate,
+  };
+}
+
+/**
+ * Phân Tích Chi Phí Cơ Hội (Opportunity Cost vs Lãi Suất Tiết Kiệm Ngân Hàng)
+ * @param {Array} buyOrders
+ * @param {Number} totalCumulativePL
+ * @param {Number} bankRate - Lãi suất gửi tiết kiệm %/năm (mặc định 5.0%)
+ */
+export function computeOpportunityCost(buyOrders = [], totalCumulativePL = 0, bankRate = 5.0) {
+  if (!buyOrders || buyOrders.length === 0) {
+    return {
+      totalSimulatedInterest: 0,
+      alphaCash: 0,
+      alphaPct: 0,
+      bankRoiPct: 0,
+      stockRoiPct: 0,
+      outperformed: false,
+      totalInvested: 0,
+      holdingDaysAvg: 0,
+      bankRate,
+    };
+  }
+
+  const now = new Date();
+  let totalInvested = 0;
+  let totalSimulatedInterest = 0;
+  let totalWeightedDays = 0;
+
+  buyOrders.forEach(b => {
+    const cost = b.totalCost || (b.quantity * b.price);
+    if (!cost || cost <= 0) return;
+    totalInvested += cost;
+
+    let buyDate = b.date ? new Date(b.date) : now;
+    if (isNaN(buyDate.getTime())) buyDate = now;
+    const days = Math.max(1, Math.floor((now.getTime() - buyDate.getTime()) / (1000 * 86400)));
+    totalWeightedDays += days * cost;
+
+    // Lãi tiết kiệm giả định: Vốn * (Lãi suất / 100) * (Số ngày / 365)
+    const interest = cost * (bankRate / 100) * (days / 365);
+    totalSimulatedInterest += interest;
+  });
+
+  const holdingDaysAvg = totalInvested > 0 ? Math.round(totalWeightedDays / totalInvested) : 0;
+  const alphaCash = totalCumulativePL - totalSimulatedInterest;
+  const stockRoiPct = totalInvested > 0 ? parseFloat(((totalCumulativePL / totalInvested) * 100).toFixed(2)) : 0;
+  const bankRoiPct = totalInvested > 0 ? parseFloat(((totalSimulatedInterest / totalInvested) * 100).toFixed(2)) : 0;
+  const alphaPct = parseFloat((stockRoiPct - bankRoiPct).toFixed(2));
+  const outperformed = alphaCash >= 0;
+
+  return {
+    totalSimulatedInterest: Math.round(totalSimulatedInterest),
+    alphaCash: Math.round(alphaCash),
+    alphaPct,
+    bankRoiPct,
+    stockRoiPct,
+    outperformed,
+    totalInvested,
+    holdingDaysAvg,
+    bankRate,
+  };
+}

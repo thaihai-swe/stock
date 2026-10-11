@@ -148,10 +148,10 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
 
   if (strategyList.length === 0) {
     return (
-      <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm max-w-2xl mx-auto">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center border border-gray-100 dark:border-slate-700 shadow-sm max-w-2xl mx-auto">
         <span className="text-5xl block mb-3">🎯</span>
-        <h3 className="text-lg font-bold text-gray-800">Chưa có dữ liệu chiến lược</h3>
-        <p className="text-sm text-gray-500 mt-2 max-w-md mx-auto leading-relaxed">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-white">Chưa có dữ liệu chiến lược</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">
           Hãy gắn các <b>🏷️ Thẻ nhật ký</b> (như <i>Tích sản, Lướt sóng, Breakout, Bắt đáy...</i>) khi nhập lệnh mua hoặc bán để hệ thống tự động đo lường tỷ lệ thắng và hiệu quả đầu tư của từng phương pháp.
         </p>
       </div>
@@ -192,80 +192,80 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
       {/* 4 Thẻ KPI Tinh Hoa */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* KPI 1: Sinh lời tốt nhất */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700/60 shadow-sm">
+          <p className="text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider mb-1">
             🏆 Lợi Nhuận Cao Nhất
           </p>
           {topProfitStrategy ? (
             <div>
-              <div className="font-bold text-gray-900 text-base flex items-center gap-1.5 truncate">
-                <span className="text-indigo-600">#{topProfitStrategy.tag}</span>
+              <div className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-1.5 truncate">
+                <span className="text-indigo-600 dark:text-indigo-400">#{topProfitStrategy.tag}</span>
               </div>
-              <div className="text-emerald-600 font-bold text-lg mt-0.5">
+              <div className="text-emerald-600 dark:text-emerald-400 font-bold text-lg mt-0.5">
                 +{fmtMoney(topProfitStrategy.totalRealizedPL)}đ
               </div>
-              <div className="text-[11px] text-gray-400 mt-0.5">
+              <div className="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5">
                 Win Rate: {topProfitStrategy.winRate}% ({topProfitStrategy.winCount}/{topProfitStrategy.totalClosed})
               </div>
             </div>
           ) : (
-            <div className="text-xs text-gray-400 mt-2">Chưa có lệnh chốt lời</div>
+            <div className="text-xs text-gray-400 dark:text-slate-500 mt-2">Chưa có lệnh chốt lời</div>
           )}
         </div>
 
         {/* KPI 2: Tỷ lệ thắng cao nhất */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700/60 shadow-sm">
+          <p className="text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider mb-1">
             🎯 Tỷ Lệ Thắng Tốt Nhất
           </p>
           {topWinRateStrategy ? (
             <div>
-              <div className="font-bold text-gray-900 text-base truncate">
-                <span className="text-indigo-600">#{topWinRateStrategy.tag}</span>
+              <div className="font-bold text-gray-900 dark:text-white text-base truncate">
+                <span className="text-indigo-600 dark:text-indigo-400">#{topWinRateStrategy.tag}</span>
               </div>
-              <div className="text-indigo-600 font-bold text-lg mt-0.5">
+              <div className="text-indigo-600 dark:text-indigo-400 font-bold text-lg mt-0.5">
                 {topWinRateStrategy.winRate}%
               </div>
-              <div className="text-[11px] text-gray-400 mt-0.5">
+              <div className="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5">
                 {topWinRateStrategy.winCount} thắng / {topWinRateStrategy.totalClosed} lệnh chốt
               </div>
             </div>
           ) : (
-            <div className="text-xs text-gray-400 mt-2">Chưa có dữ liệu</div>
+            <div className="text-xs text-gray-400 dark:text-slate-500 mt-2">Chưa có dữ liệu</div>
           )}
         </div>
 
         {/* KPI 3: Vốn đang giữ nhiều nhất */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700/60 shadow-sm">
+          <p className="text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider mb-1">
             💼 Vốn Giải Ngân Lớn Nhất
           </p>
           {topHoldingStrategy ? (
             <div>
-              <div className="font-bold text-gray-900 text-base truncate">
-                <span className="text-indigo-600">#{topHoldingStrategy.tag}</span>
+              <div className="font-bold text-gray-900 dark:text-white text-base truncate">
+                <span className="text-indigo-600 dark:text-indigo-400">#{topHoldingStrategy.tag}</span>
               </div>
-              <div className="text-gray-900 font-bold text-lg mt-0.5">
+              <div className="text-gray-900 dark:text-white font-bold text-lg mt-0.5">
                 {fmtMoney(topHoldingStrategy.activeCapital)}đ
               </div>
-              <div className="text-[11px] text-gray-400 mt-0.5">
+              <div className="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5">
                 {topHoldingStrategy.activeSymbols.length} mã: {topHoldingStrategy.activeSymbols.join(', ')}
               </div>
             </div>
           ) : (
-            <div className="text-xs text-gray-400 mt-2">Không có vị thế mở</div>
+            <div className="text-xs text-gray-400 dark:text-slate-500 mt-2">Không có vị thế mở</div>
           )}
         </div>
 
         {/* KPI 4: Tổng lệnh đã chốt */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700/60 shadow-sm">
+          <p className="text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider mb-1">
             📋 Tổng Lệnh Đã Chốt
           </p>
-          <div className="text-gray-900 font-bold text-lg mt-1">
+          <div className="text-gray-900 dark:text-white font-bold text-lg mt-1">
             {totalAllClosed} giao dịch
           </div>
-          <div className="text-[11px] text-gray-400 mt-0.5">
+          <div className="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5">
             Qua {strategyList.length} phong cách đầu tư
           </div>
         </div>
@@ -298,18 +298,18 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
       {/* 2 Biểu Đồ Trực Quan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Biểu đồ Cột: So sánh Lãi/Lỗ theo Chiến Lược */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-gray-100 dark:border-slate-700/60 shadow-sm flex flex-col">
           <div className="mb-4">
-            <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <h3 className="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2">
               <span>📊</span> Lãi / Lỗ Đã Chốt Theo Chiến Lược
             </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">
               So sánh mức sinh lời thực tế giữa các phương pháp
             </p>
           </div>
 
           {barChartData.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-xs text-gray-400 h-64">
+            <div className="flex-1 flex items-center justify-center text-xs text-gray-400 dark:text-slate-500 h-64">
               Chưa có lệnh bán nào để vẽ biểu đồ lãi/lỗ
             </div>
           ) : (
@@ -333,11 +333,11 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                         const d = payload[0].payload;
                         const isWin = d.profitLoss >= 0;
                         return (
-                          <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100 text-xs">
-                            <p className="font-bold text-gray-800 text-sm">Chiến lược: #{d.tag}</p>
-                            <p className="text-gray-500 mt-1">Số lệnh chốt: <b>{d.count}</b></p>
-                            <p className="text-gray-500">Tỷ lệ thắng: <b>{d.winRate}%</b></p>
-                            <p className={`font-bold mt-1 text-sm ${isWin ? 'text-emerald-600' : 'text-red-500'}`}>
+                          <div className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800 text-xs">
+                            <p className="font-bold text-gray-800 dark:text-white text-sm">Chiến lược: #{d.tag}</p>
+                            <p className="text-gray-500 dark:text-slate-400 mt-1">Số lệnh chốt: <b className="text-gray-800 dark:text-slate-200">{d.count}</b></p>
+                            <p className="text-gray-500 dark:text-slate-400">Tỷ lệ thắng: <b className="text-gray-800 dark:text-slate-200">{d.winRate}%</b></p>
+                            <p className={`font-bold mt-1 text-sm ${isWin ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                               Lãi/Lỗ: {isWin ? '+' : ''}{fmtMoney(d.profitLoss)}đ
                             </p>
                           </div>
@@ -361,18 +361,18 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
         </div>
 
         {/* Biểu đồ Tròn: Phân Bổ Vốn Đang Nắm Giữ */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-gray-100 dark:border-slate-700/60 shadow-sm flex flex-col">
           <div className="mb-4">
-            <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <h3 className="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2">
               <span>🥧</span> Cơ Cấu Vốn Đang Nắm Giữ Theo Chiến Lược
             </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">
               Tỷ trọng vốn đang giải ngân vào từng phong cách
             </p>
           </div>
 
           {pieChartData.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-xs text-gray-400 h-64">
+            <div className="flex-1 flex items-center justify-center text-xs text-gray-400 dark:text-slate-500 h-64">
               Không có vị thế nắm giữ nào đang mở
             </div>
           ) : (
@@ -425,13 +425,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
       </div>
 
       {/* Bảng Xếp Hạng Toàn Bộ Chiến Lược */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/60 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
+            <h3 className="font-bold text-gray-800 dark:text-white text-base flex items-center gap-2">
               <span>📋</span> Bảng Hiệu Suất Chi Tiết Theo Chiến Lược ({strategyList.length})
             </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">
               Bấm vào từng dòng để xem danh sách chi tiết các lệnh mua & bán tương ứng
             </p>
           </div>
@@ -439,7 +439,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
+            <thead className="bg-gray-50/80 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
               <tr>
                 <th className="text-left px-5 py-3.5">Chiến Lược (Tag)</th>
                 <th className="text-center px-4 py-3.5">Số Lệnh Chốt</th>
@@ -452,7 +452,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                 <th className="text-center px-4 py-3.5">Chi Tiết</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
               {strategyList.map(item => {
                 const isSelected = selectedTag === item.tag;
                 const winRateBadgeColor =
@@ -469,13 +469,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                     key={item.tag}
                     onClick={() => setSelectedTag(isSelected ? null : item.tag)}
                     className={`cursor-pointer transition-colors ${
-                      isSelected ? 'bg-indigo-50/70' : 'hover:bg-gray-50/70'
+                      isSelected ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : 'hover:bg-gray-50/70 dark:hover:bg-slate-700/40'
                     }`}
                   >
                     {/* Tên Thẻ */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-indigo-700 text-sm bg-indigo-50 px-2.5 py-1 rounded-xl">
+                        <span className="font-bold text-indigo-700 dark:text-indigo-400 text-sm bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-1 rounded-xl">
                           #{item.tag}
                         </span>
                       </div>
@@ -485,13 +485,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                     <td className="px-4 py-4 text-center">
                       {item.totalClosed > 0 ? (
                         <div>
-                          <span className="font-semibold text-gray-800">{item.totalClosed}</span>
-                          <div className="text-[11px] text-gray-400">
+                          <span className="font-semibold text-gray-800 dark:text-slate-200">{item.totalClosed}</span>
+                          <div className="text-[11px] text-gray-400 dark:text-slate-500">
                             {item.winCount}W - {item.lossCount}L
                           </div>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-300">0</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">0</span>
                       )}
                     </td>
 
@@ -502,7 +502,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                           {item.winRate}%
                         </span>
                       ) : (
-                        <span className="text-xs text-gray-300">—</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">—</span>
                       )}
                     </td>
 
@@ -513,7 +513,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                           {item.totalRealizedPL >= 0 ? '+' : ''}{fmtMoney(item.totalRealizedPL)}đ
                         </span>
                       ) : (
-                        <span className="text-xs text-gray-300">—</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">—</span>
                       )}
                     </td>
 
@@ -524,18 +524,18 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                           {item.avgPLPerTrade >= 0 ? '+' : ''}{fmtMoney(item.avgPLPerTrade)}đ
                         </span>
                       ) : (
-                        <span className="text-xs text-gray-300">—</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">—</span>
                       )}
                     </td>
 
                     {/* Tỷ lệ Lãi:Lỗ (Win:Loss) */}
                     <td className="px-4 py-4 text-center">
                       {item.totalClosed > 0 && item.winLossRatio > 0 ? (
-                        <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-semibold text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-md">
                           {item.winLossRatio === 99.9 ? 'Tuyệt đối' : `${item.winLossRatio} : 1`}
                         </span>
                       ) : (
-                        <span className="text-xs text-gray-300">—</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">—</span>
                       )}
                     </td>
 
@@ -543,17 +543,17 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                     <td className="px-4 py-4 text-right">
                       {item.activeCapital > 0 ? (
                         <div>
-                          <span className="font-semibold text-gray-800 text-xs">
+                          <span className="font-semibold text-gray-800 dark:text-slate-200 text-xs">
                             {fmtMoney(item.activeCapital)}đ
                           </span>
                           {item.activeSymbols.length > 0 && (
-                            <div className="text-[10px] text-gray-400">
+                            <div className="text-[10px] text-gray-400 dark:text-slate-500">
                               {item.activeSymbols.join(', ')}
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-300">—</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">—</span>
                       )}
                     </td>
 
@@ -569,7 +569,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                           </span>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-300">—</span>
+                        <span className="text-xs text-gray-300 dark:text-slate-600">—</span>
                       )}
                     </td>
 
@@ -584,7 +584,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                         className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${
                           isSelected
                             ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                            : 'bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-slate-300'
                         }`}
                       >
                         {isSelected ? 'Ẩn' : '🔍 Xem'}
@@ -599,33 +599,33 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
       </div>
 
       {/* 🧠 Thống Kê Tâm Lý & Điểm Kỷ Luật Giao Dịch */}
-      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-slate-700 pb-4">
           <div>
-            <h3 className="font-bold text-gray-900 text-base flex items-center gap-2">
+            <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
               <span>🧠</span> Nhật Ký Đánh Giá Tâm Lý & Kỷ Luật Giao Dịch
             </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">
               Tự soi xét tâm lý khi chốt lệnh giúp kiểm soát cảm xúc, nâng cao kỷ luật cá nhân
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+          <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-900/60 px-4 py-2 rounded-2xl border border-gray-100 dark:border-slate-700">
             <div>
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
                 Điểm Kỷ Luật
               </div>
-              <div className="text-sm font-bold text-gray-800">
+              <div className="text-sm font-bold text-gray-800 dark:text-slate-200">
                 {disciplineStats.disciplineScore !== null ? (
-                  <span className={disciplineStats.disciplineScore >= 70 ? 'text-emerald-600' : disciplineStats.disciplineScore >= 50 ? 'text-amber-600' : 'text-red-500'}>
+                  <span className={disciplineStats.disciplineScore >= 70 ? 'text-emerald-600 dark:text-emerald-400' : disciplineStats.disciplineScore >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-500 dark:text-red-400'}>
                     {disciplineStats.disciplineScore}%
                   </span>
                 ) : (
-                  <span className="text-gray-400 text-xs">Chưa đủ dữ liệu</span>
+                  <span className="text-gray-400 dark:text-slate-500 text-xs">Chưa đủ dữ liệu</span>
                 )}
               </div>
             </div>
-            <div className="text-xs text-gray-500 border-l border-gray-200 pl-3">
+            <div className="text-xs text-gray-500 dark:text-slate-400 border-l border-gray-200 dark:border-slate-700 pl-3">
               {disciplineStats.evaluatedCount > 0 ? (
                 <><b>{disciplineStats.positiveCount}</b> / {disciplineStats.evaluatedCount} lệnh chuẩn kỷ luật</>
               ) : (
@@ -687,13 +687,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
 
       {/* Drill-down Chi Tiết Giao Dịch Của Tag Được Chọn */}
       {activeStrategyDetail && (
-        <div className="bg-white rounded-3xl p-6 border-2 border-indigo-200 shadow-md animate-in fade-in duration-200 space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-100 pb-4 flex-wrap gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border-2 border-indigo-200 dark:border-indigo-800 shadow-md animate-in fade-in duration-200 space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-4 flex-wrap gap-2">
             <div>
-              <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                <span>🔍</span> Chi Tiết Giao Dịch: <span className="text-indigo-600">#{activeStrategyDetail.tag}</span>
+              <h3 className="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
+                <span>🔍</span> Chi Tiết Giao Dịch: <span className="text-indigo-600 dark:text-indigo-400">#{activeStrategyDetail.tag}</span>
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                 Xem toàn bộ lịch sử lệnh mua và bán gắn với chiến lược này
               </p>
             </div>
@@ -706,7 +706,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                 className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all ${
                   drilldownTab === 'closed'
                     ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
                 }`}
               >
                 💸 Lệnh Đã Chốt ({activeStrategyDetail.totalClosed})
@@ -717,7 +717,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                 className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all ${
                   drilldownTab === 'active'
                     ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
                 }`}
               >
                 🛒 Vị Thế Đang Giữ ({activeStrategyDetail.activeLots.length})
@@ -725,7 +725,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
               <button
                 type="button"
                 onClick={() => setSelectedTag(null)}
-                className="text-gray-400 hover:text-gray-600 text-sm p-1 ml-2"
+                className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 text-sm p-1 ml-2"
                 title="Đóng chi tiết"
               >
                 ✕
@@ -736,13 +736,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
           {/* Nội dung Tab: Lệnh Đã Chốt */}
           {drilldownTab === 'closed' && (
             activeStrategyDetail.closedTrades.length === 0 ? (
-              <div className="py-8 text-center text-xs text-gray-400">
+              <div className="py-8 text-center text-xs text-gray-400 dark:text-slate-500">
                 Chiến lược này chưa có lệnh bán chốt lời/lỗ nào.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                  <thead className="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
                     <tr>
                       <th className="text-left px-4 py-2.5">Ngày Bán</th>
                       <th className="text-left px-4 py-2.5">Mã CP</th>
@@ -753,17 +753,17 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                       <th className="text-left px-4 py-2.5">Ghi Chú</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
                     {activeStrategyDetail.closedTrades.map(s => (
-                      <tr key={s.id} className="hover:bg-gray-50/80">
-                        <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">{fmtDate(s.date)}</td>
+                      <tr key={s.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/40">
+                        <td className="px-4 py-2.5 text-gray-600 dark:text-slate-400 whitespace-nowrap">{fmtDate(s.date)}</td>
                         <td className="px-4 py-2.5">
-                          <span className="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
+                          <span className="font-bold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
                             {s.symbol}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-right font-medium text-gray-700">{s.quantity.toLocaleString()} cp</td>
-                        <td className="px-4 py-2.5 text-right font-medium text-gray-700">{fmtMoney(s.price)}đ</td>
+                        <td className="px-4 py-2.5 text-right font-medium text-gray-700 dark:text-slate-300">{s.quantity.toLocaleString()} cp</td>
+                        <td className="px-4 py-2.5 text-right font-medium text-gray-700 dark:text-slate-300">{fmtMoney(s.price)}đ</td>
                         <td className="px-4 py-2.5 text-right font-bold">
                           <span className={plColor(s.profitLoss)}>
                             {s.profitLoss >= 0 ? '+' : ''}{fmtMoney(s.profitLoss)}đ
@@ -774,7 +774,7 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                             {s.profitLossPct >= 0 ? '+' : ''}{s.profitLossPct}%
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-gray-500 max-w-xs truncate">{s.note || '—'}</td>
+                        <td className="px-4 py-2.5 text-gray-500 dark:text-slate-400 max-w-xs truncate">{s.note || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -786,13 +786,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
           {/* Nội dung Tab: Vị Thế Đang Giữ */}
           {drilldownTab === 'active' && (
             activeStrategyDetail.activeLots.length === 0 ? (
-              <div className="py-8 text-center text-xs text-gray-400">
+              <div className="py-8 text-center text-xs text-gray-400 dark:text-slate-500">
                 Chiến lược này hiện không còn cổ phiếu nào đang nắm giữ.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                  <thead className="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
                     <tr>
                       <th className="text-left px-4 py-2.5">Ngày Mua</th>
                       <th className="text-left px-4 py-2.5">Mã CP</th>
@@ -803,30 +803,30 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
                       <th className="text-left px-4 py-2.5">Ghi Chú</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
                     {activeStrategyDetail.activeLots.map(b => {
                       const curPrice = marketPrices[b.symbol]?.price;
                       return (
-                        <tr key={b.id} className="hover:bg-gray-50/80">
-                          <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">{fmtDate(b.date)}</td>
+                        <tr key={b.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/40">
+                          <td className="px-4 py-2.5 text-gray-600 dark:text-slate-400 whitespace-nowrap">{fmtDate(b.date)}</td>
                           <td className="px-4 py-2.5">
-                            <span className="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
+                            <span className="font-bold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
                               {b.symbol}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-right font-medium text-gray-700">{b.remainingQty.toLocaleString()} cp</td>
-                          <td className="px-4 py-2.5 text-right font-medium text-gray-700">{fmtMoney(b.costPerShare || b.price)}đ</td>
-                          <td className="px-4 py-2.5 text-right font-bold text-gray-800">
+                          <td className="px-4 py-2.5 text-right font-medium text-gray-700 dark:text-slate-300">{b.remainingQty.toLocaleString()} cp</td>
+                          <td className="px-4 py-2.5 text-right font-medium text-gray-700 dark:text-slate-300">{fmtMoney(b.costPerShare || b.price)}đ</td>
+                          <td className="px-4 py-2.5 text-right font-bold text-gray-800 dark:text-slate-200">
                             {fmtMoney(b.remainingQty * (b.costPerShare || b.price))}đ
                           </td>
                           <td className="px-4 py-2.5 text-right">
                             {curPrice ? (
-                              <span className="font-bold text-blue-700">{fmtMoney(curPrice)}đ</span>
+                              <span className="font-bold text-blue-700 dark:text-blue-400">{fmtMoney(curPrice)}đ</span>
                             ) : (
-                              <span className="text-gray-400">—</span>
+                              <span className="text-gray-400 dark:text-slate-500">—</span>
                             )}
                           </td>
-                          <td className="px-4 py-2.5 text-gray-500 max-w-xs truncate">{b.note || '—'}</td>
+                          <td className="px-4 py-2.5 text-gray-500 dark:text-slate-400 max-w-xs truncate">{b.note || '—'}</td>
                         </tr>
                       );
                     })}

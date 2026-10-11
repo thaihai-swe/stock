@@ -4,6 +4,11 @@ export function fmtMoney(value) {
   return new Intl.NumberFormat('vi-VN').format(Math.round(value));
 }
 
+export function formatVND(value) {
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  return Number(value).toLocaleString('vi-VN') + ' đ';
+}
+
 // Lấy ngày hôm nay định dạng YYYY-MM-DD
 export function getTodayDate() {
   const now = new Date();
@@ -27,17 +32,17 @@ export function fmtDate(dateString) {
   });
 }
 
-// Màu lãi/lỗ
+// Màu lãi/lỗ chuẩn FinTech (Emerald / Rose / Slate)
 export function plColor(value) {
-  if (value > 0) return 'text-green-600 dark:text-emerald-400';
-  if (value < 0) return 'text-red-500 dark:text-rose-400';
-  return 'text-gray-500 dark:text-slate-400';
+  if (value > 0) return 'text-emerald-600 dark:text-emerald-400';
+  if (value < 0) return 'text-rose-600 dark:text-rose-400';
+  return 'text-slate-500 dark:text-slate-400';
 }
 
 export function plBg(value) {
-  if (value > 0) return 'bg-green-50 text-green-700 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
-  if (value < 0) return 'bg-red-50 text-red-600 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/60';
-  return 'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+  if (value > 0) return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
+  if (value < 0) return 'bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/60';
+  return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
 }
 
 // Tags gợi ý mặc định
@@ -47,7 +52,6 @@ export const DEFAULT_TAGS = [
   'Bắt đáy',
   'Cơ bản',
   'Kỹ thuật',
-  'Theo sóng ngành',
   'Cổ tức',
 ];
 
@@ -209,3 +213,219 @@ export function compareAvgCostWithMarket(avgCost, marketPrice) {
     status: 'even',
   };
 }
+
+// 10. Format quy mô tiền tỷ / nghìn tỷ cho doanh nghiệp
+export function fmtBillion(value) {
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  const val = Number(value);
+  const abs = Math.abs(val);
+  const sign = val < 0 ? '-' : '';
+  if (abs >= 1e12) {
+    return `${sign}${(abs / 1e12).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} nghìn tỷ`;
+  }
+  if (abs >= 1e9) {
+    return `${sign}${(abs / 1e9).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} tỷ`;
+  }
+  if (abs >= 1e6) {
+    return `${sign}${(abs / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} tr`;
+  }
+  return fmtMoney(val) + ' đ';
+}
+
+// 11. Format số lượng cổ phiếu rút gọn
+export function fmtShares(value) {
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  const val = Number(value);
+  if (val >= 1e9) {
+    return `${(val / 1e9).toFixed(2)} tỷ CP`;
+  }
+  if (val >= 1e6) {
+    return `${(val / 1e6).toFixed(1)} tr CP`;
+  }
+  return `${val.toLocaleString('vi-VN')} CP`;
+}
+
+// 12. Format phần trăm an toàn
+export function fmtPercent(value, withSign = false) {
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  const num = Number(value);
+  const sign = withSign && num > 0 ? '+' : '';
+  return `${sign}${num.toFixed(2)}%`;
+}
+
+// 13. Format số thập phân an toàn
+export function fmtDecimal(value, digits = 2) {
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  return Number(value).toFixed(digits);
+}
+
+// 14. Bảng màu và Phân loại nhóm ngành chuẩn GICS Việt Nam
+export const SECTOR_COLORS = {
+  'Ngân hàng': '#2563eb', // blue
+  'Bất động sản': '#ea580c', // orange
+  'Chứng khoán & Tài chính': '#0284c7', // sky
+  'Nguyên vật liệu & Thép': '#78716c', // stone
+  'Công nghệ thông tin': '#4f46e5', // indigo
+  'Bán lẻ & Tiêu dùng': '#10b981', // emerald
+  'Năng lượng & Tiện ích': '#f59e0b', // amber
+  'Xây dựng & Công nghiệp': '#8b5cf6', // purple
+  'Y tế & Dược phẩm': '#ec4899', // pink
+  'Quỹ ETF': '#06b6d4', // cyan
+  'Khác': '#64748b', // slate
+};
+
+export function getStockSector(symbol, fundamentalsMap = {}) {
+  const sym = (symbol || '').toUpperCase().trim();
+  if (!sym) return { name: 'Khác', icon: '📦', color: SECTOR_COLORS['Khác'] };
+
+  // 1. Nhận diện ETF
+  if (sym.startsWith('FU') || sym.startsWith('E1')) {
+    return { name: 'Quỹ ETF', icon: '💎', color: SECTOR_COLORS['Quỹ ETF'] };
+  }
+
+  const fund = fundamentalsMap[sym];
+  const sector = (fund?.sector || '').toLowerCase();
+  const industry = (fund?.industry || '').toLowerCase();
+
+  // 2. Tra cứu qua sector / industry từ API
+  if (industry.includes('bank') || industry.includes('ngân hàng')) {
+    return { name: 'Ngân hàng', icon: '🏦', color: SECTOR_COLORS['Ngân hàng'] };
+  }
+  if (industry.includes('real estate') || industry.includes('bất động sản') || industry.includes('property')) {
+    return { name: 'Bất động sản', icon: '🏢', color: SECTOR_COLORS['Bất động sản'] };
+  }
+  if (industry.includes('broker') || industry.includes('securities') || industry.includes('chứng khoán') || industry.includes('investment trust') || industry.includes('fund')) {
+    if (industry.includes('investment trust') && (sym.startsWith('E1') || sym.startsWith('FU'))) {
+      return { name: 'Quỹ ETF', icon: '💎', color: SECTOR_COLORS['Quỹ ETF'] };
+    }
+    return { name: 'Chứng khoán & Tài chính', icon: '📈', color: SECTOR_COLORS['Chứng khoán & Tài chính'] };
+  }
+  if (industry.includes('steel') || sector.includes('mineral') || sector.includes('material') || industry.includes('chemical') || industry.includes('thép')) {
+    return { name: 'Nguyên vật liệu & Thép', icon: '⛏️', color: SECTOR_COLORS['Nguyên vật liệu & Thép'] };
+  }
+  if (sector.includes('tech') || industry.includes('software') || industry.includes('computer') || industry.includes('công nghệ')) {
+    return { name: 'Công nghệ thông tin', icon: '💻', color: SECTOR_COLORS['Công nghệ thông tin'] };
+  }
+  if (sector.includes('consumer') || sector.includes('retail') || industry.includes('retail') || industry.includes('food') || industry.includes('beverage')) {
+    return { name: 'Bán lẻ & Tiêu dùng', icon: '🛒', color: SECTOR_COLORS['Bán lẻ & Tiêu dùng'] };
+  }
+  if (sector.includes('energy') || sector.includes('utility') || industry.includes('oil') || industry.includes('gas') || industry.includes('electric')) {
+    return { name: 'Năng lượng & Tiện ích', icon: '⚡', color: SECTOR_COLORS['Năng lượng & Tiện ích'] };
+  }
+  if (sector.includes('industrial') || industry.includes('construction') || industry.includes('transport') || industry.includes('logistics')) {
+    return { name: 'Xây dựng & Công nghiệp', icon: '🏗️', color: SECTOR_COLORS['Xây dựng & Công nghiệp'] };
+  }
+  if (sector.includes('health') || industry.includes('pharmaceutical') || industry.includes('drug')) {
+    return { name: 'Y tế & Dược phẩm', icon: '💊', color: SECTOR_COLORS['Y tế & Dược phẩm'] };
+  }
+
+  // 3. Fallback theo từ điển mã quen thuộc tại VN
+  const BANK_SYMS = ['VCB', 'BID', 'CTG', 'TCB', 'MBB', 'ACB', 'VPB', 'HDB', 'STB', 'SHB', 'VIB', 'TPB', 'MSB', 'OCB', 'LPB', 'SSB', 'EIB', 'BAB', 'NAB', 'BVB', 'KLB', 'PGB', 'ABB', 'VBB'];
+  if (BANK_SYMS.includes(sym)) return { name: 'Ngân hàng', icon: '🏦', color: SECTOR_COLORS['Ngân hàng'] };
+
+  const REAL_ESTATE_SYMS = ['VHM', 'VIC', 'VRE', 'NVL', 'KDH', 'NLG', 'DXG', 'PDR', 'DIG', 'CEO', 'KBC', 'IDC', 'SZC', 'BCM', 'VGC', 'ITA', 'HDG', 'TCH', 'NTL', 'DXS', 'IJC', 'KHG', 'AGG', 'SCR'];
+  if (REAL_ESTATE_SYMS.includes(sym)) return { name: 'Bất động sản', icon: '🏢', color: SECTOR_COLORS['Bất động sản'] };
+
+  const SEC_SYMS = ['SSI', 'VND', 'VCI', 'HCM', 'SHS', 'MBS', 'FTS', 'BSI', 'CTS', 'AGR', 'VIX', 'ORS', 'TVS', 'EVS', 'APG', 'VDS'];
+  if (SEC_SYMS.includes(sym)) return { name: 'Chứng khoán & Tài chính', icon: '📈', color: SECTOR_COLORS['Chứng khoán & Tài chính'] };
+
+  const MAT_SYMS = ['HPG', 'HSG', 'NKG', 'DGC', 'DCM', 'DPM', 'GVR', 'PHR', 'DPR', 'CSV', 'LAS', 'BFC', 'HT1', 'BCC', 'VCS'];
+  if (MAT_SYMS.includes(sym)) return { name: 'Nguyên vật liệu & Thép', icon: '⛏️', color: SECTOR_COLORS['Nguyên vật liệu & Thép'] };
+
+  const TECH_SYMS = ['FPT', 'CMG', 'ELC', 'SAM', 'FOX', 'ITD'];
+  if (TECH_SYMS.includes(sym)) return { name: 'Công nghệ thông tin', icon: '💻', color: SECTOR_COLORS['Công nghệ thông tin'] };
+
+  const RETAIL_SYMS = ['MWG', 'MSN', 'PNJ', 'FRT', 'VNM', 'SAB', 'MCH', 'DGW', 'PET', 'KDC', 'QNS', 'VHC', 'ANV', 'FMC', 'IDI', 'BAF', 'DBC'];
+  if (RETAIL_SYMS.includes(sym)) return { name: 'Bán lẻ & Tiêu dùng', icon: '🛒', color: SECTOR_COLORS['Bán lẻ & Tiêu dùng'] };
+
+  const ENERGY_SYMS = ['GAS', 'PLX', 'PVD', 'PVS', 'BSR', 'POW', 'REE', 'GEG', 'NT2', 'PPC', 'HND', 'VSH', 'PC1', 'TV2', 'PVB', 'PVC'];
+  if (ENERGY_SYMS.includes(sym)) return { name: 'Năng lượng & Tiện ích', icon: '⚡', color: SECTOR_COLORS['Năng lượng & Tiện ích'] };
+
+  const IND_SYMS = ['HAH', 'GMD', 'VOS', 'PVT', 'VCG', 'HHV', 'CII', 'FCN', 'LCG', 'CTD', 'HBC', 'BMP', 'NTP', 'ACV', 'VJC', 'HVN'];
+  if (IND_SYMS.includes(sym)) return { name: 'Xây dựng & Công nghiệp', icon: '🏗️', color: SECTOR_COLORS['Xây dựng & Công nghiệp'] };
+
+  const HEALTH_SYMS = ['DHG', 'DVN', 'IMP', 'TRA', 'DBD', 'DMC', 'VMD'];
+  if (HEALTH_SYMS.includes(sym)) return { name: 'Y tế & Dược phẩm', icon: '💊', color: SECTOR_COLORS['Y tế & Dược phẩm'] };
+
+  return { name: fund?.sector || 'Khác', icon: '📦', color: SECTOR_COLORS['Khác'] };
+}
+
+// Format tỷ VNĐ (viết tắt Bn VND)
+export function formatBn(val) {
+  if (val === null || val === undefined || isNaN(val)) return '—';
+  return Number(val).toLocaleString('vi-VN') + ' tỷ';
+}
+
+// Format phần trăm có dấu (+ / -)
+export function formatPercent(val) {
+  if (val === null || val === undefined || isNaN(val)) return '—';
+  const num = Number(val);
+  const sign = num > 0 ? '+' : '';
+  return `${sign}${num.toFixed(1)}%`;
+}
+
+/**
+ * Định dạng & suy luận chiến lược khớp lệnh bán (Sell Lot Matching Strategy)
+ * Hỗ trợ 3 chiến lược:
+ * - 'lowest': Khớp lô mua giá thấp nhất trước (Tối đa hóa lợi nhuận chốt ngay)
+ * - 'highest': Khớp lô mua giá cao nhất trước (Hạ giá vốn cổ phiếu còn lại / Tối ưu thuế)
+ * - 'fifo': Mua trước bán trước theo thứ tự thời gian (First-In First-Out)
+ */
+export function getMatchMethodInfo(matchMethod, matchedLots = []) {
+  let method = matchMethod;
+
+  // Tương thích ngược: Suy luận phương thức khớp nếu chưa được lưu trong DB
+  if (!method && Array.isArray(matchedLots) && matchedLots.length > 1) {
+    const isCostAsc = matchedLots.every((lot, i) => i === 0 || (lot.unitCost || lot.buyPrice) >= (matchedLots[i - 1].unitCost || matchedLots[i - 1].buyPrice));
+    const isCostDesc = matchedLots.every((lot, i) => i === 0 || (lot.unitCost || lot.buyPrice) <= (matchedLots[i - 1].unitCost || matchedLots[i - 1].buyPrice));
+    const isDateAsc = matchedLots.every((lot, i) => i === 0 || new Date(lot.buyDate) >= new Date(matchedLots[i - 1].buyDate));
+
+    if (isCostAsc && !isCostDesc) method = 'lowest';
+    else if (isCostDesc && !isCostAsc) method = 'highest';
+    else if (isDateAsc) method = 'fifo';
+  }
+
+  // Mặc định chuẩn của hệ thống là 'lowest'
+  method = method || 'lowest';
+
+  switch (method) {
+    case 'highest':
+      return {
+        key: 'highest',
+        label: 'Giá vốn cao nhất',
+        shortLabel: 'Lô Giá Cao',
+        badge: '📈 Max Cost (Hạ vốn)',
+        color: 'indigo',
+        icon: '📈',
+        badgeBg: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+        buttonBg: 'bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/40',
+        description: 'Khớp các lô mua đắt nhất trước, giúp hạ giá vốn các cổ phiếu còn lại trong danh mục',
+      };
+    case 'fifo':
+      return {
+        key: 'fifo',
+        label: 'Mua trước bán trước (FIFO)',
+        shortLabel: 'Lô FIFO',
+        badge: '⏱️ FIFO (Mua sớm)',
+        color: 'emerald',
+        icon: '⏱️',
+        badgeBg: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+        buttonBg: 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40',
+        description: 'Khớp các lô mua sớm nhất trước theo thứ tự thời gian (First-In First-Out)',
+      };
+    case 'lowest':
+    default:
+      return {
+        key: 'lowest',
+        label: 'Giá vốn thấp nhất',
+        shortLabel: 'Lô Giá Thấp',
+        badge: '📉 Min Cost (Max lãi)',
+        color: 'orange',
+        icon: '📉',
+        badgeBg: 'bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+        buttonBg: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40',
+        description: 'Khớp các lô mua rẻ nhất trước để tối đa hóa lợi nhuận chốt lời ngay lập tức',
+      };
+  }
+}
+

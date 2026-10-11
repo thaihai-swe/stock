@@ -9,6 +9,8 @@ import watchlistRoutes from './routes/watchlistRoutes.js';
 import priceRoutes from './routes/priceRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import dividendRoutes from './routes/dividendRoutes.js';
+import fundamentalRoutes from './routes/fundamentalRoutes.js';
+import valuationRoutes from './routes/valuationRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import { authMiddleware } from './middleware/auth.js';
 
@@ -25,6 +27,8 @@ app.use('/api', watchlistRoutes);
 app.use('/api', priceRoutes);
 app.use('/api', settingsRoutes);
 app.use('/api', dividendRoutes);
+app.use('/api', fundamentalRoutes);
+app.use('/api', valuationRoutes);
 
 import { getDbInfo } from './storage/db.js';
 

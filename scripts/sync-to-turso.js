@@ -67,7 +67,7 @@ async function syncToTurso() {
       fee_pct REAL DEFAULT 0, fee REAL DEFAULT 0, tax_pct REAL DEFAULT 0.1, tax REAL DEFAULT 0,
       gross_revenue REAL NOT NULL, net_revenue REAL NOT NULL, total_cost REAL NOT NULL,
       profit_loss REAL NOT NULL, profit_loss_pct REAL NOT NULL, matched_lots TEXT DEFAULT '[]',
-      date TEXT NOT NULL, note TEXT DEFAULT '', tags TEXT DEFAULT '[]'
+      match_method TEXT DEFAULT 'lowest', date TEXT NOT NULL, note TEXT DEFAULT '', tags TEXT DEFAULT '[]'
     );`,
     `CREATE TABLE IF NOT EXISTS dividends (
       id TEXT PRIMARY KEY, type TEXT NOT NULL, symbol TEXT NOT NULL, date TEXT NOT NULL,
@@ -95,8 +95,8 @@ async function syncToTurso() {
     }
     for (const r of dataToSync.sellRows) {
       statements.push({
-        sql: `INSERT OR REPLACE INTO sell_orders (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, date, note, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-        args: [r.id, r.symbol, r.quantity, r.price, r.fee_pct, r.fee, r.tax_pct, r.tax, r.gross_revenue, r.net_revenue, r.total_cost, r.profit_loss, r.profit_loss_pct, r.matched_lots, r.date, r.note, r.tags],
+        sql: `INSERT OR REPLACE INTO sell_orders (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, match_method, date, note, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+        args: [r.id, r.symbol, r.quantity, r.price, r.fee_pct, r.fee, r.tax_pct, r.tax, r.gross_revenue, r.net_revenue, r.total_cost, r.profit_loss, r.profit_loss_pct, r.matched_lots, r.match_method || 'lowest', r.date, r.note, r.tags],
       });
     }
     for (const r of dataToSync.divRows) {

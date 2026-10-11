@@ -1,0 +1,57 @@
+name: Daily EOD Stock Fundamentals & Macro Sync (Python)
+
+on:
+  schedule:
+    # Chạy tự động lúc 18:00 (Giờ Việt Nam, tức 11:00 UTC) từ Thứ 2 đến Thứ 6 sau khi sàn đóng cửa
+    - cron: '0 11 * * 1-5'
+
+  workflow_dispatch:
+    # Nút bấm kích hoạt thủ công từ GitHub Actions UI
+    inputs:
+      reason:
+        description: 'Lý do kích hoạt đồng bộ EOD'
+        required: false
+        default: 'Manual trigger Daily EOD'
+
+permissions:
+  contents: write
+
+jobs:
+  daily-eod-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 1. Checkout mã nguồn
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 🐍 2. Cài đặt Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 3. Cài đặt dependencies với uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          export PATH="$HOME/.local/bin:$PATH"
+          uv pip install --system pandas requests beautifulsoup4 yfinance curl_cffi lxml numpy
+
+      - name: ⚡ 4. Chạy Daily EOD Pipeline
+        run: python scripts/run_pipeline.py --cadence daily
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+
+      - name: 💾 5. Tự động Commit & Push dữ liệu Cache EOD mới
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fundamentals_cache.json data/macro_valuation.json data/financials/
+          if git diff --staged --quiet; then
+            echo "ℹ️ Không có thay đổi dữ liệu EOD mới."
+          else
+            git commit -m "chore(data): daily EOD market & fundamentals sync [skip ci]"
+            git push
+            echo "✅ Đã commit và push dữ liệu EOD mới lên GitHub thành công!"
+          fi

@@ -105,6 +105,7 @@ export async function initDatabase() {
       profit_loss REAL NOT NULL,
       profit_loss_pct REAL NOT NULL,
       matched_lots TEXT DEFAULT '[]',
+      match_method TEXT DEFAULT 'lowest',
       date TEXT NOT NULL,
       note TEXT DEFAULT '',
       tags TEXT DEFAULT '[]',
@@ -169,6 +170,7 @@ export async function initDatabase() {
   // 7. Migration an toàn: Bổ sung cột user_id vào các database đã có sẵn dữ liệu
   await addColumnSafe('buy_orders', 'user_id TEXT DEFAULT "demo"');
   await addColumnSafe('sell_orders', 'user_id TEXT DEFAULT "demo"');
+  await addColumnSafe('sell_orders', 'match_method TEXT DEFAULT "lowest"');
   await addColumnSafe('dividends', 'user_id TEXT DEFAULT "demo"');
   await addColumnSafe('watchlist', 'user_id TEXT DEFAULT "demo"');
   await addColumnSafe('app_settings', 'user_id TEXT DEFAULT "demo"');
@@ -242,8 +244,8 @@ async function autoMigrateFromJson() {
         for (const s of data.sellOrders) {
           await db.execute({
             sql: `INSERT OR REPLACE INTO sell_orders
-                  (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, date, note, tags)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                  (id, symbol, quantity, price, fee_pct, fee, tax_pct, tax, gross_revenue, net_revenue, total_cost, profit_loss, profit_loss_pct, matched_lots, match_method, date, note, tags)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             args: [
               s.id,
               s.symbol,
@@ -259,6 +261,7 @@ async function autoMigrateFromJson() {
               s.profitLoss,
               s.profitLossPct,
               JSON.stringify(s.matchedLots || []),
+              s.matchMethod || 'lowest',
               s.date,
               s.note || '',
               JSON.stringify(s.tags || []),
