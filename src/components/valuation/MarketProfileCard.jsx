@@ -36,7 +36,7 @@ export default function MarketProfileCard({ marketProfile, symbol, currentPrice 
               </h3>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Phân tích cấu trúc khối lượng theo dải giá (VAP), Dòng tiền Wyckoff & Rủi ro đuôi từ <code className="font-mono text-indigo-600 dark:text-indigo-400">ref-equity-research-vn</code>
+              Phân tích cấu trúc khối lượng theo dải giá (VAP), Dòng tiền Wyckoff & Rủi ro
             </p>
           </div>
 
@@ -95,8 +95,8 @@ export default function MarketProfileCard({ marketProfile, symbol, currentPrice 
                 <div className="flex-1 bg-gray-100 dark:bg-gray-700/50 rounded-full h-4 overflow-hidden relative">
                   <div
                     className={`h-full rounded-full transition-all ${isPoc
-                        ? 'bg-amber-500 dark:bg-amber-400'
-                        : b.volumePercent >= 12
+                      ? 'bg-amber-500 dark:bg-amber-400'
+                      : b.volumePercent >= 12
                         ? 'bg-indigo-500 dark:bg-indigo-400'
                         : 'bg-indigo-200 dark:bg-indigo-900/60'
                       }`}
@@ -186,8 +186,8 @@ export default function MarketProfileCard({ marketProfile, symbol, currentPrice 
               </h4>
             </div>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${effortWithoutResultDetected
-                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-                : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+              ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+              : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
               }`}>
               {effortWithoutResultDetected ? 'Phát hiện tín hiệu gom/xả ẩn' : 'Thị trường bình thường'}
             </span>

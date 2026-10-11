@@ -55,9 +55,6 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
                 Mô Hình Chiết Khấu Dòng Tiền Tự Do DCF (FCFF) & Reverse DCF
               </h3>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Chuẩn phân tích dòng tiền chiết khấu chuyên nghiệp (Institutional-grade) từ <code className="font-mono text-indigo-600 dark:text-indigo-400">ref-equity-research-vn</code>
-            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
@@ -154,8 +151,8 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
           </div>
           {reverseDcfImpliedGrowth != null && (
             <span className={`text-sm font-black px-2.5 py-1 rounded-xl ${reverseDcfImpliedGrowth <= 6.0
-                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                : reverseDcfImpliedGrowth <= 15.0
+              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+              : reverseDcfImpliedGrowth <= 15.0
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
                 : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
               }`}>
@@ -168,8 +165,8 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
           <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/40 space-y-2">
             <div className="font-bold text-gray-800 dark:text-gray-200">Ý nghĩa phương pháp Reverse DCF:</div>
             <p className="leading-relaxed">
-              Giải ngược bài toán: Tại thị giá hiện tại ({formatVND(curPrice)}), thị trường đang kỳ vọng dòng tiền của {symbol} phải tăng trưởng bình quân 
-              <span className="font-bold text-indigo-600 dark:text-indigo-400"> {reverseDcfImpliedGrowth != null ? `${reverseDcfImpliedGrowth}%/năm` : '—'} </span> 
+              Giải ngược bài toán: Tại thị giá hiện tại ({formatVND(curPrice)}), thị trường đang kỳ vọng dòng tiền của {symbol} phải tăng trưởng bình quân
+              <span className="font-bold text-indigo-600 dark:text-indigo-400"> {reverseDcfImpliedGrowth != null ? `${reverseDcfImpliedGrowth}%/năm` : '—'} </span>
               trong 5 năm tới để bù đắp mức định giá.
             </p>
           </div>
@@ -179,8 +176,8 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
               {reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 8.0
                 ? '✅ Thị trường đang định giá rất thận trọng (kỳ vọng tăng trưởng thấp hơn GDP/ngành), tạo biên an toàn hấp dẫn cho nhà đầu tư tích lũy dài hạn.'
                 : reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 18.0
-                ? '⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.'
-                : '⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá.'}
+                  ? '⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.'
+                  : '⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá.'}
             </p>
           </div>
         </div>
@@ -227,8 +224,8 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
                         <td
                           key={cIdx}
                           className={`p-3 font-mono font-bold border border-gray-200 dark:border-gray-700 ${isBase
-                              ? 'bg-indigo-100/70 text-indigo-900 dark:bg-indigo-900/60 dark:text-indigo-200 ring-2 ring-indigo-500'
-                              : cellVal && curPrice && cellVal >= curPrice
+                            ? 'bg-indigo-100/70 text-indigo-900 dark:bg-indigo-900/60 dark:text-indigo-200 ring-2 ring-indigo-500'
+                            : cellVal && curPrice && cellVal >= curPrice
                               ? 'text-emerald-700 dark:text-emerald-300'
                               : 'text-rose-700 dark:text-rose-300'
                             }`}

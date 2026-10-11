@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
 
+function getArticleUrl(item, symbol) {
+  if (item?.link && item.link !== '#' && item.link.startsWith('http')) {
+    return item.link;
+  }
+  const query = `${item?.title || ''} ${item?.source || symbol || ''}`.trim();
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}&hl=vi`;
+}
+
 export default function NewsSentimentCard({ newsDigest, symbol }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -41,7 +49,7 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
               </h3>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Phân loại 5 nhóm tin tức, đo lường điểm số tâm lý (-100 đến +100) theo chuẩn <code className="font-mono text-indigo-600 dark:text-indigo-400">ref-equity-research-vn</code>
+              Phân loại 5 nhóm tin tức, đo lường điểm số tâm lý (-100 đến +100)
             </p>
           </div>
 
@@ -58,8 +66,8 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
             <div key={idx} className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-700/40 text-center space-y-0.5">
               <div className="text-[11px] text-gray-500 dark:text-gray-400">{box.label}</div>
               <div className={`text-base font-black ${box.type === 'positive'
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : box.type === 'negative'
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : box.type === 'negative'
                   ? 'text-rose-600 dark:text-rose-400'
                   : 'text-gray-900 dark:text-white'
                 }`}>
@@ -129,12 +137,12 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
                 <div key={catKey} className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/40 text-center">
                   <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{label}</div>
                   <div className={`text-sm font-bold font-mono mt-0.5 ${catScore != null
-                      ? catScore > 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : catScore < 0
+                    ? catScore > 0
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : catScore < 0
                         ? 'text-rose-600 dark:text-rose-400'
                         : 'text-gray-700 dark:text-gray-300'
-                      : 'text-gray-400'
+                    : 'text-gray-400'
                     }`}>
                     {catScore != null ? (catScore > 0 ? `+${catScore}` : catScore) : '—'}
                   </div>
@@ -163,8 +171,8 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
                 type="button"
                 onClick={() => setSelectedCategory(c.id)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${selectedCategory === c.id
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                   }`}
               >
                 {c.label}
@@ -175,40 +183,53 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
 
         {/* List of News Cards */}
         <div className="space-y-3">
-          {filteredItems.map(item => (
-            <div
-              key={item.id}
-              className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700/60 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all space-y-2"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
-                    {item.categoryLabel}
-                  </span>
-                  <span className={`font-bold px-2 py-0.5 rounded-md ${item.sentiment === 'bullish'
+          {filteredItems.map(item => {
+            const articleUrl = getArticleUrl(item, symbol);
+            return (
+              <a
+                key={item.id}
+                href={articleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700/60 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-gray-750 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 group cursor-pointer text-left no-underline"
+                title={`Mở bài viết gốc từ ${item.source || 'Báo chí'} (Mở tab mới)`}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+                      {item.categoryLabel}
+                    </span>
+                    <span className={`font-bold px-2 py-0.5 rounded-md ${item.sentiment === 'bullish'
                       ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                       : item.sentiment === 'bearish'
-                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                      : 'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
-                    }`}>
-                    {item.sentiment === 'bullish' ? '▲ Tích cực' : item.sentiment === 'bearish' ? '▼ Tiêu cực' : '◆ Trung lập'}
-                  </span>
-                  <span className="text-gray-400">Tác động: <strong>{item.impact}</strong></span>
+                        ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
+                        : 'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                      }`}>
+                      {item.sentiment === 'bullish' ? '▲ Tích cực' : item.sentiment === 'bearish' ? '▼ Tiêu cực' : '◆ Trung lập'}
+                    </span>
+                    <span className="text-gray-400">Tác động: <strong>{item.impact}</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-400 font-mono text-[11px]">
+                    <span>{item.date} · {item.source}</span>
+                    <span className="inline-flex items-center gap-1 font-bold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors ml-1">
+                      <span>Mở bài viết</span>
+                      <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </span>
+                  </div>
                 </div>
-                <div className="text-gray-400 font-mono">
-                  {item.date} · {item.source}
-                </div>
-              </div>
 
-              <h5 className="text-xs font-bold text-gray-900 dark:text-white leading-snug">
-                {item.title}
-              </h5>
+                <h5 className="text-xs font-bold text-gray-900 dark:text-white leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {item.title}
+                </h5>
 
-              <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">
-                {item.summary}
-              </p>
-            </div>
-          ))}
+                <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {item.summary}
+                </p>
+              </a>
+            );
+          })}
         </div>
       </div>
     </div>

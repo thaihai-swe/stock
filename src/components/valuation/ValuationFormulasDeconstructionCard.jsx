@@ -212,20 +212,20 @@ export default function ValuationFormulasDeconstructionCard({
       </div>
 
       {/* ── 3. KHỐI GIẢI PHẪU CƠ CHẾ CONSENSUS & LỌC NGOẠI LAI ±60% ── */}
-      <div className="p-5 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl border border-indigo-900/60 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-800/60 pb-3">
+      <div className="p-5 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50/60 dark:from-slate-900 dark:to-indigo-950 text-gray-900 dark:text-white rounded-2xl border border-indigo-100 dark:border-indigo-900/60 space-y-4 shadow-xs dark:shadow-none transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-100 dark:border-indigo-800/60 pb-3">
           <div>
-            <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-wider block">
               Động Cơ Đồng Thuận
             </span>
-            <h4 className="text-sm font-black text-white mt-0.5">
+            <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5">
               Quy Trình Lọc Ngoại Lai ±60% & Tính Giá Trị Nội Tại Hội Tụ (Consensus)
             </h4>
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] text-gray-400 block">Giá Hội Tụ Sau Cùng:</span>
-            <span className="text-xl font-black text-emerald-400">
+            <span className="text-[10px] text-gray-500 dark:text-gray-400 block">Giá Hội Tụ Sau Cùng:</span>
+            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
               {formatVND(valData.consensusFairValue || valData.fairValue)}
             </span>
           </div>
@@ -233,64 +233,64 @@ export default function ValuationFormulasDeconstructionCard({
 
         {/* 4 Bước Quy Trình */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-            <span className="text-[10px] text-indigo-300 font-bold block">BƯỚC 1: TÍNH 10 MÔ HÌNH</span>
-            <p className="text-[11px] text-gray-300">
+          <div className="p-3 bg-white/90 dark:bg-white/5 rounded-xl border border-indigo-100/80 dark:border-white/10 space-y-1 shadow-2xs dark:shadow-none">
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-300 font-bold block">BƯỚC 1: TÍNH 10 MÔ HÌNH</span>
+            <p className="text-[11px] text-gray-600 dark:text-gray-300">
               Tính độc lập 10 giá trị mục tiêu dựa trên BCTC 8 quý, 5 năm và TradingView Scanner.
             </p>
           </div>
 
-          <div className="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-            <span className="text-[10px] text-indigo-300 font-bold block">BƯỚC 2: XÁC ĐỊNH MEDIAN</span>
-            <p className="text-[11px] text-gray-300">
+          <div className="p-3 bg-white/90 dark:bg-white/5 rounded-xl border border-indigo-100/80 dark:border-white/10 space-y-1 shadow-2xs dark:shadow-none">
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-300 font-bold block">BƯỚC 2: XÁC ĐỊNH MEDIAN</span>
+            <p className="text-[11px] text-gray-600 dark:text-gray-300">
               Tìm trung vị sơ bộ để làm tâm định vị, triệt tiêu sai lệch cực đoan ban đầu.
             </p>
           </div>
 
-          <div className="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-            <span className="text-[10px] text-rose-300 font-bold block">BƯỚC 3: LỌC NGOẠI LAI ±60%</span>
-            <p className="text-[11px] text-gray-300">
+          <div className="p-3 bg-white/90 dark:bg-white/5 rounded-xl border border-indigo-100/80 dark:border-white/10 space-y-1 shadow-2xs dark:shadow-none">
+            <span className="text-[10px] text-rose-600 dark:text-rose-300 font-bold block">BƯỚC 3: LỌC NGOẠI LAI ±60%</span>
+            <p className="text-[11px] text-gray-600 dark:text-gray-300">
               Loại bỏ các mô hình lệch quá ±60% so với median để bảo vệ tính thận trọng.
             </p>
           </div>
 
-          <div className="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-            <span className="text-[10px] text-emerald-300 font-bold block">BƯỚC 4: TÁI CHUẨN HÓA TRỌNG SỐ</span>
-            <p className="text-[11px] text-gray-300">
+          <div className="p-3 bg-white/90 dark:bg-white/5 rounded-xl border border-indigo-100/80 dark:border-white/10 space-y-1 shadow-2xs dark:shadow-none">
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-300 font-bold block">BƯỚC 4: TÁI CHUẨN HÓA TRỌNG SỐ</span>
+            <p className="text-[11px] text-gray-600 dark:text-gray-300">
               Chuẩn hóa lại tổng trọng số các mô hình hợp lệ về đúng 100% để tính giá bình quân gia quyền.
             </p>
           </div>
         </div>
 
         {/* Thống kê Consensus thực tế của mã */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-indigo-800/40 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-indigo-100 dark:border-indigo-800/40 text-xs">
           <div className="flex items-center gap-4">
             <div>
-              <span className="text-gray-400 text-[10px] block">Độ phân tán (Dispersion):</span>
+              <span className="text-gray-500 dark:text-gray-400 text-[10px] block">Độ phân tán (Dispersion):</span>
               <span className={`font-black ${
-                (consensusDetails.dispersionPct || 0) <= 20 ? 'text-emerald-400' : 'text-amber-400'
+                (consensusDetails.dispersionPct || 0) <= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
               }`}>
                 {consensusDetails.dispersionPct != null ? `${consensusDetails.dispersionPct}%` : '—'}
               </span>
             </div>
             <div>
-              <span className="text-gray-400 text-[10px] block">Mô hình hợp lệ:</span>
-              <span className="font-black text-white">
+              <span className="text-gray-500 dark:text-gray-400 text-[10px] block">Mô hình hợp lệ:</span>
+              <span className="font-black text-gray-900 dark:text-white">
                 {consensusDetails.modelsUsed != null ? `${consensusDetails.modelsUsed}/10` : '—'}
               </span>
             </div>
             {consensusDetails.excludedOutliers && consensusDetails.excludedOutliers.length > 0 && (
               <div>
-                <span className="text-gray-400 text-[10px] block">Ngoại lai bị loại trừ:</span>
-                <span className="font-bold text-rose-400">
+                <span className="text-gray-500 dark:text-gray-400 text-[10px] block">Ngoại lai bị loại trừ:</span>
+                <span className="font-bold text-rose-600 dark:text-rose-400">
                   {consensusDetails.excludedOutliers.join(', ')}
                 </span>
               </div>
             )}
           </div>
 
-          <div className="text-[11px] text-indigo-200">
-            Biên An Toàn Hội Tụ (MoS): <strong className="text-emerald-400 text-sm">
+          <div className="text-[11px] text-indigo-700 dark:text-indigo-200">
+            Biên An Toàn Hội Tụ (MoS): <strong className="text-emerald-600 dark:text-emerald-400 text-sm">
               {valData.marginOfSafety != null ? `${valData.marginOfSafety}%` : '—'}
             </strong>
           </div>

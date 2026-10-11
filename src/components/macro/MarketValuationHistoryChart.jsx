@@ -10,6 +10,7 @@ import {
   ReferenceArea,
 } from 'recharts';
 import { fetchMarketValuationHistory } from '../../utils/api.js';
+import { useChartTheme } from '../../utils/useChartTheme.js';
 
 const PERIODS = [
   { id: '1year', label: '1Y' },
@@ -32,6 +33,7 @@ export default function MarketValuationHistoryChart() {
   const [selectedPeriod, setSelectedPeriod] = useState('1year');
   const [selectedMetric, setSelectedMetric] = useState('absolutePe');
   const [loading, setLoading] = useState(true);
+  const chartTheme = useChartTheme();
 
   useEffect(() => {
     async function loadData() {
@@ -392,7 +394,7 @@ export default function MarketValuationHistoryChart() {
 
                 <XAxis
                   dataKey="dateLabel"
-                  stroke="#94a3b8"
+                  stroke={chartTheme.axisColor}
                   fontSize={11}
                   tickLine={false}
                   interval="preserveStartEnd"
@@ -400,7 +402,7 @@ export default function MarketValuationHistoryChart() {
                 />
                 <YAxis
                   domain={[yMin, yMax]}
-                  stroke="#94a3b8"
+                  stroke={chartTheme.axisColor}
                   fontSize={11}
                   tickLine={false}
                   orientation="right"
@@ -413,16 +415,23 @@ export default function MarketValuationHistoryChart() {
                     const diff = stats.mean != null ? +(d.value - stats.mean).toFixed(2) : null;
                     const z = stats.stdDev && stats.stdDev > 0 ? +((d.value - stats.mean) / stats.stdDev).toFixed(2) : null;
                     return (
-                      <div className="bg-slate-900 text-white p-3 rounded-xl shadow-xl border border-slate-800 text-xs space-y-1">
-                        <div className="text-gray-400 font-medium">{d.dateFull}</div>
-                        <div className="text-sm font-black text-white">
+                      <div
+                        className="p-3.5 rounded-2xl shadow-xl text-xs space-y-1 transition-all"
+                        style={{
+                          backgroundColor: chartTheme.tooltipBg,
+                          borderColor: chartTheme.tooltipBorder,
+                          borderWidth: 1,
+                          color: chartTheme.tooltipText,
+                        }}
+                      >
+                        <div style={{ color: chartTheme.tooltipMuted }} className="font-medium">{d.dateFull}</div>
+                        <div className="text-sm font-black">
                           {metricConfig.label}: {d.value} {metricConfig.unit}
                         </div>
                         {diff != null && (
                           <div
-                            className={`text-[11px] font-bold ${
-                              diff >= 0 ? 'text-rose-400' : 'text-emerald-400'
-                            }`}
+                            className="text-[11px] font-bold"
+                            style={{ color: diff >= 0 ? chartTheme.dangerColor : chartTheme.successColor }}
                           >
                             Lệch Mean: {diff > 0 ? `+${diff}` : diff} {metricConfig.unit} {z != null ? `(${z > 0 ? `+${z}` : z} SD)` : ''}
                           </div>
@@ -432,14 +441,14 @@ export default function MarketValuationHistoryChart() {
                   }}
                 />
 
-                {/* Đường Chuỗi Dữ Liệu Thực Tế (Dark Navy / Indigo) */}
+                {/* Đường Chuỗi Dữ Liệu Thực Tế (Indigo / Cyan Luminous) */}
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke="#1e293b"
-                  strokeWidth={2.4}
+                  stroke={chartTheme.primaryLine}
+                  strokeWidth={2.5}
                   dot={false}
-                  activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: chartTheme.primaryLine, stroke: chartTheme.tooltipBg, strokeWidth: 2 }}
                   isAnimationActive={true}
                 />
               </ComposedChart>

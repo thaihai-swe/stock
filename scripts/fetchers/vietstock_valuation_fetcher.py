@@ -182,8 +182,8 @@ class VietstockValuationFetcher:
         return self.fetch_index_history("VN30", duration=duration, force_refresh=force_refresh)
 
     def fetch_all_key_indices(self, duration: str = "ALL") -> Dict[str, pd.DataFrame]:
-        """Lấy tất cả các chỉ số chính: VNINDEX, VN30, HNXINDEX, HNX30, UPCOMINDEX."""
-        codes = ["VNINDEX", "VN30", "HNXINDEX", "HNX30", "UPCOMINDEX"]
+        """Lấy tất cả các chỉ số chính của HOSE: VNINDEX, VN30."""
+        codes = ["VNINDEX", "VN30"]
         result = {}
         for code in codes:
             df = self.fetch_index_history(code, duration=duration)

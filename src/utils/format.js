@@ -32,17 +32,17 @@ export function fmtDate(dateString) {
   });
 }
 
-// Màu lãi/lỗ
+// Màu lãi/lỗ chuẩn FinTech (Emerald / Rose / Slate)
 export function plColor(value) {
-  if (value > 0) return 'text-green-600 dark:text-emerald-400';
-  if (value < 0) return 'text-red-500 dark:text-rose-400';
-  return 'text-gray-500 dark:text-slate-400';
+  if (value > 0) return 'text-emerald-600 dark:text-emerald-400';
+  if (value < 0) return 'text-rose-600 dark:text-rose-400';
+  return 'text-slate-500 dark:text-slate-400';
 }
 
 export function plBg(value) {
-  if (value > 0) return 'bg-green-50 text-green-700 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
-  if (value < 0) return 'bg-red-50 text-red-600 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/60';
-  return 'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+  if (value > 0) return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
+  if (value < 0) return 'bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/60';
+  return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
 }
 
 // Tags gợi ý mặc định
@@ -363,3 +363,69 @@ export function formatPercent(val) {
   const sign = num > 0 ? '+' : '';
   return `${sign}${num.toFixed(1)}%`;
 }
+
+/**
+ * Định dạng & suy luận chiến lược khớp lệnh bán (Sell Lot Matching Strategy)
+ * Hỗ trợ 3 chiến lược:
+ * - 'lowest': Khớp lô mua giá thấp nhất trước (Tối đa hóa lợi nhuận chốt ngay)
+ * - 'highest': Khớp lô mua giá cao nhất trước (Hạ giá vốn cổ phiếu còn lại / Tối ưu thuế)
+ * - 'fifo': Mua trước bán trước theo thứ tự thời gian (First-In First-Out)
+ */
+export function getMatchMethodInfo(matchMethod, matchedLots = []) {
+  let method = matchMethod;
+
+  // Tương thích ngược: Suy luận phương thức khớp nếu chưa được lưu trong DB
+  if (!method && Array.isArray(matchedLots) && matchedLots.length > 1) {
+    const isCostAsc = matchedLots.every((lot, i) => i === 0 || (lot.unitCost || lot.buyPrice) >= (matchedLots[i - 1].unitCost || matchedLots[i - 1].buyPrice));
+    const isCostDesc = matchedLots.every((lot, i) => i === 0 || (lot.unitCost || lot.buyPrice) <= (matchedLots[i - 1].unitCost || matchedLots[i - 1].buyPrice));
+    const isDateAsc = matchedLots.every((lot, i) => i === 0 || new Date(lot.buyDate) >= new Date(matchedLots[i - 1].buyDate));
+
+    if (isCostAsc && !isCostDesc) method = 'lowest';
+    else if (isCostDesc && !isCostAsc) method = 'highest';
+    else if (isDateAsc) method = 'fifo';
+  }
+
+  // Mặc định chuẩn của hệ thống là 'lowest'
+  method = method || 'lowest';
+
+  switch (method) {
+    case 'highest':
+      return {
+        key: 'highest',
+        label: 'Giá vốn cao nhất',
+        shortLabel: 'Lô Giá Cao',
+        badge: '📈 Max Cost (Hạ vốn)',
+        color: 'indigo',
+        icon: '📈',
+        badgeBg: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+        buttonBg: 'bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/40',
+        description: 'Khớp các lô mua đắt nhất trước, giúp hạ giá vốn các cổ phiếu còn lại trong danh mục',
+      };
+    case 'fifo':
+      return {
+        key: 'fifo',
+        label: 'Mua trước bán trước (FIFO)',
+        shortLabel: 'Lô FIFO',
+        badge: '⏱️ FIFO (Mua sớm)',
+        color: 'emerald',
+        icon: '⏱️',
+        badgeBg: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+        buttonBg: 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40',
+        description: 'Khớp các lô mua sớm nhất trước theo thứ tự thời gian (First-In First-Out)',
+      };
+    case 'lowest':
+    default:
+      return {
+        key: 'lowest',
+        label: 'Giá vốn thấp nhất',
+        shortLabel: 'Lô Giá Thấp',
+        badge: '📉 Min Cost (Max lãi)',
+        color: 'orange',
+        icon: '📉',
+        badgeBg: 'bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+        buttonBg: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40',
+        description: 'Khớp các lô mua rẻ nhất trước để tối đa hóa lợi nhuận chốt lời ngay lập tức',
+      };
+  }
+}
+

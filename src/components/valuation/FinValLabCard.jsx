@@ -1,13 +1,141 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
-export default function FinValLabCard({ finvalLab, symbol }) {
+const METRIC_DEFINITIONS = [
+  { key: 'eps', label: 'EPS (Thu nhập mỗi CP)', unit: 'đ', invertLogic: false },
+  { key: 'bvps', label: 'BVPS (Giá trị sổ sách)', unit: 'đ', invertLogic: false },
+  { key: 'pe', label: 'Hệ số P/E', unit: 'x', invertLogic: true },
+  { key: 'pb', label: 'Hệ số P/B', unit: 'x', invertLogic: true },
+  { key: 'roe', label: 'Tỷ suất ROE', unit: '%', invertLogic: false },
+  { key: 'roa', label: 'Tỷ suất ROA', unit: '%', invertLogic: false },
+  { key: 'roic', label: 'Tỷ suất ROIC', unit: '%', invertLogic: false },
+  { key: 'grossMargin', label: 'Biên Lợi Nhuận Gộp', unit: '%', invertLogic: false },
+  { key: 'netMargin', label: 'Biên Lợi Nhuận Ròng', unit: '%', invertLogic: false },
+  { key: 'revenue', label: 'Doanh Thu Thuần', unit: 'Tỷ', invertLogic: false },
+  { key: 'netIncome', label: 'Lợi Nhuận Sau Thuế', unit: 'Tỷ', invertLogic: false },
+  { key: 'ebitda', label: 'Chỉ số EBITDA', unit: 'Tỷ', invertLogic: false },
+  { key: 'freeCashFlow', label: 'Dòng Tiền Tự Do FCF', unit: 'Tỷ', invertLogic: false },
+  { key: 'debtToEquity', label: 'Nợ / Vốn Chủ (D/E)', unit: 'x', invertLogic: true },
+  { key: 'currentRatio', label: 'Hệ Số Thanh Toán Hiện Hành', unit: 'x', invertLogic: false },
+  { key: 'cashRatio', label: 'Hệ Số Tiền Mặt', unit: 'x', invertLogic: false }
+];
+
+export default function FinValLabCard({ finvalLab, symbol, financials, currentStock }) {
   const [filterType, setFilterType] = useState('all'); // 'all' | 'improved' | 'worse'
 
-  if (!finvalLab || !finvalLab.items || finvalLab.items.length === 0) {
+  // Reconciliation layer: Kết hợp dữ liệu từ finvalLab, financials và currentStock
+  const items = useMemo(() => {
+    const rawItemsMap = {};
+    if (finvalLab?.items && Array.isArray(finvalLab.items)) {
+      finvalLab.items.forEach(it => {
+        if (it?.key) rawItemsMap[it.key] = it;
+      });
+    }
+
+    const yearlyDocs = financials?.yearly || [];
+    const ratios = financials?.financialRatios || {};
+    const close = currentStock?.close || financials?.quarterly?.[financials?.quarterly?.length - 1]?.close;
+
+    return METRIC_DEFINITIONS.map(def => {
+      const existing = rawItemsMap[def.key] || {};
+      let currentVal = existing.current;
+      let smaVal = existing.sma5y;
+
+      // 1. Fallback nếu currentVal bị null
+      if (currentVal == null) {
+        if (def.key === 'eps') {
+          currentVal = currentStock?.profitability?.eps || ratios?.valuation?.eps || existing.eps;
+        } else if (def.key === 'bvps') {
+          currentVal = currentStock?.valuation?.bvps || existing.bvps;
+        } else if (def.key === 'pe') {
+          currentVal = ratios?.valuation?.pe || currentStock?.valuation?.pe || (close && existing.current ? Math.round((close / existing.current) * 100) / 100 : null);
+        } else if (def.key === 'pb') {
+          currentVal = ratios?.valuation?.pb || currentStock?.valuation?.pb;
+        } else if (def.key === 'roe') {
+          currentVal = ratios?.profitability?.roe || currentStock?.profitability?.roe;
+        } else if (def.key === 'roa') {
+          currentVal = ratios?.profitability?.roa;
+        } else if (def.key === 'roic') {
+          currentVal = ratios?.profitability?.roic;
+        } else if (def.key === 'grossMargin') {
+          currentVal = ratios?.profitability?.grossMargin;
+        } else if (def.key === 'netMargin') {
+          currentVal = ratios?.profitability?.netMargin || currentStock?.profitability?.netMargin;
+        } else if (def.key === 'revenue') {
+          const rev = currentStock?.scale?.revenue || (yearlyDocs[yearlyDocs.length - 1]?.revenue);
+          currentVal = rev > 1e8 ? rev / 1e9 : rev;
+        } else if (def.key === 'netIncome') {
+          const ni = currentStock?.scale?.netIncome || (yearlyDocs[yearlyDocs.length - 1]?.netIncome);
+          currentVal = ni > 1e8 ? ni / 1e9 : ni;
+        } else if (def.key === 'ebitda') {
+          const eb = ratios?.profitability?.ebitda || currentStock?.health?.ebitda || (yearlyDocs[yearlyDocs.length - 1]?.ebitda);
+          currentVal = eb > 1e8 ? eb / 1e9 : eb;
+        } else if (def.key === 'freeCashFlow') {
+          const fcf = financials?.cashflowHealth?.latestFcf || (yearlyDocs[yearlyDocs.length - 1]?.freeCashFlow);
+          currentVal = fcf > 1e8 ? fcf / 1e9 : fcf;
+        } else if (def.key === 'debtToEquity') {
+          currentVal = ratios?.leverage?.debtToEquity || currentStock?.health?.debtToEquity;
+        } else if (def.key === 'currentRatio') {
+          currentVal = ratios?.liquidity?.currentRatio;
+        } else if (def.key === 'cashRatio') {
+          currentVal = ratios?.liquidity?.cashRatio;
+        }
+      }
+
+      // 2. Fallback nếu smaVal bị null mà có lịch sử yearlyDocs
+      if (smaVal == null && yearlyDocs.length > 0) {
+        const histVals = yearlyDocs
+          .map(y => {
+            const v = y[def.key];
+            if (v != null && !isNaN(v)) {
+              return (def.unit === 'Tỷ' && Math.abs(v) > 1e8) ? v / 1e9 : Number(v);
+            }
+            return null;
+          })
+          .filter(v => v != null);
+
+        if (histVals.length > 0) {
+          smaVal = histVals.reduce((acc, curr) => acc + curr, 0) / histVals.length;
+        } else if (currentVal != null) {
+          smaVal = currentVal; // Giữ nguyên hiện tại nếu thiếu dữ liệu quá khứ
+        }
+      }
+
+      // 3. Chuẩn hóa tỷ lệ biến động deltaPct và đánh giá chu kỳ
+      let deltaPct = existing.deltaPct;
+      let status = existing.status || 'Ổn định';
+      let badgeColor = existing.badgeColor || 'text-gray-400';
+
+      if (deltaPct == null && currentVal != null && smaVal != null && smaVal !== 0) {
+        deltaPct = Math.round(((Number(currentVal) - Number(smaVal)) / Math.abs(Number(smaVal))) * 1000) / 10;
+        const isBetter = def.invertLogic ? deltaPct <= -15.0 : deltaPct >= 15.0;
+        const isWorse = def.invertLogic ? deltaPct >= 15.0 : deltaPct <= -15.0;
+
+        if (isBetter) {
+          status = 'Cải thiện rõ rệt';
+          badgeColor = 'text-emerald-500 font-semibold';
+        } else if (isWorse) {
+          status = 'Suy giảm so với TB';
+          badgeColor = 'text-rose-400 font-semibold';
+        }
+      }
+
+      return {
+        key: def.key,
+        label: existing.label || def.label,
+        unit: existing.unit || def.unit,
+        current: currentVal != null ? (def.unit === 'Tỷ' ? Math.round(Number(currentVal) * 10) / 10 : (def.unit === 'đ' ? Math.round(Number(currentVal)) : Math.round(Number(currentVal) * 100) / 100)) : null,
+        sma5y: smaVal != null ? (def.unit === 'Tỷ' ? Math.round(Number(smaVal) * 10) / 10 : (def.unit === 'đ' ? Math.round(Number(smaVal)) : Math.round(Number(smaVal) * 100) / 100)) : null,
+        deltaPct,
+        status,
+        badgeColor,
+        invertLogic: def.invertLogic
+      };
+    });
+  }, [finvalLab, financials, currentStock]);
+
+  if (!items || items.length === 0) {
     return null;
   }
-
-  const items = finvalLab.items;
 
   // Thống kê nhanh
   const improvedCount = items.filter(it => it.status === 'Cải thiện rõ rệt').length;

@@ -12,9 +12,11 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { fmtMoney, plColor } from '../../utils/format.js';
+import { useChartTheme } from '../../utils/useChartTheme.js';
 
 export default function MonthlyPLChart({ sellOrders = [], dividends = [] }) {
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' | 'cumulative'
+  const chartTheme = useChartTheme();
 
   if (!sellOrders || sellOrders.length === 0) {
     return (
@@ -182,15 +184,15 @@ export default function MonthlyPLChart({ sellOrders = [], dividends = [] }) {
         <ResponsiveContainer width="100%" height="100%">
           {viewMode === 'monthly' ? (
             <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-              <ReferenceLine y={0} stroke="#9ca3af" strokeDasharray="3 3" />
+              <ReferenceLine y={0} stroke={chartTheme.axisColor} strokeDasharray="3 3" />
               <XAxis
                 dataKey="monthLabel"
-                tick={{ fontSize: 11, fill: '#6b7280' }}
-                axisLine={{ stroke: '#e5e7eb' }}
+                tick={{ fontSize: 11, fill: chartTheme.textColor }}
+                axisLine={{ stroke: chartTheme.axisColor }}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: '#9ca3af' }}
+                tick={{ fontSize: 10, fill: chartTheme.textColor }}
                 tickFormatter={(val) => {
                   if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
                   if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
@@ -204,7 +206,7 @@ export default function MonthlyPLChart({ sellOrders = [], dividends = [] }) {
                 {monthlyData.map((entry, index) => (
                   <Cell
                     key={`bar-${index}`}
-                    fill={entry.profitLoss >= 0 ? '#10b981' : '#ef4444'}
+                    fill={entry.profitLoss >= 0 ? chartTheme.successColor : chartTheme.dangerColor}
                   />
                 ))}
               </Bar>
@@ -213,23 +215,23 @@ export default function MonthlyPLChart({ sellOrders = [], dividends = [] }) {
             <AreaChart data={monthlyData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
               <defs>
                 <linearGradient id="colorCumulativePos" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor={chartTheme.successColor} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={chartTheme.successColor} stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="colorCumulativeNeg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor={chartTheme.dangerColor} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={chartTheme.dangerColor} stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <ReferenceLine y={0} stroke="#9ca3af" strokeDasharray="3 3" />
+              <ReferenceLine y={0} stroke={chartTheme.axisColor} strokeDasharray="3 3" />
               <XAxis
                 dataKey="monthLabel"
-                tick={{ fontSize: 11, fill: '#6b7280' }}
-                axisLine={{ stroke: '#e5e7eb' }}
+                tick={{ fontSize: 11, fill: chartTheme.textColor }}
+                axisLine={{ stroke: chartTheme.axisColor }}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: '#9ca3af' }}
+                tick={{ fontSize: 10, fill: chartTheme.textColor }}
                 tickFormatter={(val) => {
                   if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
                   if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(0)}k`;

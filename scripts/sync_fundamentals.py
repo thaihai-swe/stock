@@ -177,12 +177,14 @@ def normalize_row(row):
     yearly_history = []
     capex_val = 0.0
     effective_cfo = fcf_val
+    fin_ratios = {}
 
     if fin_file.exists():
         try:
             with open(fin_file, "r", encoding="utf-8") as f_fin:
                 fin_data = json.load(f_fin)
                 yearly_history = fin_data.get("yearly", [])
+                fin_ratios = fin_data.get("financialRatios", {})
                 latest_q = fin_data.get("quarterly", [{}])[-1] if fin_data.get("quarterly") else {}
                 if latest_q.get("capex"):
                     capex_val = abs(float(latest_q["capex"])) * 1_000_000_000 * 4
@@ -197,6 +199,7 @@ def normalize_row(row):
     val_eval = engine.evaluate({
         "close": close,
         "eps": eps_val,
+        "pe": pe_val,
         "pb": pb_val,
         "dps": dps_val,
         "revenue": rev_val,
@@ -207,8 +210,14 @@ def normalize_row(row):
         "cfo": effective_cfo,
         "capex": capex_val,
         "shares": shares_val,
-        "roe": roe_val,
-        "netMargin": net_margin_val,
+        "roe": roe_val or fin_ratios.get("profitability", {}).get("roe"),
+        "roa": fin_ratios.get("profitability", {}).get("roa"),
+        "roic": fin_ratios.get("profitability", {}).get("roic"),
+        "grossMargin": fin_ratios.get("profitability", {}).get("grossMargin"),
+        "netMargin": net_margin_val or fin_ratios.get("profitability", {}).get("netMargin"),
+        "debtToEquity": fin_ratios.get("leverage", {}).get("debtToEquity"),
+        "currentRatio": fin_ratios.get("liquidity", {}).get("currentRatio"),
+        "cashRatio": fin_ratios.get("liquidity", {}).get("cashRatio"),
         "sector": d.get("sector.tr") or "Khác",
         "industry": d.get("industry.tr") or "Khác",
         "yearlyHistory": yearly_history,
@@ -480,9 +489,22 @@ def main():
         if s not in new_cache and s in old_cache and not s.startswith("_"):
             item = old_cache[s]
             # Bổ sung tính toán định giá cập nhật
+            fin_f = FINANCIALS_DIR / f"{s}.json"
+            fallback_yearly = []
+            fallback_ratios = {}
+            if fin_f.exists():
+                try:
+                    with open(fin_f, "r", encoding="utf-8") as f_f:
+                        f_data = json.load(f_f)
+                        fallback_yearly = f_data.get("yearly", [])
+                        fallback_ratios = f_data.get("financialRatios", {})
+                except Exception:
+                    pass
+
             val_eval = engine.evaluate({
                 "close": item.get("close"),
                 "eps": item.get("profitability", {}).get("eps"),
+                "pe": item.get("valuation", {}).get("pe"),
                 "pb": item.get("valuation", {}).get("pb"),
                 "bvps": item.get("valuation", {}).get("bvps"),
                 "dps": item.get("dividends", {}).get("dps", 0),
@@ -493,8 +515,15 @@ def main():
                 "ebitda": item.get("health", {}).get("ebitda"),
                 "cfo": item.get("dividends", {}).get("fcf"),
                 "shares": item.get("scale", {}).get("sharesOutstanding"),
-                "roe": item.get("profitability", {}).get("roe"),
-                "netMargin": item.get("profitability", {}).get("netMargin"),
+                "roe": item.get("profitability", {}).get("roe") or fallback_ratios.get("profitability", {}).get("roe"),
+                "roa": fallback_ratios.get("profitability", {}).get("roa"),
+                "roic": fallback_ratios.get("profitability", {}).get("roic"),
+                "grossMargin": fallback_ratios.get("profitability", {}).get("grossMargin"),
+                "netMargin": item.get("profitability", {}).get("netMargin") or fallback_ratios.get("profitability", {}).get("netMargin"),
+                "debtToEquity": fallback_ratios.get("leverage", {}).get("debtToEquity"),
+                "currentRatio": fallback_ratios.get("liquidity", {}).get("currentRatio"),
+                "cashRatio": fallback_ratios.get("liquidity", {}).get("cashRatio"),
+                "yearlyHistory": fallback_yearly,
                 "high52w": item.get("performance", {}).get("high52w"),
                 "low52w": item.get("performance", {}).get("low52w"),
                 "recommendScore": item.get("technicals", {}).get("recommendScore"),

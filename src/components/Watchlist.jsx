@@ -241,7 +241,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
               onClick={() => loadMarketPrices(true)}
               disabled={loadingPrices}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-200 font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-2xs text-xs"
-              title="Lấy thị giá khớp lệnh thời gian thực từ sàn HOSE/HNX (Bỏ qua bộ đệm 1h)"
+              title="Lấy thị giá khớp lệnh thời gian thực từ sàn HOSE (Bỏ qua bộ đệm 1h)"
             >
               <span>{loadingPrices ? '⏳' : '⚡'}</span>
               <span>{loadingPrices ? 'Đang tải giá...' : 'Cập nhật giá sàn'}</span>

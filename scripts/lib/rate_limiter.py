@@ -10,6 +10,14 @@ from datetime import datetime
 from collections import defaultdict
 from typing import Dict
 
+try:
+    from .config_loader import get_system_config
+except ImportError:
+    try:
+        from lib.config_loader import get_system_config
+    except ImportError:
+        from scripts.lib.config_loader import get_system_config
+
 logger = logging.getLogger(__name__)
 
 class MultiSourceRateLimiter:
@@ -21,11 +29,13 @@ class MultiSourceRateLimiter:
     """
 
     def __init__(self, default_requests_per_minute: int = 45):
-        self.default_limit = default_requests_per_minute
+        sys_cfg = get_system_config()
+        configured_limits = sys_cfg.get("rateLimitsPerMinute", {})
+        self.default_limit = configured_limits.get("DEFAULT", default_requests_per_minute)
         self.source_limits: Dict[str, int] = {
-            'VCI': 45,
-            'TCBS': 45,
-            'TRADINGVIEW': 60,
+            'VCI': configured_limits.get('VCI', 45),
+            'TCBS': configured_limits.get('TCBS', 45),
+            'TRADINGVIEW': configured_limits.get('TRADINGVIEW', 60),
         }
         self.minute_counts = defaultdict(int)
         self.last_minute_reset = defaultdict(datetime.now)

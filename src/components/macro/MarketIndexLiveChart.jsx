@@ -22,8 +22,6 @@ const INDEX_OPTIONS = [
   { id: 'VNDIAMOND', name: 'VN Diamond', label: 'Kim Cương (FUEVFVND)', icon: '💎', isIndex: false, isEtf: true },
   { id: 'VNMIDCAP', name: 'VN Midcap', label: 'Vốn Hóa Vừa (FUEDCMID)', icon: '🚀', isIndex: false, isEtf: true },
   { id: 'VN100', name: 'VN100', label: 'VN30 + Midcap', icon: '🌐', isIndex: true },
-  { id: 'HNX', name: 'HNX-Index', label: 'Sàn Hà Nội', icon: '📊', isIndex: true },
-  { id: 'UPCOM', name: 'UPCoM', label: 'Sàn UPCoM', icon: '📈', isIndex: true },
 ];
 
 export default function MarketIndexLiveChart() {
@@ -170,7 +168,7 @@ export default function MarketIndexLiveChart() {
     <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs overflow-hidden">
       {/* ── 1. HEADER & THỜI ĐIỂM CẬP NHẬT ── */}
       <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-700/60 space-y-4">
-        {/* Selector bar đa chỉ số: VN-Index, VN30, VN Diamond, VN Midcap, VN100, HNX, UPCoM */}
+        {/* Selector bar đa chỉ số: VN-Index, VN30, VN Diamond, VN Midcap, VN100 */}
         <div className="flex flex-wrap items-center gap-1.5 p-1 bg-gray-100/80 dark:bg-gray-700/50 rounded-2xl border border-gray-200/50 dark:border-gray-600/50">
           {INDEX_OPTIONS.map((opt) => (
             <button
@@ -344,17 +342,17 @@ export default function MarketIndexLiveChart() {
                     if (!active || !payload?.length) return null;
                     const d = payload[0].payload;
                     return (
-                      <div className="bg-slate-900 text-white p-3 rounded-xl shadow-xl border border-slate-800 text-xs space-y-1">
-                        <div className="text-gray-400 font-medium">
+                      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-3.5 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1 transition-all">
+                        <div className="text-slate-500 dark:text-gray-400 font-medium">
                           {d.dateStr} {d.label}
                         </div>
-                        <div className="text-base font-black text-white">
+                        <div className="text-base font-black text-slate-900 dark:text-white">
                           {currentOption.name}: {currentOption.isIndex
                             ? Number(d.close).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             : `${(Number(d.close) * 1000).toLocaleString('vi-VN')}đ`}
                         </div>
                         {d.volume > 0 && (
-                          <div className="text-[11px] text-gray-300">
+                          <div className="text-[11px] text-slate-600 dark:text-gray-300">
                             Khối lượng: {Number(d.volume).toLocaleString('vi-VN')} {currentOption.isIndex ? 'CP' : 'CCQ'}
                           </div>
                         )}

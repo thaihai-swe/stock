@@ -19,17 +19,28 @@ import math
 from typing import Optional, Dict, Any, List, Tuple
 
 
+try:
+    from .config_loader import get_valuation_config
+except ImportError:
+    try:
+        from lib.config_loader import get_valuation_config
+    except ImportError:
+        from scripts.lib.config_loader import get_valuation_config
+
+_val_cfg = get_valuation_config()
+
 # ---------------------------------------------------------------------------
-# CÁC THAM SỐ CHUẨN HÓA THỊ TRƯỜNG CHỨNG KHOÁN VIỆT NAM (DEFAULT BENCHMARKS)
+# CÁC THAM SỐ CHUẨN HÓA THỊ TRƯỜNG CHỨNG KHOÁN VIỆT NAM (DYNAMIC BENCHMARKS TỪ JSON)
 # ---------------------------------------------------------------------------
-DEFAULT_WACC = 0.115               # 11.5% Chi phí vốn bình quân yêu cầu (WACC thị trường VN)
-DEFAULT_GROWTH_RATE = 0.035        # 3.5% Tốc độ tăng trưởng dài hạn thận trọng (g)
-DEFAULT_PE_MULTIPLE = 11.5         # 11.5x P/E trung vị cổ phiếu chất lượng
-DEFAULT_PB_MULTIPLE = 1.35         # 1.35x P/B trung vị thị trường
-DEFAULT_EV_EBITDA_MULTIPLE = 7.5   # 7.5x EV/EBITDA trung vị ngành sản xuất & kinh doanh
-DEFAULT_PCF_MULTIPLE = 8.0         # 8.0x P/CF trung vị dòng tiền hoạt động
-DEFAULT_PS_MULTIPLE = 1.1          # 1.1x P/S trung vị doanh thu
-DEFAULT_RISK_FREE_RATE = 0.045     # 4.5% Lãi suất TPCP VN 10Y/20Y cơ sở
+DEFAULT_WACC = float(_val_cfg.get("wacc", 0.115))                         # Chi phí vốn bình quân yêu cầu (WACC thị trường VN)
+DEFAULT_GROWTH_RATE = float(_val_cfg.get("growthRate", 0.035))           # Tốc độ tăng trưởng dài hạn thận trọng (g)
+DEFAULT_PE_MULTIPLE = float(_val_cfg.get("peMultiple", 11.5))            # P/E trung vị cổ phiếu chất lượng
+DEFAULT_PB_MULTIPLE = float(_val_cfg.get("pbMultiple", 1.35))            # P/B trung vị thị trường
+DEFAULT_EV_EBITDA_MULTIPLE = float(_val_cfg.get("evEbitdaMultiple", 7.5))# EV/EBITDA trung vị ngành sản xuất & kinh doanh
+DEFAULT_PCF_MULTIPLE = float(_val_cfg.get("pcfMultiple", 8.0))            # P/CF trung vị dòng tiền hoạt động
+DEFAULT_PS_MULTIPLE = float(_val_cfg.get("psMultiple", 1.1))              # P/S trung vị doanh thu
+DEFAULT_RISK_FREE_RATE = float(_val_cfg.get("riskFreeRate", 0.045))       # Lãi suất TPCP VN 10Y/20Y cơ sở
+OUTLIER_GAP_THRESHOLD = float(_val_cfg.get("outlierFilter", {}).get("outlierGapThreshold", 0.60))
 
 
 def _safe_float(val: Any, default: float = 0.0) -> float:
@@ -463,7 +474,7 @@ def calc_implied_fcf_yield(
 
 
 # ---------------------------------------------------------------------------
-# CÁC MÔ HÌNH ĐỊNH GIÁ CHIẾT KHẤU DÒNG TIỀN DCF & REVERSE DCF (REF-EQUITY-RESEARCH-VN)
+# CÁC MÔ HÌNH ĐỊNH GIÁ CHIẾT KHẤU DÒNG TIỀN DCF & REVERSE DCF
 # ---------------------------------------------------------------------------
 
 SECTOR_WACC_BENCHMARKS = {
@@ -767,7 +778,7 @@ def calc_consensus_fair_value(
 # 3. MA TRẬN 23 PHÂN NGÀNH TTCK VN & BỘ LỌC NGOẠI LAI (OUTLIER FILTERING ±60%)
 # ---------------------------------------------------------------------------
 
-SECTOR_WEIGHTS_23: Dict[str, Dict[str, float]] = {
+SECTOR_WEIGHTS_23: Dict[str, Dict[str, float]] = _val_cfg.get("sectorWeights") or {
     "Ngân Hàng": {"pe": 0.13, "pb": 0.22, "graham": 0.05, "dcf": 0.00, "fcff": 0.00, "fcfe": 0.00, "rim": 0.18, "nav": 0.17, "evebitda": 0.00, "ddm": 0.25},
     "Chứng Khoán": {"pe": 0.25, "pb": 0.25, "graham": 0.08, "dcf": 0.00, "fcff": 0.00, "fcfe": 0.00, "rim": 0.15, "nav": 0.17, "evebitda": 0.00, "ddm": 0.10},
     "Bảo Hiểm": {"pe": 0.20, "pb": 0.22, "graham": 0.08, "dcf": 0.00, "fcff": 0.00, "fcfe": 0.00, "rim": 0.18, "nav": 0.12, "evebitda": 0.00, "ddm": 0.20},
@@ -907,7 +918,7 @@ def filter_outliers_and_consensus(
         w = m.get("weight", 0)
         if v and v > 0 and w > 0:
             gap = abs(v - initial_median) / initial_median if initial_median > 0 else 0.0
-            if gap <= 0.60:
+            if gap <= OUTLIER_GAP_THRESHOLD:
                 m["isOutlier"] = False
                 m["outlierGapPct"] = round(gap * 100, 1)
                 clean_candidates.append(m)
@@ -1267,10 +1278,11 @@ def calc_historical_valuation_bands(
     eps: Optional[float],
     bvps: Optional[float],
     pe_history: Optional[List[float]] = None,
-    pb_history: Optional[List[float]] = None
+    pb_history: Optional[List[float]] = None,
+    yearly_history: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
     """
-    Tính dải băng P25 - P50 - P75 theo phân vị định giá lịch sử.
+    Tính dải băng P25 - P50 - P75 theo phân vị định giá lịch sử từ BCTC thực tế 5 năm.
     """
     if not close or not eps or eps <= 0 or not bvps or bvps <= 0:
         return {
@@ -1280,6 +1292,11 @@ def calc_historical_valuation_bands(
             "bandPosition": "N/A",
             "bandWidthPct": None
         }
+
+    if yearly_history and not pe_history:
+        pe_history = [float(y["pe"]) for y in yearly_history if isinstance(y, dict) and y.get("pe") and float(y["pe"]) > 0]
+    if yearly_history and not pb_history:
+        pb_history = [float(y["pb"]) for y in yearly_history if isinstance(y, dict) and y.get("pb") and float(y["pb"]) > 0]
 
     pe_list = sorted([p for p in (pe_history or [8.0, 10.5, 12.0, 14.5, 17.0]) if p and p > 0])
     pb_list = sorted([p for p in (pb_history or [1.0, 1.25, 1.45, 1.8, 2.2]) if p and p > 0])
@@ -1420,16 +1437,116 @@ def calc_dividend_sustainability(
 # 7. PHÒNG THÍ NGHIỆM FINVAL LAB (20+ CHỈ TIÊU VS SMA 5 NĂM)
 # ---------------------------------------------------------------------------
 
+def _extract_finval_metric(d: Dict[str, Any], key: str, shares: Optional[float] = None, close: Optional[float] = None) -> Optional[float]:
+    """Trích xuất hoặc suy diễn thông minh chỉ tiêu tài chính từ dictionary."""
+    if not isinstance(d, dict):
+        return None
+    v = d.get(key)
+    if v is not None and not (isinstance(v, float) and (math.isnan(v) or math.isinf(v))):
+        return float(v)
+
+    sh = shares or d.get("shares")
+    cl = close or d.get("close")
+    rev = d.get("revenue")
+    ni = d.get("netIncomeParent") if d.get("netIncomeParent") is not None else d.get("netIncome")
+    eq = d.get("equity")
+    assets = d.get("totalAssets")
+    debt = d.get("totalDebt")
+    interest = d.get("interestExpense") or 0.0
+    deprec = d.get("depreciation") or 0.0
+    gp = d.get("grossProfit")
+    cogs = d.get("costOfGoodsSold")
+    cfo = d.get("cfo")
+    capex = d.get("capex") or 0.0
+
+    if key == "eps":
+        if ni is not None and sh and float(sh) > 0:
+            ni_val = float(ni)
+            if abs(ni_val) < 1e8:
+                ni_val *= 1e9
+            return round(ni_val / float(sh))
+        if cl and d.get("pe") and float(d["pe"]) > 0:
+            return round(float(cl) / float(d["pe"]))
+    elif key == "bvps":
+        if eq is not None and sh and float(sh) > 0:
+            eq_val = float(eq)
+            if abs(eq_val) < 1e8:
+                eq_val *= 1e9
+            return round(eq_val / float(sh))
+        if cl and d.get("pb") and float(d["pb"]) > 0:
+            return round(float(cl) / float(d["pb"]))
+    elif key == "pe":
+        eps_v = _extract_finval_metric(d, "eps", shares=sh, close=cl)
+        if cl and eps_v and eps_v > 0:
+            return round(float(cl) / eps_v, 2)
+    elif key == "pb":
+        bvps_v = _extract_finval_metric(d, "bvps", shares=sh, close=cl)
+        if cl and bvps_v and bvps_v > 0:
+            return round(float(cl) / bvps_v, 2)
+    elif key == "roe":
+        if ni is not None and eq and float(eq) > 0:
+            return round((float(ni) / float(eq)) * 100.0, 2)
+    elif key == "roa":
+        if ni is not None and assets and float(assets) > 0:
+            return round((float(ni) / float(assets)) * 100.0, 2)
+    elif key == "roic":
+        if ni is not None and (eq or debt):
+            cap = float(eq or 0) + float(debt or 0)
+            if cap > 0:
+                ebit_proxy = float(ni) + float(interest) * 0.8
+                return round((ebit_proxy / cap) * 100.0, 2)
+    elif key == "grossMargin":
+        if gp is not None and rev and float(rev) > 0:
+            return round((float(gp) / float(rev)) * 100.0, 2)
+        if cogs is not None and rev and float(rev) > 0:
+            return round(((float(rev) - float(cogs)) / float(rev)) * 100.0, 2)
+    elif key == "netMargin":
+        if ni is not None and rev and float(rev) > 0:
+            return round((float(ni) / float(rev)) * 100.0, 2)
+    elif key == "ebitda":
+        if ni is not None and interest is not None and deprec is not None:
+            return round(float(ni) + float(interest) + float(deprec))
+        if ni is not None and deprec is not None:
+            return round(float(ni) * 1.25 + float(deprec))
+    elif key == "freeCashFlow":
+        if cfo is not None:
+            return round(float(cfo) - abs(float(capex)))
+    elif key == "debtToEquity":
+        if debt is not None and eq and float(eq) > 0:
+            return round(float(debt) / float(eq), 2)
+    elif key == "currentRatio":
+        st_assets = d.get("shortTermAssets")
+        st_debt = d.get("shortTermDebt")
+        if st_assets is not None and st_debt and float(st_debt) > 0:
+            return round(float(st_assets) / float(st_debt), 2)
+        if assets is not None and debt and float(debt) > 0:
+            st_d = float(debt) * 0.65
+            inv = float(d.get("inventory") or 0)
+            rec = float(d.get("accountsReceivable") or 0)
+            st_a = inv + rec + (float(assets) * 0.12)
+            if st_d > 0:
+                return round(st_a / st_d, 2)
+    elif key == "cashRatio":
+        cash = d.get("cashAndEquivalents")
+        st_debt = d.get("shortTermDebt")
+        if cash is not None and st_debt and float(st_debt) > 0:
+            return round(float(cash) / float(st_debt), 2)
+        if assets is not None and debt and float(debt) > 0:
+            st_d = float(debt) * 0.65
+            if st_d > 0:
+                return round((float(assets) * 0.12) / st_d, 2)
+
+    return None
+
+
 def compute_finval_lab_snapshot(
     latest_data: Dict[str, Any],
     yearly_history: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
     """
-    FinVal Lab Snapshot: Đối chiếu 20+ chỉ tiêu tài chính cốt lõi giữa hiện tại và SMA 5 năm.
+    FinVal Lab Snapshot: Đối chiếu 16 chỉ tiêu tài chính cốt lõi giữa hiện tại và SMA 5 năm.
+    Tự động suy diễn và chuẩn hóa nếu dữ liệu quá khứ thiếu hụt.
     """
-    if not yearly_history:
-        return {"items": []}
-
     metrics_def = [
         ("eps", "EPS (Thu nhập mỗi CP)", "đ", False),
         ("bvps", "BVPS (Giá trị sổ sách)", "đ", False),
@@ -1449,11 +1566,30 @@ def compute_finval_lab_snapshot(
         ("cashRatio", "Hệ Số Tiền Mặt", "x", False)
     ]
 
+    sh = latest_data.get("shares")
+    cl = latest_data.get("close")
+
     items = []
     for key, label, unit, invert_color in metrics_def:
-        cur_v = latest_data.get(key)
-        hist_vals = [y.get(key) for y in yearly_history if y.get(key) is not None]
+        cur_v = _extract_finval_metric(latest_data, key, shares=sh, close=cl)
+
+        hist_vals = []
+        if yearly_history:
+            for y in yearly_history:
+                y_val = _extract_finval_metric(y, key, shares=sh, close=cl)
+                if y_val is not None:
+                    hist_vals.append(y_val)
+
         sma_5y = sum(hist_vals) / len(hist_vals) if hist_vals else None
+
+        # Fallback bổ sung cho SMA nếu lịch sử thiếu các chỉ số tỷ suất:
+        if sma_5y is None:
+            if key == "pe":
+                sma_5y = latest_data.get("pe_p50") or cur_v
+            elif key == "pb":
+                sma_5y = latest_data.get("pb_p50") or cur_v
+            elif cur_v is not None and yearly_history:
+                sma_5y = cur_v
 
         # Chuẩn hóa đơn vị: Nếu là chỉ tiêu tính bằng "Tỷ" (revenue, netIncome, ebitda, freeCashFlow)
         cur_norm = cur_v
@@ -1484,8 +1620,8 @@ def compute_finval_lab_snapshot(
             "key": key,
             "label": label,
             "unit": unit,
-            "current": round(cur_norm, 1) if (cur_norm is not None and unit == "Tỷ") else cur_v,
-            "sma5y": round(sma_norm, 2) if sma_norm is not None else None,
+            "current": round(cur_norm, 1) if (cur_norm is not None and unit == "Tỷ") else (round(cur_norm, 2) if isinstance(cur_norm, float) else cur_norm),
+            "sma5y": round(sma_norm, 2) if (sma_norm is not None and unit != "đ") else (round(sma_norm) if sma_norm is not None else None),
             "deltaPct": delta_pct,
             "status": status,
             "badgeColor": badge,
@@ -1758,7 +1894,8 @@ class StockValuationEngine:
             eps=eps,
             bvps=bvps,
             pe_history=stock_data.get("peHistory"),
-            pb_history=stock_data.get("pbHistory")
+            pb_history=stock_data.get("pbHistory"),
+            yearly_history=stock_data.get("yearlyHistory") or stock_data.get("yearly")
         )
 
         pe_band = bands_eval.get("peBand", {})
@@ -1990,11 +2127,45 @@ class StockValuationEngine:
 
         # 7. FinVal Lab Snapshot
         yearly_hist = stock_data.get("yearlyHistory") or []
+        pe_curr = stock_data.get("pe")
+        if pe_curr is None and close and eps and eps > 0:
+            pe_curr = round(close / eps, 2)
+        pb_curr = stock_data.get("pb")
+        if pb_curr is None and close and bvps and bvps > 0:
+            pb_curr = round(close / bvps, 2)
+
+        roa_curr = stock_data.get("roa") or stock_data.get("profitability", {}).get("roa")
+        roic_curr = stock_data.get("roic") or stock_data.get("profitability", {}).get("roic")
+        gross_margin_curr = stock_data.get("grossMargin") or stock_data.get("profitability", {}).get("grossMargin")
+        debt_to_equity_curr = stock_data.get("debtToEquity") or stock_data.get("leverage", {}).get("debtToEquity")
+        current_ratio_curr = stock_data.get("currentRatio") or stock_data.get("liquidity", {}).get("currentRatio")
+        cash_ratio_curr = stock_data.get("cashRatio") or stock_data.get("liquidity", {}).get("cashRatio")
+
         lab_snapshot = compute_finval_lab_snapshot(
             latest_data={
-                "eps": eps, "bvps": bvps, "pe": stock_data.get("pe"), "pb": stock_data.get("pb"),
-                "roe": roe_val, "netMargin": net_margin_val, "revenue": revenue, "netIncome": net_income,
-                "ebitda": ebitda, "freeCashFlow": cfo, "debtToEquity": stock_data.get("debtToEquity")
+                "eps": eps,
+                "bvps": bvps,
+                "pe": pe_curr,
+                "pb": pb_curr,
+                "pe_p50": pe_p50,
+                "pb_p50": pb_p50,
+                "roe": roe_val,
+                "roa": roa_curr,
+                "roic": roic_curr,
+                "grossMargin": gross_margin_curr,
+                "netMargin": net_margin_val,
+                "revenue": revenue,
+                "netIncome": net_income,
+                "ebitda": ebitda,
+                "freeCashFlow": cfo,
+                "debtToEquity": debt_to_equity_curr,
+                "currentRatio": current_ratio_curr,
+                "cashRatio": cash_ratio_curr,
+                "totalAssets": total_assets,
+                "totalDebt": total_debt,
+                "equity": equity,
+                "shares": shares,
+                "close": close
             },
             yearly_history=yearly_hist
         )

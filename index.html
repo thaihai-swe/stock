@@ -9,12 +9,26 @@
   <script>
     (function () {
       try {
-        var t = localStorage.getItem('stock_theme') || localStorage.getItem('theme');
+        var mode = localStorage.getItem('stock_theme_mode');
+        var legacy = localStorage.getItem('stock_theme');
+        var isDark = false;
         var supportDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (t === 'dark' || (!t && supportDark)) {
+
+        if (mode === 'dark' || (!mode && legacy === 'dark')) {
+          isDark = true;
+        } else if (mode === 'light' || (!mode && legacy === 'light')) {
+          isDark = false;
+        } else {
+          // 'system' hoặc chưa chọn
+          isDark = supportDark;
+        }
+
+        if (isDark) {
           document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
         } else {
           document.documentElement.classList.remove('dark');
+          document.documentElement.style.colorScheme = 'light';
         }
       } catch (e) {}
     })();

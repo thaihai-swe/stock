@@ -3,7 +3,6 @@ scripts/lib/market_profile_engine.py
 Động cơ Phân tích Hồ sơ Thị trường & Hành vi Giá - Khối lượng Định lượng (Quantitative Market Profile)
 dành riêng cho Cổ phiếu Thị Trường Chứng Khoán Việt Nam.
 
-Tham chiếu phương pháp luận từ: ref-equity-research-vn/vn-technical-analysis/references/stock_profile_blocks.md
 Bao gồm:
 1. Volume at Price (VAP / Volume Profile): 10 Dải giá, Point of Control (POC), High/Low Volume Nodes (HVN/LVN)
 2. Xác nhận Khối lượng VPCI (Volume Price Confirmation Index)
@@ -347,7 +346,7 @@ def classify_stock_archetype(
     beta: float
 ) -> Dict[str, Any]:
     """
-    Phân loại Archetype tính cách cổ phiếu theo chuẩn ref-equity-research-vn:
+    Phân loại Archetype tính cách cổ phiếu:
     - trend_following: Bám trend mạnh mẽ
     - accumulation_breakout: Tích lũy bùng nổ
     - range_bound_cyclical: Dao động hộp tích lũy

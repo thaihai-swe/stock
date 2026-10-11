@@ -12,6 +12,16 @@ Bộ động cơ định lượng vĩ mô, nhận diện chu kỳ và phân bổ
 
 from typing import Any, Dict, List, Optional, Tuple
 
+try:
+    from .config_loader import get_macro_config
+except ImportError:
+    try:
+        from lib.config_loader import get_macro_config
+    except ImportError:
+        from scripts.lib.config_loader import get_macro_config
+
+_macro_cfg = get_macro_config()
+
 PHASES = ("Recovery", "Expansion", "Overheating", "Slowdown", "Recession")
 
 PHASE_META = {
@@ -47,7 +57,7 @@ PHASE_META = {
     },
 }
 
-_PHASE_RULES = {
+_PHASE_RULES = _macro_cfg.get("phaseRules") or {
     "sbv_refinancing_rate": {
         "Recovery": (None, 4.5),
         "Expansion": (4.0, 5.5),

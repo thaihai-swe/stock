@@ -1,0 +1,352 @@
+export default function HistoryFilterToolbar({
+  subTab = 'orders',
+  setSubTab,
+  allTxCount = 0,
+  performanceCount = 0,
+  tab = 'all',
+  setTab,
+  pnlFilter = 'all',
+  setPnlFilter,
+  textSearch = '',
+  setTextSearch,
+  symbolFilter = '',
+  setSymbolFilter,
+  uniqueSymbols = [],
+  tagFilter = '',
+  setTagFilter,
+  uniqueTags = [],
+  startDate = '',
+  setStartDate,
+  endDate = '',
+  setEndDate,
+  handleResetFilters,
+  hasFilterActive = false,
+  activeFilterCount = 0,
+  mobileViewMode = 'card',
+  setMobileViewMode,
+  showAdvancedFilters = false,
+  setShowAdvancedFilters,
+}) {
+  return (
+    <div className="card-base rounded-3xl p-4 sm:p-5 space-y-3.5">
+      {/* HÀNG 1: SUB-TAB SWITCHER & VIEW SWITCHER (THẺ / BẢNG) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+        {/* Sub-Tab Selector */}
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-full sm:w-auto overflow-x-auto no-scrollbar">
+          <button
+            type="button"
+            onClick={() => setSubTab('orders')}
+            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 ${
+              subTab === 'orders'
+                ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}
+          >
+            <span>📑</span>
+            <span>Nhật Ký Từng Lệnh</span>
+            <span className="badge-indigo text-[10px] ml-0.5">
+              {allTxCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSubTab('performance')}
+            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 ${
+              subTab === 'performance'
+                ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}
+          >
+            <span>📊</span>
+            <span>Hiệu Suất Theo Mã</span>
+            <span className="badge-gain text-[10px] ml-0.5">
+              {performanceCount}
+            </span>
+          </button>
+        </div>
+
+        {/* Nút chuyển Thẻ / Bảng cho cả Mobile và Desktop */}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
+            <button
+              type="button"
+              onClick={() => setMobileViewMode('card')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                mobileViewMode === 'card'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              <span>📱</span>
+              <span>Thẻ</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileViewMode('table')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                mobileViewMode === 'table'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              <span>📊</span>
+              <span>Bảng</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* CHỈ HIỂN THỊ CÁC HÀNG LỌC SAU KHI Ở SUBTAB 'orders' */}
+      {subTab === 'orders' && (
+        <div className="space-y-3">
+          {/* HÀNG 2: TÌM KIẾM NHANH + LOẠI LỆNH (MUA/BÁN) + NÚT MỞ BỘ LỌC NÂNG CAO */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            {/* Ô tìm kiếm tức thì */}
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={textSearch}
+                onChange={e => setTextSearch(e.target.value)}
+                placeholder="🔍 Tìm mã CP, ghi chú, thẻ tag..."
+                className="input-base text-xs font-semibold pr-8"
+              />
+              {textSearch && (
+                <button
+                  type="button"
+                  onClick={() => setTextSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Segmented Loại Lệnh: [Tất cả] [🛒 Mua] [💸 Bán] */}
+            <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl text-xs gap-1 shrink-0">
+              {[
+                { id: 'all', label: 'Tất cả', icon: '🌐' },
+                { id: 'buy', label: 'Mua vào', icon: '🛒' },
+                { id: 'sell', label: 'Bán ra', icon: '💸' },
+              ].map(item => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setTab(item.id)}
+                  className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                    tab === item.id
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Nút bật/tắt Bộ Lọc Nâng Cao (Advanced Filters) */}
+            <button
+              type="button"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold border flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 ${
+                showAdvancedFilters || activeFilterCount > 0
+                  ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
+                  : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-750'
+              }`}
+            >
+              <span>⚙️ Bộ Lọc</span>
+              {activeFilterCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* HÀNG 3: CHIP LỌC P&L + PRESET CHU KỲ THỜI GIAN 1-CHẠM + NÚT RESET */}
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Lọc P&L cho Lệnh Bán */}
+              <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
+                <button
+                  type="button"
+                  onClick={() => setPnlFilter('all')}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                    pnlFilter === 'all'
+                      ? 'bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 shadow-2xs'
+                      : 'text-gray-500 dark:text-slate-400'
+                  }`}
+                >
+                  Tất cả P&L
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPnlFilter('profit')}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                    pnlFilter === 'profit'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
+                  }`}
+                >
+                  <span>🟢</span> Lãi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPnlFilter('loss')}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                    pnlFilter === 'loss'
+                      ? 'bg-rose-600 text-white shadow-2xs'
+                      : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                  }`}
+                >
+                  <span>🔴</span> Lỗ
+                </button>
+              </div>
+
+              {/* Presets Chu Kỳ Thời Gian (YTD / 1Y / MTD) */}
+              <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
+                <button
+                  type="button"
+                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                    !startDate && !endDate
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
+                  }`}
+                >
+                  <span className="sm:hidden">Tất cả</span>
+                  <span className="hidden sm:inline">Toàn thời gian</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const now = new Date();
+                    setStartDate(`${now.getFullYear()}-01-01`);
+                    setEndDate(now.toISOString().slice(0, 10));
+                  }}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                    startDate === `${new Date().getFullYear()}-01-01`
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
+                  }`}
+                >
+                  YTD
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const now = new Date();
+                    const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                    setStartDate(oneYearAgo.toISOString().slice(0, 10));
+                    setEndDate(now.toISOString().slice(0, 10));
+                  }}
+                  className="px-2.5 py-1 rounded-lg font-bold text-gray-500 dark:text-slate-400 hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                  1Y
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const now = new Date();
+                    const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+                    setStartDate(`${now.getFullYear()}-${monthStr}-01`);
+                    setEndDate(now.toISOString().slice(0, 10));
+                  }}
+                  className="px-2.5 py-1 rounded-lg font-bold text-gray-500 dark:text-slate-400 hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                  MTD
+                </button>
+              </div>
+            </div>
+
+            {/* Nút đặt lại bộ lọc */}
+            {hasFilterActive && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 transition-colors cursor-pointer ml-auto border border-indigo-200/60 dark:border-indigo-900/40"
+              >
+                ✕ Đặt lại bộ lọc
+              </button>
+            )}
+          </div>
+
+          {/* HÀNG 4: DRAWER BỘ LỌC NÂNG CAO (MÃ CP, THẺ TAG, TỪ NGÀY -> ĐẾN NGÀY) */}
+          {showAdvancedFilters && (
+            <div className="card-nested p-3.5 space-y-3 animate-in fade-in duration-200">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                {/* Lọc theo mã cổ phiếu */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                    Mã Cổ Phiếu:
+                  </label>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={symbolFilter}
+                      onChange={e => setSymbolFilter(e.target.value.toUpperCase())}
+                      placeholder="VD: HPG..."
+                      className="input-base font-bold uppercase"
+                    />
+                    {uniqueSymbols.length > 0 && (
+                      <select
+                        value={symbolFilter}
+                        onChange={e => setSymbolFilter(e.target.value)}
+                        className="select-base text-xs font-bold"
+                      >
+                        <option value="">Tất cả mã</option>
+                        {uniqueSymbols.map(sym => (
+                          <option key={sym} value={sym}>{sym}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                </div>
+
+                {/* Lọc theo Thẻ / Tag Kỷ Luật */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                    Thẻ Kỷ Luật:
+                  </label>
+                  <select
+                    value={tagFilter}
+                    onChange={e => setTagFilter(e.target.value)}
+                    className="select-base text-xs font-medium"
+                  >
+                    <option value="">-- Tất cả thẻ tag --</option>
+                    {uniqueTags.map(tag => (
+                      <option key={tag} value={tag}>#{tag}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Khoảng ngày tùy chỉnh */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                    Khoảng Ngày Khớp Lệnh:
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={e => setStartDate(e.target.value)}
+                      className="input-base !w-1/2 text-[11px] font-semibold"
+                    />
+                    <span className="text-slate-400">→</span>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={e => setEndDate(e.target.value)}
+                      className="input-base !w-1/2 text-[11px] font-semibold"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

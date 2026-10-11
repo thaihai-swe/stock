@@ -55,8 +55,15 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 ---
 
 ### PHÂN HỆ 1: BÁO CÁO TÀI CHÍNH (FINANCIAL STATEMENTS)
-* **Nguồn cung cấp chính**: Thư viện Python `vnstock` (`vnstock.api.financial.Finance(source='VCI')`) & TCBS API (`apipubaws.tcbs.com.vn`).
-* **Thời gian/Kỳ báo cáo**: Chuỗi trượt động (Rolling Quarters & Years) gồm 8 Quý gần nhất (`2024-Q4` → `2026-Q3`) và 5 Năm gần nhất (`2021` → `2025`), tự động cập nhật theo lịch tài chính hiện hành.
+* **Nguồn cung cấp chính**: **Yahoo Finance (`yfinance`, Ticker `<MÃ>.VN`) — BCTC Kiểm Toán Thật 100%** từ sàn niêm yết (HOSE/HNX) kết hợp TradingView Scanner Fundamental API.
+* **Cam kết toàn vẹn dữ liệu (CRITICAL)**: **100% Số liệu thật từ Báo cáo kiểm toán**. Hệ thống đã **xóa bỏ hoàn toàn mọi thuật toán giả định và hệ số nội suy mùa vụ** (`seasonal_factors`, `margin_factors`, `y_growth`). Toàn bộ tính toán phân tích (Extended DuPont, 54 Ratios, 10 Mô hình định giá, DCF 3 kịch bản, Piotroski F-Score, Beneish M-Score) đều vận hành thuần túy trên các con số thật này.
+* **Trạng thái kiểm toán & Metadata**:
+  * Mã có BCTC: `_meta.status = "AUDITED_REAL_DATA"`, `_meta.source = "Yahoo Finance Audit Statements & VAS TT200"`.
+  * Mã chưa công bố BCTC hoặc chứng chỉ quỹ ETF: `_meta.status = "NO_AUDITED_DATA"` (hoặc `"ETF_INDEX_FUND"`), hiển thị minh bạch cho người dùng, tuyệt đối không tự chế số liệu.
+* **Thời gian/Kỳ báo cáo & Cơ Chế Tích Lũy Lịch Sử (Cumulative Merging)**:
+  * Chuỗi báo cáo thật khởi đầu gồm 5–6 Quý kiểm toán và 4–5 Năm tài chính từ Yahoo Finance.
+  * **Cơ chế Upsert Hợp Nhất Không Phá Hủy (`merge_financial_series`)**: Hệ thống tự động gộp dữ liệu mới vào dữ liệu cũ theo khóa `period` (`YYYY-Qx`) và `year` (`YYYY`). Khi có quý/năm mới công bố, các kỳ cũ trong quá khứ được **bảo toàn nguyên vẹn vĩnh viễn**, giúp kho dữ liệu tự động tích lũy phình to (8Q, 12Q, 16Q... và 6Y, 8Y, 10Y...) mà không bao giờ bị mất đi dù Yahoo Finance đẩy ra khỏi rolling window.
+  * Giao diện React hiển thị nhãn động theo số lượng thực tế trong kho: `${quarterlyCount} Quý` và `${yearlyCount} Năm`.
 * **Đơn vị chuẩn hóa**: **Tỷ đồng (Bn. VND)** đối với số tuyệt đối; **đồng/cổ phiếu** đối với EPS/BVPS.
 * **Vị trí lưu trữ**: `data/financials/<MÃ>.json` (trong mảng `quarterly` và `yearly`).
 
@@ -936,11 +943,12 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 * **Cơ Chế Phạt Trần**: Khi rủi ro bẫy ở mức `CAO` ($\ge 4.0$), hệ thống tự động khóa trần khuyến nghị $\le 5.0/10$ (`HOLD`), ngăn ngừa mua vào các cổ phiếu rẻ giả tạo.
 
 #### 5. Dải Băng Định Giá Lịch Sử 3 Tầng P25 - P50 - P75 (`historicalBands`):
-* Thống kê phân vị chu kỳ 5 năm cho P/E Band và P/B Band.
+* Thống kê phân vị chu kỳ định giá 5 năm thực tế từ BCTC (P/E Band và P/B Band).
 * `peBand` (`p25`, `p50`, `p75`, `current`): Phân vị P/E và P/E hiện tại thực tế.
 * `pbBand` (`p25`, `p50`, `p75`, `current`): Phân vị P/B và P/B hiện tại thực tế.
 * `priceBands`: Mốc giá tương ứng: `peP25Price`, `peP50Price`, `peP75Price`, `pbP25Price`, `pbP50Price`, `pbP75Price`.
 * `band25`, `band50`, `band75`, `bandPosition`, `bandWidthPct`: Mức giá tổng hợp các phân vị.
+* Giao diện trực quan hoá bằng 2 Thang đo Gauge (P/E và P/B) định vị thị giá hiện tại so với các mốc phân vị kèm Lưới 6 mốc thị giá tương ứng, bảo đảm 100% dữ liệu tài chính thực tế và không sử dụng dữ liệu giả định/nội suy.
 
 #### 6. Kiểm Toán Độ Bền Vững Cổ Tức (`dividendSustainability`):
 * `fcfPayoutRatio`: Tỷ lệ chi trả cổ tức trên Dòng tiền tự do FCF ($< 60\%$ = rất an toàn; $> 100\%$ = cảnh báo bẫy cổ tức).
@@ -949,7 +957,62 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 * `status`: Phân loại an toàn / rủi ro bẫy cổ tức.
 
 #### 7. Phòng Thí Nghiệm FinVal Lab (`finvalLab`):
-* Đối chiếu 20+ chỉ tiêu tài chính cốt lõi (Doanh thu, LNST, EPS, BVPS, ROE, ROA, ROIC, Biên gộp, Biên ròng, EBITDA, FCF, D/E, Khả năng thanh toán) giữa kỳ hiện tại (TTM) và Trung bình động 5 năm (5Y SMA).
-* Đánh giá mức độ biến động $\Delta\%$ và tự động đảo màu cho các chỉ tiêu chi phí/nợ vay.
+* Đối chiếu 16 chỉ tiêu tài chính cốt lõi giữa kỳ hiện tại (TTM) và Trung bình động 5 năm (5Y SMA):
+  1. `eps`: Thu nhập trên mỗi cổ phiếu (đ/cp) — TTM 4 quý trượt vs SMA 5 năm.
+  2. `bvps`: Giá trị sổ sách mỗi cổ phiếu (đ/cp) — Vốn chủ sở hữu / Số CP lưu hành.
+  3. `pe`: Hệ số P/E (x) — Thị giá / EPS TTM vs Trung vị lịch sử P/E 5Y.
+  4. `pb`: Hệ số P/B (x) — Thị giá / BVPS vs Trung vị lịch sử P/B 5Y.
+  5. `roe`: Tỷ suất sinh lời trên vốn chủ sở hữu (%) — LNST / Vốn chủ sở hữu bình quân.
+  6. `roa`: Tỷ suất sinh lời trên tổng tài sản (%) — LNST / Tổng tài sản bình quân.
+  7. `roic`: Tỷ suất sinh lời trên vốn đầu tư (%) — $(LNST + Lãi\_vay \times 0.8) / (Vốn\_chủ + Nợ\_vay)$.
+  8. `grossMargin`: Biên lợi nhuận gộp (%) — Lợi nhuận gộp / Doanh thu thuần.
+  9. `netMargin`: Biên lợi nhuận ròng (%) — LNST Cổ đông công ty mẹ / Doanh thu thuần.
+  10. `revenue`: Doanh thu thuần (Tỷ đồng).
+  11. `netIncome`: Lợi nhuận sau thuế của Cổ đông Công ty mẹ (Tỷ đồng).
+  12. `ebitda`: Lợi nhuận trước lãi vay, thuế và khấu hao (Tỷ đồng).
+  13. `freeCashFlow`: Dòng tiền tự do FCF (Tỷ đồng) = $CFO - |CapEx|$.
+  14. `debtToEquity`: Đòn bẩy tài chính Nợ vay / Vốn chủ (x).
+  15. `currentRatio`: Hệ số thanh toán hiện hành (x) — Tài sản ngắn hạn / Nợ ngắn hạn.
+  16. `cashRatio`: Hệ số tiền mặt (x) — Tiền & tương đương tiền / Nợ ngắn hạn.
 
+---
 
+### PHÂN HỆ 7: CẤU HÌNH THAM SỐ HỆ THỐNG (SYSTEM CONFIGURATION & CONSTANTS)
+* **File lưu trữ**: `data/default-constant-value.json` (Tầng 1/3 - Commit Git để làm chuẩn mẫu, người dùng tùy biến cục bộ).
+* **Mục đích**: Tập trung hóa toàn bộ các hằng số, tham số định giá, quy tắc vĩ mô, thuế phí giao dịch và rate limiting thành một tệp JSON duy nhất (Single Source of Truth), cho phép người dùng tùy biến mà không cần can thiệp mã nguồn.
+* **Bộ điều phối**:
+  - Python: `scripts/lib/config_loader.py` (Nạp cho `valuation_engine.py`, `macro_regime.py`, `rate_limiter.py`).
+  - Node.js: `server/config/configLoader.js` (Nạp cho `server/config/constants.js`).
+* **Cơ chế dự phòng**: Deep Merge Fallback tự động — nếu file bị xoá, sửa thiếu hoặc sai cú pháp, hệ thống tự động nạp bộ giá trị mặc định chuẩn để bảo đảm an toàn 100% không bị crash.
+
+#### Ma Trận Nhóm Tham Số Cấu Hình:
+1. **`valuation` (Định Giá Doanh Nghiệp)**:
+   - `wacc`: 0.115 (11.5% Chi phí vốn bình quân thị trường).
+   - `growthRate`: 0.035 (3.5% Tốc độ tăng trưởng dài hạn g).
+   - `peMultiple`: 11.5 | `pbMultiple`: 1.35 | `evEbitdaMultiple`: 7.5 | `pcfMultiple`: 8.0 | `psMultiple`: 1.1 | `riskFreeRate`: 0.045.
+   - `graham`: `maxMultiplier`: 22.5, `minMultiplier`: 4.0, `basePe`: 7.0, `growthFactor`: 1.0, `benchmarkYield`: 4.4.
+   - `outlierFilter`: `outlierGapThreshold`: 0.60 (ngưỡng lọc ngoại lai ±60%), `minModels`: 2.
+   - `marginOfSafety`: `strongBuyPct`: 15.0, `fairValuePct`: 0.0.
+   - `sectorWeights`: Ma trận trọng số 10 mô hình định giá cho 23 nhóm ngành GICS/Vietstock.
+2. **`macro` (Kinh Tế Vĩ Mô & Chu Kỳ)**:
+   - `phaseRules`: Ngưỡng quy tắc 6 động lực (sbv_refinancing_rate, interbank_rate, cpi_yoy, credit_growth_yoy, pmi, usdvnd) phân định 5 pha chu kỳ.
+   - `riskScoreWeights`: Trọng số 4 tầng rủi ro vĩ mô (monetary: 0.35, growth: 0.25, price: 0.20, external: 0.20).
+   - `goldArbitrage`: Thuế phí gia công vàng trong nước (1.5%) và ngưỡng chênh lệch giá vàng (high: 10%, low: 3%).
+   - `marketValuationBands`: Cảnh báo z-score cực đoan (|z| > 2.0) và ngưỡng tích số Benjamin Graham (22.5).
+3. **`tradingAndFees` (Giao Dịch, Thuế, Phí)**:
+   - `personalIncomeTaxRate`: 0.001 (0.1% thuế TNCN khi bán CP).
+   - `defaultBrokerFeeRate`: 0.0015 (0.15% phí môi giới mặc định).
+   - `brokerFeePresets`: [0.0, 0.001, 0.0015].
+   - `dividendCashTaxRate`: 0.05 (5.0% thuế TNCN cổ tức tiền mặt).
+   - `riskFreeRateAnnual`: 0.045 (4.5% lãi suất tham chiếu Sharpe / Sortino).
+   - `vnindexAnnualVolatility`: 18.0 (18% độ biến động chuẩn VN-Index).
+   - `defaultBankInterestRate`: 5.0 (5.0%/năm lãi suất tiết kiệm tính chi phí cơ hội).
+   - `tradingDaysPerYear`: 252.
+   - `defaultTags`: Danh sách các thẻ gợi ý giao dịch.
+4. **`systemAndNetwork` (Hệ Thống & Tần Suất Gọi API)**:
+   - `serverPort`: 3001.
+   - `inSessionTtlMs`: 3,600,000 (1 giờ).
+   - `fundamentalsTtlMs`: 43,200,000 (12 giờ).
+   - `httpTimeoutSeconds`: 30.
+   - `httpMaxRetries`: 2.
+   - `rateLimitsPerMinute`: VCI: 45, TCBS: 45, TRADINGVIEW: 60, DEFAULT: 45.

@@ -549,7 +549,7 @@ export default function DcaPlannerView({
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-gray-400 dark:text-slate-400 mt-1.5">1 lô chuẩn sàn HOSE / HNX</p>
+                <p className="text-[11px] text-gray-400 dark:text-slate-400 mt-1.5">1 lô chuẩn sàn HOSE (100 CP)</p>
               </div>
             </div>
 

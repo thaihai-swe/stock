@@ -20,5 +20,25 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      chunkSizeWarningLimit: 800,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react-dom') || id.includes('react/') || id.includes('react/jsx-runtime')) {
+                return 'vendor-react';
+              }
+              if (id.includes('recharts') || id.includes('d3-') || id.includes('victory-vendor')) {
+                return 'vendor-charts';
+              }
+              if (id.includes('@react-oauth/google') || id.includes('google-auth-library')) {
+                return 'vendor-auth';
+              }
+            }
+          },
+        },
+      },
+    },
   };
 });

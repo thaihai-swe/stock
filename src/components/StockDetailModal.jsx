@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { fmtMoney, fmtDate, plColor, plBg, getStockColor } from '../utils/format.js';
+import { fmtMoney, fmtDate, plColor, plBg, getStockColor, getMatchMethodInfo } from '../utils/format.js';
 import { computeStockPerformance } from '../utils/stockAnalytics.js';
 
 export default function StockDetailModal({
@@ -68,6 +68,7 @@ export default function StockDetailModal({
         profitLoss: s.profitLoss,
         profitLossPct: s.profitLossPct,
         matchedLots: s.matchedLots || [],
+        matchMethod: s.matchMethod || s.match_method,
         note: s.note || '',
         tags: s.tags || [],
       }));
@@ -114,14 +115,14 @@ export default function StockDetailModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+        className="modal-backdrop"
         onClick={onClose}
       />
 
       {/* Modal Container */}
-      <div className="relative bg-white dark:bg-gray-800 w-full max-w-3xl rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden z-10 max-h-[94vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
+      <div className="modal-dialog max-w-3xl max-h-[94vh] flex flex-col">
         {/* 1. Modal Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between shrink-0 bg-gray-50/70 dark:bg-gray-800/80">
+        <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-slate-900/80">
           <div className="flex items-center gap-3">
             <span
               className="inline-flex items-center px-3 py-1.5 rounded-2xl text-sm font-extrabold shadow-2xs border"
@@ -140,20 +141,20 @@ export default function StockDetailModal({
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
                   Sổ Cái Lãi/Lỗ — {stockSummary.symbol}
                 </h3>
                 {stockSummary.isHolding ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="badge-gain text-[10px]">
                     🟢 Đang giữ {stockSummary.holdingQty.toLocaleString()} cp
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                  <span className="badge-neutral text-[10px]">
                     ⚪ Đã tất toán vị thế
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-gray-400 mt-0.5">
+              <p className="text-[11px] text-slate-400 mt-0.5">
                 Toàn bộ lịch sử giao dịch Mua / Bán / Nhận cổ tức và tổng kết lãi lỗ
               </p>
             </div>
@@ -163,7 +164,7 @@ export default function StockDetailModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 hover:text-gray-800 dark:text-gray-300 transition-colors flex items-center justify-center font-bold text-sm cursor-pointer"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-300 transition-colors flex items-center justify-center font-bold text-sm cursor-pointer"
               title="Đóng cửa sổ"
             >
               ✕
@@ -209,40 +210,40 @@ export default function StockDetailModal({
           {/* 3 Trụ Cột Thành Phần (Breakdown Cards) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* 1. Lãi đã chốt */}
-            <div className="bg-gray-50/80 dark:bg-gray-700/40 rounded-2xl p-3.5 border border-gray-200/70 dark:border-gray-700">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 block">
+            <div className="card-nested p-3.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 1. Lãi / Lỗ Đã Chốt
               </span>
               <div className={`text-lg font-bold mt-1 ${plColor(stockSummary.realizedPL)}`}>
                 {stockSummary.realizedPL >= 0 ? '+' : ''}{fmtMoney(stockSummary.realizedPL)}đ
               </div>
-              <span className="text-[10px] text-gray-400 block mt-0.5">
+              <span className="text-[10px] text-slate-400 block mt-0.5">
                 Từ các lệnh đã bán ra
               </span>
             </div>
 
             {/* 2. Lãi chưa chốt */}
-            <div className="bg-gray-50/80 dark:bg-gray-700/40 rounded-2xl p-3.5 border border-gray-200/70 dark:border-gray-700">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 block">
+            <div className="card-nested p-3.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 2. Lãi / Lỗ Tạm Tính
               </span>
               <div className={`text-lg font-bold mt-1 ${plColor(stockSummary.unrealizedPL)}`}>
                 {stockSummary.unrealizedPL >= 0 ? '+' : ''}{fmtMoney(stockSummary.unrealizedPL)}đ
               </div>
-              <span className="text-[10px] text-gray-400 block mt-0.5">
+              <span className="text-[10px] text-slate-400 block mt-0.5">
                 Vị thế đang nắm giữ ({stockSummary.holdingQty.toLocaleString()} cp)
               </span>
             </div>
 
             {/* 3. Cổ tức đã nhận */}
-            <div className="bg-gray-50/80 dark:bg-gray-700/40 rounded-2xl p-3.5 border border-gray-200/70 dark:border-gray-700">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 block">
+            <div className="card-nested p-3.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 3. Cổ Tức Đã Nhận
               </span>
               <div className="text-lg font-bold mt-1 text-emerald-600 dark:text-emerald-400">
                 +{fmtMoney(stockSummary.totalDividends)}đ
               </div>
-              <span className="text-[10px] text-gray-400 block mt-0.5">
+              <span className="text-[10px] text-slate-400 block mt-0.5">
                 Cổ tức tiền mặt thực tế
               </span>
             </div>
@@ -375,6 +376,7 @@ export default function StockDetailModal({
 
                   if (item.type === 'SELL') {
                     const isSellProfit = (item.profitLoss || 0) >= 0;
+                    const methodInfo = item.matchedLots?.length > 0 ? getMatchMethodInfo(item.matchMethod, item.matchedLots) : null;
                     return (
                       <div key={item.id || idx} className="p-3.5 bg-white dark:bg-gray-800 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-3">
@@ -382,8 +384,13 @@ export default function StockDetailModal({
                             B
                           </span>
                           <div>
-                            <div className="font-bold text-gray-900 dark:text-white">
-                              Bán {item.quantity?.toLocaleString()} cp @ {fmtMoney(item.price)}đ
+                            <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5 flex-wrap">
+                              <span>Bán {item.quantity?.toLocaleString()} cp @ {fmtMoney(item.price)}đ</span>
+                              {methodInfo && (
+                                <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${methodInfo.badgeBg}`} title={`Khớp theo chiến lược: ${methodInfo.label}`}>
+                                  {methodInfo.shortLabel}
+                                </span>
+                              )}
                             </div>
                             <div className="text-[10px] text-gray-400">
                               {fmtDate(item.date)} {item.note ? `• ${item.note}` : ''}
@@ -435,7 +442,7 @@ export default function StockDetailModal({
         </div>
 
         {/* 4. Modal Footer (Actions) */}
-        <div className="px-5 sm:px-6 py-3.5 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex items-center justify-between shrink-0">
+        <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             {onNavigateBuy && (
               <button
@@ -444,7 +451,7 @@ export default function StockDetailModal({
                   onClose();
                   onNavigateBuy({ symbol: stockSummary.symbol, quantity: '100', price: stockSummary.livePrice ? String(stockSummary.livePrice / 1000) : '' });
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                className="btn-primary !text-xs !px-3.5 !py-1.5 flex items-center gap-1 shadow-2xs"
               >
                 <span>🛒</span> Mua thêm
               </button>
@@ -457,7 +464,7 @@ export default function StockDetailModal({
                   onClose();
                   onNavigateSell(stockSummary.symbol);
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                className="btn-danger !text-xs !px-3.5 !py-1.5 flex items-center gap-1 shadow-2xs"
               >
                 <span>💸</span> Bán bớt
               </button>
@@ -470,7 +477,7 @@ export default function StockDetailModal({
                   onClose();
                   onSwitchTab('valuation', stockSummary.symbol);
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs hover:bg-indigo-100 transition-colors cursor-pointer"
+                className="btn-secondary !text-xs !px-3.5 !py-1.5 !bg-indigo-50 dark:!bg-indigo-950/60 !text-indigo-700 dark:!text-indigo-300 !border-indigo-200 dark:!border-indigo-800 hover:!bg-indigo-100 flex items-center gap-1"
               >
                 <span>🎯</span> Sang Tab Định Giá
               </button>
@@ -480,7 +487,7 @@ export default function StockDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold text-xs transition-colors cursor-pointer"
+            className="btn-secondary !text-xs !px-4 !py-1.5"
           >
             Đóng
           </button>

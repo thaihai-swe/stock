@@ -11,32 +11,149 @@ export const setAuthToken = (token) => {
   } else {
     localStorage.removeItem(TOKEN_KEY);
   }
+  invalidateApiCache(); // Xóa sạch RAM cache ngay khi chuyển đổi tài khoản
 };
 
 export const clearAuthToken = () => {
   localStorage.removeItem(TOKEN_KEY);
+  invalidateApiCache(); // Xóa sạch RAM cache ngay khi đăng xuất
 };
+
+const MAX_CACHE_ENTRIES = 100;
+const apiCache = new Map();
+const inFlightRequests = new Map();
+
+/**
+ * Xóa cache API theo mẫu hoặc toàn bộ
+ * @param {string} [pattern] - Chuỗi tìm kiếm key cần xóa. Nếu rỗng, xóa toàn bộ.
+ */
+export const invalidateApiCache = (pattern = '') => {
+  if (!pattern) {
+    apiCache.clear();
+    return;
+  }
+  for (const key of apiCache.keys()) {
+    if (key.includes(pattern)) {
+      apiCache.delete(key);
+    }
+  }
+};
+
+/**
+ * Xác định thời gian sống (TTL - ms) cho từng endpoint
+ */
+function getEndpointTTL(path) {
+  if (path.startsWith('/prices')) return 15000;              // 15s thị giá sàn
+  if (path.startsWith('/data')) return 10000;                // 10s sổ lệnh & danh mục
+  if (path.startsWith('/cash-balance')) return 15000;        // 15s số dư tiền mặt
+  if (path.startsWith('/fundamentals')) return 60000;        // 60s chỉ số cơ bản
+  if (path.startsWith('/valuation/macro')) return 60000;     // 60s vĩ mô & chu kỳ
+  if (path.startsWith('/valuation/macro-indicators')) return 120000; // 2 phút 95 chỉ số TE
+  if (path.startsWith('/valuation/financials')) return 120000; // 2 phút BCTC chi tiết
+  if (path.startsWith('/valuation/stocks')) return 60000;    // 60s danh sách mã định giá
+  if (path.startsWith('/valuation/raw-json')) return 60000;  // 60s raw json
+  if (path.startsWith('/market-index')) return 30000;        // 30s chỉ số VN-Index
+  if (path.startsWith('/watchlist')) return 30000;           // 30s danh mục theo dõi
+  if (path.startsWith('/auth/me')) return 60000;             // 60s phiên đăng nhập
+  return 15000;                                              // Mặc định 15s cho GET
+}
 
 async function request(path, options = {}) {
   const token = getAuthToken();
+  const method = (options.method || 'GET').toUpperCase();
+  const isGet = method === 'GET';
+  const isForce = path.includes('force=true');
+  const cacheKey = `${token}:${path}`;
+
+  // 1. Kiểm tra Cache trong bộ nhớ cho lời gọi GET (trừ khi có cờ force=true)
+  if (isGet && !isForce) {
+    const cached = apiCache.get(cacheKey);
+    if (cached && Date.now() < cached.expiresAt) {
+      return cached.data;
+    }
+  }
+
+  // 2. Chống gọi trùng lặp (In-Flight Request Deduplication)
+  if (isGet && inFlightRequests.has(cacheKey)) {
+    return inFlightRequests.get(cacheKey);
+  }
+
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
 
-  const res = await fetch(`${BASE}${path}`, {
-    ...options,
-    headers,
-  });
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    data = {};
+  const fetchPromise = (async () => {
+    try {
+      const res = await fetch(`${BASE}${path}`, {
+        ...options,
+        headers,
+      });
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+      if (!res.ok) throw new Error(data.error || `Lỗi máy chủ (${res.status} ${res.statusText})`);
+
+      // 3. Lưu vào Cache nếu là GET thành công
+      if (isGet) {
+        // Tự động thu hồi bộ nhớ (Memory Hygiene): Dọn key hết hạn hoặc key cũ nhất nếu đạt ngưỡng 100 entries
+        if (apiCache.size >= MAX_CACHE_ENTRIES) {
+          const now = Date.now();
+          for (const [k, v] of apiCache.entries()) {
+            if (now >= v.expiresAt) apiCache.delete(k);
+          }
+          if (apiCache.size >= MAX_CACHE_ENTRIES) {
+            const oldestKey = apiCache.keys().next().value;
+            if (oldestKey) apiCache.delete(oldestKey);
+          }
+        }
+
+        const ttl = getEndpointTTL(path);
+        apiCache.set(cacheKey, {
+          data,
+          expiresAt: Date.now() + ttl,
+        });
+      } else {
+        // 4. Nếu là thao tác GHI (POST/DELETE/PUT), tự động dọn dẹp cache liên quan
+        if (path.startsWith('/buy') || path.startsWith('/sell')) {
+          invalidateApiCache('/data');
+          invalidateApiCache('/prices');
+          invalidateApiCache('/cash-balance');
+        } else if (path.startsWith('/dividends')) {
+          invalidateApiCache('/data');
+          invalidateApiCache('/dividends');
+        } else if (path.startsWith('/cash-balance')) {
+          invalidateApiCache('/data');
+          invalidateApiCache('/cash-balance');
+        } else if (path.startsWith('/watchlist')) {
+          invalidateApiCache('/watchlist');
+          invalidateApiCache('/data');
+        } else if (path.startsWith('/restore') || path.startsWith('/user-data')) {
+          apiCache.clear();
+        } else if (path.includes('sync')) {
+          invalidateApiCache('/fundamentals');
+          invalidateApiCache('/valuation');
+          invalidateApiCache('/prices');
+        }
+      }
+
+      return data;
+    } finally {
+      if (isGet) {
+        inFlightRequests.delete(cacheKey);
+      }
+    }
+  })();
+
+  if (isGet) {
+    inFlightRequests.set(cacheKey, fetchPromise);
   }
-  if (!res.ok) throw new Error(data.error || `Lỗi máy chủ (${res.status} ${res.statusText})`);
-  return data;
+
+  return fetchPromise;
 }
 
 export const fetchData       = ()        => request('/data');
@@ -105,7 +222,7 @@ export const fetchDnseOhlc = async ({ symbol = 'VNINDEX', resolution = '1D', fro
   }
 
   // Fallback: Gọi trực tiếp tới máy chủ DNSE (hỗ trợ CORS mở)
-  const INDEX_SYMBOLS = ['VNINDEX', 'VN30', 'HNX', 'HNX30', 'UPCOM', 'VN100', 'VNXALLSHARE', 'VNDIVIDEND', 'VNMITECH', 'VN50GROWTH'];
+  const INDEX_SYMBOLS = ['VNINDEX', 'VN30', 'VN100', 'VNXALLSHARE', 'VNDIVIDEND', 'VNMITECH', 'VN50GROWTH'];
   let type = 'stock';
   if (INDEX_SYMBOLS.includes(symbol)) {
     type = 'index';

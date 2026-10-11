@@ -104,7 +104,7 @@ router.get('/valuation/dnse-ohlc', async (req, res) => {
   }
 
   // Phân định loại symbol: index, derivative, hay stock
-  const INDEX_SYMBOLS = ['VNINDEX', 'VN30', 'HNX', 'HNX30', 'UPCOM', 'VN100', 'VNXALLSHARE', 'VNDIVIDEND', 'VNMITECH', 'VN50GROWTH'];
+  const INDEX_SYMBOLS = ['VNINDEX', 'VN30', 'VN100', 'VNXALLSHARE', 'VNDIVIDEND', 'VNMITECH', 'VN50GROWTH'];
   let type = 'stock';
   if (INDEX_SYMBOLS.includes(symbol)) {
     type = 'index';

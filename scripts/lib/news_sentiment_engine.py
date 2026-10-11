@@ -3,7 +3,6 @@ scripts/lib/news_sentiment_engine.py
 Động cơ Bản tin Thời sự & Bộ Đo Lường Tâm Lý Tin Tức 30 Ngày (Corporate News Digest & Sentiment Analyzer)
 dành cho Cổ phiếu Thị Trường Chứng Khoán Việt Nam.
 
-Tham chiếu phương pháp luận từ: ref-equity-research-vn/vn-news-digest/SKILL.md
 Bao gồm:
 1. Thu thập & chuẩn hóa 50 tin tức từ vnstock / nguồn doanh nghiệp
 2. Phân loại 5 nhóm: biz (Kinh doanh), sector (Ngành), macro (Vĩ mô), disclosure (Công bố thông tin), analyst (Phân tích CTCK)
@@ -28,7 +27,7 @@ except ImportError:
 # Từ điển từ khóa phân loại danh mục
 CATEGORY_KEYWORDS = {
     "biz": [
-        "doanh thu", "lợi nhuận", "lnst", "ebitda", "kết quả kinh doanh", "kqkd", 
+        "doanh thu", "lợi nhuận", "lnst", "ebitda", "kết quả kinh doanh", "kqkd",
         "sản lượng", "doanh số", "biên lợi nhuận", "hợp đồng", "doanh thu thuần",
         "tăng trưởng", "kỷ lục", "vượt kế hoạch", "đạt kế hoạch", "lãi ròng", "lỗ"
     ],
@@ -121,7 +120,7 @@ def detect_news_sentiment_and_impact(title: str, content: str = "") -> Dict[str,
 
 def calculate_news_sentiment_score(items: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Tính Sentiment Score tổng hợp (-100 đến +100) theo công thức của ref-equity-research-vn:
+    Tính Sentiment Score tổng hợp (-100 đến +100)
     raw_sum = sum(sentiment_val * weight)
     max_possible = sum(weight)
     score = (raw_sum / max_possible) * 100
@@ -411,7 +410,7 @@ def extract_corporate_events_from_news(
                 "ratio": "10%",
                 "value": round(dps) if dps else 1000,
                 "source": "Nghị quyết ĐHĐCĐ Doanh Nghiệp",
-                "link": "#"
+                "link": f"https://www.google.com/search?q={urllib.parse.quote(f'{symbol} cổ tức tiền mặt {cur_year-1}')}&hl=vi"
             },
             {
                 "date": f"{cur_year}-04-25",
@@ -420,7 +419,7 @@ def extract_corporate_events_from_news(
                 "ratio": "—",
                 "value": None,
                 "source": "Biên bản ĐHĐCĐ Doanh Nghiệp",
-                "link": "#"
+                "link": f"https://www.google.com/search?q={urllib.parse.quote(f'{symbol} đại hội đồng cổ đông {cur_year}')}&hl=vi"
             }
         ]
         for fb in fallback_milestones:
@@ -511,7 +510,7 @@ def build_news_digest_doc(symbol: str, raw_news_list: Optional[List[Dict[str, An
                 }.get(cat, "Kinh Doanh"),
                 "date": datetime.now().strftime("%Y-%m-%d"),
                 "source": "Báo cáo Doanh Nghiệp & CTCK",
-                "link": "#",
+                "link": f"https://www.google.com/search?q={urllib.parse.quote(f'{sym} {title}')}&hl=vi",
                 "sentiment": sent,
                 "sentimentValue": 1 if sent == "bullish" else (-1 if sent == "bearish" else 0),
                 "impact": imp,
