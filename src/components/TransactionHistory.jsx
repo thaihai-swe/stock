@@ -4,7 +4,7 @@ import { fmtDate, fmtMoney, getDisciplineTagInfo, getStockColor, plBg, plColor }
 import StockDetailModal from './StockDetailModal.jsx';
 import StockPerformanceTable from './StockPerformanceTable.jsx';
 
-export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onNavigateSell, onSwitchTab }) {
+export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onNavigateSell, onSwitchTab, showToast }) {
   const { buyOrders = [], sellOrders = [] } = data;
   const [subTab, setSubTab] = useState('orders'); // 'orders' | 'performance'
   const [selectedSymbolModal, setSelectedSymbolModal] = useState(null);
@@ -162,9 +162,11 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
     try {
       if (tx.type === 'BUY') await deleteBuy(tx.id);
       else await deleteSell(tx.id);
+      if (showToast) showToast(`✅ Đã xóa lệnh ${tx.type === 'BUY' ? 'mua' : 'bán'} ${tx.symbol}`, 'success');
       onSuccess();
     } catch (err) {
-      alert('❌ ' + err.message);
+      if (showToast) showToast('❌ ' + err.message, 'error');
+      else alert('❌ ' + err.message);
     } finally {
       setDeletingId(null);
     }
@@ -445,9 +447,63 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                 </div>
               )}
 
-              {/* Lọc theo khoảng ngày */}
+              {/* Lọc theo khoảng ngày & Presets */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-medium text-gray-500">Từ:</span>
+                <span className="text-xs font-medium text-gray-500">Kỳ:</span>
+                <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => { setStartDate(''); setEndDate(''); }}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                      !startDate && !endDate
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    Tất cả
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const now = new Date();
+                      setStartDate(`${now.getFullYear()}-01-01`);
+                      setEndDate(now.toISOString().slice(0, 10));
+                    }}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                      startDate === `${new Date().getFullYear()}-01-01`
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    YTD
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const now = new Date();
+                      const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                      setStartDate(oneYearAgo.toISOString().slice(0, 10));
+                      setEndDate(now.toISOString().slice(0, 10));
+                    }}
+                    className="px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer text-gray-600 hover:bg-gray-100"
+                  >
+                    1Y
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const now = new Date();
+                      const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+                      setStartDate(`${now.getFullYear()}-${monthStr}-01`);
+                      setEndDate(now.toISOString().slice(0, 10));
+                    }}
+                    className="px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer text-gray-600 hover:bg-gray-100"
+                  >
+                    MTD
+                  </button>
+                </div>
+
+                <span className="text-xs font-medium text-gray-500 ml-1">Từ:</span>
                 <input
                   type="date"
                   value={startDate}
@@ -715,9 +771,26 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
 
               {/* Chế độ xem Bảng (Desktop mặc định / Mobile khi chọn Bảng) */}
               <div className={`overflow-x-auto ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
+                {mobileViewMode === 'table' && (
+                  <p className="sm:hidden text-[11px] text-indigo-700 px-4 py-1.5 bg-indigo-50/60 border-b border-indigo-100 flex items-center gap-1 font-medium">
+                    <span>👉</span> Vuốt ngang để xem thêm chi tiết lệnh
+                  </p>
+                )}
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider select-none border-b border-gray-100">
                     <tr>
+                      {/* Mã */}
+                      <th
+                        onClick={() => handleSort('symbol')}
+                        className="text-left px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors group sticky left-0 bg-gray-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]"
+                        title="Nhấn để sắp xếp theo Mã cổ phiếu"
+                      >
+                        <div className="inline-flex items-center">
+                          <span className={sortField === 'symbol' ? 'text-indigo-600 font-bold' : ''}>Mã CP</span>
+                          {renderSortIcon('symbol')}
+                        </div>
+                      </th>
+
                       {/* Loại */}
                       <th
                         onClick={() => handleSort('type')}
@@ -727,18 +800,6 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                         <div className="inline-flex items-center">
                           <span className={sortField === 'type' ? 'text-indigo-600 font-bold' : ''}>Loại</span>
                           {renderSortIcon('type')}
-                        </div>
-                      </th>
-
-                      {/* Mã */}
-                      <th
-                        onClick={() => handleSort('symbol')}
-                        className="text-left px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors group"
-                        title="Nhấn để sắp xếp theo Mã cổ phiếu"
-                      >
-                        <div className="inline-flex items-center">
-                          <span className={sortField === 'symbol' ? 'text-indigo-600 font-bold' : ''}>Mã CP</span>
-                          {renderSortIcon('symbol')}
                         </div>
                       </th>
 
@@ -822,16 +883,8 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                       return (
                         <Fragment key={tx.id}>
                           <tr className={`hover:bg-gray-50/80 transition-colors ${isExpanded ? 'bg-indigo-50/30' : ''}`}>
-                            {/* Loại */}
-                            <td className="px-5 py-3.5">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${isBuy ? 'bg-indigo-100 text-indigo-700' : 'bg-orange-100 text-orange-700'
-                                }`}>
-                                {isBuy ? '🛒 MUA' : '💸 BÁN'}
-                              </span>
-                            </td>
-
                             {/* Mã */}
-                            <td className="px-4 py-3.5">
+                            <td className="px-4 py-3.5 sticky left-0 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
                               <button
                                 type="button"
                                 onClick={() => setSelectedSymbolModal(tx.symbol)}
@@ -849,6 +902,14 @@ export default function TransactionHistory({ data, onSuccess, onNavigateBuy, onN
                                 />
                                 {tx.symbol}
                               </button>
+                            </td>
+
+                            {/* Loại */}
+                            <td className="px-5 py-3.5">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${isBuy ? 'bg-indigo-100 text-indigo-700' : 'bg-orange-100 text-orange-700'
+                                }`}>
+                                {isBuy ? '🛒 MUA' : '💸 BÁN'}
+                              </span>
                             </td>
 
                             {/* SL */}

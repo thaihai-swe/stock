@@ -349,3 +349,17 @@ export function getStockSector(symbol, fundamentalsMap = {}) {
 
   return { name: fund?.sector || 'Khác', icon: '📦', color: SECTOR_COLORS['Khác'] };
 }
+
+// Format tỷ VNĐ (viết tắt Bn VND)
+export function formatBn(val) {
+  if (val === null || val === undefined || isNaN(val)) return '—';
+  return Number(val).toLocaleString('vi-VN') + ' tỷ';
+}
+
+// Format phần trăm có dấu (+ / -)
+export function formatPercent(val) {
+  if (val === null || val === undefined || isNaN(val)) return '—';
+  const num = Number(val);
+  const sign = num > 0 ? '+' : '';
+  return `${sign}${num.toFixed(1)}%`;
+}

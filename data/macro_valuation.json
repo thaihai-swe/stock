@@ -1,8 +1,189 @@
 {
   "_meta": {
-    "updatedAt": "2026-10-11T05:54:23Z",
+    "updatedAt": "2026-10-11T09:58:35Z",
     "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
-    "version": "3.4"
+    "version": "4.0"
+  },
+  "yieldCurveMonitor": {
+    "_meta": {
+      "source": "VnBondLab & VN_MACRO_v4.2 Quantitative Engine",
+      "version": "1.2",
+      "timestamp": "Live"
+    },
+    "summary": {
+      "vnYcCode": "YC0",
+      "vnYcLabel": "NEUTRAL_MIXED",
+      "vnYcDesc": "Trạng thái cân bằng chu kỳ. Đường cong phân hóa.",
+      "usYcCode": "YC0",
+      "usYcLabel": "NEUTRAL_MIXED",
+      "transChainStage": "LIQUIDITY SQUEEZE",
+      "transStageSummary": "Áp lực tỷ giá kéo căng thanh khoản liên ngân hàng trong nước",
+      "transBadge": "bg-amber-500/20 text-amber-400 border-amber-500/30",
+      "assetDecision": "EQUITY FAVORED OVER BONDS",
+      "assetDecisionVi": "Ưu Tiên Cổ Phiếu Vượt Trội Trái Phiếu (ERP cao)",
+      "assetBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+      "equityRiskPremium": 4.86,
+      "earningsYield": 9.33,
+      "vnCurvature": -0.52,
+      "usCurvature": 0.15,
+      "vnMoveFocus": "LONG (Đầu dài 10Y)",
+      "favoredSectors": "Luân chuyển cân bằng (Neutral Rotation)"
+    },
+    "links": {
+      "linkA": {
+        "state": "PRESSURE (Áp lực)",
+        "pressured": true,
+        "label": "Tỷ giá USD/VND & Fed Rate"
+      },
+      "linkB": {
+        "state": "STRESSED (Căng thẳng)",
+        "pressured": true,
+        "label": "Thanh khoản Liên ngân hàng ON"
+      },
+      "linkC": {
+        "state": "NORMAL (Bình thường)",
+        "pressured": false,
+        "label": "Đảo ngược đường cong VN10Y"
+      }
+    },
+    "rows": [
+      {
+        "id": 1,
+        "metric": "Policy Rate (Lãi suất điều hành)",
+        "vn": "4.50% (Tái cấp vốn SBV)",
+        "us": "4.85% (Fed Funds)",
+        "delta": "-0.35%",
+        "highlight": "normal"
+      },
+      {
+        "id": 2,
+        "metric": "Short / Interbank (Ngắn hạn & Liên ngân hàng)",
+        "vn": "6.47% (Qua đêm ON INBR)",
+        "us": "4.65% (US 2Y Yield)",
+        "delta": "+1.82%",
+        "highlight": "warning"
+      },
+      {
+        "id": 3,
+        "metric": "Real Rate / Stance (Lãi suất thực & Định hướng)",
+        "vn": "-0.58% (NỚI LỎNG)",
+        "us": "+1.95% (RESTRICTIVE)",
+        "delta": "-2.53%",
+        "highlight": "normal"
+      },
+      {
+        "id": 4,
+        "metric": "2Y / 5Y / 10Y Yields (Bộ 3 kỳ hạn TPCP)",
+        "vn": "2.45% / 3.20% / 4.47%",
+        "us": "4.65% / 5.02% / 5.24%",
+        "delta": "Spread 10Y: -0.77%",
+        "highlight": "normal"
+      },
+      {
+        "id": 5,
+        "metric": "Level / Slope / Curvature (Nelson-Siegel)",
+        "vn": "3.37% / +2.02% / -0.52%",
+        "us": "4.97% / +0.59% / +0.15%",
+        "delta": "Curv VN: -0.52%",
+        "highlight": "normal"
+      },
+      {
+        "id": 6,
+        "metric": "YC Regime (Hình thái đường cong)",
+        "vn": "YC0 | NEUTRAL_MIXED",
+        "us": "YC0 | NEUTRAL_MIXED",
+        "delta": "Trạng thái cân bằng chu kỳ. Đường cong phân hóa.",
+        "highlight": "normal"
+      },
+      {
+        "id": 7,
+        "metric": "Segmented Slope (Độ dốc phân đoạn)",
+        "vn": "2-5Y: +0.75% | 5-10Y: +1.27%",
+        "us": "2-5Y: +0.37% | 5-10Y: +0.22%",
+        "delta": "10Y-2Y: +2.02%",
+        "highlight": "normal"
+      },
+      {
+        "id": 8,
+        "metric": "Curve Stress Score (Điểm căng thẳng đường cong)",
+        "vn": "37.7/100 (MID)",
+        "us": "43.5/100 (MID)",
+        "delta": "Ngưỡng rủi ro: 75/100",
+        "highlight": "normal"
+      },
+      {
+        "id": 9,
+        "metric": "Move Focus (Trọng tâm dịch chuyển kỳ hạn)",
+        "vn": "LONG (Đầu dài 10Y)",
+        "us": "LINEAR (Tuyến tính)",
+        "delta": "Bình thường",
+        "highlight": "normal"
+      },
+      {
+        "id": 10,
+        "metric": "Data Quality (Mức độ sẵn sàng dữ liệu)",
+        "vn": "HIGH (3/3 Kỳ hạn cốt lõi)",
+        "us": "HIGH (3/3 Kỳ hạn cốt lõi)",
+        "delta": "100% Khớp chuẩn",
+        "highlight": "success"
+      },
+      {
+        "id": 11,
+        "metric": "4 Macro Spreads (4 Chênh lệch vĩ mô)",
+        "vn": "LiqGap: +1.97% | 10Y-Policy: -0.03%",
+        "us": "Spread10Y: -0.77% | PolicyGap: -0.35%",
+        "delta": "Driver: LOCAL STRESS",
+        "highlight": "warning"
+      },
+      {
+        "id": 12,
+        "metric": "Macro Risk Bucket (Phân tầng rủi ro bộ đệm)",
+        "vn": "B1 LEAN POSITIVE (Hỗ trợ tăng trưởng)",
+        "us": "B2 NEUTRAL (Chờ đợi nới lỏng)",
+        "delta": "Bộ đệm Hysteresis",
+        "highlight": "success"
+      },
+      {
+        "id": 13,
+        "metric": "Funding Dynamics (Động lực thanh khoản hệ thống)",
+        "vn": "Thanh khoản dồi dào | Gap: +1.97%",
+        "us": "Spread 2Y: -2.20% | USD/VND: 25,879",
+        "delta": "LOCAL STRESS",
+        "highlight": "normal"
+      },
+      {
+        "id": 14,
+        "metric": "Transmission Chain (Chuỗi truyền dẫn 3 mắt xích)",
+        "vn": "LIQUIDITY SQUEEZE (A:P | B:S | C:N)",
+        "us": "Fed Funds -> FX Rate -> Interbank -> VN10Y",
+        "delta": "Áp lực tỷ giá kéo căng thanh khoản liên ngân hàng trong nước",
+        "highlight": "warning"
+      },
+      {
+        "id": 15,
+        "metric": "Yield Curve Outlook (Triển vọng thị trường nợ)",
+        "vn": "Đường cong dốc nhẹ, áp lực lãi suất kiểm soát tốt.",
+        "us": "Fed duy trì lãi suất chờ tín hiệu lạm phát hạ nhiệt.",
+        "delta": "Ổn định dòng vốn",
+        "highlight": "normal"
+      },
+      {
+        "id": 16,
+        "metric": "Sector Alignment (Ngành hưởng lợi theo YC)",
+        "vn": "Luân chuyển cân bằng (Neutral Rotation)",
+        "us": "Tech, Communication, Consumer Discretionary",
+        "delta": "Xoay vòng đón sóng",
+        "highlight": "success"
+      },
+      {
+        "id": 17,
+        "metric": "Asset Decision (Quyết định ưu tiên tài sản)",
+        "vn": "EQUITY FAVORED OVER BONDS (ERP = +4.86%)",
+        "us": "Neutral Equity vs Fixed Income",
+        "delta": "Ưu Tiên Cổ Phiếu Vượt Trội Trái Phiếu (ERP cao)",
+        "highlight": "success"
+      }
+    ]
   },
   "marketIndex": {
     "symbol": "VNINDEX",
@@ -3750,7 +3931,7 @@
   },
   "marketValuationHistory": {
     "_meta": {
-      "updatedAt": "2026-10-11T13:54:26.432608",
+      "updatedAt": "2026-10-11T17:58:38.235469",
       "sheetId": "1TdXzsXN_bMQKHLN0Zqc8t4lS-59us02Btr_SLc0AgpQ",
       "source": "Google Sheets (Simply Wall St Vietnam)",
       "periods": [

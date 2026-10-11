@@ -815,6 +815,61 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   * $MoS < -20\%$: `RISKY` — **Rất Đắt / Rủi Ro** (Thị giá cao hơn giá trị nội tại $> 20\%$, màu đỏ hồng `rose`).
 
 ### D. Kiểm Thử Đơn Vị Tự Động (Unit Testing):
-* Script thực thi: `scripts/test_valuation_engine.py` (bao phủ 20 test cases toàn diện cho: 7 mô hình toán học cơ bản, DuPont 3 nhân tố, DuPont 5 nhân tố mở rộng, Điểm Sức khỏe Tài chính 4 trụ cột, Cảnh báo sớm Red Flags, Phân tích đặc thù ngành, Mô hình DCF FCFF 3 kịch bản, Reverse DCF Implied Growth, Ma trận độ nhạy cảm WACC/g, Hồ sơ thị trường định lượng VAP/Wyckoff, Bản tin thời sự & Sentiment 30 ngày, Tech Score và Engine class).
+* Script thực thi: `scripts/test_valuation_engine.py` (bao phủ 24 test cases toàn diện cho: 7 mô hình toán học cơ bản, DuPont 3 nhân tố, DuPont 5 nhân tố mở rộng, Điểm Sức khỏe Tài chính 4 trụ cột, Cảnh báo sớm Red Flags, Phân tích đặc thù ngành, Mô hình DCF FCFF 3 kịch bản, Reverse DCF Implied Growth, Ma trận độ nhạy cảm WACC/g, Hồ sơ thị trường định lượng VAP/Wyckoff, Bản tin thời sự & Sentiment 30 ngày, Tech Score, **Bảng Giám Sát Cấu Trúc Lợi Suất 17 Dòng (Nelson-Siegel)**, **Mô Hình Kiểm Toán Gian Lận Beneish M-Score**, **Joel Greenblatt Magic Formula (EY% & ROIC%)**, **Điểm Uốn Dòng Tiền FCF Inflection & Accruals Ratio**).
 * Lệnh chạy: `.venv/bin/python scripts/test_valuation_engine.py`.
+
+---
+
+### E. Đặc Tả Bộ Ba Phân Hệ Nâng Cấp Nâng Cao (Institutional Dossier & Yield Curve Monitor):
+
+#### 1. Bảng Giám Sát Cấu Trúc Lợi Suất & Lãi Suất 17 Dòng (`data/macro_valuation.json` -> `yieldCurveMonitor`):
+* **Cơ sở lý thuyết**: Kế thừa chuẩn lượng hóa VnBondLab & VN_MACRO_v4:
+  * **17 Dòng đối chiếu song song VN vs US**: 8 Kỳ hạn TPCP Việt Nam (1Y-20Y), 3 Kỳ hạn Mỹ (2Y, 5Y, 10Y), Lãi suất điều hành SBV (4.5%), Lãi suất qua đêm liên ngân hàng ON, Tỷ giá USD/VND, Lạm phát CPI YoY, và P/E VN-Index.
+  * **Độ cong Nelson-Siegel Curvature**: $2 \times Y_{5Y} - (Y_{2Y} + Y_{10Y})$. Đo lường mức độ lồi/lõm của đường cong tại kỳ hạn trung bình 5 năm.
+  * **5 Hình thái đường cong chu kỳ (YC0 - YC4)**:
+    * `YC0`: Bình thường / Cân bằng chu kỳ.
+    * `YC1`: Dốc đứng mở rộng (Steepening) — Hỗ trợ mạnh nhóm cổ phiếu tài chính, ngân hàng, công nghiệp.
+    * `YC2`: Phẳng dần (Flattening) — Cảnh báo chu kỳ tăng trưởng chậm lại.
+    * `YC3`: Đảo ngược (Inversion) — Tín hiệu suy thoái / phòng thủ tiền mặt.
+    * `YC4`: Dốc ngược đuôi ngắn (Humped) — Căng thẳng thanh khoản ngắn hạn.
+  * **Chuỗi truyền dẫn 3 mắt xích (Transmission Links)**:
+    * `Link A`: Tỷ giá USD/VND & Fed Funds rate tác động lên biên độ chính sách SBV.
+    * `Link B`: Thanh khoản liên ngân hàng qua đêm (ON Rate) tác động mặt bằng huy động.
+    * `Link C`: Lợi suất TPCP 10Y tác động lên chi phí vốn thị trường chứng khoán.
+  * **Quyết định phân bổ tài sản (Asset Decision)**: So sánh Earnings Yield của VN-Index ($1 / PE$) với Lợi suất TPCP 10Y ($VN10Y$) để ra quyết định ưu tiên tài sản: `EQUITY_FAVORED` (ERP $> +2.5\%$), `BALANCED`, hoặc `BONDS_FAVORED`.
+
+#### 2. Bộ Kiểm Toán Gian Lận Beneish M-Score (`data/financials/<MÃ>.json` -> `beneishMScore`):
+* **Mô hình 8 biến số học thuật (Messod Beneish, 1999)**:
+  $$M = -4.84 + 0.920 \times DSRI + 0.528 \times GMI + 0.404 \times AQI + 0.892 \times SGI + 0.115 \times DEPI - 0.172 \times SGAI + 4.037 \times TATA + 0.0327 \times LVGI$$
+* **8 Chỉ số con**:
+  1. $DSRI$: Tỷ lệ Khoản phải thu / Doanh thu. $DSRI > 1$ cảnh báo nới lỏng tín dụng hoặc doanh thu ảo.
+  2. $GMI$: Biên gộp kỳ trước / Biên gộp kỳ này. $GMI > 1$ cho thấy biên gộp đang xói mòn.
+  3. $AQI$: Chất lượng tài sản (Non-current assets ngoài TSCĐ). $AQI > 1$ nghi vấn vốn hóa chi phí vào tài sản.
+  4. $SGI$: Tốc độ tăng trưởng doanh thu.
+  5. $DEPI$: Tỷ lệ khấu hao kỳ trước / kỳ này. $DEPI > 1$ nghi vấn làm chậm khấu hao để tăng lãi.
+  6. $SGAI$: Tỷ lệ chi phí SG&A / Doanh thu.
+  7. $LVGI$: Đòn bẩy nợ kỳ này / kỳ trước.
+  8. $TATA$: Tỷ lệ dồn tích trên tổng tài sản $(LNST - CFO) / TotalAssets$. $TATA$ âm sâu chứng minh tiền mặt thực tế dồi dào.
+* **Ngưỡng phân loại**:
+  * $M < -2.22$: **An toàn (Improbable Manipulator)** — Rủi ro gian lận BCTC rất thấp.
+  * $-2.22 \le M \le -1.78$: **Vùng Xám (Grey Zone)** — Cần rà soát các khoản phải thu và chi phí dở dang.
+  * $M > -1.78$: **Nguy cơ cao (Possible Manipulator)** — Cảnh báo dấu hiệu làm đẹp báo cáo.
+
+#### 3. Joel Greenblatt Magic Formula (`data/financials/<MÃ>.json` -> `magicFormula`):
+* **Earnings Yield (EY %)**:
+  $$EY = \frac{EBIT}{EV} \times 100\% \quad (EV = MarketCap + TotalDebt - Cash)$$
+* **Return on Capital (ROIC %)**:
+  $$ROIC = \frac{EBIT}{NetWorkingCapital + NetFixedAssets} \times 100\%$$
+* **Phân hạng 4 cấp độ (Tiers)**:
+  * `TOP_TIER`: Hạng 1: Siêu Phẩm ($EY \ge 8.5\%$ & $ROIC \ge 15.0\%$) — Doanh nghiệp xuất sắc ở mức giá hời.
+  * `QUALITY_GROWTH`: Hạng 2: Cổ phiếu tăng trưởng chất lượng (ROIC cao nhưng định giá đắt).
+  * `VALUE_PLAY`: Hạng 3: Định giá rẻ nhưng hiệu quả sử dụng vốn trung bình.
+  * `UNDERPERFORM`: Hạng 4: Kém hấp dẫn (Định giá đắt và hiệu quả vốn yếu).
+
+#### 4. Giải Mã Điểm Uốn Dòng Tiền & Dồn Tích (`data/financials/<MÃ>.json` -> `fcfInflection`):
+* **Nguyên lý Điểm Uốn Chu Kỳ Vốn (CapEx Peak Inflection)**:
+  * Tỷ lệ tiền mặt kinh doanh $CFO / LNST \ge 1.0x$: Tiền mặt thật về công ty dồi dào, lợi nhuận thực chất.
+  * $FCF \le 0$ tạm thời do $CapEx$ đạt đỉnh chu kỳ mở rộng đại công trình hoặc XDCB dở dang $> 15\%$ tổng tài sản.
+  * Khi dự án hoàn thành đưa vào vận hành thương mại, CapEx sụt giảm mạnh và doanh thu bùng nổ $\rightarrow FCF$ đảo chiều dương kích hoạt sóng tái định giá (Multiple Expansion).
+* **Thước đo Dồn tích (Accruals Ratio)**: $(LNST - CFO) / TotalAssets \le -0.03$ xếp hạng **Thượng Hạng (Top-Tier)**.
 

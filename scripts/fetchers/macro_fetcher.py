@@ -143,12 +143,43 @@ class MacroFetcher(BaseFetcher):
             "source": "UNAVAILABLE"
         }
 
+    def _fetch_yahoo_direct_chart(self, ticker: str) -> Optional[float]:
+        """
+        Gọi trực tiếp Yahoo Finance Chart API qua HTTPS (dự phòng độc lập khi yfinance bị lỗi).
+        Endpoint: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d
+        Trả về giá trị thị trường thực tế gần nhất từ sàn quốc tế (không dùng số giả định).
+        """
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d"
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/plain, */*",
+        }
+        try:
+            raw_text = self.http_get(url, headers=headers, timeout=8, verify_ssl=True)
+            if raw_text:
+                data = json.loads(raw_text)
+                result_list = data.get("chart", {}).get("result", [])
+                if result_list:
+                    meta = result_list[0].get("meta", {})
+                    price = meta.get("regularMarketPrice")
+                    if price and float(price) > 0:
+                        return round(float(price), 2)
+                    closes = result_list[0].get("indicators", {}).get("quote", [{}])[0].get("close", [])
+                    valid_closes = [c for c in closes if c is not None and float(c) > 0]
+                    if valid_closes:
+                        return round(float(valid_closes[-1]), 2)
+        except Exception:
+            pass
+        return None
+
     def fetch_global_commodities_fx(self) -> Dict[str, float]:
         """
-        Lấy tỷ giá USD/VND, Lợi suất US 10Y, Dầu Brent, Vàng thế giới và DXY qua Yahoo Finance.
-        Khởi tạo động từ snapshot macro cache gần nhất thay vì hằng số fix cứng.
+        Lấy tỷ giá USD/VND, Lợi suất US 10Y/5Y/2Y, Dầu Brent, Vàng thế giới và DXY qua Yahoo Finance.
+        Khởi tạo động từ snapshot macro cache thực tế gần nhất thay vì gán hằng số tĩnh.
+        Ưu tiên: yfinance -> Direct Yahoo Chart HTTPS API -> Real Cache Snapshot.
         """
         result = {}
+        # 1. Nạp dữ liệu thực tế từ cache trước đó (nếu có)
         try:
             cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
             if cache_file.exists():
@@ -159,38 +190,41 @@ class MacroFetcher(BaseFetcher):
                         if m_prev.get("goldWorld"): result["goldWorld"] = float(m_prev["goldWorld"])
                         if m_prev.get("oilBrent"): result["oilBrent"] = float(m_prev["oilBrent"])
                         if m_prev.get("us10yYield"): result["us10yYield"] = float(m_prev["us10yYield"])
+                        if m_prev.get("us05yYield"): result["us05yYield"] = float(m_prev["us05yYield"])
+                        if m_prev.get("us02yYield"): result["us02yYield"] = float(m_prev["us02yYield"])
                         if m_prev.get("dxy"): result["dxy"] = float(m_prev["dxy"])
                         if m_prev.get("usdVndRate"): result["usdVndRate"] = float(m_prev["usdVndRate"])
         except Exception:
             pass
 
-        # Đảm bảo các chỉ số có giá trị hợp lý nếu khởi chạy lần đầu tiên
-        result.setdefault("goldWorld", 2700.0)
-        result.setdefault("oilBrent", 75.0)
-        result.setdefault("us10yYield", 4.0)
-        result.setdefault("dxy", 103.0)
-        result.setdefault("usdVndRate", 25500.0)
-
-        if yf is None:
-            return result
-
         tickers_map = {
             "goldWorld": "GC=F",
             "oilBrent": "BZ=F",
             "us10yYield": "^TNX",
+            "us05yYield": "^FVX",
+            "us02yYield": "2YY=F",
             "dxy": "DX-Y.NYB",
             "usdVndRate": "USDVND=X",
         }
 
+        # 2. Thu thập dữ liệu thực tế từ thị trường
         for key, sym in tickers_map.items():
-            try:
-                t = yf.Ticker(sym)
-                df = t.history(period="5d")
-                if not df.empty:
-                    val = float(df["Close"].iloc[-1])
-                    result[key] = round(val, 2)
-            except Exception:
-                pass
+            val = None
+            if yf is not None:
+                try:
+                    t = yf.Ticker(sym)
+                    df = t.history(period="5d")
+                    if not df.empty:
+                        val = float(df["Close"].iloc[-1])
+                except Exception:
+                    pass
+
+            # Dự phòng Tầng 2: Gọi trực tiếp Yahoo Chart API nếu yfinance không phản hồi
+            if val is None or val <= 0:
+                val = self._fetch_yahoo_direct_chart(sym)
+
+            if val is not None and val > 0:
+                result[key] = round(val, 2)
 
         return result
 
@@ -198,22 +232,32 @@ class MacroFetcher(BaseFetcher):
         """
         Lấy đường cong lợi suất Trái phiếu Chính phủ Việt Nam 8 kỳ hạn từ HNX Portal.
         Sử dụng BeautifulSoup4 + pandas (pd.read_html) để bóc tách bảng dữ liệu chuẩn hóa.
-        Hỗ trợ tự động lùi ngày giao dịch (tối đa 5 ngày) nếu ngày hiện tại là cuối tuần hoặc nghỉ lễ.
-        Trả về dictionary dạng { '1Y': 3.93, '5Y': 4.29, '10Y': 4.47, ... }
+        Hỗ trợ tự động lùi ngày giao dịch (tối đa 10 ngày) để tìm phiên gần nhất khi rơi vào cuối tuần/nghỉ lễ.
+        Dữ liệu dự phòng lấy từ cache thực tế đã lưu trước đó, tuyệt đối không dùng số giả định.
         """
         start_date = target_date or date.today()
-        default_yields = {
-            "1Y": 1.85, "2Y": 2.10, "3Y": 2.35, "5Y": 2.75,
-            "7Y": 3.10, "10Y": 3.45, "15Y": 3.80, "20Y": 4.10
-        }
+
+        # 1. Nạp cache HNX thực tế đã lưu trước đó làm nguồn dự phòng an toàn
+        cached_yields: Dict[str, float] = {}
+        try:
+            cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
+            if cache_file.exists():
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cdata = json.load(f)
+                    m_prev = cdata.get("macro", {})
+                    y_prev = m_prev.get("yieldCurve", {})
+                    if y_prev and isinstance(y_prev, dict):
+                        cached_yields = {k: float(v) for k, v in y_prev.items() if float(v) > 0}
+        except Exception:
+            pass
 
         tenor_map = {
             "1 năm": "1Y", "2 năm": "2Y", "3 năm": "3Y", "5 năm": "5Y",
             "7 năm": "7Y", "10 năm": "10Y", "15 năm": "15Y", "20 năm": "20Y"
         }
 
-        # Thử từ start_date lùi dần về trước tối đa 5 ngày giao dịch
-        for day_offset in range(5):
+        # 2. Thử từ start_date lùi dần về trước tối đa 10 ngày giao dịch
+        for day_offset in range(10):
             check_date = start_date - timedelta(days=day_offset)
             pdate = check_date.strftime("%d/%m/%Y")
 
@@ -250,42 +294,69 @@ class MacroFetcher(BaseFetcher):
                                     pass
 
                 if len(yields) >= 4:
-                    default_yields.update(yields)
-                    print(f"  [HNX] Bóc tách thành công đường cong lợi suất TPCP ngày {pdate} ({len(yields)} kỳ hạn, 10Y={default_yields.get('10Y')}%) qua BeautifulSoup + Pandas.")
-                    return default_yields
+                    print(f"  [HNX] Bóc tách thành công đường cong lợi suất TPCP ngày {pdate} ({len(yields)} kỳ hạn, 10Y={yields.get('10Y')}%) qua BeautifulSoup + Pandas.")
+                    return yields
 
             except Exception as e:
                 print(f"  ⚠️ [HNX] Lỗi bóc tách bảng lợi suất ngày {pdate}: {e}")
 
-        print("  ⚠️ [HNX] Không tìm thấy dữ liệu bảng lợi suất gần nhất trong 5 ngày, sử dụng cấu hình mặc định an toàn.")
-        return default_yields
+        print("  ⚠️ [HNX] Không tìm thấy dữ liệu bảng lợi suất gần nhất trong 10 ngày, bảo toàn dữ liệu HNX thực tế từ cache.")
+        return cached_yields
 
     def fetch_sbv_rates(self) -> Dict[str, float]:
         """
         Lấy lãi suất điều hành Ngân hàng Nhà nước Việt Nam (SBV).
+        Ưu tiên lấy từ dữ liệu thực tế TradingEconomics (macro_indicators.json) hoặc cache thực tế.
         """
-        return {
-            "refinancingRate": 4.5,   # Lãi suất tái cấp vốn (%)
-            "discountRate": 3.0,      # Lãi suất tái chiết khấu (%)
-            "interbankOvernight": 3.8 # Lãi suất O/N LNH (%)
+        rates = {
+            "refinancingRate": 4.5,
+            "discountRate": 3.0,
+            "interbankOvernight": 4.5
         }
+        try:
+            te_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_indicators.json"
+            if te_file.exists():
+                with open(te_file, "r", encoding="utf-8") as f:
+                    te_data = json.load(f)
+                    core = te_data.get("macroCore", {})
+                    if core.get("sbv_refinancing_rate"):
+                        rates["refinancingRate"] = float(core["sbv_refinancing_rate"])
+                    if core.get("interbank_rate"):
+                        rates["interbankOvernight"] = float(core["interbank_rate"])
+        except Exception:
+            pass
+
+        try:
+            cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
+            if cache_file.exists():
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cdata = json.load(f)
+                    sbv_prev = cdata.get("macro", {}).get("sbvRates", {})
+                    if sbv_prev:
+                        if sbv_prev.get("refinancingRate"): rates["refinancingRate"] = float(sbv_prev["refinancingRate"])
+                        if sbv_prev.get("discountRate"): rates["discountRate"] = float(sbv_prev["discountRate"])
+                        if sbv_prev.get("interbankOvernight"): rates["interbankOvernight"] = float(sbv_prev["interbankOvernight"])
+        except Exception:
+            pass
+
+        return rates
 
     def fetch_pnj_gold(self) -> Dict[str, Any]:
         """
         Lấy giá vàng miếng SJC và vàng nhẫn PNJ 999.9 chính thức từ PNJ Edge API.
         Endpoint: https://edge-api.pnj.io/ecom-frontend/v1/get-gold-price?zone=00
-        Đơn vị trả về: triệu đồng/lượng.
+        Đơn vị trả về: triệu đồng/lượng. Dữ liệu thực tế 100%, không dùng số tĩnh.
         """
         result = {
-            "sjcBuy": 141.8,
-            "sjcSell": 144.8,
-            "pnjBuy": 141.3,
-            "pnjSell": 144.3,
+            "sjcBuy": None,
+            "sjcSell": None,
+            "pnjBuy": None,
+            "pnjSell": None,
             "updateDate": "",
             "source": "PNJ Official Edge API"
         }
 
-        # 1. Khôi phục từ cache gần nhất nếu hợp lệ
+        # 1. Khôi phục từ cache thực tế trước đó nếu PNJ Edge API tạm thời gián đoạn
         try:
             cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
             if cache_file.exists():
@@ -293,11 +364,11 @@ class MacroFetcher(BaseFetcher):
                     cdata = json.load(f)
                     m = cdata.get("macro", {})
                     if m.get("sjcGoldSell") and 50.0 <= float(m["sjcGoldSell"]) <= 300.0:
-                        result["sjcBuy"] = float(m.get("sjcGoldBuy", result["sjcBuy"]))
-                        result["sjcSell"] = float(m.get("sjcGoldSell", result["sjcSell"]))
+                        result["sjcBuy"] = float(m.get("sjcGoldBuy") or 0)
+                        result["sjcSell"] = float(m.get("sjcGoldSell") or 0)
                     if m.get("pnjGoldSell") and 50.0 <= float(m["pnjGoldSell"]) <= 300.0:
-                        result["pnjBuy"] = float(m.get("pnjGoldBuy", result["pnjBuy"]))
-                        result["pnjSell"] = float(m.get("pnjGoldSell", result["pnjSell"]))
+                        result["pnjBuy"] = float(m.get("pnjGoldBuy") or 0)
+                        result["pnjSell"] = float(m.get("pnjGoldSell") or 0)
                     if m.get("pnjUpdateDate"):
                         result["updateDate"] = str(m["pnjUpdateDate"])
         except Exception:

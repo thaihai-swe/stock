@@ -14,6 +14,7 @@ export default function TradeOrderView({
   onBuySuccess,
   onSellSuccess,
   onDividendSuccess,
+  showToast,
 }) {
   const [activeType, setActiveType] = useState(initialType || 'buy');
 
@@ -30,9 +31,21 @@ export default function TradeOrderView({
     }
   };
 
-  const handleBuySuccess = onBuySuccess || onSuccess;
-  const handleSellSuccess = onSellSuccess || onSuccess;
-  const handleDividendSuccess = onDividendSuccess || onSuccess;
+  const handleBuySuccess = () => {
+    if (showToast) showToast('✅ Khớp lệnh mua thành công!', 'success');
+    if (onBuySuccess) onBuySuccess();
+    else if (onSuccess) onSuccess();
+  };
+  const handleSellSuccess = () => {
+    if (showToast) showToast('✅ Khớp lệnh bán thành công!', 'success');
+    if (onSellSuccess) onSellSuccess();
+    else if (onSuccess) onSuccess();
+  };
+  const handleDividendSuccess = () => {
+    if (showToast) showToast('✅ Cập nhật cổ tức thành công!', 'success');
+    if (onDividendSuccess) onDividendSuccess();
+    else if (onSuccess) onSuccess();
+  };
 
   return (
     <div className={`mx-auto space-y-4 transition-all duration-300 ${
@@ -129,6 +142,7 @@ export default function TradeOrderView({
             dividends={dividends}
             portfolio={portfolio}
             onSuccess={handleDividendSuccess}
+            showToast={showToast}
           />
         )}
       </div>

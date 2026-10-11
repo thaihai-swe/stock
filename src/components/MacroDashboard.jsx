@@ -6,8 +6,9 @@ import StyleValuationComparison from './macro/StyleValuationComparison.jsx';
 import ExecutiveSummaryCard from './macro/ExecutiveSummaryCard.jsx';
 import ScenarioAllocationMatrix from './macro/ScenarioAllocationMatrix.jsx';
 import SectorValuationHeatmap from './macro/SectorValuationHeatmap.jsx';
+import YieldCurveMonitorCard from './macro/YieldCurveMonitorCard.jsx';
 
-export default function MacroDashboard({ refreshKey, onSwitchTab }) {
+export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
   const [macroData, setMacroData] = useState(null);
   const [indicatorsData, setIndicatorsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,8 +47,10 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
     try {
       await triggerValuationSync();
       await loadAllMacroData();
+      if (showToast) showToast('✅ Đồng bộ dữ liệu vĩ mô thành công!', 'success');
     } catch (e) {
-      alert('Lỗi đồng bộ: ' + e.message);
+      if (showToast) showToast('❌ Lỗi đồng bộ: ' + e.message, 'error');
+      else alert('Lỗi đồng bộ: ' + e.message);
     } finally {
       setSyncing(false);
     }
@@ -254,6 +257,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
         {[
           { id: 'overview', icon: '📊', shortLabel: 'VN-Index & Định Giá', fullLabel: 'Định Giá VN-Index & Tài Sản Thực' },
           { id: 'regime', icon: '🌀', shortLabel: 'Chu Kỳ 5 Pha', fullLabel: 'Chu Kỳ 5 Pha & Radar Dẫn Dắt' },
+          { id: 'yield_curve', icon: '📈', shortLabel: 'Lợi Suất 17 Dòng', fullLabel: 'Đường Cong Lợi Suất 17 Dòng (VN vs US)' },
           { id: 'sectors', icon: '🗺️', shortLabel: '10 Nhóm Ngành', fullLabel: 'Bản Đồ Nhiệt 10 Nhóm Ngành GICS' },
           { id: 'allocation', icon: '⚖️', shortLabel: 'Phân Bổ & Giá Vàng', fullLabel: 'Phân Bổ 4 Tài Sản & Giá Vàng' },
           { id: 'indicators', icon: '📑', shortLabel: '95 Chỉ Số TradingEconomics', fullLabel: '95 Chỉ Số TradingEconomics', fullSpan: true },
@@ -1233,6 +1237,13 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── PHÂN HỆ: ĐƯỜNG CONG LỢI SUẤT & LÃI SUẤT 17 DÒNG (VN vs US) ── */}
+      {activeTab === 'yield_curve' && (
+        <div className="space-y-6">
+          <YieldCurveMonitorCard data={macroData} />
         </div>
       )}
 

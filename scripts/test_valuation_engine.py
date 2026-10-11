@@ -398,6 +398,102 @@ def test_news_sentiment_engine():
     print("✅ test_news_sentiment_engine: PASS")
 
 
+def test_yield_curve_monitor():
+    from lib.yield_curve_monitor import compute_yield_curve_monitor
+
+    mock_macro = {
+        "sbvRefinancingRate": 4.5,
+        "interbankRate": 6.47,
+        "cpiYoY": 5.08,
+        "vn02y": 2.45,
+        "vn05y": 3.20,
+        "vn10y": 3.45,
+        "usd": 25881.0,
+        "pe": 13.8,
+        "usPolicy": 4.85,
+        "us02y": 4.65,
+        "us05y": 5.02,
+        "us10y": 5.24,
+        "usCpi": 2.9
+    }
+
+    res = compute_yield_curve_monitor(mock_macro)
+    assert len(res["rows"]) == 17, f"Phải có 17 dòng, nhận được {len(res['rows'])}"
+    assert res["summary"]["vnCurvature"] is not None
+    assert res["summary"]["vnYcCode"] in ["YC0", "YC1", "YC2", "YC3", "YC4"]
+    assert "links" in res
+    assert "linkA" in res["links"]
+    assert "linkB" in res["links"]
+    assert "linkC" in res["links"]
+    assert "assetDecision" in res["summary"]
+    print("✅ test_yield_curve_monitor: PASS")
+
+
+def test_beneish_m_score():
+    from lib.financial_analytics_engine import calculate_beneish_m_score
+
+    mock_yearly = [
+        {
+            "year": 2024, "revenue": 100000, "costOfGoodsSold": 80000, "accountsReceivable": 20000,
+            "totalAssets": 150000, "shortTermAssets": 80000, "fixedAssets": 50000,
+            "shortTermInvestments": 5000, "depreciation": 4000, "sellingExpense": 2000,
+            "adminExpense": 2000, "totalDebt": 50000, "netIncomeParent": 10000, "cfo": 12000
+        },
+        {
+            "year": 2025, "revenue": 120000, "costOfGoodsSold": 93000, "accountsReceivable": 22000,
+            "totalAssets": 170000, "shortTermAssets": 90000, "fixedAssets": 58000,
+            "shortTermInvestments": 6000, "depreciation": 4800, "sellingExpense": 2200,
+            "adminExpense": 2400, "totalDebt": 55000, "netIncomeParent": 13000, "cfo": 16000
+        }
+    ]
+
+    res = calculate_beneish_m_score(quarterly_data=[], yearly_data=mock_yearly)
+    assert res["mScore"] is not None
+    assert len(res["indices"]) == 8, f"Phải có 8 chỉ số con Beneish, nhận được {len(res['indices'])}"
+    assert res["status"] in ["SAFE", "GREY", "ALERT"]
+    assert res["mScore"] < -1.78, "Doanh nghiệp minh bạch phải có M-Score < -1.78"
+    print("✅ test_beneish_m_score: PASS")
+
+
+def test_magic_formula():
+    from lib.financial_analytics_engine import calculate_magic_formula
+
+    mock_quarter = {
+        "close": 28000, "operatingProfit": 4000, "totalDebt": 30000,
+        "cashAndEquivalents": 15000, "shortTermInvestments": 5000,
+        "shortTermAssets": 60000, "shortTermDebt": 18000, "fixedAssets": 45000, "equity": 75000
+    }
+    mock_stock = {
+        "close": 28000,
+        "scale": {"sharesOutstanding": 4_000_000_000, "marketCap": 112_000_000_000_000}
+    }
+
+    res = calculate_magic_formula(mock_quarter, mock_stock)
+    assert res["earningsYield"] > 0
+    assert res["roic"] > 0
+    assert 0 <= res["compositeScore"] <= 100
+    assert res["tier"] in ["TOP_TIER", "QUALITY_GROWTH", "VALUE_PLAY", "UNDERPERFORM"]
+    print("✅ test_magic_formula: PASS")
+
+
+def test_fcf_inflection_point():
+    from lib.financial_analytics_engine import analyze_fcf_inflection_point
+
+    mock_quarters = [
+        {"period": "2024-Q1", "cfo": 3000, "capex": -2000, "revenue": 30000, "netIncome": 2500, "totalAssets": 150000, "constructionInProgress": 25000},
+        {"period": "2024-Q2", "cfo": 3200, "capex": -2500, "revenue": 32000, "netIncome": 2600, "totalAssets": 155000, "constructionInProgress": 28000},
+        {"period": "2024-Q3", "cfo": 3500, "capex": -3000, "revenue": 34000, "netIncome": 2800, "totalAssets": 160000, "constructionInProgress": 32000},
+        {"period": "2024-Q4", "cfo": 4200, "capex": -5000, "revenue": 38000, "netIncome": 3000, "totalAssets": 170000, "constructionInProgress": 40000}
+    ]
+
+    res = analyze_fcf_inflection_point(mock_quarters)
+    assert res["cfoToNiRatio"] >= 1.0, "CFO/NI phải >= 1.0"
+    assert res["signal"] in ["EXPANSION_CAPEX_INFLECTION", "CASH_COW_GENERATION", "REINVESTMENT_GROWTH", "CASH_DRAIN_ALERT"]
+    assert res["accrualsRatio"] is not None
+    assert res["accrualsRating"] is not None
+    print("✅ test_fcf_inflection_point: PASS")
+
+
 if __name__ == "__main__":
     print("\n=======================================================")
     print("🧪 CHẠY UNIT TEST BỘ ĐỘNG CƠ ĐỊNH GIÁ & PHÂN TÍCH TÀI CHÍNH")
@@ -422,4 +518,8 @@ if __name__ == "__main__":
     test_calc_dcf_sensitivity_matrix()
     test_market_profile_engine()
     test_news_sentiment_engine()
-    print("\n🎉 TẤT CẢ 20 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")
+    test_yield_curve_monitor()
+    test_beneish_m_score()
+    test_magic_formula()
+    test_fcf_inflection_point()
+    print("\n🎉 TẤT CẢ 24 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")

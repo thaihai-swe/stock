@@ -48,7 +48,10 @@ from lib.financial_analytics_engine import (
     calculate_early_warning,
     calculate_overall_health_score,
     calculate_stock_risk_metrics,
-    calculate_ttm_series
+    calculate_ttm_series,
+    calculate_beneish_m_score,
+    calculate_magic_formula,
+    analyze_fcf_inflection_point
 )
 from lib.industry_metrics import compute_industry_metrics
 from lib.market_profile_engine import compute_full_market_profile
@@ -746,6 +749,20 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
             merged_events.append(ev)
     merged_events.sort(key=lambda x: str(x.get("date", "")), reverse=True)
     doc["corporateEvents"] = merged_events
+
+    # 10. Forensic Accounting & Greenblatt Magic Formula & FCF Inflection Point
+    beneish_data = calculate_beneish_m_score(quarterly_data, doc.get("yearly", []))
+    magic_data = calculate_magic_formula(latest_q, stock_item, doc.get("ttmSeries", []))
+    fcf_inflection_data = analyze_fcf_inflection_point(quarterly_data, doc.get("yearly", []))
+
+    doc["beneishMScore"] = beneish_data
+    doc["magicFormula"] = magic_data
+    doc["fcfInflection"] = fcf_inflection_data
+    doc["forensicAnalysis"] = {
+        "beneish": beneish_data,
+        "magicFormula": magic_data,
+        "fcfInflection": fcf_inflection_data
+    }
 
     return doc
 

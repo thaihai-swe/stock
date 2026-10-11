@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { addWatchlist, deleteWatchlist, fetchPrices } from '../utils/api.js';
 import { fmtDate, fmtMoney } from '../utils/format.js';
 
-export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell, refreshKey }) {
+export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell, refreshKey, showToast }) {
   const [symbol, setSymbol] = useState('');
   const [targetBuyPrice, setTargetBuyPrice] = useState('');
   const [targetSellPrice, setTargetSellPrice] = useState('');
@@ -57,6 +57,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
         targetPrice: buyP, // backward compatibility
         note,
       });
+      if (showToast) showToast(`✅ Đã thêm mã ${symbol.trim().toUpperCase()} vào watchlist`, 'success');
       setSymbol('');
       setTargetBuyPrice('');
       setTargetSellPrice('');
@@ -64,6 +65,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
       onSuccess();
     } catch (err) {
       setError(err.message);
+      if (showToast) showToast('❌ ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -74,9 +76,11 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
     setDeletingId(id);
     try {
       await deleteWatchlist(id);
+      if (showToast) showToast(`✅ Đã xóa mã ${sym} khỏi watchlist`, 'success');
       onSuccess();
     } catch (err) {
-      alert('❌ ' + err.message);
+      if (showToast) showToast('❌ ' + err.message, 'error');
+      else alert('❌ ' + err.message);
     } finally {
       setDeletingId(null);
     }

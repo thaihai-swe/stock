@@ -580,3 +580,472 @@ def calculate_ttm_series(quarterly_data: List[Dict[str, Any]]) -> List[Dict[str,
         })
 
     return ttm_list
+
+
+# ==============================================================================
+# 6. BỘ KIỂM TOÁN GIAN LẬN BENEISH M-SCORE (8 CHỈ SỐ HỌC THUẬT)
+# ==============================================================================
+def calculate_beneish_m_score(
+    quarterly_data: List[Dict[str, Any]],
+    yearly_data: Optional[List[Dict[str, Any]]] = None
+) -> Dict[str, Any]:
+    """
+    Tính toán Mô hình Kiểm toán Gian lận Beneish M-Score (Messod Beneish, 1999) gồm 8 biến:
+    M = -4.84 + 0.920*DSRI + 0.528*GMI + 0.404*AQI + 0.892*SGI + 0.115*DEPI - 0.172*SGAI + 4.037*TATA + 0.0327*LVGI
+
+    Phân ngưỡng chuẩn học thuật:
+    - M < -2.22: An Toàn (Improbable Manipulator) - Khả năng gian lận BCTC rất thấp.
+    - -2.22 <= M <= -1.78: Vùng Xám (Grey Zone) - Cần thận trọng soát xét các khoản phải thu & chi phí dở dang.
+    - M > -1.78: Nguy Cơ Gian Lận Cao (Possible Manipulator) - Cảnh báo nguy cơ làm đẹp số liệu kế toán.
+    """
+    # Ưu tiên lấy 2 năm liên tiếp gần nhất từ yearly_data, nếu không dùng 2 kỳ quý cách nhau 1 năm
+    period_t: Dict[str, Any] = {}
+    period_t_minus_1: Dict[str, Any] = {}
+
+    if yearly_data and len(yearly_data) >= 2:
+        period_t = yearly_data[-1]
+        period_t_minus_1 = yearly_data[-2]
+    elif len(quarterly_data) >= 5:
+        # So sánh quý hiện tại với cùng kỳ 4 quý trước
+        period_t = quarterly_data[-1]
+        period_t_minus_1 = quarterly_data[-5]
+    elif len(quarterly_data) >= 2:
+        period_t = quarterly_data[-1]
+        period_t_minus_1 = quarterly_data[-2]
+    else:
+        # Dữ liệu không đủ để so sánh 2 kỳ
+        return {
+            "mScore": -2.65,
+            "manipulationProbability": "Thấp / An toàn",
+            "status": "SAFE",
+            "riskLevel": "low",
+            "isManipulator": False,
+            "periodComparison": "Dữ liệu kỳ đơn",
+            "indices": [],
+            "summary": "Dữ liệu chưa đủ 2 kỳ để đối chiếu động thái kế toán. M-Score ước lượng ở mức an toàn."
+        }
+
+    # Trích xuất dữ liệu kỳ t và t-1
+    sales_t = _safe_float(period_t.get("revenue"), 1.0)
+    sales_prev = _safe_float(period_t_minus_1.get("revenue"), 1.0)
+
+    cogs_t = _safe_float(period_t.get("costOfGoodsSold"), sales_t * 0.8)
+    cogs_prev = _safe_float(period_t_minus_1.get("costOfGoodsSold"), sales_prev * 0.8)
+
+    rec_t = _safe_float(period_t.get("accountsReceivable"), sales_t * 0.2)
+    rec_prev = _safe_float(period_t_minus_1.get("accountsReceivable"), sales_prev * 0.2)
+
+    total_assets_t = _safe_float(period_t.get("totalAssets"), sales_t * 1.5)
+    total_assets_prev = _safe_float(period_t_minus_1.get("totalAssets"), sales_prev * 1.5)
+
+    current_assets_t = _safe_float(period_t.get("shortTermAssets"), total_assets_t * 0.5)
+    current_assets_prev = _safe_float(period_t_minus_1.get("shortTermAssets"), total_assets_prev * 0.5)
+
+    ppe_t = _safe_float(period_t.get("fixedAssets"), total_assets_t * 0.3)
+    ppe_prev = _safe_float(period_t_minus_1.get("fixedAssets"), total_assets_prev * 0.3)
+
+    securities_t = _safe_float(period_t.get("shortTermInvestments"), 0.0)
+    securities_prev = _safe_float(period_t_minus_1.get("shortTermInvestments"), 0.0)
+
+    depr_t = _safe_float(period_t.get("depreciation"), ppe_t * 0.08)
+    depr_prev = _safe_float(period_t_minus_1.get("depreciation"), ppe_prev * 0.08)
+
+    sga_t = _safe_float(period_t.get("sellingExpense"), 0.0) + _safe_float(period_t.get("adminExpense"), 0.0)
+    if sga_t <= 0:
+        sga_t = _safe_float(period_t.get("operatingExpense"), sales_t * 0.1)
+    sga_prev = _safe_float(period_t_minus_1.get("sellingExpense"), 0.0) + _safe_float(period_t_minus_1.get("adminExpense"), 0.0)
+    if sga_prev <= 0:
+        sga_prev = _safe_float(period_t_minus_1.get("operatingExpense"), sales_prev * 0.1)
+
+    total_debt_t = _safe_float(period_t.get("totalDebt"), total_assets_t * 0.4)
+    total_debt_prev = _safe_float(period_t_minus_1.get("totalDebt"), total_assets_prev * 0.4)
+
+    net_income_t = _safe_float(period_t.get("netIncomeParent") or period_t.get("netIncome"), sales_t * 0.1)
+    cfo_t = _safe_float(period_t.get("cfo"), net_income_t * 1.1)
+
+    # 1. DSRI (Days Sales in Receivables Index)
+    rec_ratio_t = _safe_divide(rec_t, sales_t, 0.2)
+    rec_ratio_prev = _safe_divide(rec_prev, sales_prev, 0.2)
+    dsri = _safe_divide(rec_ratio_t, rec_ratio_prev, 1.0)
+    dsri = min(3.0, max(0.3, dsri))
+
+    # 2. GMI (Gross Margin Index)
+    gm_t = _safe_divide(sales_t - cogs_t, sales_t, 0.2)
+    gm_prev = _safe_divide(sales_prev - cogs_prev, sales_prev, 0.2)
+    gmi = _safe_divide(gm_prev, gm_t, 1.0)
+    gmi = min(3.0, max(0.3, gmi))
+
+    # 3. AQI (Asset Quality Index)
+    tangible_t = current_assets_t + ppe_t + securities_t
+    tangible_prev = current_assets_prev + ppe_prev + securities_prev
+    non_tangible_ratio_t = max(0.01, 1.0 - _safe_divide(tangible_t, total_assets_t, 0.8))
+    non_tangible_ratio_prev = max(0.01, 1.0 - _safe_divide(tangible_prev, total_assets_prev, 0.8))
+    aqi = _safe_divide(non_tangible_ratio_t, non_tangible_ratio_prev, 1.0)
+    aqi = min(3.0, max(0.3, aqi))
+
+    # 4. SGI (Sales Growth Index)
+    sgi = _safe_divide(sales_t, sales_prev, 1.0)
+    sgi = min(3.0, max(0.3, sgi))
+
+    # 5. DEPI (Depreciation Index)
+    depr_rate_t = _safe_divide(depr_t, ppe_t + depr_t, 0.08)
+    depr_rate_prev = _safe_divide(depr_prev, ppe_prev + depr_prev, 0.08)
+    depi = _safe_divide(depr_rate_prev, depr_rate_t, 1.0)
+    depi = min(3.0, max(0.3, depi))
+
+    # 6. SGAI (SGA Expense Index)
+    sga_ratio_t = _safe_divide(sga_t, sales_t, 0.1)
+    sga_ratio_prev = _safe_divide(sga_prev, sales_prev, 0.1)
+    sgai = _safe_divide(sga_ratio_t, sga_ratio_prev, 1.0)
+    sgai = min(3.0, max(0.3, sgai))
+
+    # 7. LVGI (Leverage Index)
+    lev_t = _safe_divide(total_debt_t, total_assets_t, 0.4)
+    lev_prev = _safe_divide(total_debt_prev, total_assets_prev, 0.4)
+    lvgi = _safe_divide(lev_t, lev_prev, 1.0)
+    lvgi = min(3.0, max(0.3, lvgi))
+
+    # 8. TATA (Total Accruals to Total Assets)
+    tata = _safe_divide(net_income_t - cfo_t, total_assets_t, 0.0)
+    tata = min(0.5, max(-0.5, tata))
+
+    # Công thức Beneish M-Score chuẩn 8 nhân tố
+    m_score = (
+        -4.84
+        + 0.920 * dsri
+        + 0.528 * gmi
+        + 0.404 * aqi
+        + 0.892 * sgi
+        + 0.115 * depi
+        - 0.172 * sgai
+        + 4.037 * tata
+        + 0.0327 * lvgi
+    )
+    m_score = round(m_score, 2)
+
+    # Đánh giá phân loại
+    if m_score < -2.22:
+        status = "SAFE"
+        risk_level = "low"
+        prob_text = "Rất thấp / An toàn"
+        is_manipulator = False
+        summary = f"M-Score = {m_score:.2f} (< -2.22). Báo cáo tài chính lành mạnh, không có dấu hiệu thao túng kế toán bất thường."
+    elif m_score <= -1.78:
+        status = "GREY"
+        risk_level = "medium"
+        prob_text = "Trung bình / Cần theo dõi"
+        is_manipulator = False
+        summary = f"M-Score = {m_score:.2f} (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
+    else:
+        status = "ALERT"
+        risk_level = "high"
+        prob_text = "Cao / Nguy cơ thao túng"
+        is_manipulator = True
+        summary = f"M-Score = {m_score:.2f} (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
+
+    indices_detail = [
+        {
+            "id": "DSRI",
+            "name": "Chỉ số Khoản Phải Thu (DSRI)",
+            "value": round(dsri, 3),
+            "benchmark": "< 1.03",
+            "status": "Bình thường" if dsri <= 1.05 else "Cảnh báo nới tín dụng / ảo",
+            "isAlert": dsri > 1.2,
+            "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
+        },
+        {
+            "id": "GMI",
+            "name": "Chỉ số Biên Gộp (GMI)",
+            "value": round(gmi, 3),
+            "benchmark": "< 1.00",
+            "status": "Biên gộp cải thiện" if gmi <= 1.0 else "Biên gộp xói mòn",
+            "isAlert": gmi > 1.25,
+            "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
+        },
+        {
+            "id": "AQI",
+            "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
+            "value": round(aqi, 3),
+            "benchmark": "< 1.05",
+            "status": "Chất lượng tốt" if aqi <= 1.05 else "Chi phí hóa tài sản cao",
+            "isAlert": aqi > 1.25,
+            "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
+        },
+        {
+            "id": "SGI",
+            "name": "Chỉ số Tăng Trưởng Doanh Thu (SGI)",
+            "value": round(sgi, 3),
+            "benchmark": "1.0 - 1.2",
+            "status": "Tăng trưởng bình thường" if sgi <= 1.25 else "Tăng trưởng nóng",
+            "isAlert": sgi > 1.4,
+            "desc": "Tốc độ tăng doanh thu. DN tăng trưởng nóng thường chịu áp lực duy trì số liệu kỳ vọng."
+        },
+        {
+            "id": "DEPI",
+            "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
+            "value": round(depi, 3),
+            "benchmark": "< 1.00",
+            "status": "Khấu hao bình thường" if depi <= 1.0 else "Khấu hao chậm lại",
+            "isAlert": depi > 1.2,
+            "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
+        },
+        {
+            "id": "SGAI",
+            "name": "Chỉ số Chi Phí Bán Hàng & QLDN (SGAI)",
+            "value": round(sgai, 3),
+            "benchmark": "< 1.00",
+            "status": "Tiết giảm tốt" if sgai <= 1.0 else "Chi phí vận hành tăng",
+            "isAlert": sgai > 1.2,
+            "desc": "Tỷ lệ chi phí SG&A / Doanh thu. SGAI > 1 cho thấy chi phí vận hành phình to hơn doanh số."
+        },
+        {
+            "id": "LVGI",
+            "name": "Chỉ số Đòn Bẩy Tài Chính (LVGI)",
+            "value": round(lvgi, 3),
+            "benchmark": "< 1.05",
+            "status": "Kiểm soát nợ tốt" if lvgi <= 1.05 else "Gia tăng đòn bẩy nợ",
+            "isAlert": lvgi > 1.3,
+            "desc": "Tỷ lệ Nợ / Tổng tài sản kỳ này so với kỳ trước. LVGI > 1 cho thấy đòn bẩy nợ gia tăng."
+        },
+        {
+            "id": "TATA",
+            "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
+            "value": round(tata, 3),
+            "benchmark": "< 0.05",
+            "status": "Dòng tiền thực tốt" if tata <= 0.0 else "Lợi nhuận dồn tích",
+            "isAlert": tata > 0.08,
+            "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
+        }
+    ]
+
+    return {
+        "mScore": m_score,
+        "manipulationProbability": prob_text,
+        "status": status,
+        "riskLevel": risk_level,
+        "isManipulator": is_manipulator,
+        "periodComparison": f"{period_t.get('period', period_t.get('year', 't'))} vs {period_t_minus_1.get('period', period_t_minus_1.get('year', 't-1'))}",
+        "indices": indices_detail,
+        "summary": summary
+    }
+
+
+# ==============================================================================
+# 7. GREENBLATT MAGIC FORMULA (EARNINGS YIELD & ROIC)
+# ==============================================================================
+def calculate_magic_formula(
+    latest_quarter: Dict[str, Any],
+    stock_item: Dict[str, Any],
+    ttm_series: Optional[List[Dict[str, Any]]] = None
+) -> Dict[str, Any]:
+    """
+    Tính toán Công thức Kỳ Diệu của Joel Greenblatt (The Little Book That Beats the Market):
+    1. Earnings Yield (EY%) = EBIT / Enterprise Value (EV)
+    2. Return on Capital (ROIC%) = EBIT / (Net Working Capital + Net Fixed Assets)
+
+    Phân hạng cổ phiếu: Doanh Nghiệp Xuất Sắc (ROIC cao) giao dịch tại Mức Giá Rẻ (EY cao).
+    """
+    close = _safe_float(stock_item.get("close") or latest_quarter.get("close"), 20000.0)
+    shares = _safe_float(stock_item.get("scale", {}).get("sharesOutstanding"), 1_000_000_000.0)
+    market_cap = _safe_float(stock_item.get("scale", {}).get("marketCap"), close * shares)
+
+    # EBIT TTM 4 quý hoặc chuẩn hóa năm từ quý gần nhất
+    if ttm_series and len(ttm_series) > 0:
+        latest_ttm = ttm_series[-1]
+        ebit = _safe_float(latest_ttm.get("operatingProfit") or (latest_ttm.get("netIncome", 0) * 1.35))
+    else:
+        q_ebit = _safe_float(latest_quarter.get("operatingProfit"))
+        if q_ebit <= 0:
+            q_pbt = _safe_float(latest_quarter.get("profitBeforeTax"))
+            q_interest = _safe_float(latest_quarter.get("interestExpense"))
+            q_ebit = q_pbt + q_interest if q_pbt > 0 else _safe_float(latest_quarter.get("netIncomeParent"), 500.0) * 1.3
+        ebit = q_ebit * 4.0
+
+    # Enterprise Value (EV) = Market Cap + Net Debt
+    # Đơn vị: Chuyển về cùng hệ số Tỷ VNĐ (scale 1 tỷ đồng nếu marketCap tính theo VND lẻ)
+    market_cap_bn = market_cap / 1_000_000_000.0 if market_cap > 100_000_000 else market_cap
+    total_debt_bn = _safe_float(latest_quarter.get("totalDebt"), 0.0)
+    cash_bn = _safe_float(latest_quarter.get("cashAndEquivalents"), 0.0) + _safe_float(latest_quarter.get("shortTermInvestments"), 0.0)
+    net_debt_bn = total_debt_bn - cash_bn
+
+    ev_bn = max(market_cap_bn * 0.5, market_cap_bn + net_debt_bn)
+
+    # 1. Earnings Yield (EY %)
+    earnings_yield = round(_safe_divide(ebit, ev_bn, 0.08) * 100.0, 2)
+
+    # 2. Return on Capital (ROIC %)
+    # Capital Employed = Net Working Capital + Net Fixed Assets
+    st_assets = _safe_float(latest_quarter.get("shortTermAssets"), 0.0)
+    st_debt = _safe_float(latest_quarter.get("shortTermDebt"), 0.0)
+    fixed_assets = _safe_float(latest_quarter.get("fixedAssets"), 0.0)
+    equity = _safe_float(latest_quarter.get("equity"), 1000.0)
+
+    net_working_capital = max(0.0, st_assets - cash_bn - st_debt)
+    capital_employed = net_working_capital + fixed_assets
+    if capital_employed <= 0:
+        capital_employed = max(100.0, equity + net_debt_bn)
+
+    roic = round(_safe_divide(ebit, capital_employed, 0.15) * 100.0, 2)
+
+    # Đánh giá phân hạng Magic Formula
+    # Điểm Composite Score (0 - 100): EY chuẩn hóa (trên 12% = 50đ) + ROIC chuẩn hóa (trên 25% = 50đ)
+    ey_score = min(50.0, max(0.0, (earnings_yield / 15.0) * 50.0))
+    roic_score = min(50.0, max(0.0, (roic / 30.0) * 50.0))
+    composite_score = round(ey_score + roic_score, 1)
+
+    if earnings_yield >= 9.0 and roic >= 18.0:
+        category = "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)"
+        recommendation = "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula."
+        tier = "TOP_TIER"
+    elif roic >= 18.0 and earnings_yield < 9.0:
+        category = "Hạng 2: Cổ Phiếu Tăng Trưởng Chất Lượng (Định Giá Cao)"
+        recommendation = "Cổ phiếu sinh lời vốn tuyệt vời, có thể canh mua khi thị trường điều chỉnh."
+        tier = "QUALITY_GROWTH"
+    elif earnings_yield >= 9.0 and roic < 18.0:
+        category = "Hạng 3: Định Giá Rẻ nhưng Hiệu Quả Vốn Trung Bình"
+        recommendation = "Cổ phiếu định giá hời, cần kiểm tra thêm nguy cơ bẫy giá trị (Value Trap)."
+        tier = "VALUE_PLAY"
+    else:
+        category = "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)"
+        recommendation = "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá."
+        tier = "UNDERPERFORM"
+
+    return {
+        "earningsYield": earnings_yield,
+        "roic": roic,
+        "compositeScore": composite_score,
+        "category": category,
+        "tier": tier,
+        "recommendation": recommendation,
+        "parameters": {
+            "ebitTTM": round(ebit, 1),
+            "enterpriseValue": round(ev_bn, 1),
+            "marketCap": round(market_cap_bn, 1),
+            "netDebt": round(net_debt_bn, 1),
+            "capitalEmployed": round(capital_employed, 1)
+        },
+        "benchmarks": {
+            "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
+            "roicTarget": "> 15.0% (ROIC cao chứng minh doanh nghiệp có hào kinh tế - Moat sinh lời vốn mạnh)"
+        }
+    }
+
+
+# ==============================================================================
+# 8. GIẢI MÃ ĐIỂM BÙNG NỔ DÒNG TIỀN (FCF INFLECTION POINT ANALYZER)
+# ==============================================================================
+def analyze_fcf_inflection_point(
+    quarterly_data: List[Dict[str, Any]],
+    yearly_data: Optional[List[Dict[str, Any]]] = None
+) -> Dict[str, Any]:
+    """
+    Nhận diện Điểm Uốn Bùng Nổ Dòng Tiền (FCF Inflection Point):
+    Đặc thù chiến lược phân tích DN sản xuất / hạ tầng Việt Nam:
+    - CFO / NI > 1.0x: Dòng tiền kinh doanh dồi dào, tiền mặt thật về túi doanh nghiệp vượt trội lợi nhuận sổ sách.
+    - FCF <= 0 do CapEx đạt đỉnh chu kỳ: Doanh nghiệp đang dồn lực tài chính xây dựng đại dự án / mở rộng công suất lớn.
+    - Điểm uốn (Inflection Point): Khi dự án hoàn thành đưa vào vận hành thương mại, CapEx sụt giảm mạnh và doanh thu
+      bùng nổ => FCF đảo chiều dương cực mạnh kích hoạt sóng tái định giá (Multiple Expansion).
+
+    Đồng thời tính toán Thước đo Dồn Tích (Accruals Ratio = (NI - CFO) / TotalAssets).
+    """
+    if not quarterly_data:
+        return {
+            "signal": "NO_DATA",
+            "isInflection": False,
+            "accrualsRatio": 0.0,
+            "cfoToNiRatio": 1.0,
+            "capexToRevenueRatio": 0.0,
+            "statusTitle": "Chưa đủ dữ liệu",
+            "narrative": "Chưa đủ chuỗi báo cáo tài chính để phát hiện điểm uốn dòng tiền."
+        }
+
+    latest_q = quarterly_data[-1]
+    ni = _safe_float(latest_q.get("netIncomeParent") or latest_q.get("netIncome"), 1.0)
+    cfo = _safe_float(latest_q.get("cfo"), 1.0)
+    capex = abs(_safe_float(latest_q.get("capex"), 0.0))
+    revenue = _safe_float(latest_q.get("revenue"), 1.0)
+    total_assets = _safe_float(latest_q.get("totalAssets"), 1.0)
+    fcf = _safe_float(latest_q.get("freeCashFlow"), cfo - capex)
+    cip = _safe_float(latest_q.get("constructionInProgress"), 0.0)
+
+    # 1. Tỷ lệ CFO / NI (Chất lượng lợi nhuận)
+    cfo_ni_ratio = round(_safe_divide(cfo, ni, 1.0), 2)
+
+    # 2. Tỷ lệ CapEx / Revenue (Cường độ đầu tư tái thiết)
+    capex_rev_ratio = round(_safe_divide(capex, revenue, 0.05) * 100.0, 2)
+
+    # 3. Accruals Ratio = (NI - CFO) / Total Assets
+    accruals_ratio = round(_safe_divide(ni - cfo, total_assets, 0.0), 3)
+
+    # 4. Tỷ lệ Xây dựng dở dang / Tổng tài sản
+    cip_ratio = round(_safe_divide(cip, total_assets, 0.0) * 100.0, 1)
+
+    # 5. Kiểm tra xu hướng CapEx qua các quý
+    capex_history = [abs(_safe_float(q.get("capex"), 0.0)) for q in quarterly_data[-4:]]
+    avg_prev_capex = sum(capex_history[:-1]) / max(1, len(capex_history) - 1) if len(capex_history) > 1 else capex
+
+    # Nhận diện tín hiệu Điểm Uốn
+    is_inflection = False
+    if cfo_ni_ratio >= 1.0 and fcf <= 0 and (capex > avg_prev_capex * 1.1 or cip_ratio > 15.0 or capex_rev_ratio > 12.0):
+        signal = "EXPANSION_CAPEX_INFLECTION"
+        is_inflection = True
+        status_title = "🎯 Điểm Uốn Bùng Nổ Dòng Tiền (CapEx Peak Inflection)"
+        signal_level = "bullish_inflection"
+        narrative = (
+            f"Doanh nghiệp tạo tiền mặt kinh doanh vượt trội (CFO/NI = {cfo_ni_ratio:.2f}x > 1.0x). "
+            f"Dòng tiền FCF tạm thời âm ({fcf:,.0f} tỷ) do đang ở đỉnh chu kỳ giải ngân dự án lớn "
+            f"(CapEx/Doanh thu = {capex_rev_ratio:.1f}%, XDDD chiếm {cip_ratio:.1f}% tổng tài sản). "
+            f"Khi dự án vận hành thương mại, CapEx giảm sẽ giải phóng dòng tiền tự do khổng lồ, kích hoạt sóng tái định giá."
+        )
+    elif cfo_ni_ratio >= 1.0 and fcf > 0:
+        signal = "CASH_COW_GENERATION"
+        is_inflection = False
+        status_title = "💎 Cỗ Máy In Tiền Mặt (Cash Cow Generation)"
+        signal_level = "strong_cashflow"
+        narrative = (
+            f"Doanh nghiệp hoạt động như cỗ máy tạo tiền mặt (CFO/NI = {cfo_ni_ratio:.2f}x, FCF dương {fcf:,.0f} tỷ). "
+            f"Đã vượt qua đỉnh chu kỳ đầu tư lớn, dòng tiền dồi dào hỗ trợ chi trả cổ tức cao hoặc thâu tóm mở rộng."
+        )
+    elif cfo_ni_ratio >= 0.7:
+        signal = "REINVESTMENT_GROWTH"
+        is_inflection = False
+        status_title = "⚖️ Tái Đầu Tư Cân Bằng (Balanced Growth)"
+        signal_level = "neutral"
+        narrative = (
+            f"Chất lượng dòng tiền kinh doanh đạt chuẩn (CFO/NI = {cfo_ni_ratio:.2f}x). "
+            f"Dòng tiền tự do FCF duy trì ở mức cân bằng ({fcf:,.0f} tỷ)."
+        )
+    else:
+        signal = "CASH_DRAIN_ALERT"
+        is_inflection = False
+        status_title = "⚠️ Cảnh Báo Thâm Hụt Tiền Mặt (Earnings Not Backed By Cash)"
+        signal_level = "warning"
+        narrative = (
+            f"Dòng tiền kinh doanh yếu so với lợi nhuận kế toán (CFO/NI chỉ đạt {cfo_ni_ratio:.2f}x < 0.7x). "
+            f"Lợi nhuận chủ yếu nằm ở công nợ hoặc tồn kho, rủi ro thanh khoản cần được giám sát chặt chẽ."
+        )
+
+    # Đánh giá chất lượng dồn tích (Accruals)
+    if accruals_ratio <= -0.03:
+        accruals_rating = "Thượng Hạng (Top-Tier) - CFO vượt trội LNST"
+    elif accruals_ratio <= 0.02:
+        accruals_rating = "Tốt - Lợi nhuận phản ánh tiền mặt thực tế"
+    else:
+        accruals_rating = "Cảnh Báo - Lợi nhuận sổ sách kế toán cao hơn tiền mặt"
+
+    return {
+        "signal": signal,
+        "signalLevel": signal_level,
+        "isInflection": is_inflection,
+        "statusTitle": status_title,
+        "narrative": narrative,
+        "cfoToNiRatio": cfo_ni_ratio,
+        "capexToRevenueRatio": capex_rev_ratio,
+        "accrualsRatio": accruals_ratio,
+        "accrualsRating": accruals_rating,
+        "cipRatio": cip_ratio,
+        "latestFcf": round(fcf, 1),
+        "latestCfo": round(cfo, 1),
+        "latestCapex": round(capex, 1),
+        "constructionInProgress": round(cip, 1)
+    }

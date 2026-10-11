@@ -79,7 +79,8 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      alert('❌ Không thể tải file backup: ' + err.message);
+      if (showToast) showToast('❌ Không thể tải file backup: ' + err.message, 'error');
+      else alert('❌ Không thể tải file backup: ' + err.message);
     }
   }
 
@@ -89,7 +90,8 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
     if (!file) return;
 
     if (currentUser?.isDemo) {
-      alert('🛡️ Tài khoản Demo mặc định được bảo vệ và không thể khôi phục dữ liệu ghi đè. Vui lòng đăng nhập tài khoản Google để sử dụng tính năng này.');
+      if (showToast) showToast('🛡️ Tài khoản Demo mặc định được bảo vệ. Vui lòng đăng nhập Google.', 'error');
+      else alert('🛡️ Tài khoản Demo mặc định được bảo vệ và không thể khôi phục dữ liệu ghi đè. Vui lòng đăng nhập tài khoản Google để sử dụng tính năng này.');
       e.target.value = '';
       return;
     }
@@ -262,7 +264,8 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
             <button
               onClick={() => {
                 if (currentUser?.isDemo) {
-                  alert('🛡️ Tài khoản Demo mặc định được bảo vệ và không thể khôi phục dữ liệu ghi đè. Vui lòng đăng nhập tài khoản Google để sử dụng tính năng này.');
+                  if (showToast) showToast('🛡️ Tài khoản Demo mặc định được bảo vệ. Vui lòng đăng nhập Google.', 'error');
+                  else alert('🛡️ Tài khoản Demo mặc định được bảo vệ và không thể khôi phục dữ liệu ghi đè. Vui lòng đăng nhập tài khoản Google để sử dụng tính năng này.');
                   return;
                 }
                 fileInputRef.current?.click();

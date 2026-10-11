@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { addDividend, deleteDividend } from '../utils/api.js';
 import { fmtMoney, fmtDate, getTodayDate } from '../utils/format.js';
 
-export default function DividendManager({ dividends = [], portfolio = [], onSuccess }) {
+export default function DividendManager({ dividends = [], portfolio = [], onSuccess, showToast }) {
   const [type, setType] = useState('CASH'); // 'CASH' | 'STOCK'
   const [symbol, setSymbol] = useState('');
   const [date, setDate] = useState(getTodayDate());
@@ -87,9 +87,11 @@ export default function DividendManager({ dividends = [], portfolio = [], onSucc
       setQuantity('');
       setAmountPerShare('');
       setNote('');
+      if (showToast) showToast(`✅ Đã thêm cổ tức mã ${symbol.trim().toUpperCase()}`, 'success');
       onSuccess();
     } catch (err) {
       setError(err.message);
+      if (showToast) showToast('❌ ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -100,9 +102,11 @@ export default function DividendManager({ dividends = [], portfolio = [], onSucc
     setDeletingId(id);
     try {
       await deleteDividend(id);
+      if (showToast) showToast(`✅ Đã xóa bản ghi cổ tức mã ${sym}`, 'success');
       onSuccess();
     } catch (err) {
-      alert('❌ ' + err.message);
+      if (showToast) showToast('❌ ' + err.message, 'error');
+      else alert('❌ ' + err.message);
     } finally {
       setDeletingId(null);
     }

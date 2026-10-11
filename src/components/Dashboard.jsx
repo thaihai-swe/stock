@@ -26,7 +26,7 @@ function StatCard({ label, value, sub, highlight }) {
   );
 }
 
-export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess, refreshKey, onSwitchTab }) {
+export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNavigateSell, onSuccess, refreshKey, onSwitchTab, showToast }) {
   const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [], watchlist = [] } = data;
 
   // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
@@ -74,6 +74,68 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
   const totalHolding = buyOrders.reduce((s, o) => s + o.remainingQty, 0);
   const txCount = buyOrders.length + sellOrders.length;
   const totalCashDividends = (dividends || []).filter(d => d.type === 'CASH').reduce((sum, d) => sum + (d.netAmount || 0), 0);
+
+  // State Chu kỳ thời gian (Time Horizon Filter): 'all' | 'ytd' | '1y' | 'mtd'
+  const [timeWindow, setTimeWindow] = useState('all');
+
+  const { startDate: periodStartDate, endDate: periodEndDate, periodLabel } = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0, 10);
+    switch (timeWindow) {
+      case 'ytd': {
+        const start = `${now.getFullYear()}-01-01`;
+        return { startDate: start, endDate: todayStr, periodLabel: `Năm ${now.getFullYear()} (YTD)` };
+      }
+      case '1y': {
+        const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+        return { startDate: oneYearAgo, endDate: todayStr, periodLabel: '1 Năm Gần Nhất' };
+      }
+      case 'mtd': {
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        const start = `${now.getFullYear()}-${monthStr}-01`;
+        return { startDate: start, endDate: todayStr, periodLabel: `Tháng ${monthStr}/${now.getFullYear()} (MTD)` };
+      }
+      case 'all':
+      default:
+        return { startDate: '', endDate: '', periodLabel: 'Toàn Thời Gian' };
+    }
+  }, [timeWindow]);
+
+  // Lọc các giao dịch bán và cổ tức theo chu kỳ thời gian
+  const sellOrdersInPeriod = useMemo(() => {
+    if (timeWindow === 'all') return sellOrders;
+    return sellOrders.filter(s => {
+      const d = s.date ? String(s.date).slice(0, 10) : '';
+      return (!periodStartDate || d >= periodStartDate) && (!periodEndDate || d <= periodEndDate);
+    });
+  }, [sellOrders, timeWindow, periodStartDate, periodEndDate]);
+
+  const dividendsInPeriod = useMemo(() => {
+    if (timeWindow === 'all') return dividends;
+    return (dividends || []).filter(d => {
+      const dateVal = d.date ? String(d.date).slice(0, 10) : '';
+      return (!periodStartDate || dateVal >= periodStartDate) && (!periodEndDate || dateVal <= periodEndDate);
+    });
+  }, [dividends, timeWindow, periodStartDate, periodEndDate]);
+
+  // Lãi/lỗ thực hiện trong kỳ
+  const periodRealizedPL = useMemo(() => {
+    return sellOrdersInPeriod.reduce((s, o) => s + (o.profitLoss || 0), 0);
+  }, [sellOrdersInPeriod]);
+
+  // Cổ tức tiền mặt trong kỳ
+  const periodCashDividends = useMemo(() => {
+    return (dividendsInPeriod || [])
+      .filter(d => d.type === 'CASH')
+      .reduce((sum, d) => sum + (d.netAmount || 0), 0);
+  }, [dividendsInPeriod]);
+
+  // Thống kê hiệu suất lệnh chốt trong kỳ
+  const periodWins = useMemo(() => sellOrdersInPeriod.filter(s => s.profitLoss > 0), [sellOrdersInPeriod]);
+  const periodLosses = useMemo(() => sellOrdersInPeriod.filter(s => s.profitLoss < 0), [sellOrdersInPeriod]);
+  const periodWinCount = periodWins.length;
+  const periodLossCount = periodLosses.length;
+  const periodWinRate = sellOrdersInPeriod.length > 0 ? ((periodWinCount / sellOrdersInPeriod.length) * 100).toFixed(1) : 0;
 
   // Lấy giá thị trường theo danh mục đang nắm giữ
   const loadMarketPrices = useCallback(async (force = false) => {
@@ -197,9 +259,11 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
       await updateCashBalance(val);
       setCashBalance(val);
       setIsEditingCash(false);
+      if (showToast) showToast('✅ Đã cập nhật số dư tiền mặt thành công!', 'success');
       if (onSuccess) onSuccess();
     } catch (err) {
-      alert(err.message || 'Lỗi cập nhật số dư tiền mặt');
+      if (showToast) showToast(err.message || 'Lỗi cập nhật số dư tiền mặt', 'error');
+      else alert(err.message || 'Lỗi cập nhật số dư tiền mặt');
     } finally {
       setSavingCash(false);
     }
@@ -446,41 +510,41 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
             </div>
           </div>
 
-          {/* Thẻ Tổng Lãi / Lỗ Tích Luỹ Toàn Thời Gian */}
+          {/* Thẻ Tổng Lãi / Lỗ Tích Luỹ Toàn Thời Gian hoặc Trong Kỳ */}
           <div className="bg-white/10 dark:bg-slate-900/50 rounded-2xl p-3.5 sm:p-4 border border-white/10 backdrop-blur-xs mt-3.5">
             <div className="flex items-center justify-between flex-wrap gap-2.5">
               <div>
                 <span className="text-indigo-200 text-[11px] font-bold uppercase tracking-wider block">
-                  🏆 Tổng P&L Tích Luỹ Toàn Thời Gian
+                  {timeWindow === 'all' ? '🏆 Tổng P&L Tích Luỹ Toàn Thời Gian' : `🏆 Tổng P&L Đã Thu Về Trong Kỳ (${periodLabel})`}
                 </span>
                 <div className="flex items-baseline gap-2 mt-1 flex-wrap">
-                  <span className={`text-xl sm:text-2xl font-black tracking-tight ${totalCumulativePL >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {totalCumulativePL >= 0 ? '+' : ''}{fmtMoney(totalCumulativePL)}đ
+                  <span className={`text-xl sm:text-2xl font-black tracking-tight ${(timeWindow === 'all' ? totalCumulativePL : (periodRealizedPL + periodCashDividends)) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {(timeWindow === 'all' ? totalCumulativePL : (periodRealizedPL + periodCashDividends)) >= 0 ? '+' : ''}{fmtMoney(timeWindow === 'all' ? totalCumulativePL : (periodRealizedPL + periodCashDividends))}đ
                   </span>
                   <span className={`text-xs sm:text-sm font-bold px-2 py-0.5 rounded-full ${
-                    totalCumulativePL >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                    (timeWindow === 'all' ? totalCumulativePL : (periodRealizedPL + periodCashDividends)) >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                   }`}>
-                    {totalCumulativePL >= 0 ? '▲ +' : '▼ '}{totalCumulativePLPct}% ROI
+                    {timeWindow === 'all' ? `${totalCumulativePL >= 0 ? '▲ +' : '▼ '}${totalCumulativePLPct}% ROI` : `${sellOrdersInPeriod.length} lệnh chốt · ${periodWinRate}% Win`}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-2.5 text-[11px] text-indigo-200/90 flex-wrap">
                 <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
-                  <span className="opacity-75">Đã chốt: </span>
-                  <b className={realizedPL >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
-                    {realizedPL >= 0 ? '+' : ''}{fmtMoney(realizedPL)}đ
+                  <span className="opacity-75">{timeWindow === 'all' ? 'Đã chốt: ' : 'Chốt trong kỳ: '}</span>
+                  <b className={(timeWindow === 'all' ? realizedPL : periodRealizedPL) >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+                    {(timeWindow === 'all' ? realizedPL : periodRealizedPL) >= 0 ? '+' : ''}{fmtMoney(timeWindow === 'all' ? realizedPL : periodRealizedPL)}đ
+                  </b>
+                </div>
+                <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
+                  <span className="opacity-75">{timeWindow === 'all' ? 'Cổ tức: ' : 'Cổ tức trong kỳ: '}</span>
+                  <b className="text-amber-300">
+                    +{fmtMoney(timeWindow === 'all' ? totalCashDividends : periodCashDividends)}đ
                   </b>
                 </div>
                 <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
                   <span className="opacity-75">Tạm tính: </span>
                   <b className={totalUnrealizedPL >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
                     {totalUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(totalUnrealizedPL)}đ
-                  </b>
-                </div>
-                <div className="bg-black/25 px-2.5 py-1 rounded-xl border border-white/5">
-                  <span className="opacity-75">Cổ tức: </span>
-                  <b className="text-amber-300">
-                    +{fmtMoney(totalCashDividends)}đ
                   </b>
                 </div>
               </div>
@@ -534,6 +598,45 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         </div>
       </div>
 
+      {/* 🌟 BỘ LỌC CHU KỲ THỜI GIAN (TIME HORIZON SELECTOR) */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-slate-400 flex items-center gap-1.5">
+            <span>⏳</span> Chu Kỳ Hiệu Suất:
+          </span>
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+            {periodLabel}
+          </span>
+          {timeWindow !== 'all' && (
+            <span className="text-[11px] text-gray-400 dark:text-slate-500 hidden sm:inline">
+              (Lọc theo ngày chốt lệnh & nhận cổ tức)
+            </span>
+          )}
+        </div>
+        <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl gap-1 text-xs">
+          {[
+            { id: 'all', label: 'Toàn thời gian', icon: '🌐' },
+            { id: 'ytd', label: 'Năm nay (YTD)', icon: '📅' },
+            { id: '1y', label: '1 Năm', icon: '🎯' },
+            { id: 'mtd', label: 'Tháng này (MTD)', icon: '⚡' },
+          ].map(item => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setTimeWindow(item.id)}
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                timeWindow === item.id
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm'
+                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <span>{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Stat Cards - Hàng 1: Tổng vốn, Giá trị thị trường, Lãi thực hiện & Cổ tức */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-4">
         <StatCard
@@ -556,34 +659,34 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
           }
         />
         <StatCard
-          label="Lãi / Lỗ thực hiện"
+          label={`Lãi / Lỗ thực hiện ${timeWindow !== 'all' ? `(${timeWindow.toUpperCase()})` : ''}`}
           value={
-            <span className={plColor(realizedPL)}>
-              {realizedPL >= 0 ? '+' : ''}{fmtMoney(realizedPL)}đ
+            <span className={plColor(periodRealizedPL)}>
+              {periodRealizedPL >= 0 ? '+' : ''}{fmtMoney(periodRealizedPL)}đ
             </span>
           }
-          sub={`${sellOrders.length} lệnh bán đã chốt`}
+          sub={`${sellOrdersInPeriod.length} lệnh bán ${timeWindow !== 'all' ? 'trong kỳ' : 'đã chốt'}`}
         />
         <StatCard
-          label="Cổ tức thực nhận"
+          label={`Cổ tức thực nhận ${timeWindow !== 'all' ? `(${timeWindow.toUpperCase()})` : ''}`}
           value={
             <span className="text-emerald-600 dark:text-emerald-400">
-              +{fmtMoney(totalCashDividends)}đ
+              +{fmtMoney(periodCashDividends)}đ
             </span>
           }
-          sub={`${(dividends || []).length} đợt chi trả`}
+          sub={`${(dividendsInPeriod || []).length} đợt chi trả ${timeWindow !== 'all' ? 'trong kỳ' : ''}`}
         />
         <StatCard
-          label="Tổng giao dịch"
-          value={txCount}
-          sub={`${totalHolding.toLocaleString()} đang giữ`}
+          label={timeWindow === 'all' ? "Tổng giao dịch" : `Hiệu suất trong kỳ`}
+          value={timeWindow === 'all' ? txCount : `${periodWinRate}%`}
+          sub={timeWindow === 'all' ? `${totalHolding.toLocaleString()} đang giữ` : `Win Rate (${periodWinCount}W / ${periodLossCount}L)`}
         />
       </div>
 
       {/* SO KÈO CHI PHÍ CƠ HỘI (CHỨNG KHOÁN VS TIẾT KIỆM NGÂN HÀNG) */}
       <OpportunityCostCard
         buyOrders={buyOrders}
-        totalCumulativePL={totalCumulativePL}
+        totalCumulativePL={timeWindow === 'all' ? totalCumulativePL : (periodRealizedPL + periodCashDividends + totalUnrealizedPL)}
       />
 
       {/* BẢNG CẢNH BÁO WATCHLIST (KHI CÓ CỔ PHIẾU ĐẠT MỤC TIÊU MUA / BÁN) */}
@@ -1025,13 +1128,18 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
 
             {/* Chế độ xem Bảng (Desktop mặc định / Mobile khi chọn Bảng) */}
             <div className={`overflow-x-auto ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
+              {mobileViewMode === 'table' && (
+                <p className="sm:hidden text-[11px] text-indigo-700 dark:text-indigo-300 px-4 py-1.5 bg-indigo-50/60 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/40 flex items-center gap-1 font-medium">
+                  <span>👉</span> Vuốt ngang để xem toàn bộ thông số
+                </p>
+              )}
               <table className="w-full text-sm">
               <thead className="bg-gray-50/80 dark:bg-slate-950 text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-800 font-semibold select-none">
                 <tr>
                   {/* 1. Mã CP */}
                   <th
                     onClick={() => handleSort('symbol')}
-                    className="text-left px-5 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none"
+                    className="text-left px-5 py-3.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group select-none sticky left-0 bg-gray-50/90 dark:bg-slate-950 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]"
                     title="Nhấn để sắp xếp theo Mã cổ phiếu"
                   >
                     <div className="inline-flex items-center">
@@ -1146,7 +1254,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                   return (
                     <tr key={p.symbol} className="hover:bg-indigo-50/30 dark:hover:bg-slate-800/60 transition-colors">
                       {/* 1. Mã CP */}
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-4 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-indigo-50/30 dark:group-hover:bg-slate-800/60 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
                         <button
                           type="button"
                           onClick={() => setSelectedSymbolModal(p.symbol)}
@@ -1418,25 +1526,25 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
-              <span>📊</span> Lãi / Lỗ & Quỹ Đạo Vốn
+              <span>📊</span> Lãi / Lỗ & Quỹ Đạo Vốn {timeWindow !== 'all' && <span className="text-xs text-indigo-600 dark:text-indigo-400">({periodLabel})</span>}
             </h3>
             <span className="text-xs text-gray-400 dark:text-slate-500">Thực nhận sau phí</span>
           </div>
-          <MonthlyPLChart sellOrders={sellOrders} dividends={dividends} />
+          <MonthlyPLChart sellOrders={sellOrdersInPeriod} dividends={dividendsInPeriod} />
         </div>
 
         {/* Hàng 3: Đóng Góp Hiệu Suất Từng Mã (Top Gainers vs Losers) */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
-              <span>🎯</span> Đóng Góp Hiệu Suất Từng Mã (Top Gainers vs Losers)
+              <span>🎯</span> Đóng Góp Hiệu Suất Từng Mã {timeWindow !== 'all' && <span className="text-xs text-indigo-600 dark:text-indigo-400">({periodLabel})</span>}
             </h3>
             <span className="text-xs text-gray-400 dark:text-slate-500">Xếp hạng lợi nhuận theo mã</span>
           </div>
           <StockContributionChart
             buyOrders={buyOrders}
-            sellOrders={sellOrders}
-            dividends={dividends}
+            sellOrders={sellOrdersInPeriod}
+            dividends={dividendsInPeriod}
             marketPrices={pricesData?.prices || {}}
             onSelectSymbol={setSelectedSymbolModal}
           />
@@ -1446,26 +1554,26 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-gray-700 dark:text-slate-200 text-sm flex items-center gap-1.5">
-              <span>🌊</span> Biểu Đồ Thác Nước Hiệu Suất (Waterfall Return Bridge)
+              <span>🌊</span> Biểu Đồ Thác Nước Hiệu Suất {timeWindow !== 'all' && <span className="text-xs text-indigo-600 dark:text-indigo-400">({periodLabel})</span>}
             </h3>
             <span className="text-xs text-gray-400 dark:text-slate-500">Dòng chảy vốn & lãi/lỗ</span>
           </div>
           <WaterfallReturnChart
             buyOrders={buyOrders}
-            sellOrders={sellOrders}
+            sellOrders={sellOrdersInPeriod}
             portfolio={portfolio}
-            dividends={dividends}
+            dividends={dividendsInPeriod}
             marketPrices={pricesData?.prices || {}}
           />
         </div>
       </div>
 
       {/* Lãi/Lỗ từng giao dịch bán gần nhất */}
-      {sellOrders.length > 0 && (
+      {sellOrdersInPeriod.length > 0 && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
             <h2 className="font-semibold text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
-              <span>💹</span> Giao Dịch Bán Gần Nhất
+              <span>💹</span> Giao Dịch Bán Gần Nhất {timeWindow !== 'all' && <span className="text-xs text-indigo-600 dark:text-indigo-400 font-normal">({periodLabel})</span>}
             </h2>
             {onSwitchTab && (
               <button
@@ -1473,7 +1581,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                 onClick={() => onSwitchTab('history')}
                 className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
               >
-                <span>Xem tất cả ({sellOrders.length})</span>
+                <span>Xem tất cả ({sellOrdersInPeriod.length})</span>
                 <span>→</span>
               </button>
             )}
@@ -1491,7 +1599,7 @@ export default function Dashboard({ data, onNavigateBuy, onNavigateDca, onNaviga
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-slate-800/60">
-                {[...sellOrders].reverse().slice(0, 5).map((s) => {
+                {[...sellOrdersInPeriod].reverse().slice(0, 5).map((s) => {
                   const avgCost = s.totalCost / s.quantity;
                   return (
                     <tr key={s.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">

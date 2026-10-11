@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import TradeOrderView from './components/TradeOrderView.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import DcaPlannerView from './components/DcaPlannerView.jsx';
@@ -114,9 +114,11 @@ export default function App({ hasGoogleClientId = false }) {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   }
 
+  const toastTimerRef = useRef(null);
   const showToast = useCallback((message, type = 'info') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToast(null);
     }, 4000);
   }, []);
@@ -519,12 +521,14 @@ export default function App({ hasGoogleClientId = false }) {
                 onNavigateDca={handleSelectDca}
                 onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
+                showToast={showToast}
               />
             )}
             {tab === 'macro' && (
               <MacroDashboard
                 refreshKey={refreshKey}
                 onSwitchTab={switchTab}
+                showToast={showToast}
               />
             )}
             {tab === 'valuation' && (
@@ -550,6 +554,7 @@ export default function App({ hasGoogleClientId = false }) {
                 dividends={data.dividends || []}
                 buyInitial={buyInitial}
                 sellInitialSymbol={sellInitialSymbol}
+                showToast={showToast}
                 onSuccess={() => {
                   setBuyInitial({ symbol: '', quantity: '', price: '' });
                   setSellInitialSymbol('');
@@ -564,6 +569,7 @@ export default function App({ hasGoogleClientId = false }) {
                 onNavigateBuy={handleSelectBuy}
                 onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
+                showToast={showToast}
               />
             )}
             {tab === 'strategy' && (
@@ -577,6 +583,7 @@ export default function App({ hasGoogleClientId = false }) {
                 onSuccess={loadData}
                 onSelectBuy={handleSelectBuy}
                 onSelectSell={handleSelectSell}
+                showToast={showToast}
               />
             )}
             {tab === 'settings' && (
@@ -900,16 +907,26 @@ export default function App({ hasGoogleClientId = false }) {
       {/* 9. TOAST NOTIFICATION */}
       {toast && (
         <div
-          className={`fixed bottom-20 md:bottom-6 right-4 z-50 px-4 py-2.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center gap-2 animate-in slide-in-from-bottom-3 duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 z-50 max-w-sm sm:max-w-md px-4 py-3 rounded-2xl shadow-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-200 ${
             toast.type === 'success'
-              ? 'bg-emerald-600 text-white border-emerald-500'
+              ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-950/20'
               : toast.type === 'error'
-              ? 'bg-red-600 text-white border-red-500'
-              : 'bg-gray-900 text-white border-gray-800'
+              ? 'bg-rose-600 text-white border-rose-500 shadow-rose-950/20'
+              : 'bg-slate-900 text-white border-slate-800 shadow-slate-950/20'
           }`}
         >
-          <span>{toast.type === 'success' ? '✅' : toast.type === 'error' ? '⚠️' : 'ℹ️'}</span>
-          <span>{toast.message}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-sm shrink-0">{toast.type === 'success' ? '✅' : toast.type === 'error' ? '⚠️' : 'ℹ️'}</span>
+            <span className="truncate">{toast.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/20 transition-colors cursor-pointer shrink-0 text-xs font-bold leading-none"
+            title="Đóng thông báo"
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>

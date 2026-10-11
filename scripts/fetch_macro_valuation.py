@@ -21,6 +21,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from lib.macro_advisor import compute_pe_bands_and_zscore
+from lib.yield_curve_monitor import compute_yield_curve_monitor
 from lib.macro_regime import (
     detect_phase,
     calculate_risk_score_and_layers,
@@ -76,18 +77,29 @@ def fetch_and_save_macro():
     te_data = te_fetcher.fetch_all_indicators()
     te_core = te_data.get("macroCore", {})
 
-    vn10y = macro_live.get("vn10yYield", te_core.get("vn10y", 3.45))
-    sbv_refinancing = macro_live.get("sbvRefinancingRate", te_core.get("sbv_refinancing_rate", 4.5))
-    us10y = macro_live.get("us10yYield", 4.3)
-    usdvnd = macro_live.get("usdVndRate", te_core.get("usdvnd", 25881.0))
-    gold_world = macro_live.get("goldWorld", 2650.0)
-    oil_brent = macro_live.get("oilBrent", 74.2)
-    dxy = macro_live.get("dxy", 104.2)
-    sjc_buy = macro_live.get("sjcGoldBuy", 141.8)
-    sjc_sell = macro_live.get("sjcGoldSell", 144.8)
-    pnj_buy = macro_live.get("pnjGoldBuy", 141.3)
-    pnj_sell = macro_live.get("pnjGoldSell", 144.3)
-    pnj_update_date = macro_live.get("pnjUpdateDate", "")
+    # 2b. Nạp cache vĩ mô thực tế trước đó để làm fallback an toàn thay vì dùng số tĩnh
+    cached_macro = {}
+    try:
+        cache_file = DATA_DIR / "macro_valuation.json"
+        if cache_file.exists():
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cdata = json.load(f)
+                cached_macro = cdata.get("macro", {})
+    except Exception:
+        pass
+
+    vn10y = macro_live.get("vn10yYield") or cached_macro.get("vn10yYield") or te_core.get("vn10y")
+    sbv_refinancing = macro_live.get("sbvRefinancingRate") or cached_macro.get("sbvRefinancingRate") or te_core.get("sbv_refinancing_rate")
+    us10y = macro_live.get("us10yYield") or cached_macro.get("us10yYield")
+    usdvnd = macro_live.get("usdVndRate") or cached_macro.get("usdVndRate") or te_core.get("usdvnd")
+    gold_world = macro_live.get("goldWorld") or cached_macro.get("goldWorld")
+    oil_brent = macro_live.get("oilBrent") or cached_macro.get("oilBrent")
+    dxy = macro_live.get("dxy") or cached_macro.get("dxy")
+    sjc_buy = macro_live.get("sjcGoldBuy") or cached_macro.get("sjcGoldBuy")
+    sjc_sell = macro_live.get("sjcGoldSell") or cached_macro.get("sjcGoldSell")
+    pnj_buy = macro_live.get("pnjGoldBuy") or cached_macro.get("pnjGoldBuy")
+    pnj_sell = macro_live.get("pnjGoldSell") or cached_macro.get("pnjGoldSell")
+    pnj_update_date = macro_live.get("pnjUpdateDate") or cached_macro.get("pnjUpdateDate", "")
 
     # Tổng hợp các tham số vĩ mô cho Động cơ Regime
     macro_combined = {
@@ -264,12 +276,26 @@ def fetch_and_save_macro():
     except Exception as e:
         print(f"⚠️ Lỗi fetch dữ liệu định giá ngành: {e}")
 
+    # 4f. Bảng Giám Sát Đường Cong Lợi Suất & Lãi Suất 17 Dòng (VN vs US Yield Curve Monitor - ref-vn_macro)
+    yield_curve_monitor = compute_yield_curve_monitor({
+        **macro_live,
+        **macro_combined,
+        "vn10y": vn10y,
+        "sbvRefinancingRate": sbv_refinancing,
+        "us10y": us10y,
+        "usd": usdvnd,
+        "pe": current_pe,
+        "cpiYoY": te_core.get("cpi_yoy", 5.08),
+        "interbankRate": te_core.get("interbank_rate", 6.47),
+    })
+
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
-            "version": "3.4"
+            "version": "4.0"
         },
+        "yieldCurveMonitor": yield_curve_monitor,
         "marketIndex": market_index_data,
         "vn30Valuation": vn30_analysis,
         "styleIndices": style_indices,

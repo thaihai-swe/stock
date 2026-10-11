@@ -14,6 +14,7 @@ import IndustrySpecificCard from './valuation/IndustrySpecificCard.jsx';
 import MarketProfileCard from './valuation/MarketProfileCard.jsx';
 import NewsSentimentCard from './valuation/NewsSentimentCard.jsx';
 import StockRiskMetricsCard from './valuation/StockRiskMetricsCard.jsx';
+import ForensicAccountingCard from './valuation/ForensicAccountingCard.jsx';
 
 // Tính % chênh lệch giữa giá định giá và thị giá hiện tại (Upside / Downside %)
 function calcPriceDiff(fairPrice, currentPrice) {
@@ -431,6 +432,16 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                     </span>
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
+                  title="Mở Báo Cáo Phân Tích Toàn Diện Master Dossier (10 Chương Nghiên Cứu Chuyên Sâu)"
+                >
+                  <span>📑</span>
+                  <span className="hidden sm:inline">Hồ Sơ Master Dossier (10 Chương)</span>
+                </button>
 
                 <button
                   type="button"
@@ -1094,6 +1105,18 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             >
               <span>📰</span>
               <span>11. Bản Tin & Tâm Lý 30 Ngày</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMainReportView('forensic')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${mainReportView === 'forensic'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+            >
+              <span>🛡️</span>
+              <span>12. Kiểm Toán Gian Lận & Dòng Tiền</span>
             </button>
           </div>
 
@@ -2012,6 +2035,14 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <NewsSentimentCard
               newsDigest={financials.newsDigest}
               symbol={selectedSymbol}
+            />
+          )}
+
+          {/* ── VIEW 12: KIỂM TOÁN GIAN LẬN BENEISH & MAGIC FORMULA & FCF INFLECTION ── */}
+          {mainReportView === 'forensic' && (
+            <ForensicAccountingCard
+              financials={financials}
+              stockItem={currentStock}
             />
           )}
         </div>

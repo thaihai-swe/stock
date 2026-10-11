@@ -466,11 +466,16 @@ export default function StockPerformanceTable({
 
       {/* Desktop Table View */}
       <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${mobileViewMode === 'card' ? 'hidden sm:block' : 'block'}`}>
+        {mobileViewMode === 'table' && (
+          <p className="sm:hidden text-[11px] text-indigo-700 px-4 py-1.5 bg-indigo-50/60 border-b border-indigo-100 flex items-center gap-1 font-medium">
+            <span>👉</span> Vuốt ngang để xem toàn bộ thông số
+          </p>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead className="bg-gray-50/80 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b border-gray-100 select-none">
               <tr>
-                <th onClick={() => handleSort('symbol')} className="px-5 py-3.5 cursor-pointer group hover:bg-gray-100/60">
+                <th onClick={() => handleSort('symbol')} className="px-5 py-3.5 cursor-pointer group hover:bg-gray-100/60 sticky left-0 bg-gray-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
                   <span className="inline-flex items-center">Mã CP {renderSortIcon('symbol')}</span>
                 </th>
                 <th onClick={() => handleSort('status')} className="text-center px-4 py-3.5 cursor-pointer group hover:bg-gray-100/60">
@@ -516,7 +521,7 @@ export default function StockPerformanceTable({
                       onClick={() => onSelectSymbol && onSelectSymbol(s.symbol)}
                       className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
                     >
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-4 sticky left-0 bg-white group-hover:bg-indigo-50/60 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
                         <span
                           className="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs border transition-transform group-hover:scale-105"
                           style={{
