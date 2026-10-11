@@ -8,15 +8,574 @@
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 94774,
+    "grahamNumber": 37289,
     "ddmTarget": 10777,
-    "peTarget": 35765,
-    "pbTarget": 173287,
-    "evEbitdaFairPrice": 5554,
+    "peTarget": 5428,
+    "pbTarget": 176753,
+    "evEbitdaFairPrice": null,
     "pcfFairPrice": 18879,
     "psFairPrice": 18056,
-    "consensusFairValue": 33150,
-    "marginOfSafety": 42.5
+    "consensusFairValue": 34789,
+    "marginOfSafety": 45.2,
+    "upside": 82.6,
+    "consensusDiffPercent": 82.6,
+    "valuationRating": "🟡 HOLD",
+    "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
+    "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+    "validModelsCount": 3,
+    "models10": [
+      {
+        "id": "graham",
+        "name": "Benjamin Graham",
+        "fullName": "1. Benjamin Graham",
+        "cleanName": "Benjamin Graham",
+        "value": 37289,
+        "targetPrice": 37289,
+        "diffPercent": 95.7,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 8.4,
+        "formula": "√(22.5 × EPS × BVPS)",
+        "formulaDetail": "V = √(22.5 × 472 × 130,928)",
+        "parameters": {
+          "eps": 472.0,
+          "bvps": 130928,
+          "multiplier": 22.5
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "pe",
+        "name": "P/E Chuẩn Hóa",
+        "fullName": "2. P/E Chuẩn Hóa",
+        "cleanName": "P/E Chuẩn Hóa",
+        "value": 5428,
+        "targetPrice": 5428,
+        "diffPercent": -71.5,
+        "weight": 0.15,
+        "baseWeight": 0.15,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 84.2,
+        "formula": "EPS × P/E Mục Tiêu (11.5x)",
+        "formulaDetail": "V = 472 × 11.5x (Median chu kỳ 5Y)",
+        "parameters": {
+          "eps": 472.0,
+          "targetPe": 11.5
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "pb",
+        "name": "P/B Ngành & Gordon",
+        "fullName": "3. P/B Ngành & Gordon",
+        "cleanName": "P/B Ngành & Gordon",
+        "value": 176753,
+        "targetPrice": 176753,
+        "diffPercent": 827.8,
+        "weight": 0.15,
+        "baseWeight": 0.15,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 413.9,
+        "formula": "BVPS × [(ROE - g)/(r - g)]",
+        "formulaDetail": "V = 130,928 × Gordon Multiple",
+        "parameters": {
+          "bvps": 130928,
+          "roe": null,
+          "coe": 0.115,
+          "terminalG": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "dcf",
+        "name": "DCF Đa Giai Đoạn",
+        "fullName": "4. DCF Đa Giai Đoạn",
+        "cleanName": "DCF Đa Giai Đoạn",
+        "value": 34392,
+        "targetPrice": 34392,
+        "diffPercent": 80.5,
+        "weight": 0.15,
+        "baseWeight": 0.15,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+        "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+        "parameters": {
+          "baseFcf": 21860000000000.0,
+          "shares": 9263250000.0,
+          "wacc": 0.115,
+          "g1": 0.07,
+          "terminalG": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "ddm",
+        "name": "Chiết Khấu DDM",
+        "fullName": "5. Chiết Khấu DDM",
+        "cleanName": "Chiết Khấu DDM",
+        "value": 10777,
+        "targetPrice": 10777,
+        "diffPercent": -43.4,
+        "weight": 0.05,
+        "baseWeight": 0.05,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 68.7,
+        "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+        "formulaDetail": "DPS=833 đ, r=11.5%, g=3.5%",
+        "parameters": {
+          "dps": 833.0,
+          "coe": 0.115,
+          "g": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "fcff",
+        "name": "FCFF Doanh Nghiệp",
+        "fullName": "6. FCFF Doanh Nghiệp",
+        "cleanName": "FCFF Doanh Nghiệp",
+        "value": 34392,
+        "targetPrice": 34392,
+        "diffPercent": 80.5,
+        "weight": 0.12,
+        "baseWeight": 0.12,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+        "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+        "parameters": {
+          "fcff": 21860000000000.0,
+          "netDebt": 554854000000000.0,
+          "wacc": 0.115,
+          "shares": 9263250000.0
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "fcfe",
+        "name": "FCFE Cổ Đông",
+        "fullName": "7. FCFE Cổ Đông",
+        "cleanName": "FCFE Cổ Đông",
+        "value": 10342,
+        "targetPrice": 10342,
+        "diffPercent": -45.7,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 69.9,
+        "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+        "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+        "parameters": {
+          "cfo": 21860000000000.0,
+          "capex": 13992000000000.0,
+          "coe": 0.115,
+          "shares": 9263250000.0
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "rim",
+        "name": "Residual Income RIM/EVA",
+        "fullName": "8. Residual Income RIM/EVA",
+        "cleanName": "Residual Income RIM/EVA",
+        "value": null,
+        "targetPrice": null,
+        "diffPercent": null,
+        "weight": 0.044,
+        "baseWeight": 0.08,
+        "suitability": 0.55,
+        "suitabilityNote": "Thứ cấp phi TC",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+        "formulaDetail": "BVPS=130,928 đ, ROE=0.0%, CoE=11.5%",
+        "parameters": {
+          "equity": 1221484000000000.0,
+          "bvps": 130928,
+          "roe": null,
+          "coe": 0.115,
+          "shares": 9263250000.0
+        },
+        "statusNote": "Vốn chủ âm hoặc ROE < CoE"
+      },
+      {
+        "id": "nav",
+        "name": "Book NAV / RNAV",
+        "fullName": "9. Book NAV / RNAV",
+        "cleanName": "Book NAV / RNAV",
+        "value": 105491,
+        "targetPrice": 105491,
+        "diffPercent": 453.8,
+        "weight": 0.032,
+        "baseWeight": 0.07,
+        "suitability": 0.45,
+        "suitabilityNote": "Thứ cấp phi TC/BĐS",
+        "isOutlier": true,
+        "outlierGapPct": 206.7,
+        "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+        "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+        "parameters": {
+          "equity": 1221484000000000.0,
+          "totalAssets": 1776338000000000.0,
+          "totalDebt": 554854000000000.0,
+          "inventory": null,
+          "shares": 9263250000.0
+        },
+        "statusNote": "Thứ cấp phi TC/BĐS"
+      },
+      {
+        "id": "evebitda",
+        "name": "EV/EBITDA & EV/Sales",
+        "fullName": "10. EV/EBITDA & EV/Sales",
+        "cleanName": "EV/EBITDA & EV/Sales",
+        "value": null,
+        "targetPrice": null,
+        "diffPercent": null,
+        "weight": 0.07,
+        "baseWeight": 0.07,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+        "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+        "parameters": {
+          "ebitda": 28804000000000.0,
+          "multiple": 7.5,
+          "revenue": 152056000000000.0,
+          "salesMultiple": 1.1,
+          "netDebt": 554854000000000.0,
+          "shares": 9263250000.0
+        },
+        "statusNote": "EBITDA âm hoặc nợ vay quá lớn"
+      }
+    ],
+    "consensusDetails": {
+      "cleanWeightedAvg": 35054,
+      "cleanMedian": 34392,
+      "dispersionPct": 1.9,
+      "consensusLevel": "HIGH",
+      "coveragePct": 30.0,
+      "confidenceScore": 61.0,
+      "modelsUsed": 3,
+      "modelsValid": 8,
+      "excludedOutliers": [
+        "P/E Chuẩn Hóa",
+        "P/B Ngành & Gordon",
+        "Chiết Khấu DDM",
+        "FCFE Cổ Đông",
+        "Book NAV / RNAV"
+      ]
+    },
+    "valuationTraps": {
+      "trapScore": 0.0,
+      "trapLabel": "THẤP",
+      "trapReason": "Không phát hiện bẫy định giá",
+      "isCapPenalized": false,
+      "trapsList": [
+        {
+          "id": "value_trap",
+          "name": "Value Trap",
+          "active": false,
+          "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+        },
+        {
+          "id": "book_trap",
+          "name": "Book Trap",
+          "active": false,
+          "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+        },
+        {
+          "id": "cyclical_peak",
+          "name": "Cyclical Peak",
+          "active": false,
+          "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+        },
+        {
+          "id": "dividend_trap",
+          "name": "Dividend Trap",
+          "active": false,
+          "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+        },
+        {
+          "id": "debt_stress",
+          "name": "Debt Stress",
+          "active": false,
+          "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+        },
+        {
+          "id": "share_dilution",
+          "name": "Share Dilution",
+          "active": false,
+          "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+        },
+        {
+          "id": "wc_stress",
+          "name": "Working Capital Stress",
+          "active": false,
+          "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+        }
+      ]
+    },
+    "sevenPriceZones": {
+      "currentZone": "Deep Value",
+      "zoneBadge": "bg-emerald-600 text-white",
+      "safeBuyPrice": 26092,
+      "acceptableBuyPrice": 29571,
+      "bearPrice": 24352,
+      "bullPrice": 43486,
+      "boundaries": {
+        "deepValue": 23483,
+        "safeBuy": 26092,
+        "accumulate": 29571,
+        "fairLow": 31310,
+        "fairHigh": 38268,
+        "aboveFair": 41312,
+        "expensive": 50009
+      }
+    },
+    "threeLayerDecision": {
+      "compositeScore": 7.9,
+      "valuationLayerScore": 10.0,
+      "qualityLayerScore": 6.5,
+      "timingLayerScore": 6.5,
+      "roeCoeSpread": -1.5,
+      "buyRecommendation": "🟡 HOLD",
+      "decisionReason": "Thiếu độ phủ mô hình hoặc phân tán cao",
+      "isGateOpen": false,
+      "isTrapCapped": false
+    },
+    "historicalBands": {
+      "band25": 84308,
+      "band50": 97755,
+      "band75": 121257,
+      "bandPosition": "Dưới P25 (Vùng Rẻ)",
+      "bandWidthPct": 37.8,
+      "peBand": {
+        "p25": 10.5,
+        "p50": 12.0,
+        "p75": 14.5,
+        "current": 40.36
+      },
+      "pbBand": {
+        "p25": 1.25,
+        "p50": 1.45,
+        "p75": 1.8,
+        "current": 0.15
+      },
+      "priceBands": {
+        "peP25Price": 4956,
+        "peP50Price": 5664,
+        "peP75Price": 6844,
+        "pbP25Price": 163660,
+        "pbP50Price": 189846,
+        "pbP75Price": 235670
+      }
+    },
+    "dividendSustainability": {
+      "score": 2.8,
+      "status": "⚠ Cần theo dõi",
+      "payoutRatio": 176.5,
+      "fcfPayoutRatio": 35.3,
+      "consistency": 50.0
+    },
+    "finvalLab": {
+      "items": [
+        {
+          "key": "eps",
+          "label": "EPS (Thu nhập mỗi CP)",
+          "unit": "đ",
+          "current": 472.0,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "bvps",
+          "label": "BVPS (Giá trị sổ sách)",
+          "unit": "đ",
+          "current": 130928,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "pe",
+          "label": "Hệ số P/E",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "pb",
+          "label": "Hệ số P/B",
+          "unit": "x",
+          "current": 1.35,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "roe",
+          "label": "Tỷ suất ROE",
+          "unit": "%",
+          "current": null,
+          "sma5y": 2.53,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "roa",
+          "label": "Tỷ suất ROA",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "roic",
+          "label": "Tỷ suất ROIC",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "grossMargin",
+          "label": "Biên Lợi Nhuận Gộp",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "netMargin",
+          "label": "Biên Lợi Nhuận Ròng",
+          "unit": "%",
+          "current": null,
+          "sma5y": 22.15,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "revenue",
+          "label": "Doanh Thu Thuần",
+          "unit": "Tỷ",
+          "current": 152056.0,
+          "sma5y": 115943.4,
+          "deltaPct": 31.1,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "netIncome",
+          "label": "Lợi Nhuận Sau Thuế",
+          "unit": "Tỷ",
+          "current": 17140.0,
+          "sma5y": 25686.6,
+          "deltaPct": -33.3,
+          "status": "Suy giảm so với TB",
+          "badgeColor": "text-rose-400 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "ebitda",
+          "label": "Chỉ số EBITDA",
+          "unit": "Tỷ",
+          "current": 28804.0,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "Dòng Tiền Tự Do FCF",
+          "unit": "Tỷ",
+          "current": 21860.0,
+          "sma5y": 11045.2,
+          "deltaPct": 97.9,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "debtToEquity",
+          "label": "Nợ / Vốn Chủ (D/E)",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "currentRatio",
+          "label": "Hệ Số Thanh Toán Hiện Hành",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "cashRatio",
+          "label": "Hệ Số Tiền Mặt",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        }
+      ]
+    },
+    "impliedFcfYieldPrice": 28604
   },
   "financialRatios": {
     "valuation": {
@@ -788,25 +1347,25 @@
       {
         "id": "nim",
         "name": "Biên Lãi Thuần (NIM)",
-        "value": 3.6,
+        "value": 4.9,
         "unit": "%",
         "benchmark": "> 3.5%",
-        "rating": "Tốt",
+        "rating": "Xuất sắc",
         "desc": "Chênh lệch giữa thu nhập lãi cho vay và chi phí huy động vốn"
       },
       {
         "id": "npl",
         "name": "Tỷ Lệ Nợ Xấu (NPL Ratio)",
-        "value": 1.4,
+        "value": 2.4,
         "unit": "%",
         "benchmark": "< 2.0%",
-        "rating": "An toàn",
+        "rating": "Đạt chuẩn",
         "desc": "Tỷ lệ nợ nhóm 3-5 trên tổng dư nợ cho vay khách hàng"
       },
       {
         "id": "llr",
         "name": "Bao Phủ Nợ Xấu (LLR)",
-        "value": 220.0,
+        "value": 248.0,
         "unit": "%",
         "benchmark": "> 100%",
         "rating": "Dày dặn",
@@ -815,7 +1374,7 @@
       {
         "id": "casa",
         "name": "Tiền Gửi Không Kỳ Hạn (CASA)",
-        "value": 37.0,
+        "value": 47.0,
         "unit": "%",
         "benchmark": "> 25%",
         "rating": "Vượt trội",
@@ -824,16 +1383,16 @@
       {
         "id": "ldr",
         "name": "Cho Vay / Huy Động (LDR)",
-        "value": 79.5,
+        "value": 85.5,
         "unit": "%",
         "benchmark": "< 85%",
-        "rating": "Chuẩn mực",
+        "rating": "Căng thẳng",
         "desc": "Tỷ lệ cho vay trên tiền gửi huy động theo quy định của NHNN"
       },
       {
         "id": "cir",
         "name": "Chi Phí / Thu Nhập (CIR)",
-        "value": 40.5,
+        "value": 41.5,
         "unit": "%",
         "benchmark": "< 40%",
         "rating": "Cao",
@@ -1389,6 +1948,20 @@
       },
       {
         "id": "news-MBB-19",
+        "title": "Cổ phiếu đáng chú ý ngày 18/9: MBB, GEE, HHV,",
+        "summary": "Bản tin phân tích về MBB từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-18.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-09-18",
+        "source": "nguoiquansat.vn",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNb3FqYlY0ekNyVG1TVDhKZTJxcUw2Y05ZU3VkLWVBRTNkREs0UUt3UGVYSzNSS1dMenVHei1iM2dhQmZ5X21Dcm5uZWtxS0ZudDMzcXBPTjlVbkV1bnVhb2tJaHN0S1VWM1lHV3FpV1VEQkNIajJ6VGFlR29tbnZDSjJsOA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-MBB-20",
         "title": "Cổ phiếu cần quan tâm ngày 18/9",
         "summary": "Bản tin phân tích về MBB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-09-17.",
         "category": "biz",
@@ -1402,7 +1975,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-20",
+        "id": "news-MBB-21",
         "title": "MBB còn dư địa bứt phá?",
         "summary": "Bản tin phân tích về MBB từ nguồn diendandoanhnghiep.vn. Cập nhật ngày 2026-08-31.",
         "category": "biz",
@@ -1416,7 +1989,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-21",
+        "id": "news-MBB-22",
         "title": "Viettel chi gần 1.200 tỷ đồng mua cổ phiếu MBB, vốn điều lệ MB sắp vượt mốc 100.000 tỷ đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-21.",
         "category": "analyst",
@@ -1430,7 +2003,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-22",
+        "id": "news-MBB-23",
         "title": "Viettel sắp chi hơn 1.000 tỷ đồng mua cổ phiếu một ngân hàng",
         "summary": "Bản tin phân tích về MBB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-21.",
         "category": "analyst",
@@ -1444,7 +2017,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-23",
+        "id": "news-MBB-24",
         "title": "MB hoàn tất phát hành 1.2 tỷ cp trả cổ tức, nâng vốn lên hơn 92,600 tỷ, sắp bước vào đợt chào bán tiếp theo",
         "summary": "Bản tin phân tích về MBB từ nguồn Vietstock. Cập nhật ngày 2026-08-19.",
         "category": "disclosure",
@@ -1458,7 +2031,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-24",
+        "id": "news-MBB-25",
         "title": "Cổ đông MB được mua cổ phiếu phát hành thêm với giá 10.000 đồng - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-18.",
         "category": "disclosure",
@@ -1472,7 +2045,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-25",
+        "id": "news-MBB-26",
         "title": "Cổ đông ngân hàng nhận cổ tức khủng",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Tiền Phong. Cập nhật ngày 2026-08-17.",
         "category": "disclosure",
@@ -1486,7 +2059,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-26",
+        "id": "news-MBB-27",
         "title": "MBBank (MBB) sắp chào bán cổ phiếu và trả cổ tức cho cổ đông",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-08-12.",
         "category": "disclosure",
@@ -1500,7 +2073,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-27",
+        "id": "news-MBB-28",
         "title": "MB lập kỷ lục lợi nhuận, vững đà tăng trưởng - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-11.",
         "category": "biz",
@@ -1514,7 +2087,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-28",
+        "id": "news-MBB-29",
         "title": "Tuần tới, MB chốt quyền nhận cổ tức 15%, mua thêm cổ phiếu giá 10.000 đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-08-09.",
         "category": "disclosure",
@@ -1528,7 +2101,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-29",
+        "id": "news-MBB-30",
         "title": "Tuần tới, một ngân hàng sẽ chốt quyền nhận cổ tức tỷ lệ 15%, cổ đông còn được mua thêm cổ phiếu giá rẻ",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-08-08.",
         "category": "disclosure",
@@ -1542,7 +2115,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-30",
+        "id": "news-MBB-31",
         "title": "MB bứt tốc hướng tới lợi nhuận 39.500 tỷ đồng, không ngại đặt mục tiêu lớn để tạo động lực phát triển nhanh hơn",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-07.",
         "category": "biz",
@@ -1556,7 +2129,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-31",
+        "id": "news-MBB-32",
         "title": "MB tự tin cán mốc 40.000 tỷ đồng lợi nhuận, tăng tốc mở rộng hệ sinh thái tài chính",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Thanh tra. Cập nhật ngày 2026-08-06.",
         "category": "biz",
@@ -1570,7 +2143,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-32",
+        "id": "news-MBB-33",
         "title": "MB chốt quyền trả cổ tức và chào bán cổ phiếu, vốn điều lệ dự kiến vượt 100.600 tỷ đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn MoneyF. Cập nhật ngày 2026-08-05.",
         "category": "disclosure",
@@ -1584,7 +2157,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-33",
+        "id": "news-MBB-34",
         "title": "MB sở hữu 38 triệu khách hàng, lãi hơn 20.000 tỷ đồng sau 6 tháng",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Tài chính Doanh nghiệp. Cập nhật ngày 2026-08-05.",
         "category": "biz",
@@ -1598,7 +2171,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-34",
+        "id": "news-MBB-35",
         "title": "MB chốt quyền chia cổ tức 15%, phát hành chào bán gần 805,5 triệu cổ phiếu giá 10.000 đồng/CP",
         "summary": "Bản tin phân tích về MBB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-08-04.",
         "category": "disclosure",
@@ -1612,7 +2185,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-35",
+        "id": "news-MBB-36",
         "title": "Vì sao khối ngoại đổ tiền mua cổ phiếu MBB?",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-08-04.",
         "category": "analyst",
@@ -1626,7 +2199,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-36",
+        "id": "news-MBB-37",
+        "title": "MB sắp trả cổ tức bằng cổ phiếu tỷ lệ 15%, đồng thời chào bán hơn 805 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về MBB từ nguồn Báo Công Lý. Cập nhật ngày 2026-08-04.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-08-04",
+        "source": "Báo Công Lý",
+        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOeldOSEloWW5QQ1FPYUFZSEg4RWF2QXZvTkd3OFp4X3VqYWNJQ0FjVGRQcEY0aFZ2ckMwTGFBQThBQUlHM05OXzJvNzFmZGZELUsxMUZsNlpyVmh4RDc5MmhPcmdVd1ZxYXp3UEdLOVF1NElJcS1uTVQ1VFNzQjJnTzhhOU5wTDBjZkxnUDJpTXdoRDkzVUJCWndFTHVYaTFnTXhFakZKeVhLSjcwN3JDS0w3YmxHdw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-MBB-38",
         "title": "MB sắp nâng vốn điều lệ vượt 100.000 tỷ đồng, cổ phiếu MBB tăng chạm trần",
         "summary": "Bản tin phân tích về MBB từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-08-03.",
         "category": "biz",
@@ -1640,7 +2227,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-37",
+        "id": "news-MBB-39",
         "title": "Một ngân hàng sắp trả cổ tức 15%",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-08-03.",
         "category": "disclosure",
@@ -1654,7 +2241,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-38",
+        "id": "news-MBB-40",
         "title": "MB lãi hơn 20.000 tỷ đồng, tín dụng tăng 13,2% tiếp sức đà tăng trưởng",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -1668,7 +2255,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-MBB-39",
+        "id": "news-MBB-41",
         "title": "Lợi nhuận MBBank (MBB) vượt 20.000 tỷ đồng bán niên 2026, tín dụng tăng trưởng 13%",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -1682,7 +2269,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-MBB-40",
+        "id": "news-MBB-42",
         "title": "Lợi nhuận trước thuế quý 2 của MB tăng 41% nhờ hoạt động kinh doanh chính tăng mạnh",
         "summary": "Bản tin phân tích về MBB từ nguồn Vietstock. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1696,7 +2283,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-41",
+        "id": "news-MBB-43",
         "title": "MB thu về hơn 20.000 tỷ đồng lợi nhuận sau 6 tháng đầu năm",
         "summary": "Bản tin phân tích về MBB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1710,7 +2297,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-42",
+        "id": "news-MBB-44",
         "title": "MB lãi hơn 20.188 tỷ đồng sau 6 tháng đầu năm 2026, tăng hơn 27% so với cùng kỳ",
         "summary": "Bản tin phân tích về MBB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1724,7 +2311,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-43",
+        "id": "news-MBB-45",
         "title": "MB báo lãi quý II tăng hơn 40%, chi bình quân nhân viên lên gần 54 triệu đồng/tháng",
         "summary": "Bản tin phân tích về MBB từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1738,7 +2325,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-44",
+        "id": "news-MBB-46",
         "title": "Dòng tiền kinh doanh MBBank bất ngờ âm tới 53.000 tỷ đồng, nợ xấu 17.797 tỷ",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Nông nghiệp và Môi trường. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1752,7 +2339,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-45",
+        "id": "news-MBB-47",
         "title": "Lợi nhuận MB vượt 20.000 tỷ đồng trong 6 tháng đầu năm, đóng góp hơn 7.700 tỷ đồng vào ngân sách Nhà nước",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Thanh tra. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1766,7 +2353,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-46",
+        "id": "news-MBB-48",
         "title": "Cổ đông ngân hàng sắp nhận nghìn tỷ đồng tiền mặt",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Dân trí. Cập nhật ngày 2026-07-07.",
         "category": "biz",
@@ -1780,7 +2367,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-47",
+        "id": "news-MBB-49",
         "title": "Một ngân hàng lớn dồn dập trả cổ tức, chào bán cổ phiếu",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-07-07.",
         "category": "disclosure",
@@ -1794,7 +2381,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-48",
+        "id": "news-MBB-50",
         "title": "MB sắp trả cổ tức bằng cổ phiếu, chào bán hơn 805 triệu cổ phiếu để tăng vốn vượt 100.000 tỷ đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-07-06.",
         "category": "disclosure",
@@ -1806,55 +2393,27 @@
         "sentimentValue": 1,
         "impact": "Rất cao",
         "weight": 2.0
-      },
-      {
-        "id": "news-MBB-49",
-        "title": "Tuần tới, Ngân hàng Quân đội (MB) sẽ lăn chốt trả cổ tức tiền mặt cho hàng trăm nghìn cổ đông",
-        "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-07-05.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-07-05",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQaG1yRXFzUW90WEFUWFdmc2Q3ZTZTZlZrc1pJRVJ2VW02alB4c1hWUExDblJZYjdaZVlZS3dTSEJ6U2NqV2ZmYlc1LVZUSGpsc2tBTTNpVTFQQ0RpYWRkSmRQUWJaYklTbXA4ZmtzY1NaOGdta3MybEh5MGNqR1BSaVRfblJqVnM4WGpXdHlyamNZWnVtX0xkblRHeE1CWWNTaFpuRDZuWlh4ZjVPV0x3cm1iSkdqd3RzQnIxZ3BBdWxXZ0lSaTBYTG1n?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-MBB-50",
-        "title": "MB chốt ngày trả cổ tức tiền mặt 10%, cổ đông sắp nhận hơn 8.000 tỷ đồng - Vietnam+ (VietnamPlus)",
-        "summary": "Bản tin phân tích về MBB từ nguồn Vietnam+ (VietnamPlus). Cập nhật ngày 2026-07-02.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-07-02",
-        "source": "Vietnam+ (VietnamPlus)",
-        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNQVdYMzFCRnpEbURENnJuMWtnV2xZR1NscjRPbVIxcUUxUTZtbXJCakh5V3RBZTUxc0F4M3lkUV9JQldqQ3RlMklsSlF5WkVPQlVhWFlKUW05TXc5b3dmZmg3eWxVYlpIUk9vMlNOcElxZzNMVHNhZy1qakQ1bi1HTVpqbk9ZU1JyQlVPNF9UdU1oOGdPc1FlcjdsUmx3VGVqMHlYbE1QTXlfaXVhbHBmWjNn?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
       }
     ],
     "sentiment": {
-      "score": 44.8,
+      "score": 39.4,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 20,
-      "neutralCount": 30,
+      "bullishCount": 18,
+      "neutralCount": 32,
       "bearishCount": 0,
       "totalCount": 50,
       "categoryScores": {
         "analyst": 60.0,
-        "biz": 43.9,
-        "disclosure": 37.0,
+        "biz": 42.4,
+        "disclosure": 24.0,
         "sector": 100.0
       }
     },
     "tldr": {
       "title": "MBB 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về MBB nghiêng rõ rệt về chiều hướng tích cực với 20/50 tin tức mang gam màu tươi sáng (40.0%). Tâm điểm chú ý xoay quanh: 'Ba cổ phiếu MBB, NT2 và POW được khuyến nghị mua'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về MBB nghiêng rõ rệt về chiều hướng tích cực với 18/50 tin tức mang gam màu tươi sáng (36.0%). Tâm điểm chú ý xoay quanh: 'Ba cổ phiếu MBB, NT2 và POW được khuyến nghị mua'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -1863,12 +2422,12 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "40.0%",
+          "value": "36.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+44.8",
+          "value": "+39.4",
           "type": "positive"
         },
         {
@@ -1877,6 +2436,244 @@
           "type": "positive"
         }
       ]
+    }
+  },
+  "beneishMScore": {
+    "mScore": -2.05,
+    "manipulationProbability": "Trung bình / Cần theo dõi",
+    "status": "GREY",
+    "riskLevel": "medium",
+    "isManipulator": false,
+    "periodComparison": "2025 vs 2024",
+    "indices": [
+      {
+        "id": "DSRI",
+        "name": "Chỉ số Khoản Phải Thu (DSRI)",
+        "value": 1.0,
+        "benchmark": "< 1.03",
+        "status": "Bình thường",
+        "isAlert": false,
+        "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
+      },
+      {
+        "id": "GMI",
+        "name": "Chỉ số Biên Gộp (GMI)",
+        "value": 1.0,
+        "benchmark": "< 1.00",
+        "status": "Biên gộp cải thiện",
+        "isAlert": false,
+        "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
+      },
+      {
+        "id": "AQI",
+        "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
+        "value": 1.0,
+        "benchmark": "< 1.05",
+        "status": "Chất lượng tốt",
+        "isAlert": false,
+        "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
+      },
+      {
+        "id": "SGI",
+        "name": "Chỉ số Tăng Trưởng Doanh Thu (SGI)",
+        "value": 1.105,
+        "benchmark": "1.0 - 1.2",
+        "status": "Tăng trưởng bình thường",
+        "isAlert": false,
+        "desc": "Tốc độ tăng doanh thu. DN tăng trưởng nóng thường chịu áp lực duy trì số liệu kỳ vọng."
+      },
+      {
+        "id": "DEPI",
+        "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
+        "value": 1.0,
+        "benchmark": "< 1.00",
+        "status": "Khấu hao bình thường",
+        "isAlert": false,
+        "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
+      },
+      {
+        "id": "SGAI",
+        "name": "Chỉ số Chi Phí Bán Hàng & QLDN (SGAI)",
+        "value": 1.0,
+        "benchmark": "< 1.00",
+        "status": "Tiết giảm tốt",
+        "isAlert": false,
+        "desc": "Tỷ lệ chi phí SG&A / Doanh thu. SGAI > 1 cho thấy chi phí vận hành phình to hơn doanh số."
+      },
+      {
+        "id": "LVGI",
+        "name": "Chỉ số Đòn Bẩy Tài Chính (LVGI)",
+        "value": 1.0,
+        "benchmark": "< 1.05",
+        "status": "Kiểm soát nợ tốt",
+        "isAlert": false,
+        "desc": "Tỷ lệ Nợ / Tổng tài sản kỳ này so với kỳ trước. LVGI > 1 cho thấy đòn bẩy nợ gia tăng."
+      },
+      {
+        "id": "TATA",
+        "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
+        "value": -0.005,
+        "benchmark": "< 0.05",
+        "status": "Dòng tiền thực tốt",
+        "isAlert": false,
+        "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
+      }
+    ],
+    "summary": "M-Score = -2.05 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
+  },
+  "magicFormula": {
+    "earningsYield": 6.16,
+    "roic": 2.53,
+    "compositeScore": 24.8,
+    "category": "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)",
+    "tier": "UNDERPERFORM",
+    "recommendation": "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá.",
+    "parameters": {
+      "ebitTTM": 20996.6,
+      "enterpriseValue": 341044.9,
+      "marketCap": 176464.9,
+      "netDebt": 164580.0,
+      "capitalEmployed": 830479.0
+    },
+    "benchmarks": {
+      "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
+      "roicTarget": "> 15.0% (ROIC cao chứng minh doanh nghiệp có hào kinh tế - Moat sinh lời vốn mạnh)"
+    }
+  },
+  "fcfInflection": {
+    "signal": "CASH_COW_GENERATION",
+    "signalLevel": "strong_cashflow",
+    "isInflection": false,
+    "statusTitle": "💎 Cỗ Máy In Tiền Mặt (Cash Cow Generation)",
+    "narrative": "Doanh nghiệp hoạt động như cỗ máy tạo tiền mặt (CFO/NI = 1.28x, FCF dương 1,967 tỷ). Đã vượt qua đỉnh chu kỳ đầu tư lớn, dòng tiền dồi dào hỗ trợ chi trả cổ tức cao hoặc thâu tóm mở rộng.",
+    "cfoToNiRatio": 1.28,
+    "capexToRevenueRatio": 9.2,
+    "accrualsRatio": -0.001,
+    "accrualsRating": "Tốt - Lợi nhuận phản ánh tiền mặt thực tế",
+    "cipRatio": 16.5,
+    "latestFcf": 1967.0,
+    "latestCfo": 5465.0,
+    "latestCapex": 3498.0,
+    "constructionInProgress": 293572.0
+  },
+  "forensicAnalysis": {
+    "beneish": {
+      "mScore": -2.05,
+      "manipulationProbability": "Trung bình / Cần theo dõi",
+      "status": "GREY",
+      "riskLevel": "medium",
+      "isManipulator": false,
+      "periodComparison": "2025 vs 2024",
+      "indices": [
+        {
+          "id": "DSRI",
+          "name": "Chỉ số Khoản Phải Thu (DSRI)",
+          "value": 1.0,
+          "benchmark": "< 1.03",
+          "status": "Bình thường",
+          "isAlert": false,
+          "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
+        },
+        {
+          "id": "GMI",
+          "name": "Chỉ số Biên Gộp (GMI)",
+          "value": 1.0,
+          "benchmark": "< 1.00",
+          "status": "Biên gộp cải thiện",
+          "isAlert": false,
+          "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
+        },
+        {
+          "id": "AQI",
+          "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
+          "value": 1.0,
+          "benchmark": "< 1.05",
+          "status": "Chất lượng tốt",
+          "isAlert": false,
+          "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
+        },
+        {
+          "id": "SGI",
+          "name": "Chỉ số Tăng Trưởng Doanh Thu (SGI)",
+          "value": 1.105,
+          "benchmark": "1.0 - 1.2",
+          "status": "Tăng trưởng bình thường",
+          "isAlert": false,
+          "desc": "Tốc độ tăng doanh thu. DN tăng trưởng nóng thường chịu áp lực duy trì số liệu kỳ vọng."
+        },
+        {
+          "id": "DEPI",
+          "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
+          "value": 1.0,
+          "benchmark": "< 1.00",
+          "status": "Khấu hao bình thường",
+          "isAlert": false,
+          "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
+        },
+        {
+          "id": "SGAI",
+          "name": "Chỉ số Chi Phí Bán Hàng & QLDN (SGAI)",
+          "value": 1.0,
+          "benchmark": "< 1.00",
+          "status": "Tiết giảm tốt",
+          "isAlert": false,
+          "desc": "Tỷ lệ chi phí SG&A / Doanh thu. SGAI > 1 cho thấy chi phí vận hành phình to hơn doanh số."
+        },
+        {
+          "id": "LVGI",
+          "name": "Chỉ số Đòn Bẩy Tài Chính (LVGI)",
+          "value": 1.0,
+          "benchmark": "< 1.05",
+          "status": "Kiểm soát nợ tốt",
+          "isAlert": false,
+          "desc": "Tỷ lệ Nợ / Tổng tài sản kỳ này so với kỳ trước. LVGI > 1 cho thấy đòn bẩy nợ gia tăng."
+        },
+        {
+          "id": "TATA",
+          "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
+          "value": -0.005,
+          "benchmark": "< 0.05",
+          "status": "Dòng tiền thực tốt",
+          "isAlert": false,
+          "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
+        }
+      ],
+      "summary": "M-Score = -2.05 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
+    },
+    "magicFormula": {
+      "earningsYield": 6.16,
+      "roic": 2.53,
+      "compositeScore": 24.8,
+      "category": "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)",
+      "tier": "UNDERPERFORM",
+      "recommendation": "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá.",
+      "parameters": {
+        "ebitTTM": 20996.6,
+        "enterpriseValue": 341044.9,
+        "marketCap": 176464.9,
+        "netDebt": 164580.0,
+        "capitalEmployed": 830479.0
+      },
+      "benchmarks": {
+        "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
+        "roicTarget": "> 15.0% (ROIC cao chứng minh doanh nghiệp có hào kinh tế - Moat sinh lời vốn mạnh)"
+      }
+    },
+    "fcfInflection": {
+      "signal": "CASH_COW_GENERATION",
+      "signalLevel": "strong_cashflow",
+      "isInflection": false,
+      "statusTitle": "💎 Cỗ Máy In Tiền Mặt (Cash Cow Generation)",
+      "narrative": "Doanh nghiệp hoạt động như cỗ máy tạo tiền mặt (CFO/NI = 1.28x, FCF dương 1,967 tỷ). Đã vượt qua đỉnh chu kỳ đầu tư lớn, dòng tiền dồi dào hỗ trợ chi trả cổ tức cao hoặc thâu tóm mở rộng.",
+      "cfoToNiRatio": 1.28,
+      "capexToRevenueRatio": 9.2,
+      "accrualsRatio": -0.001,
+      "accrualsRating": "Tốt - Lợi nhuận phản ánh tiền mặt thực tế",
+      "cipRatio": 16.5,
+      "latestFcf": 1967.0,
+      "latestCfo": 5465.0,
+      "latestCapex": 3498.0,
+      "constructionInProgress": 293572.0
     }
   }
 }

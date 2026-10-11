@@ -8,15 +8,572 @@
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 65186,
+    "grahamNumber": 45712,
     "ddmTarget": null,
-    "peTarget": 65262,
-    "pbTarget": 44925,
-    "evEbitdaFairPrice": 135191,
+    "peTarget": 31464,
+    "pbTarget": 45824,
+    "evEbitdaFairPrice": 127239,
     "pcfFairPrice": 109434,
     "psFairPrice": 104694,
-    "consensusFairValue": 93768,
-    "marginOfSafety": 79.2
+    "consensusFairValue": 43799,
+    "marginOfSafety": 55.5,
+    "upside": 124.6,
+    "consensusDiffPercent": 124.6,
+    "valuationRating": "🟡 HOLD",
+    "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
+    "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+    "validModelsCount": 5,
+    "models10": [
+      {
+        "id": "graham",
+        "name": "Benjamin Graham",
+        "fullName": "1. Benjamin Graham",
+        "cleanName": "Benjamin Graham",
+        "value": 45712,
+        "targetPrice": 45712,
+        "diffPercent": 134.4,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 13.6,
+        "formula": "√(22.5 × EPS × BVPS)",
+        "formulaDetail": "V = √(22.5 × 2,736 × 33,944)",
+        "parameters": {
+          "eps": 2736.0,
+          "bvps": 33944,
+          "multiplier": 22.5
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "pe",
+        "name": "P/E Chuẩn Hóa",
+        "fullName": "2. P/E Chuẩn Hóa",
+        "cleanName": "P/E Chuẩn Hóa",
+        "value": 31464,
+        "targetPrice": 31464,
+        "diffPercent": 61.4,
+        "weight": 0.15,
+        "baseWeight": 0.15,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 40.5,
+        "formula": "EPS × P/E Mục Tiêu (11.5x)",
+        "formulaDetail": "V = 2,736 × 11.5x (Median chu kỳ 5Y)",
+        "parameters": {
+          "eps": 2736.0,
+          "targetPe": 11.5
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "pb",
+        "name": "P/B Ngành & Gordon",
+        "fullName": "3. P/B Ngành & Gordon",
+        "cleanName": "P/B Ngành & Gordon",
+        "value": 45824,
+        "targetPrice": 45824,
+        "diffPercent": 135.0,
+        "weight": 0.15,
+        "baseWeight": 0.15,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 13.4,
+        "formula": "BVPS × [(ROE - g)/(r - g)]",
+        "formulaDetail": "V = 33,944 × Gordon Multiple",
+        "parameters": {
+          "bvps": 33944,
+          "roe": null,
+          "coe": 0.115,
+          "terminalG": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "dcf",
+        "name": "DCF Đa Giai Đoạn",
+        "fullName": "4. DCF Đa Giai Đoạn",
+        "cleanName": "DCF Đa Giai Đoạn",
+        "value": 199356,
+        "targetPrice": 199356,
+        "diffPercent": 922.3,
+        "weight": 0.15,
+        "baseWeight": 0.15,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 276.9,
+        "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+        "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+        "parameters": {
+          "baseFcf": 7000000000000.0,
+          "shares": 511722000.0,
+          "wacc": 0.115,
+          "g1": 0.07,
+          "terminalG": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "ddm",
+        "name": "Chiết Khấu DDM",
+        "fullName": "5. Chiết Khấu DDM",
+        "cleanName": "Chiết Khấu DDM",
+        "value": null,
+        "targetPrice": null,
+        "diffPercent": null,
+        "weight": 0.0,
+        "baseWeight": 0.05,
+        "suitability": 0.0,
+        "suitabilityNote": "Không có DPS",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+        "formulaDetail": "Chiết khấu dòng cổ tức tiền mặt",
+        "parameters": {
+          "dps": 0.0,
+          "coe": 0.115,
+          "g": 0.035
+        },
+        "statusNote": "Không có cổ tức tiền mặt"
+      },
+      {
+        "id": "fcff",
+        "name": "FCFF Doanh Nghiệp",
+        "fullName": "6. FCFF Doanh Nghiệp",
+        "cleanName": "FCFF Doanh Nghiệp",
+        "value": 199356,
+        "targetPrice": 199356,
+        "diffPercent": 922.3,
+        "weight": 0.12,
+        "baseWeight": 0.12,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 276.9,
+        "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+        "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+        "parameters": {
+          "fcff": 7000000000000.0,
+          "netDebt": 4069000000000.0,
+          "wacc": 0.115,
+          "shares": 511722000.0
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "fcfe",
+        "name": "FCFE Cổ Đông",
+        "fullName": "7. FCFE Cổ Đông",
+        "cleanName": "FCFE Cổ Đông",
+        "value": 59964,
+        "targetPrice": 59964,
+        "diffPercent": 207.5,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 13.4,
+        "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+        "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+        "parameters": {
+          "cfo": 7000000000000.0,
+          "capex": 4480000000000.0,
+          "coe": 0.115,
+          "shares": 511722000.0
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "rim",
+        "name": "Residual Income RIM/EVA",
+        "fullName": "8. Residual Income RIM/EVA",
+        "cleanName": "Residual Income RIM/EVA",
+        "value": null,
+        "targetPrice": null,
+        "diffPercent": null,
+        "weight": 0.044,
+        "baseWeight": 0.08,
+        "suitability": 0.55,
+        "suitabilityNote": "Thứ cấp phi TC",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+        "formulaDetail": "BVPS=33,944 đ, ROE=0.0%, CoE=11.5%",
+        "parameters": {
+          "equity": 17474000000000.0,
+          "bvps": 33944,
+          "roe": null,
+          "coe": 0.115,
+          "shares": 511722000.0
+        },
+        "statusNote": "Vốn chủ âm hoặc ROE < CoE"
+      },
+      {
+        "id": "nav",
+        "name": "Book NAV / RNAV",
+        "fullName": "9. Book NAV / RNAV",
+        "cleanName": "Book NAV / RNAV",
+        "value": 27318,
+        "targetPrice": 27318,
+        "diffPercent": 40.1,
+        "weight": 0.032,
+        "baseWeight": 0.07,
+        "suitability": 0.45,
+        "suitabilityNote": "Thứ cấp phi TC/BĐS",
+        "isOutlier": false,
+        "outlierGapPct": 48.4,
+        "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+        "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+        "parameters": {
+          "equity": 17474000000000.0,
+          "totalAssets": 21543000000000.0,
+          "totalDebt": 4069000000000.0,
+          "inventory": null,
+          "shares": 511722000.0
+        },
+        "statusNote": "Thứ cấp phi TC/BĐS"
+      },
+      {
+        "id": "evebitda",
+        "name": "EV/EBITDA & EV/Sales",
+        "fullName": "10. EV/EBITDA & EV/Sales",
+        "cleanName": "EV/EBITDA & EV/Sales",
+        "value": 111991,
+        "targetPrice": 111991,
+        "diffPercent": 474.3,
+        "weight": 0.07,
+        "baseWeight": 0.07,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 111.7,
+        "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+        "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+        "parameters": {
+          "ebitda": 9224000000000.0,
+          "multiple": 7.5,
+          "revenue": 48704000000000.0,
+          "salesMultiple": 1.1,
+          "netDebt": 4069000000000.0,
+          "shares": 511722000.0
+        },
+        "statusNote": "Phù hợp"
+      }
+    ],
+    "consensusDetails": {
+      "cleanWeightedAvg": 42523,
+      "cleanMedian": 45712,
+      "dispersionPct": 7.0,
+      "consensusLevel": "HIGH",
+      "coveragePct": 55.6,
+      "confidenceScore": 77.2,
+      "modelsUsed": 5,
+      "modelsValid": 8,
+      "excludedOutliers": [
+        "DCF Đa Giai Đoạn",
+        "FCFF Doanh Nghiệp",
+        "EV/EBITDA & EV/Sales"
+      ]
+    },
+    "valuationTraps": {
+      "trapScore": 2.5,
+      "trapLabel": "TB",
+      "trapReason": "Book Trap (ROE thấp hơn Chi phí vốn CoE)",
+      "isCapPenalized": false,
+      "trapsList": [
+        {
+          "id": "value_trap",
+          "name": "Value Trap",
+          "active": false,
+          "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+        },
+        {
+          "id": "book_trap",
+          "name": "Book Trap",
+          "active": true,
+          "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+        },
+        {
+          "id": "cyclical_peak",
+          "name": "Cyclical Peak",
+          "active": false,
+          "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+        },
+        {
+          "id": "dividend_trap",
+          "name": "Dividend Trap",
+          "active": false,
+          "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+        },
+        {
+          "id": "debt_stress",
+          "name": "Debt Stress",
+          "active": false,
+          "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+        },
+        {
+          "id": "share_dilution",
+          "name": "Share Dilution",
+          "active": false,
+          "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+        },
+        {
+          "id": "wc_stress",
+          "name": "Working Capital Stress",
+          "active": false,
+          "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+        }
+      ]
+    },
+    "sevenPriceZones": {
+      "currentZone": "Deep Value",
+      "zoneBadge": "bg-emerald-600 text-white",
+      "safeBuyPrice": 32849,
+      "acceptableBuyPrice": 37229,
+      "bearPrice": 30659,
+      "bullPrice": 54749,
+      "boundaries": {
+        "deepValue": 29564,
+        "safeBuy": 32849,
+        "accumulate": 37229,
+        "fairLow": 39419,
+        "fairHigh": 48179,
+        "aboveFair": 52011,
+        "expensive": 62961
+      }
+    },
+    "threeLayerDecision": {
+      "compositeScore": 7.9,
+      "valuationLayerScore": 10.0,
+      "qualityLayerScore": 6.5,
+      "timingLayerScore": 6.5,
+      "roeCoeSpread": -1.5,
+      "buyRecommendation": "🟡 HOLD",
+      "decisionReason": "Thiếu độ phủ mô hình hoặc phân tán cao",
+      "isGateOpen": false,
+      "isTrapCapped": false
+    },
+    "historicalBands": {
+      "band25": 35579,
+      "band50": 41025,
+      "band75": 50386,
+      "bandPosition": "Dưới P25 (Vùng Rẻ)",
+      "bandWidthPct": 36.1,
+      "peBand": {
+        "p25": 10.5,
+        "p50": 12.0,
+        "p75": 14.5,
+        "current": 7.13
+      },
+      "pbBand": {
+        "p25": 1.25,
+        "p50": 1.45,
+        "p75": 1.8,
+        "current": 0.57
+      },
+      "priceBands": {
+        "peP25Price": 28728,
+        "peP50Price": 32832,
+        "peP75Price": 39672,
+        "pbP25Price": 42430,
+        "pbP50Price": 49219,
+        "pbP75Price": 61099
+      }
+    },
+    "dividendSustainability": {
+      "score": 0.0,
+      "status": "Không có DPS",
+      "payoutRatio": null,
+      "fcfPayoutRatio": null,
+      "consistency": 0.0
+    },
+    "finvalLab": {
+      "items": [
+        {
+          "key": "eps",
+          "label": "EPS (Thu nhập mỗi CP)",
+          "unit": "đ",
+          "current": 2736.0,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "bvps",
+          "label": "BVPS (Giá trị sổ sách)",
+          "unit": "đ",
+          "current": 33944,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "pe",
+          "label": "Hệ số P/E",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "pb",
+          "label": "Hệ số P/B",
+          "unit": "x",
+          "current": 0.75,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "roe",
+          "label": "Tỷ suất ROE",
+          "unit": "%",
+          "current": null,
+          "sma5y": 17.02,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "roa",
+          "label": "Tỷ suất ROA",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "roic",
+          "label": "Tỷ suất ROIC",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "grossMargin",
+          "label": "Biên Lợi Nhuận Gộp",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "netMargin",
+          "label": "Biên Lợi Nhuận Ròng",
+          "unit": "%",
+          "current": null,
+          "sma5y": 6.67,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "revenue",
+          "label": "Doanh Thu Thuần",
+          "unit": "Tỷ",
+          "current": 48704.0,
+          "sma5y": 37137.8,
+          "deltaPct": 31.1,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "netIncome",
+          "label": "Lợi Nhuận Sau Thuế",
+          "unit": "Tỷ",
+          "current": 5488.0,
+          "sma5y": 2475.6,
+          "deltaPct": 121.7,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "ebitda",
+          "label": "Chỉ số EBITDA",
+          "unit": "Tỷ",
+          "current": 9224.0,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "Dòng Tiền Tự Do FCF",
+          "unit": "Tỷ",
+          "current": 7000.0,
+          "sma5y": 1064.6,
+          "deltaPct": 557.5,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "debtToEquity",
+          "label": "Nợ / Vốn Chủ (D/E)",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "currentRatio",
+          "label": "Hệ Số Thanh Toán Hiện Hành",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "cashRatio",
+          "label": "Hệ Số Tiền Mặt",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        }
+      ]
+    },
+    "impliedFcfYieldPrice": 165810
   },
   "financialRatios": {
     "valuation": {
@@ -65,6 +622,15 @@
   },
   "corporateEvents": [
     {
+      "date": "2026-10-08",
+      "type": "Giao dịch nội bộ",
+      "content": "Khối ngoại và người nhà Chủ tịch PNJ thoái vốn giữa đà giảm giá",
+      "ratio": "—",
+      "value": null,
+      "source": "Laodong.vn",
+      "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQQS0tby1BU3pjN0ZXeWItNEdWR0V0VzR0azNQU1dXTHgwdUFKWUVsbUdzMFluMzhBc1h5c0hxX3lBRDh0TGNzcHRNWXhwUVJNLTVMbG1CTExpRVJtcXJFZnk3d2V2TGo4N1d6Y01Ydko3REdWamZheG5aWFlpVjdsQXVxX0JXdkNud05lQTE2QXpKXzNPWjFZY3RVTEZrVGhjOC1nb3JTbEM?oc=5"
+    },
+    {
       "date": "2026-10-07",
       "type": "Đại hội cổ đông",
       "content": "Gã khổng lồ quản lý 12.000 tỷ USD rời ghế cổ đông lớn tại PNJ ngay trước đại hội bất thường",
@@ -88,7 +654,7 @@
       "content": "PNJ phát hành riêng lẻ tối đa 550 triệu cổ phiếu, điều chỉnh chính sách thu mua",
       "ratio": "—",
       "value": null,
-      "source": "Baodautu.vn",
+      "source": "baodautu",
       "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPSTJhS1NXLTQ2TmlKODZfWXozbzhJN0tYcXh1VnY4cjFvTTk4X1Q1RUIxaXJleTF3WGpXbW5FbExRU0NvajhacFhBcDZKdUdwdWZNTzV0RS1JblVmYTgtQVVHa0lnMVBSUWlTUk04b2NiSG5hay1RSTdUc01NdnZXYXY2MXl2SWtqQ3dqYnhpdjBORnRRelZHc1RBY0dob3dBWlR5OUZ4S010VEVpa0RQag?oc=5"
     },
     {
@@ -1093,6 +1659,20 @@
       },
       {
         "id": "news-PNJ-5",
+        "title": "Top 10 cổ phiếu tăng/giảm mạnh nhất tuần: KOS vẫn bị bán tháo, PNJ được cứu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNYlVKRE45amRkYTVmbVotOVFJYnRKR0pmLVRIWk9JMnRIVDlieDVaLThYMXcwWUFuSzZKbFRmdkg4eGZmVDNBRjhETUdJaE9ETUdYa1VKTm1ObkF3UXZVa1liTVN1S1ZyV1o2NzBzU0lmcUwzODdfZmhxVDZTcEt3OG9pUW4tRnpET0tFWjNBRmRqVkdPRDB0N1JrMllaQ1l2Z3ZJUFhxNVFDYmVlZmw0bXd0V2t1SExyQThOVnNiY9IBuwFBVV95cUxPa1JEbjEtazF3SDNNZVN2eFk4cDhoYTNsRUt5clJwQlROM3V1alptbDR4UUVHeGdCOFFrbHpVQ1pBNDI0aDBiUkNHRUFFNkNuS2h2OFZ6elVDS2l5S3lwNV8wWW9WTlJEX0paSjZyX0F0SkNsUnBuQXJicmF0RW1VMmZiYU83RzJRUXl2SHZmZHJEamw2WjFZMTNoQXQ2RXVYMzM3Ml9NT3ZWU3hMdDhicjdMUm80MnpnZmE0?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-6",
         "title": "Cổ phiếu PNJ bất ngờ tăng trần",
         "summary": "Bản tin phân tích về PNJ từ nguồn Znews. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1106,21 +1686,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-6",
-        "title": "Cổ phiếu PNJ tăng kịch trần, Novaland ngược dòng",
-        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
+        "id": "news-PNJ-7",
+        "title": "PNJ thoát chuỗi giảm sàn, hơn 5 triệu cổ phiếu chờ mua giá trần",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-09.",
+        "category": "analyst",
+        "categoryLabel": "Phân Tích CTCK",
         "date": "2026-10-09",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPYmNoZ0RXZkhVQVhrY1NRNnNZYU5wamdCMjgwNFIyRnlLX1FkWktOeWFKZFRndGMzUTZ5ejc1a1FZSHk3bEN5Rk9YdVNMQy1rTXd2bXBhWHhabnd5dEN1T3ZGVjVyaXZFM3VTQU9teVZacTNaTGtIcHJBLVlRck11UTYwb3FtdDhpaFFXSkRnZjI?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
+        "source": "Báo Tuổi Trẻ",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOV3ZERWJ6U2RYVUNqc2NsbkhxX2VRR1RkcXhtRnRVRWhxb01WdEVrbDFESndGUy00OXlobWRUSm1vRV9WNmZDNnh5YWpPS0JLU1VFNTRsMTBYMHVRUVNjSDdXNVN6bnFtWUhTekgxTlJmN25lRzdQaldVWTUtZ181Z3ZrXzNxWDQ1ZWVwN051NURIWVhyLThaLXVnU3pJcFpia2FiaEh0VQ?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-7",
+        "id": "news-PNJ-8",
         "title": "Cổ phiếu PNJ bất ngờ có sắc tím sau chuỗi ngày \"dò đáy\"",
         "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1130,20 +1710,6 @@
         "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOeEQ4MV83THgzcmRsaW1BalJOVHpZUW8tbWctQ1NiX0JWX3l4Zi1OY2V3UVFoRVJoeUd4OGxjX01DX0ViLTk4NmZZWE5SQmEtOGpKX2wtWUZkdmkyelBrQzh1bl9SMVl2cGxPLVppdFBPSjAyOUxlMkdOWnBWVzlleVM0MS1pR0tNc3plczYtTjRGaEJvWXhpWkVLVQ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-8",
-        "title": "Cổ phiếu PNJ bật \"tím\": Tín hiệu phục hồi hay hiệu ứng nhất thời từ kết quả kiểm định?",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-10-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-09",
-        "source": "Tạp chí Doanh nghiệp và Hội nhập",
-        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPU3NNcWxjU2laS2ZsQXdjZXdCU213MFdIbHZWUDRqMW1OR2tzaGdRVlppUnhLVXVwZ2d4Q2doVWphNnBqanR5aTYxalhVRUdjVlZDNEljeEJFaHN3ZXR3TW9kb0lJck9LVGpaaGR5d0hubTgzWUJEZHIycGdNYjJlVG1BaVpSSVBUQzZ6X0xnZDlmbzdRaU1fTmswSmUwbEFIbnhfdUxiMnhzbXczRzJVMjVUeHgteUlYc2NJVTZWOVE1QQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -1163,6 +1729,20 @@
       },
       {
         "id": "news-PNJ-10",
+        "title": "Cổ phiếu PNJ bật \"tím\": Tín hiệu phục hồi hay hiệu ứng nhất thời từ kết quả kiểm định?",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "Tạp chí Doanh nghiệp và Hội nhập",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPU3NNcWxjU2laS2ZsQXdjZXdCU213MFdIbHZWUDRqMW1OR2tzaGdRVlppUnhLVXVwZ2d4Q2doVWphNnBqanR5aTYxalhVRUdjVlZDNEljeEJFaHN3ZXR3TW9kb0lJck9LVGpaaGR5d0hubTgzWUJEZHIycGdNYjJlVG1BaVpSSVBUQzZ6X0xnZDlmbzdRaU1fTmswSmUwbEFIbnhfdUxiMnhzbXczRzJVMjVUeHgteUlYc2NJVTZWOVE1QQ?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-11",
         "title": "Cổ phiếu PNJ bất ngờ tăng trần sau khi kết quả kiểm định độc lập kim cương được công bố",
         "summary": "Bản tin phân tích về PNJ từ nguồn Nhịp sống kinh doanh. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1176,7 +1756,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-11",
+        "id": "news-PNJ-12",
         "title": "Cổ phiếu PNJ tăng trần sau cú rơi 55%, quỹ ngoại bán mạnh",
         "summary": "Bản tin phân tích về PNJ từ nguồn Hangthat.vn. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1190,7 +1770,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-12",
+        "id": "news-PNJ-13",
         "title": "Giảm gần 80% từ đỉnh, PNJ tăng trần sau kết quả kiểm định kim cương",
         "summary": "Bản tin phân tích về PNJ từ nguồn Investing.com Việt Nam. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1204,7 +1784,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-13",
+        "id": "news-PNJ-14",
         "title": "Novaland, PNJ đồng loạt tăng trần, Quốc Cường Gia Lai bật mạnh sau thông tin liên quan bà Nguyễn Thị Như Loan",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1218,7 +1798,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-14",
+        "id": "news-PNJ-15",
         "title": "PNJ bất ngờ \"cháy hàng\"",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1232,7 +1812,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-15",
+        "id": "news-PNJ-16",
         "title": "Từng thắng lớn với dầu gội X-Men, ông Phan Quốc Công đang tạm lỗ 16 tỷ đồng tại PNJ",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1246,35 +1826,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-16",
-        "title": "Cổ phiếu PNJ đã thủng đáy năm, tại mức giá 18.xx",
-        "summary": "Bản tin phân tích về PNJ từ nguồn 24HMoney. Cập nhật ngày 2026-10-08.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-08",
-        "source": "24HMoney",
-        "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNR01mQUN1OXdyaTNrcWJaWHdHanV0YlR0aTlPcWdDRHN5ZVJETjEyclNWY0lYbWx4NFVySnYzbjZXU1g1YjEzNWlxdVRoXzVLY2M0cWFXWEttNk83RmJaNGtUWUhHWUNMMmVVY1hObG0tdVlERHlPOWFueElsLUFJaEdXWTg3d1d5UHNLUmptNU9xdw?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
         "id": "news-PNJ-17",
-        "title": "Con gái và em trai Chủ tịch Cao Thị Ngọc Dung đã bán tổng cộng 34 triệu cổ phiếu PNJ",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-08.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-08",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNZDJ3SnJJX0RwU2JwMk9DbVVyWmhDZjlqeEVxU2oxWGFWaTQwc21jdXp6Q1Z1VHFFUDdjTXBVdjlWaHhJRDNxV2hyd2QzNkRQTi1VM2pOY240c0hvUlA0YWR6X3lfREdwM3FEakc5bVhldzZVTG5RSnVHNUlTaDFXbEZKQWdPSHUtR2RtdFRYWHZuUC0yMVdQaVNvd0U4anNDQzJmcmNWWFVZZ0VkUGlsTUxETDcxMXZFQWNCenM3cXNPVGFqNERSLXFEeVZWSGvSAcsBQVVfeXFMTUJNeFRtNXNDcGd5VjRDMmFTelRrWl9ubWNuREQtUlY0cFpwa2NMeW5fSzNQWlc1RVA1RWxCNG45bjdudzVoY1JLTS0tczZyQy1jemtvOXpsMkJNeVJ6UlpwTHluQzFocmR3d2NFbG42Q0I0ZlJvbVZyNTdMMmFPSU1xNkZPZWZWaGlmZ1BtY1Z2SXE4YlF4czVidlg3WXlrUm9YOTM0Y0NBUUg5bXVUVDl0a2NCc1hIajN3cWtRaXZuZW82QjI3c3pJTlU?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-18",
         "title": "Động thái mới của \"cá mập\" nước ngoài khi cổ phiếu PNJ thấp nhất 10 năm",
         "summary": "Bản tin phân tích về PNJ từ nguồn Báo Dân trí. Cập nhật ngày 2026-10-08.",
         "category": "biz",
@@ -1288,7 +1840,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-19",
+        "id": "news-PNJ-18",
         "title": "Em trai Chủ tịch PNJ bán xong 9 triệu cổ phiếu",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-08.",
         "category": "disclosure",
@@ -1302,7 +1854,35 @@
         "weight": 1.0
       },
       {
+        "id": "news-PNJ-19",
+        "title": "9 triệu cổ phiếu PNJ được em trai Chủ tịch bán sạch trong 2 ngày",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-10-08.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-10-08",
+        "source": "Tạp chí Doanh nghiệp và Hội nhập",
+        "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPTzVjRVhJM045bUlhdVJZckg3SVlaUWdxTmlMT3JIOGthSTQ0QmsyNGdWU3pvczZycmI3LXhlWldlb0EyUHprMm5pRktoZ0tWMTE4bGY4VGJzd3hyaFNHMkhRcUhSbDBUUGsybi1mekdka0hPTFllQTZrWFpzYlJDZ0FrX0l4RnVEOXBQM253WF9JS3RMOGl6cU43WmFmVnZTVUZmRm02TGN5UQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
         "id": "news-PNJ-20",
+        "title": "Khối ngoại và người nhà Chủ tịch PNJ thoái vốn giữa đà giảm giá",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-08.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-10-08",
+        "source": "Laodong.vn",
+        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQQS0tby1BU3pjN0ZXeWItNEdWR0V0VzR0azNQU1dXTHgwdUFKWUVsbUdzMFluMzhBc1h5c0hxX3lBRDh0TGNzcHRNWXhwUVJNLTVMbG1CTExpRVJtcXJFZnk3d2V2TGo4N1d6Y01Ydko3REdWamZheG5aWFlpVjdsQXVxX0JXdkNud05lQTE2QXpKXzNPWjFZY3RVTEZrVGhjOC1nb3JTbEM?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-21",
         "title": "AIGS công bố kết quả kiểm định: 100% mẫu kim cương PNJ là kim cương thiên nhiên",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-08.",
         "category": "biz",
@@ -1316,7 +1896,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-21",
+        "id": "news-PNJ-22",
         "title": "Cổ phiếu PNJ chạm đáy lịch sử, nhà đầu tư bắt đáy lỗ nặng",
         "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1330,7 +1910,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-22",
+        "id": "news-PNJ-23",
         "title": "Cổ phiếu PNJ ở mức thấp nhất 10 năm, lộ diện quỹ ngoại bán ròng 5 triệu cổ phiếu",
         "summary": "Bản tin phân tích về PNJ từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1344,7 +1924,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-23",
+        "id": "news-PNJ-24",
         "title": "Vốn hóa cổ phiếu PNJ bốc hơi 30.000 tỉ đồng, chạm đáy gần một thập kỷ",
         "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1358,7 +1938,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-24",
+        "id": "news-PNJ-25",
         "title": "Lộ diện tổ chức nước ngoài bán cổ phiếu PNJ trong phiên khớp lệnh kỷ lục",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1372,7 +1952,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-25",
+        "id": "news-PNJ-26",
         "title": "Nhà đầu tư tháo chạy: Vốn hóa PNJ xuống dưới 10.000 tỷ, thấp nhất gần một thập kỷ",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1386,7 +1966,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-26",
+        "id": "news-PNJ-27",
         "title": "Buồn của cổ đông PNJ: Bắt đáy lãi ngay 10%, nhưng hàng về tài khoản thì lỗ",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1400,7 +1980,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-27",
+        "id": "news-PNJ-28",
         "title": "Gã khổng lồ quản lý 12.000 tỷ USD rời ghế cổ đông lớn tại PNJ ngay trước đại hội bất thường",
         "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-07.",
         "category": "disclosure",
@@ -1414,7 +1994,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-28",
+        "id": "news-PNJ-29",
         "title": "Hai nhóm cổ đông ngoại bán hơn 12 triệu cổ phiếu PNJ, cùng rời danh sách cổ đông lớn",
         "summary": "Bản tin phân tích về PNJ từ nguồn Người Đưa Tin. Cập nhật ngày 2026-10-07.",
         "category": "disclosure",
@@ -1428,7 +2008,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-29",
+        "id": "news-PNJ-30",
         "title": "Cổ phiếu PNJ tiếp tục bị bán mạnh",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1442,7 +2022,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-30",
+        "id": "news-PNJ-31",
         "title": "PNJ được dự báo lỗ nặng quý III/2026 dù doanh thu gần 11.800 tỷ đồng: Điều gì đang 'rút cạn' lợi nhuận?",
         "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1456,7 +2036,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-31",
+        "id": "news-PNJ-32",
         "title": "Cổ phiếu PNJ lại bị bán mạnh, thị giá chia hơn 4 lần từ đỉnh",
         "summary": "Bản tin phân tích về PNJ từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-06.",
         "category": "biz",
@@ -1464,20 +2044,6 @@
         "date": "2026-10-06",
         "source": "Báo Tuổi Trẻ",
         "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOS296QnR5T1h3c3pQODlySHQ3Q0VYYTBHQmVSU3NsLTBnemYyc092eEZrSE1Da19BdDBiWE5HUTMzelFXU01aZjVWaXU4dVc4bkpXMnBtU1VrSlNuRllVMDZ0X0t1X3NtWFp0c1pSZ2xWVndCdE5mQmpPaFJtdUR5TFUtajUyRHRoNElhN0FHUnA2aUtRbFhMTWlhbHhWczlqaU9v?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-32",
-        "title": "Cổ phiếu PNJ chạm đáy 10 năm",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Znews. Cập nhật ngày 2026-10-06.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-06",
-        "source": "Znews",
-        "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBRRURZNzFzb29iaTI2VkxMc041Uk8xdUJqRHJUb0NFMU10TnFfamdXQkdISmJJNGlVdURaY2lzb2xwSC1QUFVLcVBjQ0FUS3JHUmc2c0ZPUWgxY2pzdWhnSjdXTUkxZTRYaUxfY3ZyRQ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -1570,11 +2136,11 @@
       {
         "id": "news-PNJ-39",
         "title": "PNJ phát hành riêng lẻ tối đa 550 triệu cổ phiếu, điều chỉnh chính sách thu mua",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Baodautu.vn. Cập nhật ngày 2026-09-30.",
+        "summary": "Bản tin phân tích về PNJ từ nguồn baodautu. Cập nhật ngày 2026-09-30.",
         "category": "macro",
         "categoryLabel": "Vĩ Mô & Chính Sách",
         "date": "2026-09-30",
-        "source": "Baodautu.vn",
+        "source": "baodautu",
         "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPSTJhS1NXLTQ2TmlKODZfWXozbzhJN0tYcXh1VnY4cjFvTTk4X1Q1RUIxaXJleTF3WGpXbW5FbExRU0NvajhacFhBcDZKdUdwdWZNTzV0RS1JblVmYTgtQVVHa0lnMVBSUWlTUk04b2NiSG5hay1RSTdUc01NdnZXYXY2MXl2SWtqQ3dqYnhpdjBORnRRelZHc1RBY0dob3dBWlR5OUZ4S010VEVpa0RQag?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
@@ -1737,24 +2303,24 @@
       }
     ],
     "sentiment": {
-      "score": -19.3,
-      "verdict": "NEUTRAL",
-      "verdictText": "Trung Lập (Thông tin đan xen hai chiều)",
-      "verdictBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-      "bullishCount": 7,
-      "neutralCount": 29,
-      "bearishCount": 14,
+      "score": -26.3,
+      "verdict": "BEARISH",
+      "verdictText": "Tiêu Cực (Áp lực tin tức kém khả quan)",
+      "verdictBadge": "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
+      "bullishCount": 6,
+      "neutralCount": 27,
+      "bearishCount": 17,
       "totalCount": 50,
       "categoryScores": {
-        "disclosure": -14.3,
-        "biz": -22.0,
-        "analyst": 0.0,
+        "disclosure": -20.0,
+        "biz": -28.2,
+        "analyst": -50.0,
         "macro": 0.0
       }
     },
     "tldr": {
       "title": "PNJ 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Bản tin 30 ngày của PNJ ghi nhận sự cân bằng giữa các yếu tố cơ bản và biến số vĩ mô. Tổng cộng có 50 sự kiện và tin tức được ghi nhận. Sự kiện nổi bật nhất: 'Con gái Chủ tịch PNJ bị bán giải chấp gần 3 triệu cổ phiếu'. Tâm lý thị trường nhìn chung ở trạng thái trung lập chờ tín hiệu rõ ràng hơn.",
+      "summary": "Dòng tin tức 30 ngày gần nhất của PNJ chịu áp lực điều chỉnh với 17/50 tin tức tiêu cực. Vấn đề gây quan ngại chính là: 'Con gái Chủ tịch PNJ bị bán giải chấp gần 3 triệu cổ phiếu'. Nhà đầu tư nên thận trọng quan sát các chuyển biến về biên lợi nhuận và thị trường chung.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -1763,20 +2329,258 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "14.0%",
+          "value": "12.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "-19.3",
-          "type": "neutral"
+          "value": "-26.3",
+          "type": "negative"
         },
         {
           "label": "Trạng Thái Chủ Đạo",
-          "value": "NEUTRAL",
-          "type": "neutral"
+          "value": "BEARISH",
+          "type": "negative"
         }
       ]
+    }
+  },
+  "beneishMScore": {
+    "mScore": -2.18,
+    "manipulationProbability": "Trung bình / Cần theo dõi",
+    "status": "GREY",
+    "riskLevel": "medium",
+    "isManipulator": false,
+    "periodComparison": "2025 vs 2024",
+    "indices": [
+      {
+        "id": "DSRI",
+        "name": "Chỉ số Khoản Phải Thu (DSRI)",
+        "value": 1.0,
+        "benchmark": "< 1.03",
+        "status": "Bình thường",
+        "isAlert": false,
+        "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
+      },
+      {
+        "id": "GMI",
+        "name": "Chỉ số Biên Gộp (GMI)",
+        "value": 1.0,
+        "benchmark": "< 1.00",
+        "status": "Biên gộp cải thiện",
+        "isAlert": false,
+        "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
+      },
+      {
+        "id": "AQI",
+        "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
+        "value": 1.0,
+        "benchmark": "< 1.05",
+        "status": "Chất lượng tốt",
+        "isAlert": false,
+        "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
+      },
+      {
+        "id": "SGI",
+        "name": "Chỉ số Tăng Trưởng Doanh Thu (SGI)",
+        "value": 1.105,
+        "benchmark": "1.0 - 1.2",
+        "status": "Tăng trưởng bình thường",
+        "isAlert": false,
+        "desc": "Tốc độ tăng doanh thu. DN tăng trưởng nóng thường chịu áp lực duy trì số liệu kỳ vọng."
+      },
+      {
+        "id": "DEPI",
+        "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
+        "value": 1.0,
+        "benchmark": "< 1.00",
+        "status": "Khấu hao bình thường",
+        "isAlert": false,
+        "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
+      },
+      {
+        "id": "SGAI",
+        "name": "Chỉ số Chi Phí Bán Hàng & QLDN (SGAI)",
+        "value": 1.0,
+        "benchmark": "< 1.00",
+        "status": "Tiết giảm tốt",
+        "isAlert": false,
+        "desc": "Tỷ lệ chi phí SG&A / Doanh thu. SGAI > 1 cho thấy chi phí vận hành phình to hơn doanh số."
+      },
+      {
+        "id": "LVGI",
+        "name": "Chỉ số Đòn Bẩy Tài Chính (LVGI)",
+        "value": 1.0,
+        "benchmark": "< 1.05",
+        "status": "Kiểm soát nợ tốt",
+        "isAlert": false,
+        "desc": "Tỷ lệ Nợ / Tổng tài sản kỳ này so với kỳ trước. LVGI > 1 cho thấy đòn bẩy nợ gia tăng."
+      },
+      {
+        "id": "TATA",
+        "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
+        "value": -0.039,
+        "benchmark": "< 0.05",
+        "status": "Dòng tiền thực tốt",
+        "isAlert": false,
+        "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
+      }
+    ],
+    "summary": "M-Score = -2.18 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
+  },
+  "magicFormula": {
+    "earningsYield": 72.21,
+    "roic": 56.99,
+    "compositeScore": 100.0,
+    "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
+    "tier": "TOP_TIER",
+    "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
+    "parameters": {
+      "ebitTTM": 6725.7,
+      "enterpriseValue": 9314.6,
+      "marketCap": 9978.6,
+      "netDebt": -664.0,
+      "capitalEmployed": 11801.0
+    },
+    "benchmarks": {
+      "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
+      "roicTarget": "> 15.0% (ROIC cao chứng minh doanh nghiệp có hào kinh tế - Moat sinh lời vốn mạnh)"
+    }
+  },
+  "fcfInflection": {
+    "signal": "CASH_COW_GENERATION",
+    "signalLevel": "strong_cashflow",
+    "isInflection": false,
+    "statusTitle": "💎 Cỗ Máy In Tiền Mặt (Cash Cow Generation)",
+    "narrative": "Doanh nghiệp hoạt động như cỗ máy tạo tiền mặt (CFO/NI = 1.28x, FCF dương 630 tỷ). Đã vượt qua đỉnh chu kỳ đầu tư lớn, dòng tiền dồi dào hỗ trợ chi trả cổ tức cao hoặc thâu tóm mở rộng.",
+    "cfoToNiRatio": 1.28,
+    "capexToRevenueRatio": 9.2,
+    "accrualsRatio": -0.018,
+    "accrualsRating": "Tốt - Lợi nhuận phản ánh tiền mặt thực tế",
+    "cipRatio": 16.5,
+    "latestFcf": 630.0,
+    "latestCfo": 1750.0,
+    "latestCapex": 1120.0,
+    "constructionInProgress": 3560.0
+  },
+  "forensicAnalysis": {
+    "beneish": {
+      "mScore": -2.18,
+      "manipulationProbability": "Trung bình / Cần theo dõi",
+      "status": "GREY",
+      "riskLevel": "medium",
+      "isManipulator": false,
+      "periodComparison": "2025 vs 2024",
+      "indices": [
+        {
+          "id": "DSRI",
+          "name": "Chỉ số Khoản Phải Thu (DSRI)",
+          "value": 1.0,
+          "benchmark": "< 1.03",
+          "status": "Bình thường",
+          "isAlert": false,
+          "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
+        },
+        {
+          "id": "GMI",
+          "name": "Chỉ số Biên Gộp (GMI)",
+          "value": 1.0,
+          "benchmark": "< 1.00",
+          "status": "Biên gộp cải thiện",
+          "isAlert": false,
+          "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
+        },
+        {
+          "id": "AQI",
+          "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
+          "value": 1.0,
+          "benchmark": "< 1.05",
+          "status": "Chất lượng tốt",
+          "isAlert": false,
+          "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
+        },
+        {
+          "id": "SGI",
+          "name": "Chỉ số Tăng Trưởng Doanh Thu (SGI)",
+          "value": 1.105,
+          "benchmark": "1.0 - 1.2",
+          "status": "Tăng trưởng bình thường",
+          "isAlert": false,
+          "desc": "Tốc độ tăng doanh thu. DN tăng trưởng nóng thường chịu áp lực duy trì số liệu kỳ vọng."
+        },
+        {
+          "id": "DEPI",
+          "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
+          "value": 1.0,
+          "benchmark": "< 1.00",
+          "status": "Khấu hao bình thường",
+          "isAlert": false,
+          "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
+        },
+        {
+          "id": "SGAI",
+          "name": "Chỉ số Chi Phí Bán Hàng & QLDN (SGAI)",
+          "value": 1.0,
+          "benchmark": "< 1.00",
+          "status": "Tiết giảm tốt",
+          "isAlert": false,
+          "desc": "Tỷ lệ chi phí SG&A / Doanh thu. SGAI > 1 cho thấy chi phí vận hành phình to hơn doanh số."
+        },
+        {
+          "id": "LVGI",
+          "name": "Chỉ số Đòn Bẩy Tài Chính (LVGI)",
+          "value": 1.0,
+          "benchmark": "< 1.05",
+          "status": "Kiểm soát nợ tốt",
+          "isAlert": false,
+          "desc": "Tỷ lệ Nợ / Tổng tài sản kỳ này so với kỳ trước. LVGI > 1 cho thấy đòn bẩy nợ gia tăng."
+        },
+        {
+          "id": "TATA",
+          "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
+          "value": -0.039,
+          "benchmark": "< 0.05",
+          "status": "Dòng tiền thực tốt",
+          "isAlert": false,
+          "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
+        }
+      ],
+      "summary": "M-Score = -2.18 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
+    },
+    "magicFormula": {
+      "earningsYield": 72.21,
+      "roic": 56.99,
+      "compositeScore": 100.0,
+      "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
+      "tier": "TOP_TIER",
+      "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
+      "parameters": {
+        "ebitTTM": 6725.7,
+        "enterpriseValue": 9314.6,
+        "marketCap": 9978.6,
+        "netDebt": -664.0,
+        "capitalEmployed": 11801.0
+      },
+      "benchmarks": {
+        "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
+        "roicTarget": "> 15.0% (ROIC cao chứng minh doanh nghiệp có hào kinh tế - Moat sinh lời vốn mạnh)"
+      }
+    },
+    "fcfInflection": {
+      "signal": "CASH_COW_GENERATION",
+      "signalLevel": "strong_cashflow",
+      "isInflection": false,
+      "statusTitle": "💎 Cỗ Máy In Tiền Mặt (Cash Cow Generation)",
+      "narrative": "Doanh nghiệp hoạt động như cỗ máy tạo tiền mặt (CFO/NI = 1.28x, FCF dương 630 tỷ). Đã vượt qua đỉnh chu kỳ đầu tư lớn, dòng tiền dồi dào hỗ trợ chi trả cổ tức cao hoặc thâu tóm mở rộng.",
+      "cfoToNiRatio": 1.28,
+      "capexToRevenueRatio": 9.2,
+      "accrualsRatio": -0.018,
+      "accrualsRating": "Tốt - Lợi nhuận phản ánh tiền mặt thực tế",
+      "cipRatio": 16.5,
+      "latestFcf": 630.0,
+      "latestCfo": 1750.0,
+      "latestCapex": 1120.0,
+      "constructionInProgress": 3560.0
     }
   }
 }

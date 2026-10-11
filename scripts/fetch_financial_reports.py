@@ -427,24 +427,38 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
     dpo = round((latest_q["shortTermDebt"] * 0.3 * 90) / latest_q["costOfGoodsSold"]) if latest_q["costOfGoodsSold"] else 30
     ccc = dso + dio - dpo
 
-    # Mô hình định giá nâng cao ủy thác qua valuation_engine
-    ev_ebitda_fair_price = calc_ev_ebitda(ebitda_bn * 4 * scale, net_debt_bn * scale, shares)
-    pcf_fair_price = calc_pcf(latest_q["cfo"] * 4 * scale, shares) if latest_q["cfo"] else None
-    ps_fair_price = calc_ps_target(latest_q["revenue"] * 4 * scale, shares) if latest_q["revenue"] else None
+    # Động cơ định giá doanh nghiệp tập trung (Enterprise Valuation Engine 10 mô hình)
+    engine = StockValuationEngine()
+    val_res = engine.evaluate({
+        "close": close,
+        "eps": eps,
+        "pb": pb,
+        "bvps": bvps,
+        "dps": dps,
+        "revenue": latest_q["revenue"] * 4 * scale if latest_q.get("revenue") else None,
+        "netIncome": latest_q["netIncome"] * 4 * scale if latest_q.get("netIncome") else None,
+        "totalAssets": latest_q["totalAssets"] * scale if latest_q.get("totalAssets") else None,
+        "totalDebt": latest_q["totalDebt"] * scale if latest_q.get("totalDebt") else None,
+        "ebitda": ebitda_bn * 4 * scale if ebitda_bn else None,
+        "cfo": latest_q["cfo"] * 4 * scale if latest_q.get("cfo") else None,
+        "capex": abs(latest_q["capex"] * 4 * scale) if latest_q.get("capex") else None,
+        "shares": shares,
+        "sector": base_stock_data.get("sector") or "Khác",
+        "industry": base_stock_data.get("industry") or "Khác",
+        "yearlyHistory": yearly_data,
+        "altmanZ": altman_z
+    })
 
-    graham_val = calc_graham(eps, bvps)
-    ddm_val = calc_ddm(dps)
-    pe_target_val = calc_pe_target(eps)
-    pb_target_val = calc_pb_target(bvps)
-
-    # Giá hội tụ và Biên an toàn
-    consensus_res = calc_consensus_fair_value(
-        [graham_val, ddm_val, pe_target_val, pb_target_val, ev_ebitda_fair_price, pcf_fair_price],
-        close
-    )
-    consensus_fair = consensus_res["fairValue"]
-    mos_consensus = consensus_res["marginOfSafety"]
-    upside_consensus = consensus_res.get("upside")
+    graham_val = val_res.get("grahamNumber")
+    ddm_val = val_res.get("ddmTarget")
+    pe_target_val = val_res.get("peTarget")
+    pb_target_val = val_res.get("pbTarget")
+    ev_ebitda_fair_price = val_res.get("evEbitdaFairPrice")
+    pcf_fair_price = val_res.get("pcfFairPrice")
+    ps_fair_price = val_res.get("psFairPrice")
+    consensus_fair = val_res.get("fairValue")
+    mos_consensus = val_res.get("marginOfSafety")
+    upside_consensus = val_res.get("upside")
 
     # Lịch sử sự kiện & cổ tức (Events)
     cur_year = datetime.now().year
@@ -500,7 +514,20 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
             "consensusFairValue": consensus_fair,
             "marginOfSafety": mos_consensus,
             "upside": upside_consensus,
-            "consensusDiffPercent": upside_consensus
+            "consensusDiffPercent": upside_consensus,
+            "valuationRating": val_res.get("valuationRating"),
+            "valuationRatingText": val_res.get("valuationRatingText"),
+            "valuationRatingBadge": val_res.get("valuationRatingBadge"),
+            "validModelsCount": val_res.get("validModelsCount"),
+            "models10": val_res.get("models10", []),
+            "consensusDetails": val_res.get("consensusDetails", {}),
+            "valuationTraps": val_res.get("valuationTraps", {}),
+            "sevenPriceZones": val_res.get("sevenPriceZones", {}),
+            "threeLayerDecision": val_res.get("threeLayerDecision", {}),
+            "historicalBands": val_res.get("historicalBands", {}),
+            "dividendSustainability": val_res.get("dividendSustainability", {}),
+            "finvalLab": val_res.get("finvalLab", {}),
+            "impliedFcfYieldPrice": val_res.get("impliedFcfYieldPrice")
         },
         "financialRatios": {
             "valuation": {
@@ -762,6 +789,54 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
         "beneish": beneish_data,
         "magicFormula": magic_data,
         "fcfInflection": fcf_inflection_data
+    }
+
+    # 12. Cập nhật Động cơ Định giá Doanh nghiệp Toàn diện (Enterprise Valuation Engine 10 mô hình)
+    engine = StockValuationEngine()
+    val_res = engine.evaluate({
+        "close": close,
+        "eps": float(ratios.get("valuation", {}).get("eps") or latest_q.get("eps") or (latest_q.get("netIncomeParent", 0) * 1_000_000_000 / shares_count if shares_count else 2000)),
+        "pb": float(ratios.get("valuation", {}).get("pb") or (close / (float(latest_q.get("equity", 1)) * 1_000_000_000 / shares_count) if shares_count else 1.2)),
+        "bvps": round(float(latest_q.get("equity", 1)) * 1_000_000_000 / shares_count) if shares_count else 15000,
+        "dps": float(stock_item.get("dividends", {}).get("dps") or 0),
+        "revenue": float(latest_q.get("revenue", 0)) * 1_000_000_000 * 4,
+        "netIncome": float(latest_q.get("netIncomeParent") or latest_q.get("netIncome", 0)) * 1_000_000_000 * 4,
+        "totalAssets": float(latest_q.get("totalAssets", 0)) * 1_000_000_000,
+        "totalDebt": float(latest_q.get("totalDebt", 0)) * 1_000_000_000,
+        "ebitda": float(ratios.get("profitability", {}).get("ebitda") or 0) * 1_000_000_000 * 4,
+        "cfo": float(latest_q.get("cfo", 0)) * 1_000_000_000 * 4,
+        "capex": abs(float(latest_q.get("capex", 0))) * 1_000_000_000 * 4,
+        "shares": shares_count,
+        "sector": stock_item.get("sector") or doc.get("_meta", {}).get("sector") or "Khác",
+        "industry": stock_item.get("industry") or "Khác",
+        "yearlyHistory": yearly_docs,
+        "altmanZ": altman_z
+    })
+    doc["valuationMultiples"] = {
+        "grahamNumber": val_res.get("grahamNumber"),
+        "ddmTarget": val_res.get("ddmTarget"),
+        "peTarget": val_res.get("peTarget"),
+        "pbTarget": val_res.get("pbTarget"),
+        "evEbitdaFairPrice": val_res.get("evEbitdaFairPrice"),
+        "pcfFairPrice": val_res.get("pcfFairPrice"),
+        "psFairPrice": val_res.get("psFairPrice"),
+        "consensusFairValue": val_res.get("fairValue"),
+        "marginOfSafety": val_res.get("marginOfSafety"),
+        "upside": val_res.get("upside"),
+        "consensusDiffPercent": val_res.get("consensusDiffPercent"),
+        "valuationRating": val_res.get("valuationRating"),
+        "valuationRatingText": val_res.get("valuationRatingText"),
+        "valuationRatingBadge": val_res.get("valuationRatingBadge"),
+        "validModelsCount": val_res.get("validModelsCount"),
+        "models10": val_res.get("models10", []),
+        "consensusDetails": val_res.get("consensusDetails", {}),
+        "valuationTraps": val_res.get("valuationTraps", {}),
+        "sevenPriceZones": val_res.get("sevenPriceZones", {}),
+        "threeLayerDecision": val_res.get("threeLayerDecision", {}),
+        "historicalBands": val_res.get("historicalBands", {}),
+        "dividendSustainability": val_res.get("dividendSustainability", {}),
+        "finvalLab": val_res.get("finvalLab", {}),
+        "impliedFcfYieldPrice": val_res.get("impliedFcfYieldPrice")
     }
 
     return doc

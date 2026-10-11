@@ -301,8 +301,8 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'lowest' }))}
                 className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${(form.matchMethod || 'lowest') === 'lowest'
-                    ? 'bg-orange-50/80 border-orange-400 text-orange-950 ring-2 ring-orange-400/20 shadow-2xs'
-                    : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
+                  ? 'bg-orange-50/80 border-orange-400 text-orange-950 ring-2 ring-orange-400/20 shadow-2xs'
+                  : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
                   }`}
               >
                 <div className="flex items-center justify-between">
@@ -323,8 +323,8 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'highest' }))}
                 className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${form.matchMethod === 'highest'
-                    ? 'bg-indigo-50/80 border-indigo-400 text-indigo-950 ring-2 ring-indigo-400/20 shadow-2xs'
-                    : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
+                  ? 'bg-indigo-50/80 border-indigo-400 text-indigo-950 ring-2 ring-indigo-400/20 shadow-2xs'
+                  : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
                   }`}
               >
                 <div className="flex items-center justify-between">
@@ -345,8 +345,8 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                 type="button"
                 onClick={() => setForm(f => ({ ...f, matchMethod: 'fifo' }))}
                 className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${form.matchMethod === 'fifo'
-                    ? 'bg-emerald-50/80 border-emerald-400 text-emerald-950 ring-2 ring-emerald-400/20 shadow-2xs'
-                    : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
+                  ? 'bg-emerald-50/80 border-emerald-400 text-emerald-950 ring-2 ring-emerald-400/20 shadow-2xs'
+                  : 'bg-white border-gray-200 hover:border-gray-300 text-gray-600'
                   }`}
               >
                 <div className="flex items-center justify-between">
@@ -384,9 +384,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                   <p className="text-gray-500 text-[11px]">Giá vốn gốc trung bình:</p>
                   <p className="text-base font-bold text-amber-900 mt-0.5">
                     {fmtMoney(costPreview.avgCost)}đ
-                    <span className="text-xs font-normal text-gray-500 ml-1">
-                      ({(costPreview.avgCost / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})
-                    </span>
+
                   </p>
                 </div>
 
@@ -406,9 +404,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     <span className="text-gray-600">
                       • Lô ngày {fmtDate(m.date)}: <b>{m.used.toLocaleString()} cp</b>
                     </span>
-                    <span className="font-medium text-gray-800">
-                      Giá mua gốc: <b>{fmtMoney(m.unitCost)}đ</b> ({(m.unitCost / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})
-                    </span>
+
                   </div>
                 ))}
               </div>
@@ -430,7 +426,6 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     <span className={`font-bold ${costPreview.sellPrice >= costPreview.avgCost ? 'text-green-600' : 'text-red-500'}`}>
                       {costPreview.sellPrice >= costPreview.avgCost ? '+' : ''}
                       {fmtMoney(costPreview.sellPrice - costPreview.avgCost)}đ/cp
-                      {' '}({((costPreview.sellPrice - costPreview.avgCost) / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})
                     </span>
                   </div>
 
@@ -508,8 +503,8 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     key={t}
                     onClick={() => selectTag(t)}
                     className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all cursor-pointer ${isSelected
-                        ? 'bg-orange-600 text-white shadow-xs font-bold ring-2 ring-orange-400/30'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                      ? 'bg-orange-600 text-white shadow-xs font-bold ring-2 ring-orange-400/30'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
                       }`}
                   >
                     {isSelected ? '✓ ' : ''}{t}
@@ -577,8 +572,8 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     key={item.id}
                     onClick={() => setSelectedDiscipline(prev => (prev === item.label ? '' : item.label))}
                     className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${isSelected
-                        ? `${item.color} shadow-xs font-semibold ring-2 ring-indigo-400/40 border-current`
-                        : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700 text-gray-700 dark:text-slate-300'
+                      ? `${item.color} shadow-xs font-semibold ring-2 ring-indigo-400/40 border-current`
+                      : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700 text-gray-700 dark:text-slate-300'
                       }`}
                   >
                     <div className="text-xs font-medium leading-tight">
@@ -641,9 +636,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <p className="text-lg font-bold text-gray-900 mt-0.5">
                 {fmtMoney(result.price)}đ/cp
               </p>
-              <p className="text-xs text-orange-600 font-semibold">
-                ({(result.price / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})
-              </p>
+
               <p className="text-[11px] text-gray-400 mt-1">
                 Tổng doanh thu: {fmtMoney(result.grossRevenue || result.quantity * result.price)}đ
               </p>
@@ -654,9 +647,7 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
               <p className="text-lg font-bold text-amber-900 mt-0.5">
                 {fmtMoney(result.totalCost / result.quantity)}đ/cp
               </p>
-              <p className="text-xs text-amber-700 font-semibold">
-                ({((result.totalCost / result.quantity) / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})
-              </p>
+
               <p className="text-[11px] text-gray-400 mt-1">
                 Tổng tiền vốn gốc: {fmtMoney(result.totalCost)}đ
               </p>
@@ -713,7 +704,6 @@ export default function SellForm({ onSuccess, portfolio = [], initialSymbol = ''
                     <div className="text-right">
                       <div className="font-bold text-amber-900">
                         Giá gốc: {fmtMoney(lotUnitCost)}đ/cp
-                        <span className="text-gray-400 font-normal ml-1">({(lotUnitCost / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })})</span>
                       </div>
                       <div className="text-[11px] text-gray-400">
                         Thành tiền vốn: {fmtMoney(m.quantityUsed * lotUnitCost)}đ

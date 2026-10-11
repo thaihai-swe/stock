@@ -19,10 +19,25 @@ from lib.valuation_engine import (
     calc_ddm,
     calc_pe_target,
     calc_pb_target,
+    calc_gordon_pb,
+    calc_multi_stage_dcf,
+    calc_fcfe,
+    calc_rim_eva,
+    calc_rnav_real_estate,
+    calc_advanced_multiples,
+    calc_implied_fcf_yield,
     calc_ev_ebitda,
     calc_pcf,
     calc_ps_target,
     calc_consensus_fair_value,
+    get_method_suitability,
+    filter_outliers_and_consensus,
+    detect_valuation_traps,
+    calc_7_price_zones,
+    calc_3_layer_decision,
+    calc_historical_valuation_bands,
+    calc_dividend_sustainability,
+    compute_finval_lab_snapshot,
     calc_dupont,
     calc_tech_score,
     calc_fcf,
@@ -32,13 +47,27 @@ from lib.valuation_engine import (
 
 
 def test_calc_graham():
-    # 1. Trường hợp bình thường (HPG thực tế: EPS=2750, BVPS=15344)
-    val = calc_graham(2750, 15344)
-    expected = round(math.sqrt(22.5 * 2750 * 15344))
-    assert val == expected, f"Graham thất bại: {val} != {expected}"
-    assert val == 30812, f"Graham HPG phải bằng 30812, ra {val}"
+    # 1. Trường hợp mặc định không truyền multiples (Hệ số trần 22.5)
+    val_default = calc_graham(2750, 15344)
+    expected_default = round(math.sqrt(22.5 * 2750 * 15344))
+    assert val_default == expected_default, f"Graham thất bại: {val_default} != {expected_default}"
+    assert val_default == 30812, f"Graham HPG mặc định phải bằng 30812, ra {val_default}"
 
-    # 2. Trường hợp biên âm hoặc bằng 0
+    # 2. Trường hợp thích ứng động (Dynamic Multiplier < 22.5, ví dụ HPG pe=12.0, pb=1.45)
+    val_dyn = calc_graham(2750, 15344, pe_avg=12.0, pb_avg=1.45)
+    expected_dyn = round(math.sqrt(17.40 * 2750 * 15344))
+    assert val_dyn == expected_dyn == 27096, f"Graham động thất bại: {val_dyn} != 27096"
+
+    # 3. Trường hợp bội số cao vượt trần (pe=20.0, pb=2.0 -> 40.0 > 22.5 -> chặn trần 22.5)
+    val_capped = calc_graham(2750, 15344, pe_avg=20.0, pb_avg=2.0)
+    assert val_capped == 30812, f"Graham trần 22.5 thất bại: {val_capped} != 30812"
+
+    # 4. Trường hợp sàn an toàn (pe=3.0, pb=0.8 -> 2.4 < 4.0 -> kẹp sàn 4.0)
+    val_floored = calc_graham(2750, 15344, pe_avg=3.0, pb_avg=0.8)
+    expected_floor = round(math.sqrt(4.0 * 2750 * 15344))
+    assert val_floored == expected_floor, f"Graham sàn thất bại: {val_floored} != {expected_floor}"
+
+    # 5. Trường hợp biên âm hoặc bằng 0
     assert calc_graham(-1000, 15000) is None, "EPS âm phải trả về None"
     assert calc_graham(1000, -5000) is None, "BVPS âm phải trả về None"
     assert calc_graham(0, 15000) is None, "EPS = 0 phải trả về None"
@@ -494,6 +523,166 @@ def test_fcf_inflection_point():
     print("✅ test_fcf_inflection_point: PASS")
 
 
+def test_calc_gordon_pb():
+    # BVPS = 18000, ROE = 19.5%, CoE = 11.5%, g = 3.0%
+    # PB_fair = (0.195 - 0.03) / (0.115 - 0.03) = 0.165 / 0.085 = 1.941
+    # Fair Price = 18000 * 1.941 = 34941
+    val = calc_gordon_pb(18000, 19.5, coe=0.115, terminal_g=0.03)
+    assert val is not None and val > 18000, f"Gordon P/B ngân hàng sinh lời cao phải lớn hơn BVPS: {val}"
+    assert val == 34941, f"Gordon P/B phải ra 34941, ra {val}"
+    # Trường hợp ROE thấp hơn g
+    assert calc_gordon_pb(15000, 2.0, coe=0.115, terminal_g=0.03) is not None
+    print("✅ test_calc_gordon_pb: PASS")
+
+
+def test_calc_multi_stage_dcf():
+    # FCF = 5000 tỷ, 1000 triệu CP, CoE = 11.5%, g1 = 8.0%, g_term = 3.0%
+    val = calc_multi_stage_dcf(5000, 1000, coe=0.115, g1=0.08, stage1_years=3, stage2_years=2, terminal_g=0.03)
+    assert val is not None and val > 0, "Multi-stage DCF phải trả về giá trị dương"
+    assert calc_multi_stage_dcf(-100, 1000) is None, "FCF âm phải trả về None"
+    print("✅ test_calc_multi_stage_dcf: PASS")
+
+
+def test_calc_fcfe():
+    # CFO = 4000, CapEx = 1500, Borrowing = 500 -> FCFE = 3000
+    val = calc_fcfe(4000, 1500, 500, 1000, coe=0.115, g=0.04, terminal_g=0.03)
+    assert val is not None and val > 0, "FCFE phải trả về giá trị dương"
+    assert calc_fcfe(1000, 3000, 0, 1000) is None, "FCFE âm phải trả về None"
+    print("✅ test_calc_fcfe: PASS")
+
+
+def test_calc_rim_eva():
+    # Equity = 100000, ROE = 18.0%, Shares = 1000, CoE = 11.5% (Tạo giá trị thặng dư > BVPS)
+    val = calc_rim_eva(100000, 18.0, 1000, coe=0.115, forecast_years=5, terminal_g=0.03)
+    bvps = 100000 / 1000 # 100
+    assert val is not None and val > bvps, f"RIM khi ROE > CoE phải lớn hơn BVPS: {val} > {bvps}"
+    print("✅ test_calc_rim_eva: PASS")
+
+
+def test_calc_rnav_real_estate():
+    # Assets = 50000, Debt = 20000, Inventory = 28000 (>50% assets -> thưởng +10%), Shares = 1000
+    val = calc_rnav_real_estate(50000, 20000, 28000, 1000, current_liabilities=8000, discount_pct=0.20, is_real_estate=True)
+    assert val is not None and val > 0, "RNAV BĐS phải trả về giá trị hợp lệ"
+    print("✅ test_calc_rnav_real_estate: PASS")
+
+
+def test_calc_advanced_multiples():
+    # EBITDA = 8000, Revenue = 50000, NetDebt = 5000, Shares = 1000
+    val = calc_advanced_multiples(8000, 50000, 5000, 1000, target_ev_ebitda=7.5, target_ev_sales=1.1)
+    assert val is not None and val > 0, "Advanced Multiples phải tính ra giá trị dương"
+    print("✅ test_calc_advanced_multiples: PASS")
+
+
+def test_sector_weights_and_outlier_filtering():
+    # 1. Kiểm tra ma trận phù hợp: Ngân hàng phải tắt DCF / FCFF / EV-EBITDA
+    suit_dcf, note_dcf = get_method_suitability("DCF", "Ngân Hàng", 1000)
+    assert suit_dcf == 0.0 and "N/A ngành TC" in note_dcf
+    suit_pb, note_pb = get_method_suitability("PB", "Ngân Hàng", 1000)
+    assert suit_pb == 1.0
+
+    # 2. Kiểm tra bộ lọc ngoại lai ±60%
+    models = [
+        {"id": "m1", "name": "Mô hình 1", "value": 24000, "weight": 0.25},
+        {"id": "m2", "name": "Mô hình 2", "value": 25000, "weight": 0.25},
+        {"id": "m3", "name": "Mô hình 3", "value": 26000, "weight": 0.25},
+        {"id": "m4", "name": "Mô hình ngoại lai", "value": 90000, "weight": 0.25} # Lệch > 60% so với median ~25500
+    ]
+    res = filter_outliers_and_consensus(models, close=22000)
+    assert res["modelsUsed"] == 3, f"Phải loại bỏ 1 mô hình ngoại lai, còn 3: {res['modelsUsed']}"
+    assert "m4" in res["excludedOutliers"] or "Mô hình ngoại lai" in res["excludedOutliers"]
+    assert 24000 <= res["fairValue"] <= 26000, f"Consensus sau khi lọc phải nằm trong dải chuẩn: {res['fairValue']}"
+    print("✅ test_sector_weights_and_outlier_filtering: PASS")
+
+
+def test_detect_valuation_traps():
+    # 1. Kiểm tra phát hiện Value Trap & Cyclical Peak
+    res_trap = detect_valuation_traps(
+        pe=6.0, # Rất thấp
+        pb=0.8, # Rất thấp
+        roe=8.0,
+        coe_pct=11.5, # ROE < CoE -> Book trap
+        fcf=-1000, # FCF âm -> Cyclical peak & debt stress
+        de=2.2, # Đòn bẩy cao
+        rev_cagr=-5.0, # Tăng trưởng âm -> Value trap
+        eps_cagr=-8.0,
+        dps=500, # Có cổ tức nhưng FCF âm -> Dividend trap
+        sector="Thép"
+    )
+    assert res_trap["trapLabel"] == "CAO", f"Rủi ro tổng hợp cao phải gán nhãn CAO: {res_trap['trapLabel']}"
+    assert res_trap["isCapPenalized"] is True, "Bẫy CAO phải kích hoạt phạt trần điểm"
+    assert len(res_trap["trapsList"]) == 7, "Phải kiểm tra đủ 7 bẫy"
+
+    # 2. Doanh nghiệp lành mạnh không có bẫy
+    res_clean = detect_valuation_traps(
+        pe=12.0, pb=1.8, roe=20.0, coe_pct=11.5, fcf=5000, de=0.4,
+        rev_cagr=15.0, eps_cagr=18.0, dps=1000, sector="Công Nghệ & Viễn Thông"
+    )
+    assert res_clean["trapLabel"] == "THẤP"
+    assert res_clean["isCapPenalized"] is False
+    print("✅ test_detect_valuation_traps: PASS")
+
+
+def test_calc_7_price_zones_and_3_layer_decision():
+    # 1. 7 Vùng Giá
+    zones = calc_7_price_zones(
+        close=18000,
+        consensus_fv=25000,
+        safe_buy=20000,
+        buy_price_base=22000
+    )
+    assert zones["currentZone"] in ["Deep Value", "Buy Zone"]
+    assert zones["boundaries"]["deepValue"] < zones["boundaries"]["safeBuy"]
+
+    # 2. Khung Quyết Định 3 Tầng Gated
+    dec = calc_3_layer_decision(
+        close=18000,
+        consensus_fv=25000,
+        margin_of_safety=28.0,
+        risk_adjusted_mos=20.0,
+        models_used=5,
+        coverage_pct=80.0,
+        confidence_score=75.0,
+        dispersion_pct=12.0,
+        trap_label="THẤP",
+        roe=18.0,
+        coe_pct=11.5,
+        cfo=4000,
+        net_income=3000,
+        altman_z=3.2,
+        tech_score=2
+    )
+    assert dec["isGateOpen"] is True
+    assert "STRONG BUY" in dec["buyRecommendation"] or "BUY" in dec["buyRecommendation"]
+    assert dec["roeCoeSpread"] == 6.5
+    print("✅ test_calc_7_price_zones_and_3_layer_decision: PASS")
+
+
+def test_historical_bands_and_dividend_sustainability():
+    # 1. Dải băng P25-P75
+    bands = calc_historical_valuation_bands(
+        close=21000,
+        eps=2500,
+        bvps=16000,
+        pe_history=[8.0, 10.0, 12.0, 15.0, 18.0],
+        pb_history=[1.0, 1.2, 1.4, 1.8, 2.2]
+    )
+    assert bands["band25"] is not None and bands["band75"] is not None
+    assert bands["band25"] < bands["band50"] < bands["band75"]
+    assert "P25" in bands["bandPosition"] or "P50" in bands["bandPosition"]
+
+    # 2. Độ an toàn cổ tức
+    div = calc_dividend_sustainability(
+        dps=1000,
+        eps=2500, # Payout = 40% < 70% -> tốt
+        fcf=2_500_000, # 2.5 triệu vs tổng cổ tức 1.0 triệu -> fcf_payout = 40% < 80%
+        shares=1000,
+        dps_history=[1000, 1000, 1000, 1000] # Consistency 100%
+    )
+    assert div["score"] >= 4.0
+    assert "Rất an toàn" in div["status"]
+    print("✅ test_historical_bands_and_dividend_sustainability: PASS")
+
+
 if __name__ == "__main__":
     print("\n=======================================================")
     print("🧪 CHẠY UNIT TEST BỘ ĐỘNG CƠ ĐỊNH GIÁ & PHÂN TÍCH TÀI CHÍNH")
@@ -522,4 +711,15 @@ if __name__ == "__main__":
     test_beneish_m_score()
     test_magic_formula()
     test_fcf_inflection_point()
-    print("\n🎉 TẤT CẢ 24 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")
+    test_calc_gordon_pb()
+    test_calc_multi_stage_dcf()
+    test_calc_fcfe()
+    test_calc_rim_eva()
+    test_calc_rnav_real_estate()
+    test_calc_advanced_multiples()
+    test_sector_weights_and_outlier_filtering()
+    test_detect_valuation_traps()
+    test_calc_7_price_zones_and_3_layer_decision()
+    test_historical_bands_and_dividend_sustainability()
+    print("\n🎉 TẤT CẢ 34 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")
+

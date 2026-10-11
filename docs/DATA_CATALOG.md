@@ -873,3 +873,83 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   * Khi dự án hoàn thành đưa vào vận hành thương mại, CapEx sụt giảm mạnh và doanh thu bùng nổ $\rightarrow FCF$ đảo chiều dương kích hoạt sóng tái định giá (Multiple Expansion).
 * **Thước đo Dồn tích (Accruals Ratio)**: $(LNST - CFO) / TotalAssets \le -0.03$ xếp hạng **Thượng Hạng (Top-Tier)**.
 
+---
+
+### PHÂN HỆ 7: HỆ THỐNG ĐỊNH GIÁ ĐỊNH LƯỢNG NÂNG CAO (ADVANCED VALUATION ENGINE — FAM v11.4P & QUANTITATIVE FRAMEWORK)
+* **Tệp tin lưu trữ**: `data/fundamentals_cache.json` (`valuation`) và `data/financials/<MÃ>.json` (`valuationMultiples`).
+* **Động cơ thực thi**: `scripts/lib/valuation_engine.py` (Enterprise Stock Valuation Engine - Single Source of Truth).
+* **Đặc tả các khối dữ liệu mới**:
+
+#### 1. Lưới 10 Mô Hình Định Lượng Độc Lập (`models10`):
+* **Mô hình 1: Graham Normalized**: $V = \sqrt{\text{Multiplier} \times EPS_{norm} \times BVPS}$ với hệ số thích ứng động $\text{Multiplier} = \min(22.5, \max(4.0, PE_{avg} \times PB_{avg}))$ thay vì dùng cứng $22.5$ ($15.0x \times 1.5x$), giúp tránh định giá quá hào phóng cho các ngành chu kỳ/thâm dụng vốn; $EPS_{norm} = \text{Trung vị}(EPS_{3Y}, EPS_{TTM})$.
+* **Mô hình 2: P/E Median Chu Kỳ**: $V = EPS_{norm} \times PE_{med5Y}$.
+* **Mô hình 3: Gordon P/B**: $V = BVPS \times \frac{ROE - g}{r - g}$ (Đặc biệt phù hợp cho Ngân hàng, Chứng khoán, Bảo hiểm).
+* **Mô hình 4: Multi-Stage DCF**: Chiết khấu dòng tiền 3 pha (Tăng trưởng cao $\rightarrow$ Chuyển tiếp Fade $\rightarrow$ Vĩnh viễn).
+* **Mô hình 5: DDM Consistency Fade**: Chiết khấu cổ tức kết hợp tỷ lệ suy giảm fade và bảo chứng dòng tiền FCF.
+* **Mô hình 6: DCF FCFF (Free Cash Flow to Firm)**: Dòng tiền tự do doanh nghiệp chiết khấu theo WACC ngành.
+* **Mô hình 7: FCFE (Free Cash Flow to Equity)**: Dòng tiền tự do vốn chủ $FCFE = CFO - CapEx + \text{Vay nợ ròng}$ chiết khấu theo Cost of Equity.
+* **Mô hình 8: RIM / EVA (Residual Income Model)**: $V = BVPS + \sum \frac{RI_t}{(1+r)^t} + TV$ với $RI = BVPS \times (ROE - r)$.
+* **Mô hình 9: RNAV / Book NAV**: Định giá tài sản ròng tái định giá (Áp dụng BĐS: thặng dư quỹ đất + chiết khấu rủi ro nợ).
+* **Mô hình 10: Advanced Multiples**: EV/EBITDA ngành ($7.5x$) và EV/Sales ($1.5x$).
+* **Ma trận 23 Phân Ngành GICS (`SECTOR_WEIGHTS_23`)**: Tự động gán trọng số $w_i$ phù hợp đặc thù ngành (Tài chính tắt hoàn toàn DCF/FCFF/FCFE/EV-EBITDA).
+* **Thuật toán Lọc Ngoại Lai ±60% & Consensus (`consensusDetails`)**: Loại trừ các mô hình vượt quá $\pm 60\%$ so với median sơ bộ để bảo vệ giá trị hội tụ Consensus thận trọng.
+* **Schema Chi Tiết Từng Phần Tử trong `models10`**:
+  * `id` (string): Định danh mô hình (`graham`, `pe`, `pb`, `multi_stage_dcf`, `ddm`, `fcff`, `fcfe`, `rim`, `rnav`, `multiples`).
+  * `name` (string): Tên mô hình ngắn gọn.
+  * `fullName` (string): Tên đầy đủ kèm chỉ số thứ tự (ví dụ: `1. Benjamin Graham`).
+  * `cleanName` (string): Tên hiển thị sạch đã loại bỏ số thứ tự thừa (ví dụ: `Benjamin Graham`).
+  * `value` / `targetPrice` (number | null): Giá trị nội tại tính toán theo mô hình (VND).
+  * `diffPercent` (number | null): % chênh lệch so với thị giá hiện tại ($P_0$).
+  * `weight` (number): Trọng số hiệu dụng sau chuẩn hóa trong Consensus.
+  * `baseWeight` (number): Trọng số cơ sở trước khi lọc ngoại lai theo phân ngành.
+  * `suitability` (number): Hệ số phù hợp theo ngành (0.0 đến 1.0).
+  * `suitabilityNote` (string): Ghi chú đặc thù phân ngành.
+  * `isOutlier` (boolean): `true` nếu bị loại trừ do lệch quá $\pm 60\%$ so với median.
+  * `outlierGapPct` (number): Độ lệch % so với median sơ bộ.
+  * `formula` (string): Công thức toán học vắn tắt.
+  * `formulaDetail` (string): Công thức toán học thế số chi tiết từ BCTC thực tế.
+  * `parameters` (object): Bảng biến số đầu vào chi tiết dùng trong công thức thế số.
+  * `statusNote` (string): Trạng thái áp dụng (`Phù hợp` hoặc lý do không áp dụng).
+
+#### 2. Bản Đồ 7 Vùng Giá Định Giá (`sevenPriceZones`):
+* `Deep Value` ($< 0.75x$ Fair Value): Vùng giá trị sâu, biên an toàn vượt trội.
+* `Safe Buy` ($0.75 - 0.85x$ Fair Value): Vùng mua an toàn (MoS 15-25%).
+* `Accumulate` ($0.85 - 0.95x$ Fair Value): Vùng mua tích luỹ định kỳ DCA (MoS 5-15%).
+* `Fair Range` ($0.95 - 1.10x$ Fair Value): Vùng thị giá hợp lý cân bằng.
+* `Above Fair` ($1.10 - 1.20x$ Fair Value): Vùng chớm đắt.
+* `Expensive` ($1.20 - 1.35x$ Fair Value): Vùng định giá cao.
+* `Extreme Danger` ($> 1.35x$ Fair Value): Vùng bong bóng rủi ro.
+* Kèm các ngưỡng quan trọng: `safeBuyPrice`, `acceptableBuyPrice`, `bearPrice` (-30% stress), `bullPrice` (+25% catalyst).
+
+#### 3. Khung Ra Quyết Định Gated 3 Tầng (`threeLayerDecision`):
+* **3 Tầng trọng số**:
+  * Tầng 1: Định Giá $V_{40}$ (Trọng số 40%): Độ rẻ tương đối so với giá trị nội tại hội tụ và dải định giá lịch sử.
+  * Tầng 2: Chất Lượng $Q_{35}$ (Trọng số 35%): Piotroski F-Score, Altman Z, M-Score, ROE, đòn bẩy.
+  * Tầng 3: Thời Điểm $T_{25}$ (Trọng số 25%): RSI, Tech Score, Trend, Vị trí 52 tuần.
+* **Điểm Composite /10**: Xếp hạng khuyến nghị 5 bậc (`STRONG BUY`, `ACCUMULATE`, `HOLD`, `REDUCE`, `AVOID`).
+* **Cơ Chế Khóa Cổng (Gate Condition)**: Bắt buộc cả $V_{40} \ge 6.0$ VÀ $Q_{35} \ge 6.0$ mới mở cổng kích hoạt tín hiệu Mua.
+* **Thặng Dư Giá Trị Kinh Tế ($ROE - CoE$ Spread)**: Đo lường phần bù tạo lập giá trị so với chi phí vốn chủ sở hữu.
+
+#### 4. Bộ Quét 7 Bẫy Định Giá (`valuationTraps`):
+* Nhận diện 7 bẫy định giá kinh điển: Value Trap, Book Trap, Cyclical Peak, Dividend Trap, Debt Stress, Share Dilution, Working Capital Stress.
+* Điểm rủi ro bẫy `trapScore` (0-10) và nhãn `THẤP` / `TRUNG BÌNH` / `CAO`.
+* **Cơ Chế Phạt Trần**: Khi rủi ro bẫy ở mức `CAO` ($\ge 4.0$), hệ thống tự động khóa trần khuyến nghị $\le 5.0/10$ (`HOLD`), ngăn ngừa mua vào các cổ phiếu rẻ giả tạo.
+
+#### 5. Dải Băng Định Giá Lịch Sử 3 Tầng P25 - P50 - P75 (`historicalBands`):
+* Thống kê phân vị chu kỳ 5 năm cho P/E Band và P/B Band.
+* `peBand` (`p25`, `p50`, `p75`, `current`): Phân vị P/E và P/E hiện tại thực tế.
+* `pbBand` (`p25`, `p50`, `p75`, `current`): Phân vị P/B và P/B hiện tại thực tế.
+* `priceBands`: Mốc giá tương ứng: `peP25Price`, `peP50Price`, `peP75Price`, `pbP25Price`, `pbP50Price`, `pbP75Price`.
+* `band25`, `band50`, `band75`, `bandPosition`, `bandWidthPct`: Mức giá tổng hợp các phân vị.
+
+#### 6. Kiểm Toán Độ Bền Vững Cổ Tức (`dividendSustainability`):
+* `fcfPayoutRatio`: Tỷ lệ chi trả cổ tức trên Dòng tiền tự do FCF ($< 60\%$ = rất an toàn; $> 100\%$ = cảnh báo bẫy cổ tức).
+* `payoutRatio`: Tỷ lệ chi trả cổ tức trên LNST kế toán.
+* `consistency`: Độ đều đặn lịch sử chi trả cổ tức 5 năm.
+* `status`: Phân loại an toàn / rủi ro bẫy cổ tức.
+
+#### 7. Phòng Thí Nghiệm FinVal Lab (`finvalLab`):
+* Đối chiếu 20+ chỉ tiêu tài chính cốt lõi (Doanh thu, LNST, EPS, BVPS, ROE, ROA, ROIC, Biên gộp, Biên ròng, EBITDA, FCF, D/E, Khả năng thanh toán) giữa kỳ hiện tại (TTM) và Trung bình động 5 năm (5Y SMA).
+* Đánh giá mức độ biến động $\Delta\%$ và tự động đảo màu cho các chỉ tiêu chi phí/nợ vay.
+
+

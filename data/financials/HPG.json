@@ -8,15 +8,572 @@
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 36360,
+    "grahamNumber": 18881,
     "ddmTarget": 5887,
-    "peTarget": 31625,
-    "pbTarget": 28845,
-    "evEbitdaFairPrice": 31474,
+    "peTarget": 8360,
+    "pbTarget": 29422,
+    "evEbitdaFairPrice": 24034,
     "pcfFairPrice": 29085,
     "psFairPrice": 27819,
-    "consensusFairValue": 26886,
-    "marginOfSafety": 25.2
+    "consensusFairValue": 17424,
+    "marginOfSafety": -15.4,
+    "upside": -13.3,
+    "consensusDiffPercent": -13.3,
+    "valuationRating": "🔴 SELL",
+    "valuationRatingText": "Định giá đắt đỏ (> 15% Fair Value)",
+    "valuationRatingBadge": "bg-rose-600 text-white",
+    "validModelsCount": 6,
+    "models10": [
+      {
+        "id": "graham",
+        "name": "Benjamin Graham",
+        "fullName": "1. Benjamin Graham",
+        "cleanName": "Benjamin Graham",
+        "value": 18881,
+        "targetPrice": 18881,
+        "diffPercent": -6.1,
+        "weight": 0.05,
+        "baseWeight": 0.05,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "√(22.5 × EPS × BVPS)",
+        "formulaDetail": "V = √(22.5 × 727 × 21,794)",
+        "parameters": {
+          "eps": 727.0,
+          "bvps": 21794,
+          "multiplier": 22.5
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "pe",
+        "name": "P/E Chuẩn Hóa",
+        "fullName": "2. P/E Chuẩn Hóa",
+        "cleanName": "P/E Chuẩn Hóa",
+        "value": 8360,
+        "targetPrice": 8360,
+        "diffPercent": -58.4,
+        "weight": 0.18,
+        "baseWeight": 0.18,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 55.7,
+        "formula": "EPS × P/E Mục Tiêu (11.5x)",
+        "formulaDetail": "V = 727 × 11.5x (Median chu kỳ 5Y)",
+        "parameters": {
+          "eps": 727.0,
+          "targetPe": 11.5
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "pb",
+        "name": "P/B Ngành & Gordon",
+        "fullName": "3. P/B Ngành & Gordon",
+        "cleanName": "P/B Ngành & Gordon",
+        "value": 29422,
+        "targetPrice": 29422,
+        "diffPercent": 46.4,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 55.8,
+        "formula": "BVPS × [(ROE - g)/(r - g)]",
+        "formulaDetail": "V = 21,794 × Gordon Multiple",
+        "parameters": {
+          "bvps": 21794,
+          "roe": null,
+          "coe": 0.115,
+          "terminalG": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "dcf",
+        "name": "DCF Đa Giai Đoạn",
+        "fullName": "4. DCF Đa Giai Đoạn",
+        "cleanName": "DCF Đa Giai Đoạn",
+        "value": 52985,
+        "targetPrice": 52985,
+        "diffPercent": 163.6,
+        "weight": 0.18,
+        "baseWeight": 0.18,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 180.6,
+        "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+        "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+        "parameters": {
+          "baseFcf": 30696000000000.0,
+          "shares": 8442970000.0,
+          "wacc": 0.115,
+          "g1": 0.07,
+          "terminalG": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "ddm",
+        "name": "Chiết Khấu DDM",
+        "fullName": "5. Chiết Khấu DDM",
+        "cleanName": "Chiết Khấu DDM",
+        "value": 5887,
+        "targetPrice": 5887,
+        "diffPercent": -70.7,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 68.8,
+        "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+        "formulaDetail": "DPS=455 đ, r=11.5%, g=3.5%",
+        "parameters": {
+          "dps": 455.0,
+          "coe": 0.115,
+          "g": 0.035
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "fcff",
+        "name": "FCFF Doanh Nghiệp",
+        "fullName": "6. FCFF Doanh Nghiệp",
+        "cleanName": "FCFF Doanh Nghiệp",
+        "value": 52985,
+        "targetPrice": 52985,
+        "diffPercent": 163.6,
+        "weight": 0.14,
+        "baseWeight": 0.14,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": true,
+        "outlierGapPct": 180.6,
+        "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+        "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+        "parameters": {
+          "fcff": 30696000000000.0,
+          "netDebt": 100500000000000.0,
+          "wacc": 0.115,
+          "shares": 8442970000.0
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "fcfe",
+        "name": "FCFE Cổ Đông",
+        "fullName": "7. FCFE Cổ Đông",
+        "cleanName": "FCFE Cổ Đông",
+        "value": 15939,
+        "targetPrice": 15939,
+        "diffPercent": -20.7,
+        "weight": 0.08,
+        "baseWeight": 0.08,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 15.6,
+        "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+        "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+        "parameters": {
+          "cfo": 30696000000000.0,
+          "capex": 19644000000000.0,
+          "coe": 0.115,
+          "shares": 8442970000.0
+        },
+        "statusNote": "Phù hợp"
+      },
+      {
+        "id": "rim",
+        "name": "Residual Income RIM/EVA",
+        "fullName": "8. Residual Income RIM/EVA",
+        "cleanName": "Residual Income RIM/EVA",
+        "value": null,
+        "targetPrice": null,
+        "diffPercent": null,
+        "weight": 0.0,
+        "baseWeight": 0.0,
+        "suitability": 0.55,
+        "suitabilityNote": "Thứ cấp phi TC",
+        "isOutlier": false,
+        "outlierGapPct": 0.0,
+        "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+        "formulaDetail": "BVPS=21,794 đ, ROE=0.0%, CoE=11.5%",
+        "parameters": {
+          "equity": 185403000000000.0,
+          "bvps": 21794,
+          "roe": null,
+          "coe": 0.115,
+          "shares": 8442970000.0
+        },
+        "statusNote": "Vốn chủ âm hoặc ROE < CoE"
+      },
+      {
+        "id": "nav",
+        "name": "Book NAV / RNAV",
+        "fullName": "9. Book NAV / RNAV",
+        "cleanName": "Book NAV / RNAV",
+        "value": 17568,
+        "targetPrice": 17568,
+        "diffPercent": -12.6,
+        "weight": 0.023,
+        "baseWeight": 0.05,
+        "suitability": 0.45,
+        "suitabilityNote": "Thứ cấp phi TC/BĐS",
+        "isOutlier": false,
+        "outlierGapPct": 7.0,
+        "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+        "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+        "parameters": {
+          "equity": 185403000000000.0,
+          "totalAssets": 285903000000000.0,
+          "totalDebt": 100500000000000.0,
+          "inventory": null,
+          "shares": 8442970000.0
+        },
+        "statusNote": "Thứ cấp phi TC/BĐS"
+      },
+      {
+        "id": "evebitda",
+        "name": "EV/EBITDA & EV/Sales",
+        "fullName": "10. EV/EBITDA & EV/Sales",
+        "cleanName": "EV/EBITDA & EV/Sales",
+        "value": 19975,
+        "targetPrice": 19975,
+        "diffPercent": -0.6,
+        "weight": 0.16,
+        "baseWeight": 0.16,
+        "suitability": 1.0,
+        "suitabilityNote": "Phù hợp",
+        "isOutlier": false,
+        "outlierGapPct": 5.8,
+        "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+        "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+        "parameters": {
+          "ebitda": 40456000000000.0,
+          "multiple": 7.5,
+          "revenue": 213520000000000.0,
+          "salesMultiple": 1.1,
+          "netDebt": 100500000000000.0,
+          "shares": 8442970000.0
+        },
+        "statusNote": "Phù hợp"
+      }
+    ],
+    "consensusDetails": {
+      "cleanWeightedAvg": 16890,
+      "cleanMedian": 18224,
+      "dispersionPct": 7.3,
+      "consensusLevel": "HIGH",
+      "coveragePct": 66.7,
+      "confidenceScore": 84.7,
+      "modelsUsed": 6,
+      "modelsValid": 9,
+      "excludedOutliers": [
+        "DCF Đa Giai Đoạn",
+        "Chiết Khấu DDM",
+        "FCFF Doanh Nghiệp"
+      ]
+    },
+    "valuationTraps": {
+      "trapScore": 0.0,
+      "trapLabel": "THẤP",
+      "trapReason": "Không phát hiện bẫy định giá",
+      "isCapPenalized": false,
+      "trapsList": [
+        {
+          "id": "value_trap",
+          "name": "Value Trap",
+          "active": false,
+          "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+        },
+        {
+          "id": "book_trap",
+          "name": "Book Trap",
+          "active": false,
+          "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+        },
+        {
+          "id": "cyclical_peak",
+          "name": "Cyclical Peak",
+          "active": false,
+          "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+        },
+        {
+          "id": "dividend_trap",
+          "name": "Dividend Trap",
+          "active": false,
+          "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+        },
+        {
+          "id": "debt_stress",
+          "name": "Debt Stress",
+          "active": false,
+          "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+        },
+        {
+          "id": "share_dilution",
+          "name": "Share Dilution",
+          "active": false,
+          "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+        },
+        {
+          "id": "wc_stress",
+          "name": "Working Capital Stress",
+          "active": false,
+          "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+        }
+      ]
+    },
+    "sevenPriceZones": {
+      "currentZone": "Above Fair",
+      "zoneBadge": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+      "safeBuyPrice": 13068,
+      "acceptableBuyPrice": 14810,
+      "bearPrice": 12197,
+      "bullPrice": 21780,
+      "boundaries": {
+        "deepValue": 11761,
+        "safeBuy": 13068,
+        "accumulate": 14810,
+        "fairLow": 15682,
+        "fairHigh": 19166,
+        "aboveFair": 20691,
+        "expensive": 25047
+      }
+    },
+    "threeLayerDecision": {
+      "compositeScore": 4.7,
+      "valuationLayerScore": 1.9,
+      "qualityLayerScore": 6.5,
+      "timingLayerScore": 6.5,
+      "roeCoeSpread": -1.5,
+      "buyRecommendation": "🔴 SELL",
+      "decisionReason": "Định giá đắt đỏ (> 15% Fair Value)",
+      "isGateOpen": true,
+      "isTrapCapped": false
+    },
+    "historicalBands": {
+      "band25": 17438,
+      "band50": 20163,
+      "band75": 24885,
+      "bandPosition": "P25–P50 (Hợp lý thấp)",
+      "bandWidthPct": 36.9,
+      "peBand": {
+        "p25": 10.5,
+        "p50": 12.0,
+        "p75": 14.5,
+        "current": 27.65
+      },
+      "pbBand": {
+        "p25": 1.25,
+        "p50": 1.45,
+        "p75": 1.8,
+        "current": 0.92
+      },
+      "priceBands": {
+        "peP25Price": 7634,
+        "peP50Price": 8724,
+        "peP75Price": 10542,
+        "pbP25Price": 27242,
+        "pbP50Price": 31601,
+        "pbP75Price": 39229
+      }
+    },
+    "dividendSustainability": {
+      "score": 4.2,
+      "status": "✓✓ Rất an toàn",
+      "payoutRatio": 62.6,
+      "fcfPayoutRatio": 12.5,
+      "consistency": 50.0
+    },
+    "finvalLab": {
+      "items": [
+        {
+          "key": "eps",
+          "label": "EPS (Thu nhập mỗi CP)",
+          "unit": "đ",
+          "current": 727.0,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "bvps",
+          "label": "BVPS (Giá trị sổ sách)",
+          "unit": "đ",
+          "current": 21794,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "pe",
+          "label": "Hệ số P/E",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "pb",
+          "label": "Hệ số P/B",
+          "unit": "x",
+          "current": 1.31,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "roe",
+          "label": "Tỷ suất ROE",
+          "unit": "%",
+          "current": null,
+          "sma5y": 12.87,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "roa",
+          "label": "Tỷ suất ROA",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "roic",
+          "label": "Tỷ suất ROIC",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "grossMargin",
+          "label": "Biên Lợi Nhuận Gộp",
+          "unit": "%",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "netMargin",
+          "label": "Biên Lợi Nhuận Ròng",
+          "unit": "%",
+          "current": null,
+          "sma5y": 12.18,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "revenue",
+          "label": "Doanh Thu Thuần",
+          "unit": "Tỷ",
+          "current": 213520.0,
+          "sma5y": 162810.0,
+          "deltaPct": 31.1,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "netIncome",
+          "label": "Lợi Nhuận Sau Thuế",
+          "unit": "Tỷ",
+          "current": 24064.0,
+          "sma5y": 19824.6,
+          "deltaPct": 21.4,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "ebitda",
+          "label": "Chỉ số EBITDA",
+          "unit": "Tỷ",
+          "current": 40456.0,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "Dòng Tiền Tự Do FCF",
+          "unit": "Tỷ",
+          "current": 30696.0,
+          "sma5y": 8524.8,
+          "deltaPct": 260.1,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
+          "invertLogic": false
+        },
+        {
+          "key": "debtToEquity",
+          "label": "Nợ / Vốn Chủ (D/E)",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": true
+        },
+        {
+          "key": "currentRatio",
+          "label": "Hệ Số Thanh Toán Hiện Hành",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        },
+        {
+          "key": "cashRatio",
+          "label": "Hệ Số Tiền Mặt",
+          "unit": "x",
+          "current": null,
+          "sma5y": null,
+          "deltaPct": null,
+          "status": "Ổn định",
+          "badgeColor": "text-gray-400",
+          "invertLogic": false
+        }
+      ]
+    },
+    "impliedFcfYieldPrice": 44069
   },
   "financialRatios": {
     "valuation": {
@@ -183,6 +740,15 @@
       "value": 455,
       "source": "Vietstock",
       "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPZGNHVFl3blZWSlBfNHpHZVJJVGhRZUxOMWFFd1gxOU10N2pCNDlQWW1MZ3VwS2pkUUhLNm1rNkhqdExTTHpqOFh5VlljSklSY1Y1WDRSaUpZcWNiaXZ4blhPcWwtRGM1MlVmTUtjOWx4YWJwZFNKekhjdnF1QV9feVB4aXpmQWQxazJhQzhoTjlQTWNfNTdZaXlVVUdaeHF6aEE?oc=5"
+    },
+    {
+      "date": "2026-04-21",
+      "type": "Đại hội cổ đông",
+      "content": "ĐHĐCĐ Hoà Phát: Tỷ phú Trần Đình Long 'choáng' vì có 300.000 cổ đông",
+      "ratio": "—",
+      "value": null,
+      "source": "Mekong ASEAN",
+      "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOVVFHYWFtdTJveWNWRXY4ZTg4eFRZamU2V2FfVm50bWg1U3BBZTN2c2UxSmxIZ3F5RFhEOGlvblBrNENoNDgtdWlJVlcyRHlYeFRtRXZFdFU2aURZbzNtelBrTVludnJSblkwZFNTSjA3d1pEZXZYeE9jUDk5TWpNSEJYZXBqUlQzZjlZT2VqdEpXSVJoVWJFWDZQN1BVVDA?oc=5"
     }
   ],
   "shareholders": [
@@ -1188,20 +1754,6 @@
       },
       {
         "id": "news-HPG-7",
-        "title": "Tỷ phú Trần Đình Long “lấy lại” gần 1.000 tỷ đồng sau thông tin con trai muốn gom 50 triệu cổ phiếu Hòa Phát",
-        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-10-05.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-05",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxOREV5N1BYWHpnVHVEUXF5UTFkUnY4SVA4U3VVQ3o0aWhrWFlTUWNPZnI0ZE5KSV94SEFoSERIMlpuTGdmY201ZE12NHdFQTdEdnlOVlFjcmpsYlF5SDBDbWt6WlRZdWlpOVo0QmhiblZraG9oR3lMUVVtTjZ6VGxjNTBXS3NUeFR5UVpiSngyUnRIdHY4S0VKajQzRm9vRDhyN2lmc09IWjJvRllzZkdOWUVudGRNUnhEVEVCMGh3S3lsQXNuVlVDYnJ0eGQ3ckJCWk9zanpEQmZtY1Y5a3c?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-8",
         "title": "Lãnh đạo mua bán cổ phiếu: Giao dịch đáng chú ý tại ASG, KOS và HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn Vietstock. Cập nhật ngày 2026-10-05.",
         "category": "disclosure",
@@ -1215,7 +1767,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-9",
+        "id": "news-HPG-8",
         "title": "32 triệu cổ phiếu HPG sang tay, vốn hóa HPG tăng gần 3.850 tỷ: Tiền đang quay lại?",
         "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-10-05.",
         "category": "biz",
@@ -1225,6 +1777,20 @@
         "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxONVBiVUdmNjdSMXVPTEtQZFJSbi1GU2NhYWdXU2ZFSXNjSVJzeEh2R1ZXMHJBTHc3TXdrNm81dWRjNk5qN3F2LTMzRHZEVV9YTTY0VTZXVmdaallDRzdqOEtJSGR4UHhJRWo2SVE3ZzNHNUlLTXd4YktaZW5ZR0twdng4RndGZ0VMeDlISU5OSC0zZTNQbWx3bTBRV1ViLXdjQUlucmVidFYwSjVuRzlPbVh4a0k5Ni05cmlzaw?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-9",
+        "title": "Tỷ phú Trần Đình Long “lấy lại” gần 1.000 tỷ đồng sau thông tin con trai muốn gom 50 triệu cổ phiếu Hòa Phát",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-10-05.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-05",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxOREV5N1BYWHpnVHVEUXF5UTFkUnY4SVA4U3VVQ3o0aWhrWFlTUWNPZnI0ZE5KSV94SEFoSERIMlpuTGdmY201ZE12NHdFQTdEdnlOVlFjcmpsYlF5SDBDbWt6WlRZdWlpOVo0QmhiblZraG9oR3lMUVVtTjZ6VGxjNTBXS3NUeFR5UVpiSngyUnRIdHY4S0VKajQzRm9vRDhyN2lmc09IWjJvRllzZkdOWUVudGRNUnhEVEVCMGh3S3lsQXNuVlVDYnJ0eGQ3ckJCWk9zanpEQmZtY1Y5a3c?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -1286,6 +1852,20 @@
       },
       {
         "id": "news-HPG-14",
+        "title": "Con trai tỷ phú Trần Đình Long muốn chi nghìn tỷ gom thêm 50 triệu cổ phiếu Hòa Phát",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-10-02.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-02",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMnlUWUZyWlQwanVrNWc0MkFIRFI2a1hyUHMxTDJXMWlDOWg5U3lvU2JjZ0tLSUNqYV9abjZUaDZvNmVYWW9mbmc5em9Wc1JhRWNGQUVRdE5lcXlNQ1RiRHgxbm5VT28yZFBHZVZycjRXRjZ1ZWlDVnhhV2c1NHhSNWpBN05XbGVxR2NzVndidUtjM3pSUm5uY3NEZXp2cWlxQWhZVGljQXh1OEZaTG81dTB0VDdibUczdkhlQ0FIbUV2UQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-15",
         "title": "HPG về vùng thấp nhất năm, con trai ông Trần Đình Long đăng ký mua 50 triệu cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-02.",
         "category": "disclosure",
@@ -1299,7 +1879,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-15",
+        "id": "news-HPG-16",
         "title": "Con trai tỷ phú Trần Đình Long sắp chi hơn 1.000 tỷ đồng mua cổ phiếu HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Dân trí. Cập nhật ngày 2026-10-02.",
         "category": "analyst",
@@ -1313,7 +1893,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-16",
+        "id": "news-HPG-17",
         "title": "Con trai ông Trần Đình Long tiếp tục gom cổ phiếu Hoà Phát",
         "summary": "Bản tin phân tích về HPG từ nguồn VIETTIMES. Cập nhật ngày 2026-10-02.",
         "category": "biz",
@@ -1321,20 +1901,6 @@
         "date": "2026-10-02",
         "source": "VIETTIMES",
         "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOTWpRSDUtbDY1bWpWUHRhLVAyTVRJV3VBSkFKRVZHSnM5OWJKS1NtcTQ3bXg3aEpEZWNZb0JIb2hldXZoMFliN2dyNkp5azV2N1l6VlI1VEhDOWJnbFRiRE5jN0MtUmpheWppYU5RR1ktNzZTZUcxSHdWdURNTWVZTmVoOEI2RDVJek5XaFNMd1ZSUGV4czVYcFcxVQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-17",
-        "title": "Con trai tỷ phú Trần Đình Long muốn chi nghìn tỷ gom thêm 50 triệu cổ phiếu Hòa Phát",
-        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-10-02.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-02",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMnlUWUZyWlQwanVrNWc0MkFIRFI2a1hyUHMxTDJXMWlDOWg5U3lvU2JjZ0tLSUNqYV9abjZUaDZvNmVYWW9mbmc5em9Wc1JhRWNGQUVRdE5lcXlNQ1RiRHgxbm5VT28yZFBHZVZycjRXRjZ1ZWlDVnhhV2c1NHhSNWpBN05XbGVxR2NzVndidUtjM3pSUm5uY3NEZXp2cWlxQWhZVGljQXh1OEZaTG81dTB0VDdibUczdkhlQ0FIbUV2UQ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",

@@ -1,81 +1,666 @@
 {
-  "FUEVFVND": {
-    "symbol": "FUEVFVND",
+  "PNJ": {
+    "symbol": "PNJ",
     "exchange": "HOSE",
-    "name": "FUEVFVND",
-    "description": "DCVFMVN DIAMOND ETF",
-    "close": 32450,
-    "change": 0.22,
-    "changeAbs": 70,
-    "volume": 263865,
-    "sector": "Miscellaneous",
-    "industry": "Investment trusts",
+    "name": "PNJ",
+    "description": "Phu Nhuan Jewelry JSC",
+    "close": 19500,
+    "change": 6.85,
+    "changeAbs": 1250,
+    "volume": 7161863,
+    "sector": "Consumer durables",
+    "industry": "Other consumer specialties",
     "valuation": {
-      "pe": null,
-      "pb": null,
-      "ps": null,
-      "evEbitda": null
+      "pe": 3.44,
+      "pb": 0.75,
+      "ps": 0.28,
+      "evEbitda": null,
+      "bvps": 26000,
+      "grahamNumber": 50669,
+      "marginOfSafetyGraham": 61.5,
+      "grahamDiffPercent": 159.8,
+      "ddmTarget": null,
+      "ddmDiffPercent": null,
+      "peTarget": 65262,
+      "peDiffPercent": 234.7,
+      "pbTarget": 35100,
+      "pbDiffPercent": 80,
+      "evEbitdaFairPrice": 48025,
+      "evEbitdaDiffPercent": 146.3,
+      "pcfFairPrice": 33188,
+      "pcfDiffPercent": 70.2,
+      "psFairPrice": 93481,
+      "psDiffPercent": 379.4,
+      "fairValue": 56867,
+      "consensusFairValue": 56867,
+      "marginOfSafety": 65.7,
+      "marginOfSafetyFairValue": 65.7,
+      "upside": 191.6,
+      "consensusDiffPercent": 191.6,
+      "valuationRating": "🟢 STRONG BUY",
+      "valuationRatingText": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
+      "valuationRatingBadge": "bg-emerald-600 text-white",
+      "validModelsCount": 7,
+      "models10": [
+        {
+          "id": "graham",
+          "name": "Benjamin Graham",
+          "fullName": "1. Benjamin Graham",
+          "cleanName": "Benjamin Graham",
+          "value": 50669,
+          "targetPrice": 50669,
+          "diffPercent": 159.8,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 16.2,
+          "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+          "formulaDetail": "V = √(17.4 × 5,675 × 26,000) | Hệ số = Min(22.5, 12.0x × 1.45x = 17.4)",
+          "parameters": {
+            "eps": 5675,
+            "bvps": 26000,
+            "multiplier": 17.4,
+            "peAvg": 12,
+            "pbAvg": 1.45,
+            "maxMultiplier": 22.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pe",
+          "name": "P/E Chuẩn Hóa",
+          "fullName": "2. P/E Chuẩn Hóa",
+          "cleanName": "P/E Chuẩn Hóa",
+          "value": 65262,
+          "targetPrice": 65262,
+          "diffPercent": 234.7,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 7.9,
+          "formula": "EPS × P/E Mục Tiêu (11.5x)",
+          "formulaDetail": "V = 5,675 × 11.5x (Median chu kỳ 5Y)",
+          "parameters": {
+            "eps": 5675,
+            "targetPe": 11.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pb",
+          "name": "P/B Ngành & Gordon",
+          "fullName": "3. P/B Ngành & Gordon",
+          "cleanName": "P/B Ngành & Gordon",
+          "value": 35100,
+          "targetPrice": 35100,
+          "diffPercent": 80,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 41.9,
+          "formula": "BVPS × [(ROE - g)/(r - g)]",
+          "formulaDetail": "V = 26,000 × Gordon Multiple",
+          "parameters": {
+            "bvps": 26000,
+            "roe": 22.41,
+            "coe": 0.115,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "dcf",
+          "name": "DCF Đa Giai Đoạn",
+          "fullName": "4. DCF Đa Giai Đoạn",
+          "cleanName": "DCF Đa Giai Đoạn",
+          "value": 60459,
+          "targetPrice": 60459,
+          "diffPercent": 210,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+          "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+          "parameters": {
+            "baseFcf": 2122888245600,
+            "shares": 511722000,
+            "wacc": 0.115,
+            "g1": 0.07,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "ddm",
+          "name": "Chiết Khấu DDM",
+          "fullName": "5. Chiết Khấu DDM",
+          "cleanName": "Chiết Khấu DDM",
+          "value": null,
+          "targetPrice": null,
+          "diffPercent": null,
+          "weight": 0,
+          "baseWeight": 0.05,
+          "suitability": 0,
+          "suitabilityNote": "Không có DPS",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+          "formulaDetail": "Chiết khấu dòng cổ tức tiền mặt",
+          "parameters": {
+            "dps": 0,
+            "coe": 0.115,
+            "g": 0.035
+          },
+          "statusNote": "Không có cổ tức tiền mặt"
+        },
+        {
+          "id": "fcff",
+          "name": "FCFF Doanh Nghiệp",
+          "fullName": "6. FCFF Doanh Nghiệp",
+          "cleanName": "FCFF Doanh Nghiệp",
+          "value": 60459,
+          "targetPrice": 60459,
+          "diffPercent": 210,
+          "weight": 0.12,
+          "baseWeight": 0.12,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+          "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+          "parameters": {
+            "fcff": 2122888245600,
+            "netDebt": 3989128051250,
+            "wacc": 0.115,
+            "shares": 511722000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcfe",
+          "name": "FCFE Cổ Đông",
+          "fullName": "7. FCFE Cổ Đông",
+          "cleanName": "FCFE Cổ Đông",
+          "value": null,
+          "targetPrice": null,
+          "diffPercent": null,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+          "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+          "parameters": {
+            "cfo": 2122888245600,
+            "capex": 4480000000000,
+            "coe": 0.115,
+            "shares": 511722000
+          },
+          "statusNote": "Dòng tiền FCFE âm"
+        },
+        {
+          "id": "rim",
+          "name": "Residual Income RIM/EVA",
+          "fullName": "8. Residual Income RIM/EVA",
+          "cleanName": "Residual Income RIM/EVA",
+          "value": 99644,
+          "targetPrice": 99644,
+          "diffPercent": 411,
+          "weight": 0.044,
+          "baseWeight": 0.08,
+          "suitability": 0.55,
+          "suitabilityNote": "Thứ cấp phi TC",
+          "isOutlier": true,
+          "outlierGapPct": 64.8,
+          "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+          "formulaDetail": "BVPS=26,000 đ, ROE=22.4%, CoE=11.5%",
+          "parameters": {
+            "equity": 17028442916386,
+            "bvps": 26000,
+            "roe": 22.41,
+            "coe": 0.115,
+            "shares": 511722000
+          },
+          "statusNote": "Thứ cấp phi TC"
+        },
+        {
+          "id": "nav",
+          "name": "Book NAV / RNAV",
+          "fullName": "9. Book NAV / RNAV",
+          "cleanName": "Book NAV / RNAV",
+          "value": 26621,
+          "targetPrice": 26621,
+          "diffPercent": 36.5,
+          "weight": 0.032,
+          "baseWeight": 0.07,
+          "suitability": 0.45,
+          "suitabilityNote": "Thứ cấp phi TC/BĐS",
+          "isOutlier": false,
+          "outlierGapPct": 56,
+          "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+          "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+          "parameters": {
+            "equity": 17028442916386,
+            "totalAssets": 21017570967636,
+            "totalDebt": 3989128051250,
+            "inventory": null,
+            "shares": 511722000
+          },
+          "statusNote": "Thứ cấp phi TC/BĐS"
+        },
+        {
+          "id": "evebitda",
+          "name": "EV/EBITDA & EV/Sales",
+          "fullName": "10. EV/EBITDA & EV/Sales",
+          "cleanName": "EV/EBITDA & EV/Sales",
+          "value": 66855,
+          "targetPrice": 66855,
+          "diffPercent": 242.8,
+          "weight": 0.07,
+          "baseWeight": 0.07,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 10.6,
+          "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+          "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+          "parameters": {
+            "ebitda": 3808633773070,
+            "multiple": 7.5,
+            "revenue": 43487462421515,
+            "salesMultiple": 1.1,
+            "netDebt": 3989128051250,
+            "shares": 511722000
+          },
+          "statusNote": "Phù hợp"
+        }
+      ],
+      "consensusDetails": {
+        "cleanWeightedAvg": 54473,
+        "cleanMedian": 60459,
+        "dispersionPct": 9.9,
+        "consensusLevel": "HIGH",
+        "coveragePct": 77.8,
+        "confidenceScore": 91.1,
+        "modelsUsed": 7,
+        "modelsValid": 8,
+        "excludedOutliers": [
+          "Residual Income RIM/EVA"
+        ]
+      },
+      "valuationTraps": {
+        "trapScore": 0,
+        "trapLabel": "THẤP",
+        "trapReason": "Không phát hiện bẫy định giá",
+        "isCapPenalized": false,
+        "trapsList": [
+          {
+            "id": "value_trap",
+            "name": "Value Trap",
+            "active": false,
+            "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+          },
+          {
+            "id": "book_trap",
+            "name": "Book Trap",
+            "active": false,
+            "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+          },
+          {
+            "id": "cyclical_peak",
+            "name": "Cyclical Peak",
+            "active": false,
+            "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+          },
+          {
+            "id": "dividend_trap",
+            "name": "Dividend Trap",
+            "active": false,
+            "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+          },
+          {
+            "id": "debt_stress",
+            "name": "Debt Stress",
+            "active": false,
+            "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+          },
+          {
+            "id": "share_dilution",
+            "name": "Share Dilution",
+            "active": false,
+            "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+          },
+          {
+            "id": "wc_stress",
+            "name": "Working Capital Stress",
+            "active": false,
+            "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+          }
+        ]
+      },
+      "sevenPriceZones": {
+        "currentZone": "Deep Value",
+        "zoneBadge": "bg-emerald-600 text-white",
+        "safeBuyPrice": 42650,
+        "acceptableBuyPrice": 48337,
+        "bearPrice": 39807,
+        "bullPrice": 71084,
+        "boundaries": {
+          "deepValue": 38385,
+          "safeBuy": 42650,
+          "accumulate": 48337,
+          "fairLow": 51180,
+          "fairHigh": 62554,
+          "aboveFair": 67530,
+          "expensive": 81746
+        }
+      },
+      "threeLayerDecision": {
+        "compositeScore": 7.7,
+        "valuationLayerScore": 10,
+        "qualityLayerScore": 7,
+        "timingLayerScore": 5,
+        "roeCoeSpread": 10.91,
+        "buyRecommendation": "🟢 STRONG BUY",
+        "decisionReason": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
+        "isGateOpen": true,
+        "isTrapCapped": false
+      },
+      "historicalBands": {
+        "band25": 46044,
+        "band50": 52900,
+        "band75": 64544,
+        "bandPosition": "Dưới P25 (Vùng Rẻ)",
+        "bandWidthPct": 35,
+        "peBand": {
+          "p25": 10.5,
+          "p50": 12,
+          "p75": 14.5,
+          "current": 3.44
+        },
+        "pbBand": {
+          "p25": 1.25,
+          "p50": 1.45,
+          "p75": 1.8,
+          "current": 0.75
+        },
+        "priceBands": {
+          "peP25Price": 59588,
+          "peP50Price": 68100,
+          "peP75Price": 82288,
+          "pbP25Price": 32500,
+          "pbP50Price": 37700,
+          "pbP75Price": 46800
+        }
+      },
+      "dividendSustainability": {
+        "score": 0,
+        "status": "Không có DPS",
+        "payoutRatio": null,
+        "fcfPayoutRatio": null,
+        "consistency": 0
+      },
+      "finvalLab": {
+        "items": [
+          {
+            "key": "eps",
+            "label": "EPS (Thu nhập mỗi CP)",
+            "unit": "đ",
+            "current": 5675,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "bvps",
+            "label": "BVPS (Giá trị sổ sách)",
+            "unit": "đ",
+            "current": 26000,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "pe",
+            "label": "Hệ số P/E",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "pb",
+            "label": "Hệ số P/B",
+            "unit": "x",
+            "current": 0.75,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "roe",
+            "label": "Tỷ suất ROE",
+            "unit": "%",
+            "current": 22.41,
+            "sma5y": 17.02,
+            "deltaPct": 31.7,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "roa",
+            "label": "Tỷ suất ROA",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "roic",
+            "label": "Tỷ suất ROIC",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "grossMargin",
+            "label": "Biên Lợi Nhuận Gộp",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "netMargin",
+            "label": "Biên Lợi Nhuận Ròng",
+            "unit": "%",
+            "current": 6.67,
+            "sma5y": 6.67,
+            "deltaPct": 0,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "revenue",
+            "label": "Doanh Thu Thuần",
+            "unit": "Tỷ",
+            "current": 43487.5,
+            "sma5y": 37137.8,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "netIncome",
+            "label": "Lợi Nhuận Sau Thuế",
+            "unit": "Tỷ",
+            "current": 2899.1,
+            "sma5y": 2475.6,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "ebitda",
+            "label": "Chỉ số EBITDA",
+            "unit": "Tỷ",
+            "current": 3808.6,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "freeCashFlow",
+            "label": "Dòng Tiền Tự Do FCF",
+            "unit": "Tỷ",
+            "current": 2122.9,
+            "sma5y": 1064.6,
+            "deltaPct": 99.4,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "debtToEquity",
+            "label": "Nợ / Vốn Chủ (D/E)",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "currentRatio",
+            "label": "Hệ Số Thanh Toán Hiện Hành",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "cashRatio",
+            "label": "Hệ Số Tiền Mặt",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          }
+        ]
+      },
+      "impliedFcfYieldPrice": 50285
     },
     "profitability": {
-      "roe": null,
-      "roeFy": null,
-      "roa": null,
-      "roaFy": null,
-      "eps": null,
-      "grossMargin": null,
-      "operatingMargin": null,
-      "netMargin": null
+      "roe": 22.41,
+      "roeFy": 21.13,
+      "roa": 15.19,
+      "roaFy": 13.87,
+      "eps": 5675,
+      "grossMargin": 20.64,
+      "operatingMargin": 8.58,
+      "netMargin": 6.67
+    },
+    "dupont": {
+      "roe": 22.41,
+      "netProfitMargin": 6.67,
+      "assetTurnover": 2.07,
+      "equityMultiplier": 1.23,
+      "qualityAssessment": "Trung bình: Cần theo dõi thêm sự cải thiện của biên lợi nhuận ròng."
     },
     "dividends": {
-      "yield": null,
+      "yield": 3.42,
       "dps": 0,
-      "fcf": null,
-      "fcfMargin": null
+      "fcf": 2122888245600,
+      "fcfMargin": 4.88
     },
     "health": {
-      "totalDebt": null,
-      "totalAssets": null,
-      "debtToEquity": null,
-      "currentRatio": null,
-      "quickRatio": null,
-      "ebitda": null
+      "totalDebt": 3989128051250,
+      "totalAssets": 21017570967636,
+      "debtToEquity": 0.29,
+      "currentRatio": 2.74,
+      "quickRatio": 0.6,
+      "ebitda": 3808633773070
     },
     "scale": {
-      "revenue": null,
-      "netIncome": null,
-      "marketCap": null,
-      "sharesOutstanding": null
+      "revenue": 43487462421515,
+      "netIncome": 2899133485202,
+      "marketCap": 9978578109741,
+      "sharesOutstanding": 511722000
     },
     "performance": {
-      "w1": -1.07,
-      "m1": -4.56,
-      "m3": -8.85,
-      "m6": -12.11,
-      "ytd": -15.27,
-      "y1": -17.93,
-      "y5": 24.81,
-      "high52w": 40820,
-      "low52w": 30600,
-      "range52wPercent": 18,
-      "avgVol10d": 737658,
-      "avgVol30d": 513965,
-      "volatilityW": 1.71,
-      "volatilityM": 1.66
+      "w1": -15.4,
+      "m1": -49.48,
+      "m3": -60.76,
+      "m6": -73.17,
+      "ytd": -70.06,
+      "y1": -65.26,
+      "y5": -59.96,
+      "high52w": 84666.582,
+      "low52w": 17800,
+      "range52wPercent": 3,
+      "avgVol10d": 20006711,
+      "avgVol30d": 10577096,
+      "volatilityW": 8.17,
+      "volatilityM": 4.85
     },
     "technicals": {
-      "recommendScore": -0.49,
+      "recommendScore": -0.26,
       "recommendText": "Bán",
       "recommendColor": "text-rose-400 font-medium",
-      "beta": 0.68
+      "beta": 1.47,
+      "techScore": 0,
+      "techScoreVerdict": "Trung lập (Neutral)",
+      "techScoreColor": "text-gray-400",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Yếu",
+        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
+      ]
     },
-    "updatedAt": 1791712715127,
-    "dupont": {
-      "roe": null,
-      "netProfitMargin": null,
-      "assetTurnover": null,
-      "equityMultiplier": null,
-      "qualityAssessment": "Dữ liệu được chuẩn hóa và tính toán từ Python Valuation Engine"
-    }
+    "updatedAt": 1791719268657
   },
   "DXG": {
     "symbol": "DXG",
@@ -94,9 +679,9 @@
       "ps": 2.8,
       "evEbitda": null,
       "bvps": 11207,
-      "grahamNumber": 6528,
-      "marginOfSafetyGraham": -49.4,
-      "grahamDiffPercent": -33,
+      "grahamNumber": 5741,
+      "marginOfSafetyGraham": -69.8,
+      "grahamDiffPercent": -41.1,
       "ddmTarget": null,
       "ddmDiffPercent": null,
       "peTarget": 1944,
@@ -109,16 +694,571 @@
       "pcfDiffPercent": -47.1,
       "psFairPrice": 4030,
       "psDiffPercent": -58.7,
-      "fairValue": 5757,
-      "consensusFairValue": 5757,
-      "marginOfSafety": -69.4,
-      "marginOfSafetyFairValue": -69.4,
-      "upside": -41,
-      "consensusDiffPercent": -41,
-      "valuationRating": "RISKY",
-      "valuationRatingText": "Rất Đắt / Rủi Ro (MoS < -20%)",
-      "valuationRatingBadge": "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
-      "validModelsCount": 5
+      "fairValue": 7570,
+      "consensusFairValue": 7570,
+      "marginOfSafety": -28.8,
+      "marginOfSafetyFairValue": -28.8,
+      "upside": -22.4,
+      "consensusDiffPercent": -22.4,
+      "valuationRating": "🟠 AVOID",
+      "valuationRatingText": "Thị giá cao hơn định giá cơ sở",
+      "valuationRatingBadge": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+      "validModelsCount": 4,
+      "models10": [
+        {
+          "id": "graham",
+          "name": "Benjamin Graham",
+          "fullName": "1. Benjamin Graham",
+          "cleanName": "Benjamin Graham",
+          "value": 5741,
+          "targetPrice": 5741,
+          "diffPercent": -41.1,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 24.1,
+          "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+          "formulaDetail": "V = √(17.4 × 169 × 11,207) | Hệ số = Min(22.5, 12.0x × 1.45x = 17.4)",
+          "parameters": {
+            "eps": 169,
+            "bvps": 11207,
+            "multiplier": 17.4,
+            "peAvg": 12,
+            "pbAvg": 1.45,
+            "maxMultiplier": 22.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pe",
+          "name": "P/E Chuẩn Hóa",
+          "fullName": "2. P/E Chuẩn Hóa",
+          "cleanName": "P/E Chuẩn Hóa",
+          "value": 1944,
+          "targetPrice": 1944,
+          "diffPercent": -80.1,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 74.3,
+          "formula": "EPS × P/E Mục Tiêu (11.5x)",
+          "formulaDetail": "V = 169 × 11.5x (Median chu kỳ 5Y)",
+          "parameters": {
+            "eps": 169,
+            "targetPe": 11.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pb",
+          "name": "P/B Ngành & Gordon",
+          "fullName": "3. P/B Ngành & Gordon",
+          "cleanName": "P/B Ngành & Gordon",
+          "value": 15129,
+          "targetPrice": 15129,
+          "diffPercent": 55.2,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 99.9,
+          "formula": "BVPS × [(ROE - g)/(r - g)]",
+          "formulaDetail": "V = 11,207 × Gordon Multiple",
+          "parameters": {
+            "bvps": 11207,
+            "roe": 1.42,
+            "coe": 0.115,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "dcf",
+          "name": "DCF Đa Giai Đoạn",
+          "fullName": "4. DCF Đa Giai Đoạn",
+          "cleanName": "DCF Đa Giai Đoạn",
+          "value": 9396,
+          "targetPrice": 9396,
+          "diffPercent": -3.6,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 24.1,
+          "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+          "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+          "parameters": {
+            "baseFcf": 817574182220,
+            "shares": 1268110000,
+            "wacc": 0.115,
+            "g1": 0.07,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "ddm",
+          "name": "Chiết Khấu DDM",
+          "fullName": "5. Chiết Khấu DDM",
+          "cleanName": "Chiết Khấu DDM",
+          "value": null,
+          "targetPrice": null,
+          "diffPercent": null,
+          "weight": 0,
+          "baseWeight": 0.05,
+          "suitability": 0,
+          "suitabilityNote": "Không có DPS",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+          "formulaDetail": "Chiết khấu dòng cổ tức tiền mặt",
+          "parameters": {
+            "dps": 0,
+            "coe": 0.115,
+            "g": 0.035
+          },
+          "statusNote": "Không có cổ tức tiền mặt"
+        },
+        {
+          "id": "fcff",
+          "name": "FCFF Doanh Nghiệp",
+          "fullName": "6. FCFF Doanh Nghiệp",
+          "cleanName": "FCFF Doanh Nghiệp",
+          "value": 9396,
+          "targetPrice": 9396,
+          "diffPercent": -3.6,
+          "weight": 0.12,
+          "baseWeight": 0.12,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 24.1,
+          "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+          "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+          "parameters": {
+            "fcff": 817574182220,
+            "netDebt": 5166834497710,
+            "wacc": 0.115,
+            "shares": 1268110000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcfe",
+          "name": "FCFE Cổ Đông",
+          "fullName": "7. FCFE Cổ Đông",
+          "cleanName": "FCFE Cổ Đông",
+          "value": 3241,
+          "targetPrice": 3241,
+          "diffPercent": -66.8,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 57.2,
+          "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+          "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+          "parameters": {
+            "cfo": 817574182220,
+            "capex": 480000000000,
+            "coe": 0.115,
+            "shares": 1268110000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "rim",
+          "name": "Residual Income RIM/EVA",
+          "fullName": "8. Residual Income RIM/EVA",
+          "cleanName": "Residual Income RIM/EVA",
+          "value": null,
+          "targetPrice": null,
+          "diffPercent": null,
+          "weight": 0.044,
+          "baseWeight": 0.08,
+          "suitability": 0.55,
+          "suitabilityNote": "Thứ cấp phi TC",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+          "formulaDetail": "BVPS=11,207 đ, ROE=1.4%, CoE=11.5%",
+          "parameters": {
+            "equity": 34602206335076,
+            "bvps": 11207,
+            "roe": 1.42,
+            "coe": 0.115,
+            "shares": 1268110000
+          },
+          "statusNote": "Vốn chủ âm hoặc ROE < CoE"
+        },
+        {
+          "id": "nav",
+          "name": "Book NAV / RNAV",
+          "fullName": "9. Book NAV / RNAV",
+          "cleanName": "Book NAV / RNAV",
+          "value": 21829,
+          "targetPrice": 21829,
+          "diffPercent": 123.9,
+          "weight": 0.032,
+          "baseWeight": 0.07,
+          "suitability": 0.45,
+          "suitabilityNote": "Thứ cấp phi TC/BĐS",
+          "isOutlier": true,
+          "outlierGapPct": 188.4,
+          "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+          "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+          "parameters": {
+            "equity": 34602206335076,
+            "totalAssets": 39769040832786,
+            "totalDebt": 5166834497710,
+            "inventory": null,
+            "shares": 1268110000
+          },
+          "statusNote": "Thứ cấp phi TC/BĐS"
+        },
+        {
+          "id": "evebitda",
+          "name": "EV/EBITDA & EV/Sales",
+          "fullName": "10. EV/EBITDA & EV/Sales",
+          "cleanName": "EV/EBITDA & EV/Sales",
+          "value": 28,
+          "targetPrice": 28,
+          "diffPercent": -99.7,
+          "weight": 0.07,
+          "baseWeight": 0.07,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 99.6,
+          "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+          "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+          "parameters": {
+            "ebitda": 693680274520,
+            "multiple": 7.5,
+            "revenue": 4645555067463,
+            "salesMultiple": 1.1,
+            "netDebt": 5166834497710,
+            "shares": 1268110000
+          },
+          "statusNote": "Phù hợp"
+        }
+      ],
+      "consensusDetails": {
+        "cleanWeightedAvg": 7571,
+        "cleanMedian": 7568,
+        "dispersionPct": 0,
+        "consensusLevel": "HIGH",
+        "coveragePct": 44.4,
+        "confidenceScore": 69.8,
+        "modelsUsed": 4,
+        "modelsValid": 8,
+        "excludedOutliers": [
+          "P/E Chuẩn Hóa",
+          "P/B Ngành & Gordon",
+          "Book NAV / RNAV",
+          "EV/EBITDA & EV/Sales"
+        ]
+      },
+      "valuationTraps": {
+        "trapScore": 2.5,
+        "trapLabel": "TB",
+        "trapReason": "Book Trap (ROE thấp hơn Chi phí vốn CoE)",
+        "isCapPenalized": false,
+        "trapsList": [
+          {
+            "id": "value_trap",
+            "name": "Value Trap",
+            "active": false,
+            "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+          },
+          {
+            "id": "book_trap",
+            "name": "Book Trap",
+            "active": true,
+            "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+          },
+          {
+            "id": "cyclical_peak",
+            "name": "Cyclical Peak",
+            "active": false,
+            "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+          },
+          {
+            "id": "dividend_trap",
+            "name": "Dividend Trap",
+            "active": false,
+            "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+          },
+          {
+            "id": "debt_stress",
+            "name": "Debt Stress",
+            "active": false,
+            "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+          },
+          {
+            "id": "share_dilution",
+            "name": "Share Dilution",
+            "active": false,
+            "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+          },
+          {
+            "id": "wc_stress",
+            "name": "Working Capital Stress",
+            "active": false,
+            "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+          }
+        ]
+      },
+      "sevenPriceZones": {
+        "currentZone": "Expensive",
+        "zoneBadge": "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
+        "safeBuyPrice": 5678,
+        "acceptableBuyPrice": 6434,
+        "bearPrice": 5299,
+        "bullPrice": 9462,
+        "boundaries": {
+          "deepValue": 5110,
+          "safeBuy": 5678,
+          "accumulate": 6434,
+          "fairLow": 6813,
+          "fairHigh": 8327,
+          "aboveFair": 8989,
+          "expensive": 10882
+        }
+      },
+      "threeLayerDecision": {
+        "compositeScore": 2.8,
+        "valuationLayerScore": 0,
+        "qualityLayerScore": 4.5,
+        "timingLayerScore": 5,
+        "roeCoeSpread": -10.08,
+        "buyRecommendation": "🟠 AVOID",
+        "decisionReason": "Thị giá cao hơn định giá cơ sở",
+        "isGateOpen": false,
+        "isTrapCapped": false
+      },
+      "historicalBands": {
+        "band25": 7892,
+        "band50": 9139,
+        "band75": 11312,
+        "bandPosition": "P50–P75 (Hợp lý cao)",
+        "bandWidthPct": 37.4,
+        "peBand": {
+          "p25": 10.5,
+          "p50": 12,
+          "p75": 14.5,
+          "current": 57.69
+        },
+        "pbBand": {
+          "p25": 1.25,
+          "p50": 1.45,
+          "p75": 1.8,
+          "current": 0.87
+        },
+        "priceBands": {
+          "peP25Price": 1774,
+          "peP50Price": 2028,
+          "peP75Price": 2450,
+          "pbP25Price": 14009,
+          "pbP50Price": 16250,
+          "pbP75Price": 20173
+        }
+      },
+      "dividendSustainability": {
+        "score": 0,
+        "status": "Không có DPS",
+        "payoutRatio": null,
+        "fcfPayoutRatio": null,
+        "consistency": 0
+      },
+      "finvalLab": {
+        "items": [
+          {
+            "key": "eps",
+            "label": "EPS (Thu nhập mỗi CP)",
+            "unit": "đ",
+            "current": 169,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "bvps",
+            "label": "BVPS (Giá trị sổ sách)",
+            "unit": "đ",
+            "current": 11207,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "pe",
+            "label": "Hệ số P/E",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "pb",
+            "label": "Hệ số P/B",
+            "unit": "x",
+            "current": 0.87,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "roe",
+            "label": "Tỷ suất ROE",
+            "unit": "%",
+            "current": 1.42,
+            "sma5y": 0.55,
+            "deltaPct": 158.2,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "roa",
+            "label": "Tỷ suất ROA",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "roic",
+            "label": "Tỷ suất ROIC",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "grossMargin",
+            "label": "Biên Lợi Nhuận Gộp",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "netMargin",
+            "label": "Biên Lợi Nhuận Ròng",
+            "unit": "%",
+            "current": 4.09,
+            "sma5y": 4.09,
+            "deltaPct": 0,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "revenue",
+            "label": "Doanh Thu Thuần",
+            "unit": "Tỷ",
+            "current": 4645.6,
+            "sma5y": 3967.6,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "netIncome",
+            "label": "Lợi Nhuận Sau Thuế",
+            "unit": "Tỷ",
+            "current": 190,
+            "sma5y": 162.2,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "ebitda",
+            "label": "Chỉ số EBITDA",
+            "unit": "Tỷ",
+            "current": 693.7,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "freeCashFlow",
+            "label": "Dòng Tiền Tự Do FCF",
+            "unit": "Tỷ",
+            "current": 817.6,
+            "sma5y": 69.6,
+            "deltaPct": 1074.7,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "debtToEquity",
+            "label": "Nợ / Vốn Chủ (D/E)",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "currentRatio",
+            "label": "Hệ Số Thanh Toán Hiện Hành",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "cashRatio",
+            "label": "Hệ Số Tiền Mặt",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          }
+        ]
+      },
+      "impliedFcfYieldPrice": 7815
     },
     "profitability": {
       "roe": 1.42,
@@ -187,308 +1327,7 @@
         "Hệ số Beta ổn định (0.85x)"
       ]
     },
-    "updatedAt": 1791712715127
-  },
-  "E1VFVN30": {
-    "symbol": "E1VFVN30",
-    "exchange": "HOSE",
-    "name": "E1VFVN30",
-    "description": "VFMVN30 ETF Fund",
-    "close": 33840,
-    "change": -0.47,
-    "changeAbs": -160,
-    "volume": 461451,
-    "sector": "Miscellaneous",
-    "industry": "Investment trusts",
-    "valuation": {
-      "pe": null,
-      "pb": null,
-      "ps": null,
-      "evEbitda": null
-    },
-    "profitability": {
-      "roe": null,
-      "roeFy": null,
-      "roa": null,
-      "roaFy": null,
-      "eps": null,
-      "grossMargin": null,
-      "operatingMargin": null,
-      "netMargin": null
-    },
-    "dividends": {
-      "yield": null,
-      "dps": 0,
-      "fcf": null,
-      "fcfMargin": null
-    },
-    "health": {
-      "totalDebt": null,
-      "totalAssets": null,
-      "debtToEquity": null,
-      "currentRatio": null,
-      "quickRatio": null,
-      "ebitda": null
-    },
-    "scale": {
-      "revenue": null,
-      "netIncome": null,
-      "marketCap": null,
-      "sharesOutstanding": null
-    },
-    "performance": {
-      "w1": -1.02,
-      "m1": -4.14,
-      "m3": -5.21,
-      "m6": -0.79,
-      "ytd": -6.21,
-      "y1": -0.44,
-      "y5": 37.56,
-      "high52w": 37400,
-      "low52w": 30850,
-      "range52wPercent": 46,
-      "avgVol10d": 372792,
-      "avgVol30d": 540097,
-      "volatilityW": 1.34,
-      "volatilityM": 1.48
-    },
-    "technicals": {
-      "recommendScore": -0.47,
-      "recommendText": "Bán",
-      "recommendColor": "text-rose-400 font-medium",
-      "rsi": 35.3,
-      "macd": -238.13,
-      "macdSignal": -136.27,
-      "beta": 0.81
-    },
-    "updatedAt": 1791540290725
-  },
-  "HPG": {
-    "symbol": "HPG",
-    "exchange": "HOSE",
-    "name": "HPG",
-    "description": "Hoa Phat Group JSC",
-    "close": 20100,
-    "change": -0.25,
-    "changeAbs": -50,
-    "volume": 16353579,
-    "sector": "Non-energy minerals",
-    "industry": "Steel",
-    "valuation": {
-      "pe": 7.31,
-      "pb": 1.31,
-      "ps": 1.09,
-      "evEbitda": null,
-      "bvps": 15344,
-      "grahamNumber": 30812,
-      "marginOfSafetyGraham": 34.8,
-      "grahamDiffPercent": 53.3,
-      "ddmTarget": 5887,
-      "ddmDiffPercent": -70.7,
-      "peTarget": 31625,
-      "peDiffPercent": 57.3,
-      "pbTarget": 20714,
-      "pbDiffPercent": 3.1,
-      "evEbitdaFairPrice": 20776,
-      "evEbitdaDiffPercent": 3.4,
-      "pcfFairPrice": null,
-      "pcfDiffPercent": null,
-      "psFairPrice": 24838,
-      "psDiffPercent": 23.6,
-      "fairValue": 21963,
-      "consensusFairValue": 21963,
-      "marginOfSafety": 8.5,
-      "marginOfSafetyFairValue": 8.5,
-      "upside": 9.3,
-      "consensusDiffPercent": 9.3,
-      "valuationRating": "ATTRACTIVE",
-      "valuationRatingText": "Hấp Dẫn (Vùng Mua 5 - 20%)",
-      "valuationRatingBadge": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-      "validModelsCount": 5
-    },
-    "profitability": {
-      "roe": 17.69,
-      "roeFy": 12.44,
-      "roa": 8.91,
-      "roaFy": 6.28,
-      "eps": 2750,
-      "grossMargin": 16.29,
-      "operatingMargin": 13.5,
-      "netMargin": 12.18
-    },
-    "dupont": {
-      "roe": 17.69,
-      "netProfitMargin": 12.18,
-      "assetTurnover": 0.68,
-      "equityMultiplier": 1.55,
-      "qualityAssessment": "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn."
-    },
-    "dividends": {
-      "yield": 2.26,
-      "dps": 455,
-      "fcf": -269629611550,
-      "fcfMargin": -0.14
-    },
-    "health": {
-      "totalDebt": 98529977232553,
-      "totalAssets": 278929786015406,
-      "debtToEquity": 0.7,
-      "currentRatio": 1.14,
-      "quickRatio": 0.61,
-      "ebitda": 36525966096080
-    },
-    "scale": {
-      "revenue": 190643650555249,
-      "netIncome": 23214335169900,
-      "marketCap": 169703593359375,
-      "sharesOutstanding": 8442970000
-    },
-    "performance": {
-      "w1": 0,
-      "m1": -8.22,
-      "m3": -13.36,
-      "m6": -22.69,
-      "ytd": -16.25,
-      "y1": -24.8,
-      "y5": -32.01,
-      "high52w": 27000.0027,
-      "low52w": 19600,
-      "range52wPercent": 7,
-      "avgVol10d": 22484628,
-      "avgVol30d": 20788358,
-      "volatilityW": 1.79,
-      "volatilityM": 1.96
-    },
-    "technicals": {
-      "recommendScore": -0.51,
-      "recommendText": "Bán mạnh",
-      "recommendColor": "text-rose-500 font-bold",
-      "beta": 0.71,
-      "techScore": -1,
-      "techScoreVerdict": "Kém (Moderate Bearish)",
-      "techScoreColor": "text-rose-400 font-semibold",
-      "factors": [
-        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
-        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
-      ]
-    },
-    "updatedAt": 1791712715127
-  },
-  "PNJ": {
-    "symbol": "PNJ",
-    "exchange": "HOSE",
-    "name": "PNJ",
-    "description": "Phu Nhuan Jewelry JSC",
-    "close": 19500,
-    "change": 6.85,
-    "changeAbs": 1250,
-    "volume": 7161863,
-    "sector": "Consumer durables",
-    "industry": "Other consumer specialties",
-    "valuation": {
-      "pe": 3.44,
-      "pb": 0.75,
-      "ps": 0.28,
-      "evEbitda": null,
-      "bvps": 26000,
-      "grahamNumber": 57618,
-      "marginOfSafetyGraham": 66.2,
-      "grahamDiffPercent": 195.5,
-      "ddmTarget": null,
-      "ddmDiffPercent": null,
-      "peTarget": 65262,
-      "peDiffPercent": 234.7,
-      "pbTarget": 35100,
-      "pbDiffPercent": 80,
-      "evEbitdaFairPrice": 48025,
-      "evEbitdaDiffPercent": 146.3,
-      "pcfFairPrice": 33188,
-      "pcfDiffPercent": 70.2,
-      "psFairPrice": 93481,
-      "psDiffPercent": 379.4,
-      "fairValue": 47839,
-      "consensusFairValue": 47839,
-      "marginOfSafety": 59.2,
-      "marginOfSafetyFairValue": 59.2,
-      "upside": 145.3,
-      "consensusDiffPercent": 145.3,
-      "valuationRating": "DEEP_VALUE",
-      "valuationRatingText": "Rất Rẻ (Biên an toàn > 20%)",
-      "valuationRatingBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "validModelsCount": 5
-    },
-    "profitability": {
-      "roe": 22.41,
-      "roeFy": 21.13,
-      "roa": 15.19,
-      "roaFy": 13.87,
-      "eps": 5675,
-      "grossMargin": 20.64,
-      "operatingMargin": 8.58,
-      "netMargin": 6.67
-    },
-    "dupont": {
-      "roe": 22.41,
-      "netProfitMargin": 6.67,
-      "assetTurnover": 2.07,
-      "equityMultiplier": 1.23,
-      "qualityAssessment": "Trung bình: Cần theo dõi thêm sự cải thiện của biên lợi nhuận ròng."
-    },
-    "dividends": {
-      "yield": 3.42,
-      "dps": 0,
-      "fcf": 2122888245600,
-      "fcfMargin": 4.88
-    },
-    "health": {
-      "totalDebt": 3989128051250,
-      "totalAssets": 21017570967636,
-      "debtToEquity": 0.29,
-      "currentRatio": 2.74,
-      "quickRatio": 0.6,
-      "ebitda": 3808633773070
-    },
-    "scale": {
-      "revenue": 43487462421515,
-      "netIncome": 2899133485202,
-      "marketCap": 9978578109741,
-      "sharesOutstanding": 511722000
-    },
-    "performance": {
-      "w1": -15.4,
-      "m1": -49.48,
-      "m3": -60.76,
-      "m6": -73.17,
-      "ytd": -70.06,
-      "y1": -65.26,
-      "y5": -59.96,
-      "high52w": 84666.582,
-      "low52w": 17800,
-      "range52wPercent": 3,
-      "avgVol10d": 20006711,
-      "avgVol30d": 10577096,
-      "volatilityW": 8.17,
-      "volatilityM": 4.85
-    },
-    "technicals": {
-      "recommendScore": -0.26,
-      "recommendText": "Bán",
-      "recommendColor": "text-rose-400 font-medium",
-      "beta": 1.47,
-      "techScore": 0,
-      "techScoreVerdict": "Trung lập (Neutral)",
-      "techScoreColor": "text-gray-400",
-      "factors": [
-        "Đồng thuận kỹ thuật TradingView: Yếu",
-        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
-      ]
-    },
-    "updatedAt": 1791698045380
-  },
-  "_meta": {
-    "lastSyncedAt": "2026-10-11T05:54:05Z",
-    "syncedCount": 7,
-    "symbolsCount": 7
+    "updatedAt": 1791720021659
   },
   "VND": {
     "symbol": "VND",
@@ -507,9 +1346,9 @@
       "ps": 3.94,
       "evEbitda": null,
       "bvps": 13750,
-      "grahamNumber": 23421,
-      "marginOfSafetyGraham": 43.6,
-      "grahamDiffPercent": 77.4,
+      "grahamNumber": 20596,
+      "marginOfSafetyGraham": 35.9,
+      "grahamDiffPercent": 56,
       "ddmTarget": 6469,
       "ddmDiffPercent": -51,
       "peTarget": 20390,
@@ -522,16 +1361,572 @@
       "pcfDiffPercent": 116.9,
       "psFairPrice": 3947,
       "psDiffPercent": -70.1,
-      "fairValue": 16941,
-      "consensusFairValue": 16941,
-      "marginOfSafety": 22.1,
-      "marginOfSafetyFairValue": 22.1,
-      "upside": 28.3,
-      "consensusDiffPercent": 28.3,
-      "valuationRating": "DEEP_VALUE",
-      "valuationRatingText": "Rất Rẻ (Biên an toàn > 20%)",
-      "valuationRatingBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "validModelsCount": 6
+      "fairValue": 19380,
+      "consensusFairValue": 19380,
+      "marginOfSafety": 31.9,
+      "marginOfSafetyFairValue": 31.9,
+      "upside": 46.8,
+      "consensusDiffPercent": 46.8,
+      "valuationRating": "🟡 HOLD",
+      "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
+      "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+      "validModelsCount": 5,
+      "models10": [
+        {
+          "id": "graham",
+          "name": "Benjamin Graham",
+          "fullName": "1. Benjamin Graham",
+          "cleanName": "Benjamin Graham",
+          "value": 20596,
+          "targetPrice": 20596,
+          "diffPercent": 56,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 2.9,
+          "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+          "formulaDetail": "V = √(17.4 × 1,773 × 13,750) | Hệ số = Min(22.5, 12.0x × 1.45x = 17.4)",
+          "parameters": {
+            "eps": 1773,
+            "bvps": 13750,
+            "multiplier": 17.4,
+            "peAvg": 12,
+            "pbAvg": 1.45,
+            "maxMultiplier": 22.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pe",
+          "name": "P/E Chuẩn Hóa",
+          "fullName": "2. P/E Chuẩn Hóa",
+          "cleanName": "P/E Chuẩn Hóa",
+          "value": 20390,
+          "targetPrice": 20390,
+          "diffPercent": 54.5,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 1.9,
+          "formula": "EPS × P/E Mục Tiêu (11.5x)",
+          "formulaDetail": "V = 1,773 × 11.5x (Median chu kỳ 5Y)",
+          "parameters": {
+            "eps": 1773,
+            "targetPe": 11.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pb",
+          "name": "P/B Ngành & Gordon",
+          "fullName": "3. P/B Ngành & Gordon",
+          "cleanName": "P/B Ngành & Gordon",
+          "value": 18562,
+          "targetPrice": 18562,
+          "diffPercent": 40.6,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 7.3,
+          "formula": "BVPS × [(ROE - g)/(r - g)]",
+          "formulaDetail": "V = 13,750 × Gordon Multiple",
+          "parameters": {
+            "bvps": 13750,
+            "roe": 13.15,
+            "coe": 0.115,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "dcf",
+          "name": "DCF Đa Giai Đoạn",
+          "fullName": "4. DCF Đa Giai Đoạn",
+          "cleanName": "DCF Đa Giai Đoạn",
+          "value": 52152,
+          "targetPrice": 52152,
+          "diffPercent": 295.1,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 160.6,
+          "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+          "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+          "parameters": {
+            "baseFcf": 5447588892080,
+            "shares": 1522300000,
+            "wacc": 0.115,
+            "g1": 0.07,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "ddm",
+          "name": "Chiết Khấu DDM",
+          "fullName": "5. Chiết Khấu DDM",
+          "cleanName": "Chiết Khấu DDM",
+          "value": 6469,
+          "targetPrice": 6469,
+          "diffPercent": -51,
+          "weight": 0.05,
+          "baseWeight": 0.05,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 67.7,
+          "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+          "formulaDetail": "DPS=500 đ, r=11.5%, g=3.5%",
+          "parameters": {
+            "dps": 500,
+            "coe": 0.115,
+            "g": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcff",
+          "name": "FCFF Doanh Nghiệp",
+          "fullName": "6. FCFF Doanh Nghiệp",
+          "cleanName": "FCFF Doanh Nghiệp",
+          "value": 52152,
+          "targetPrice": 52152,
+          "diffPercent": 295.1,
+          "weight": 0.12,
+          "baseWeight": 0.12,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 160.6,
+          "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+          "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+          "parameters": {
+            "fcff": 5447588892080,
+            "netDebt": 25893350321484,
+            "wacc": 0.115,
+            "shares": 1522300000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcfe",
+          "name": "FCFE Cổ Đông",
+          "fullName": "7. FCFE Cổ Đông",
+          "cleanName": "FCFE Cổ Đông",
+          "value": 39063,
+          "targetPrice": 39063,
+          "diffPercent": 195.9,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 95.2,
+          "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+          "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+          "parameters": {
+            "cfo": 5447588892080,
+            "capex": 564000000000,
+            "coe": 0.115,
+            "shares": 1522300000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "rim",
+          "name": "Residual Income RIM/EVA",
+          "fullName": "8. Residual Income RIM/EVA",
+          "cleanName": "Residual Income RIM/EVA",
+          "value": 19640,
+          "targetPrice": 19640,
+          "diffPercent": 48.8,
+          "weight": 0.044,
+          "baseWeight": 0.08,
+          "suitability": 0.55,
+          "suitabilityNote": "Thứ cấp phi TC",
+          "isOutlier": false,
+          "outlierGapPct": 1.9,
+          "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+          "formulaDetail": "BVPS=13,750 đ, ROE=13.2%, CoE=11.5%",
+          "parameters": {
+            "equity": 23972766609550,
+            "bvps": 13750,
+            "roe": 13.15,
+            "coe": 0.115,
+            "shares": 1522300000
+          },
+          "statusNote": "Thứ cấp phi TC"
+        },
+        {
+          "id": "nav",
+          "name": "Book NAV / RNAV",
+          "fullName": "9. Book NAV / RNAV",
+          "cleanName": "Book NAV / RNAV",
+          "value": 12598,
+          "targetPrice": 12598,
+          "diffPercent": -4.6,
+          "weight": 0.032,
+          "baseWeight": 0.07,
+          "suitability": 0.45,
+          "suitabilityNote": "Thứ cấp phi TC/BĐS",
+          "isOutlier": false,
+          "outlierGapPct": 37.1,
+          "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+          "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+          "parameters": {
+            "equity": 23972766609550,
+            "totalAssets": 49866116931034,
+            "totalDebt": 25893350321484,
+            "inventory": null,
+            "shares": 1522300000
+          },
+          "statusNote": "Thứ cấp phi TC/BĐS"
+        },
+        {
+          "id": "evebitda",
+          "name": "EV/EBITDA & EV/Sales",
+          "fullName": "10. EV/EBITDA & EV/Sales",
+          "cleanName": "EV/EBITDA & EV/Sales",
+          "value": 4178,
+          "targetPrice": 4178,
+          "diffPercent": -68.3,
+          "weight": 0.07,
+          "baseWeight": 0.07,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 79.1,
+          "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+          "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+          "parameters": {
+            "ebitda": 4300432148800,
+            "multiple": 7.5,
+            "revenue": 5462727457717,
+            "salesMultiple": 1.1,
+            "netDebt": 25893350321484,
+            "shares": 1522300000
+          },
+          "statusNote": "Phù hợp"
+        }
+      ],
+      "consensusDetails": {
+        "cleanWeightedAvg": 19206,
+        "cleanMedian": 19640,
+        "dispersionPct": 2.2,
+        "consensusLevel": "HIGH",
+        "coveragePct": 50,
+        "confidenceScore": 75,
+        "modelsUsed": 5,
+        "modelsValid": 10,
+        "excludedOutliers": [
+          "DCF Đa Giai Đoạn",
+          "Chiết Khấu DDM",
+          "FCFF Doanh Nghiệp",
+          "FCFE Cổ Đông",
+          "EV/EBITDA & EV/Sales"
+        ]
+      },
+      "valuationTraps": {
+        "trapScore": 0,
+        "trapLabel": "THẤP",
+        "trapReason": "Không phát hiện bẫy định giá",
+        "isCapPenalized": false,
+        "trapsList": [
+          {
+            "id": "value_trap",
+            "name": "Value Trap",
+            "active": false,
+            "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+          },
+          {
+            "id": "book_trap",
+            "name": "Book Trap",
+            "active": false,
+            "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+          },
+          {
+            "id": "cyclical_peak",
+            "name": "Cyclical Peak",
+            "active": false,
+            "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+          },
+          {
+            "id": "dividend_trap",
+            "name": "Dividend Trap",
+            "active": false,
+            "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+          },
+          {
+            "id": "debt_stress",
+            "name": "Debt Stress",
+            "active": false,
+            "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+          },
+          {
+            "id": "share_dilution",
+            "name": "Share Dilution",
+            "active": false,
+            "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+          },
+          {
+            "id": "wc_stress",
+            "name": "Working Capital Stress",
+            "active": false,
+            "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+          }
+        ]
+      },
+      "sevenPriceZones": {
+        "currentZone": "Buy Zone",
+        "zoneBadge": "bg-emerald-500 text-white",
+        "safeBuyPrice": 14535,
+        "acceptableBuyPrice": 16473,
+        "bearPrice": 13566,
+        "bullPrice": 24225,
+        "boundaries": {
+          "deepValue": 13082,
+          "safeBuy": 14535,
+          "accumulate": 16473,
+          "fairLow": 17442,
+          "fairHigh": 21318,
+          "aboveFair": 23014,
+          "expensive": 27859
+        }
+      },
+      "threeLayerDecision": {
+        "compositeScore": 7.5,
+        "valuationLayerScore": 10,
+        "qualityLayerScore": 6.5,
+        "timingLayerScore": 5,
+        "roeCoeSpread": 1.65,
+        "buyRecommendation": "🟡 HOLD",
+        "decisionReason": "Thiếu độ phủ mô hình hoặc phân tán cao",
+        "isGateOpen": false,
+        "isTrapCapped": false
+      },
+      "historicalBands": {
+        "band25": 17902,
+        "band50": 20607,
+        "band75": 25229,
+        "bandPosition": "Dưới P25 (Vùng Rẻ)",
+        "bandWidthPct": 35.6,
+        "peBand": {
+          "p25": 10.5,
+          "p50": 12,
+          "p75": 14.5,
+          "current": 7.45
+        },
+        "pbBand": {
+          "p25": 1.25,
+          "p50": 1.45,
+          "p75": 1.8,
+          "current": 0.96
+        },
+        "priceBands": {
+          "peP25Price": 18616,
+          "peP50Price": 21276,
+          "peP75Price": 25708,
+          "pbP25Price": 17188,
+          "pbP50Price": 19938,
+          "pbP75Price": 24750
+        }
+      },
+      "dividendSustainability": {
+        "score": 4.2,
+        "status": "✓✓ Rất an toàn",
+        "payoutRatio": 28.2,
+        "fcfPayoutRatio": 14,
+        "consistency": 50
+      },
+      "finvalLab": {
+        "items": [
+          {
+            "key": "eps",
+            "label": "EPS (Thu nhập mỗi CP)",
+            "unit": "đ",
+            "current": 1773,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "bvps",
+            "label": "BVPS (Giá trị sổ sách)",
+            "unit": "đ",
+            "current": 13750,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "pe",
+            "label": "Hệ số P/E",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "pb",
+            "label": "Hệ số P/B",
+            "unit": "x",
+            "current": 0.96,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "roe",
+            "label": "Tỷ suất ROE",
+            "unit": "%",
+            "current": 13.15,
+            "sma5y": 11.26,
+            "deltaPct": 16.8,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "roa",
+            "label": "Tỷ suất ROA",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "roic",
+            "label": "Tỷ suất ROIC",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "grossMargin",
+            "label": "Biên Lợi Nhuận Gộp",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "netMargin",
+            "label": "Biên Lợi Nhuận Ròng",
+            "unit": "%",
+            "current": 49.41,
+            "sma5y": 49.4,
+            "deltaPct": 0,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "revenue",
+            "label": "Doanh Thu Thuần",
+            "unit": "Tỷ",
+            "current": 5462.7,
+            "sma5y": 4665.4,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "netIncome",
+            "label": "Lợi Nhuận Sau Thuế",
+            "unit": "Tỷ",
+            "current": 2698.9,
+            "sma5y": 2304.8,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "ebitda",
+            "label": "Chỉ số EBITDA",
+            "unit": "Tỷ",
+            "current": 4300.4,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "freeCashFlow",
+            "label": "Dòng Tiền Tự Do FCF",
+            "unit": "Tỷ",
+            "current": 5447.6,
+            "sma5y": 991.4,
+            "deltaPct": 449.5,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "debtToEquity",
+            "label": "Nợ / Vốn Chủ (D/E)",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "currentRatio",
+            "label": "Hệ Số Thanh Toán Hiện Hành",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "cashRatio",
+            "label": "Hệ Số Tiền Mặt",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          }
+        ]
+      },
+      "impliedFcfYieldPrice": 43376
     },
     "profitability": {
       "roe": 13.15,
@@ -600,7 +1995,7 @@
         "Hệ số Beta ổn định (1.07x)"
       ]
     },
-    "updatedAt": 1791698045380
+    "updatedAt": 1791719268661
   },
   "MBB": {
     "symbol": "MBB",
@@ -619,9 +2014,9 @@
       "ps": 2.47,
       "evEbitda": null,
       "bvps": 14111,
-      "grahamNumber": 31423,
-      "marginOfSafetyGraham": 39.4,
-      "grahamDiffPercent": 65,
+      "grahamNumber": 27633,
+      "marginOfSafetyGraham": 31.1,
+      "grahamDiffPercent": 45.1,
       "ddmTarget": 10777,
       "ddmDiffPercent": -43.4,
       "peTarget": 35765,
@@ -634,16 +2029,570 @@
       "pcfDiffPercent": 19.4,
       "psFairPrice": 16122,
       "psDiffPercent": -15.4,
-      "fairValue": 23953,
-      "consensusFairValue": 23953,
-      "marginOfSafety": 20.5,
-      "marginOfSafetyFairValue": 20.5,
-      "upside": 25.7,
-      "consensusDiffPercent": 25.7,
-      "valuationRating": "DEEP_VALUE",
-      "valuationRatingText": "Rất Rẻ (Biên an toàn > 20%)",
-      "valuationRatingBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "validModelsCount": 5
+      "fairValue": 31519,
+      "consensusFairValue": 31519,
+      "marginOfSafety": 39.6,
+      "marginOfSafetyFairValue": 39.6,
+      "upside": 65.5,
+      "consensusDiffPercent": 65.5,
+      "valuationRating": "🟢 BUY",
+      "valuationRatingText": "Thị giá đạt biên an toàn rủi ro",
+      "valuationRatingBadge": "bg-emerald-500 text-white",
+      "validModelsCount": 6,
+      "models10": [
+        {
+          "id": "graham",
+          "name": "Benjamin Graham",
+          "fullName": "1. Benjamin Graham",
+          "cleanName": "Benjamin Graham",
+          "value": 27633,
+          "targetPrice": 27633,
+          "diffPercent": 45.1,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 22.7,
+          "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+          "formulaDetail": "V = √(17.4 × 3,110 × 14,111) | Hệ số = Min(22.5, 12.0x × 1.45x = 17.4)",
+          "parameters": {
+            "eps": 3110,
+            "bvps": 14111,
+            "multiplier": 17.4,
+            "peAvg": 12,
+            "pbAvg": 1.45,
+            "maxMultiplier": 22.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pe",
+          "name": "P/E Chuẩn Hóa",
+          "fullName": "2. P/E Chuẩn Hóa",
+          "cleanName": "P/E Chuẩn Hóa",
+          "value": 35765,
+          "targetPrice": 35765,
+          "diffPercent": 87.7,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "EPS × P/E Mục Tiêu (11.5x)",
+          "formulaDetail": "V = 3,110 × 11.5x (Median chu kỳ 5Y)",
+          "parameters": {
+            "eps": 3110,
+            "targetPe": 11.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pb",
+          "name": "P/B Ngành & Gordon",
+          "fullName": "3. P/B Ngành & Gordon",
+          "cleanName": "P/B Ngành & Gordon",
+          "value": 19050,
+          "targetPrice": 19050,
+          "diffPercent": 0,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 46.7,
+          "formula": "BVPS × [(ROE - g)/(r - g)]",
+          "formulaDetail": "V = 14,111 × Gordon Multiple",
+          "parameters": {
+            "bvps": 14111,
+            "roe": 22.12,
+            "coe": 0.115,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "dcf",
+          "name": "DCF Đa Giai Đoạn",
+          "fullName": "4. DCF Đa Giai Đoạn",
+          "cleanName": "DCF Đa Giai Đoạn",
+          "value": 41443,
+          "targetPrice": 41443,
+          "diffPercent": 117.5,
+          "weight": 0.15,
+          "baseWeight": 0.15,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 15.9,
+          "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+          "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+          "parameters": {
+            "baseFcf": 26342356000000,
+            "shares": 9263250000,
+            "wacc": 0.115,
+            "g1": 0.07,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "ddm",
+          "name": "Chiết Khấu DDM",
+          "fullName": "5. Chiết Khấu DDM",
+          "cleanName": "Chiết Khấu DDM",
+          "value": 10777,
+          "targetPrice": 10777,
+          "diffPercent": -43.4,
+          "weight": 0.05,
+          "baseWeight": 0.05,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 69.9,
+          "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+          "formulaDetail": "DPS=833 đ, r=11.5%, g=3.5%",
+          "parameters": {
+            "dps": 833,
+            "coe": 0.115,
+            "g": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcff",
+          "name": "FCFF Doanh Nghiệp",
+          "fullName": "6. FCFF Doanh Nghiệp",
+          "cleanName": "FCFF Doanh Nghiệp",
+          "value": 41443,
+          "targetPrice": 41443,
+          "diffPercent": 117.5,
+          "weight": 0.12,
+          "baseWeight": 0.12,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 15.9,
+          "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+          "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+          "parameters": {
+            "fcff": 26342356000000,
+            "netDebt": 543974312000000,
+            "wacc": 0.115,
+            "shares": 9263250000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcfe",
+          "name": "FCFE Cổ Đông",
+          "fullName": "7. FCFE Cổ Đông",
+          "cleanName": "FCFE Cổ Đông",
+          "value": 16234,
+          "targetPrice": 16234,
+          "diffPercent": -14.8,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 54.6,
+          "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+          "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+          "parameters": {
+            "cfo": 26342356000000,
+            "capex": 13992000000000,
+            "coe": 0.115,
+            "shares": 9263250000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "rim",
+          "name": "Residual Income RIM/EVA",
+          "fullName": "8. Residual Income RIM/EVA",
+          "cleanName": "Residual Income RIM/EVA",
+          "value": 376038,
+          "targetPrice": 376038,
+          "diffPercent": 1874,
+          "weight": 0.044,
+          "baseWeight": 0.08,
+          "suitability": 0.55,
+          "suitabilityNote": "Thứ cấp phi TC",
+          "isOutlier": true,
+          "outlierGapPct": 951.4,
+          "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+          "formulaDetail": "BVPS=14,111 đ, ROE=22.1%, CoE=11.5%",
+          "parameters": {
+            "equity": 1189038350000000,
+            "bvps": 14111,
+            "roe": 22.12,
+            "coe": 0.115,
+            "shares": 9263250000
+          },
+          "statusNote": "Thứ cấp phi TC"
+        },
+        {
+          "id": "nav",
+          "name": "Book NAV / RNAV",
+          "fullName": "9. Book NAV / RNAV",
+          "cleanName": "Book NAV / RNAV",
+          "value": 102689,
+          "targetPrice": 102689,
+          "diffPercent": 439,
+          "weight": 0.032,
+          "baseWeight": 0.07,
+          "suitability": 0.45,
+          "suitabilityNote": "Thứ cấp phi TC/BĐS",
+          "isOutlier": true,
+          "outlierGapPct": 187.1,
+          "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+          "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+          "parameters": {
+            "equity": 1189038350000000,
+            "totalAssets": 1733012662000000,
+            "totalDebt": 543974312000000,
+            "inventory": null,
+            "shares": 9263250000
+          },
+          "statusNote": "Thứ cấp phi TC/BĐS"
+        },
+        {
+          "id": "evebitda",
+          "name": "EV/EBITDA & EV/Sales",
+          "fullName": "10. EV/EBITDA & EV/Sales",
+          "cleanName": "EV/EBITDA & EV/Sales",
+          "value": null,
+          "targetPrice": null,
+          "diffPercent": null,
+          "weight": 0.07,
+          "baseWeight": 0.07,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+          "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+          "parameters": {
+            "ebitda": null,
+            "multiple": 7.5,
+            "revenue": 135764880000000,
+            "salesMultiple": 1.1,
+            "netDebt": 543974312000000,
+            "shares": 9263250000
+          },
+          "statusNote": "EBITDA âm hoặc nợ vay quá lớn"
+        }
+      ],
+      "consensusDetails": {
+        "cleanWeightedAvg": 31399,
+        "cleanMedian": 31699,
+        "dispersionPct": 0.9,
+        "consensusLevel": "HIGH",
+        "coveragePct": 60,
+        "confidenceScore": 82,
+        "modelsUsed": 6,
+        "modelsValid": 9,
+        "excludedOutliers": [
+          "Chiết Khấu DDM",
+          "Residual Income RIM/EVA",
+          "Book NAV / RNAV"
+        ]
+      },
+      "valuationTraps": {
+        "trapScore": 0,
+        "trapLabel": "THẤP",
+        "trapReason": "Không phát hiện bẫy định giá",
+        "isCapPenalized": false,
+        "trapsList": [
+          {
+            "id": "value_trap",
+            "name": "Value Trap",
+            "active": false,
+            "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+          },
+          {
+            "id": "book_trap",
+            "name": "Book Trap",
+            "active": false,
+            "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+          },
+          {
+            "id": "cyclical_peak",
+            "name": "Cyclical Peak",
+            "active": false,
+            "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+          },
+          {
+            "id": "dividend_trap",
+            "name": "Dividend Trap",
+            "active": false,
+            "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+          },
+          {
+            "id": "debt_stress",
+            "name": "Debt Stress",
+            "active": false,
+            "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+          },
+          {
+            "id": "share_dilution",
+            "name": "Share Dilution",
+            "active": false,
+            "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+          },
+          {
+            "id": "wc_stress",
+            "name": "Working Capital Stress",
+            "active": false,
+            "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+          }
+        ]
+      },
+      "sevenPriceZones": {
+        "currentZone": "Deep Value",
+        "zoneBadge": "bg-emerald-600 text-white",
+        "safeBuyPrice": 23639,
+        "acceptableBuyPrice": 26791,
+        "bearPrice": 22063,
+        "bullPrice": 39399,
+        "boundaries": {
+          "deepValue": 21275,
+          "safeBuy": 23639,
+          "accumulate": 26791,
+          "fairLow": 28367,
+          "fairHigh": 34671,
+          "aboveFair": 37429,
+          "expensive": 45309
+        }
+      },
+      "threeLayerDecision": {
+        "compositeScore": 7.3,
+        "valuationLayerScore": 10,
+        "qualityLayerScore": 7,
+        "timingLayerScore": 3.5,
+        "roeCoeSpread": 10.62,
+        "buyRecommendation": "🟢 BUY",
+        "decisionReason": "Thị giá đạt biên an toàn rủi ro",
+        "isGateOpen": true,
+        "isTrapCapped": false
+      },
+      "historicalBands": {
+        "band25": 25147,
+        "band50": 28890,
+        "band75": 35247,
+        "bandPosition": "Dưới P25 (Vùng Rẻ)",
+        "bandWidthPct": 35,
+        "peBand": {
+          "p25": 10.5,
+          "p50": 12,
+          "p75": 14.5,
+          "current": 6.13
+        },
+        "pbBand": {
+          "p25": 1.25,
+          "p50": 1.45,
+          "p75": 1.8,
+          "current": 1.35
+        },
+        "priceBands": {
+          "peP25Price": 32655,
+          "peP50Price": 37320,
+          "peP75Price": 45095,
+          "pbP25Price": 17639,
+          "pbP50Price": 20461,
+          "pbP75Price": 25400
+        }
+      },
+      "dividendSustainability": {
+        "score": 4.2,
+        "status": "✓✓ Rất an toàn",
+        "payoutRatio": 26.8,
+        "fcfPayoutRatio": 29.3,
+        "consistency": 50
+      },
+      "finvalLab": {
+        "items": [
+          {
+            "key": "eps",
+            "label": "EPS (Thu nhập mỗi CP)",
+            "unit": "đ",
+            "current": 3110,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "bvps",
+            "label": "BVPS (Giá trị sổ sách)",
+            "unit": "đ",
+            "current": 14111,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "pe",
+            "label": "Hệ số P/E",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "pb",
+            "label": "Hệ số P/B",
+            "unit": "x",
+            "current": 1.35,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "roe",
+            "label": "Tỷ suất ROE",
+            "unit": "%",
+            "current": 22.12,
+            "sma5y": 2.53,
+            "deltaPct": 774.3,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "roa",
+            "label": "Tỷ suất ROA",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "roic",
+            "label": "Tỷ suất ROIC",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "grossMargin",
+            "label": "Biên Lợi Nhuận Gộp",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "netMargin",
+            "label": "Biên Lợi Nhuận Ròng",
+            "unit": "%",
+            "current": 35.92,
+            "sma5y": 22.15,
+            "deltaPct": 62.2,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "revenue",
+            "label": "Doanh Thu Thuần",
+            "unit": "Tỷ",
+            "current": 135764.9,
+            "sma5y": 115943.4,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "netIncome",
+            "label": "Lợi Nhuận Sau Thuế",
+            "unit": "Tỷ",
+            "current": 30078.2,
+            "sma5y": 25686.6,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "ebitda",
+            "label": "Chỉ số EBITDA",
+            "unit": "Tỷ",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "freeCashFlow",
+            "label": "Dòng Tiền Tự Do FCF",
+            "unit": "Tỷ",
+            "current": 26342.4,
+            "sma5y": 11045.2,
+            "deltaPct": 138.5,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "debtToEquity",
+            "label": "Nợ / Vốn Chủ (D/E)",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "currentRatio",
+            "label": "Hệ Số Thanh Toán Hiện Hành",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "cashRatio",
+            "label": "Hệ Số Tiền Mặt",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          }
+        ]
+      },
+      "impliedFcfYieldPrice": 34470
     },
     "profitability": {
       "roe": 22.12,
@@ -711,6 +2660,754 @@
         "Hệ số Beta ổn định (0.82x)"
       ]
     },
-    "updatedAt": 1791698045380
+    "updatedAt": 1791719268665
+  },
+  "HPG": {
+    "symbol": "HPG",
+    "exchange": "HOSE",
+    "name": "HPG",
+    "description": "Hoa Phat Group JSC",
+    "close": 20100,
+    "change": -0.25,
+    "changeAbs": -50,
+    "volume": 16353579,
+    "sector": "Non-energy minerals",
+    "industry": "Steel",
+    "valuation": {
+      "pe": 7.31,
+      "pb": 1.31,
+      "ps": 1.09,
+      "evEbitda": null,
+      "bvps": 15344,
+      "grahamNumber": 27096,
+      "marginOfSafetyGraham": 25.8,
+      "grahamDiffPercent": 34.8,
+      "ddmTarget": 5887,
+      "ddmDiffPercent": -70.7,
+      "peTarget": 31625,
+      "peDiffPercent": 57.3,
+      "pbTarget": 20714,
+      "pbDiffPercent": 3.1,
+      "evEbitdaFairPrice": 20776,
+      "evEbitdaDiffPercent": 3.4,
+      "pcfFairPrice": 29085,
+      "pcfDiffPercent": 44.7,
+      "psFairPrice": 24838,
+      "psDiffPercent": 23.6,
+      "fairValue": 21267,
+      "consensusFairValue": 21267,
+      "marginOfSafety": 5.5,
+      "marginOfSafetyFairValue": 5.5,
+      "upside": 5.8,
+      "consensusDiffPercent": 5.8,
+      "valuationRating": "🟡 HOLD",
+      "valuationRatingText": "Thị giá dao động quanh vùng giá trị hợp lý",
+      "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+      "validModelsCount": 6,
+      "models10": [
+        {
+          "id": "graham",
+          "name": "Benjamin Graham",
+          "fullName": "1. Benjamin Graham",
+          "cleanName": "Benjamin Graham",
+          "value": 27096,
+          "targetPrice": 27096,
+          "diffPercent": 34.8,
+          "weight": 0.05,
+          "baseWeight": 0.05,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 30.8,
+          "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+          "formulaDetail": "V = √(17.4 × 2,750 × 15,344) | Hệ số = Min(22.5, 12.0x × 1.45x = 17.4)",
+          "parameters": {
+            "eps": 2750,
+            "bvps": 15344,
+            "multiplier": 17.4,
+            "peAvg": 12,
+            "pbAvg": 1.45,
+            "maxMultiplier": 22.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pe",
+          "name": "P/E Chuẩn Hóa",
+          "fullName": "2. P/E Chuẩn Hóa",
+          "cleanName": "P/E Chuẩn Hóa",
+          "value": 31625,
+          "targetPrice": 31625,
+          "diffPercent": 57.3,
+          "weight": 0.18,
+          "baseWeight": 0.18,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 52.7,
+          "formula": "EPS × P/E Mục Tiêu (11.5x)",
+          "formulaDetail": "V = 2,750 × 11.5x (Median chu kỳ 5Y)",
+          "parameters": {
+            "eps": 2750,
+            "targetPe": 11.5
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "pb",
+          "name": "P/B Ngành & Gordon",
+          "fullName": "3. P/B Ngành & Gordon",
+          "cleanName": "P/B Ngành & Gordon",
+          "value": 20714,
+          "targetPrice": 20714,
+          "diffPercent": 3.1,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "BVPS × [(ROE - g)/(r - g)]",
+          "formulaDetail": "V = 15,344 × Gordon Multiple",
+          "parameters": {
+            "bvps": 15344,
+            "roe": 17.69,
+            "coe": 0.115,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "dcf",
+          "name": "DCF Đa Giai Đoạn",
+          "fullName": "4. DCF Đa Giai Đoạn",
+          "cleanName": "DCF Đa Giai Đoạn",
+          "value": 52985,
+          "targetPrice": 52985,
+          "diffPercent": 163.6,
+          "weight": 0.18,
+          "baseWeight": 0.18,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 155.8,
+          "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
+          "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+          "parameters": {
+            "baseFcf": 30696000000000,
+            "shares": 8442970000,
+            "wacc": 0.115,
+            "g1": 0.07,
+            "terminalG": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "ddm",
+          "name": "Chiết Khấu DDM",
+          "fullName": "5. Chiết Khấu DDM",
+          "cleanName": "Chiết Khấu DDM",
+          "value": 5887,
+          "targetPrice": 5887,
+          "diffPercent": -70.7,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 71.6,
+          "formula": "[DPS × (1 + g)] / (r - g) × Fade",
+          "formulaDetail": "DPS=455 đ, r=11.5%, g=3.5%",
+          "parameters": {
+            "dps": 455,
+            "coe": 0.115,
+            "g": 0.035
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcff",
+          "name": "FCFF Doanh Nghiệp",
+          "fullName": "6. FCFF Doanh Nghiệp",
+          "cleanName": "FCFF Doanh Nghiệp",
+          "value": 52985,
+          "targetPrice": 52985,
+          "diffPercent": 163.6,
+          "weight": 0.14,
+          "baseWeight": 0.14,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": true,
+          "outlierGapPct": 155.8,
+          "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
+          "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+          "parameters": {
+            "fcff": 30696000000000,
+            "netDebt": 98529977232553,
+            "wacc": 0.115,
+            "shares": 8442970000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "fcfe",
+          "name": "FCFE Cổ Đông",
+          "fullName": "7. FCFE Cổ Đông",
+          "cleanName": "FCFE Cổ Đông",
+          "value": 15939,
+          "targetPrice": 15939,
+          "diffPercent": -20.7,
+          "weight": 0.08,
+          "baseWeight": 0.08,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 23.1,
+          "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
+          "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+          "parameters": {
+            "cfo": 30696000000000,
+            "capex": 19644000000000,
+            "coe": 0.115,
+            "shares": 8442970000
+          },
+          "statusNote": "Phù hợp"
+        },
+        {
+          "id": "rim",
+          "name": "Residual Income RIM/EVA",
+          "fullName": "8. Residual Income RIM/EVA",
+          "cleanName": "Residual Income RIM/EVA",
+          "value": 43231,
+          "targetPrice": 43231,
+          "diffPercent": 115.1,
+          "weight": 0,
+          "baseWeight": 0,
+          "suitability": 0.55,
+          "suitabilityNote": "Thứ cấp phi TC",
+          "isOutlier": false,
+          "outlierGapPct": 0,
+          "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
+          "formulaDetail": "BVPS=15,344 đ, ROE=17.7%, CoE=11.5%",
+          "parameters": {
+            "equity": 180399808782853,
+            "bvps": 15344,
+            "roe": 17.69,
+            "coe": 0.115,
+            "shares": 8442970000
+          },
+          "statusNote": "Thứ cấp phi TC"
+        },
+        {
+          "id": "nav",
+          "name": "Book NAV / RNAV",
+          "fullName": "9. Book NAV / RNAV",
+          "cleanName": "Book NAV / RNAV",
+          "value": 17093,
+          "targetPrice": 17093,
+          "diffPercent": -15,
+          "weight": 0.023,
+          "baseWeight": 0.05,
+          "suitability": 0.45,
+          "suitabilityNote": "Thứ cấp phi TC/BĐS",
+          "isOutlier": false,
+          "outlierGapPct": 17.5,
+          "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
+          "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+          "parameters": {
+            "equity": 180399808782853,
+            "totalAssets": 278929786015406,
+            "totalDebt": 98529977232553,
+            "inventory": null,
+            "shares": 8442970000
+          },
+          "statusNote": "Thứ cấp phi TC/BĐS"
+        },
+        {
+          "id": "evebitda",
+          "name": "EV/EBITDA & EV/Sales",
+          "fullName": "10. EV/EBITDA & EV/Sales",
+          "cleanName": "EV/EBITDA & EV/Sales",
+          "value": 16972,
+          "targetPrice": 16972,
+          "diffPercent": -15.6,
+          "weight": 0.16,
+          "baseWeight": 0.16,
+          "suitability": 1,
+          "suitabilityNote": "Phù hợp",
+          "isOutlier": false,
+          "outlierGapPct": 18.1,
+          "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
+          "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
+          "parameters": {
+            "ebitda": 36525966096080,
+            "multiple": 7.5,
+            "revenue": 190643650555249,
+            "salesMultiple": 1.1,
+            "netDebt": 98529977232553,
+            "shares": 8442970000
+          },
+          "statusNote": "Phù hợp"
+        }
+      ],
+      "consensusDetails": {
+        "cleanWeightedAvg": 22842,
+        "cleanMedian": 18904,
+        "dispersionPct": 20.8,
+        "consensusLevel": "MED",
+        "coveragePct": 66.7,
+        "confidenceScore": 74.7,
+        "modelsUsed": 6,
+        "modelsValid": 9,
+        "excludedOutliers": [
+          "DCF Đa Giai Đoạn",
+          "Chiết Khấu DDM",
+          "FCFF Doanh Nghiệp"
+        ]
+      },
+      "valuationTraps": {
+        "trapScore": 0,
+        "trapLabel": "THẤP",
+        "trapReason": "Không phát hiện bẫy định giá",
+        "isCapPenalized": false,
+        "trapsList": [
+          {
+            "id": "value_trap",
+            "name": "Value Trap",
+            "active": false,
+            "desc": "P/E hoặc P/B thấp giả tạo trong khi doanh thu hoặc EPS suy giảm."
+          },
+          {
+            "id": "book_trap",
+            "name": "Book Trap",
+            "active": false,
+            "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
+          },
+          {
+            "id": "cyclical_peak",
+            "name": "Cyclical Peak",
+            "active": false,
+            "desc": "Đỉnh chu kỳ kinh doanh: P/E rất thấp nhưng dòng tiền FCF đảo chiều âm."
+          },
+          {
+            "id": "dividend_trap",
+            "name": "Dividend Trap",
+            "active": false,
+            "desc": "Cổ tức tiền mặt cao nhưng dòng tiền tự do FCF âm kéo dài."
+          },
+          {
+            "id": "debt_stress",
+            "name": "Debt Stress",
+            "active": false,
+            "desc": "Đòn bẩy tài chính vượt ngưỡng kèm thâm hụt tiền mặt."
+          },
+          {
+            "id": "share_dilution",
+            "name": "Share Dilution",
+            "active": false,
+            "desc": "Pha loãng cổ phiếu nhanh hơn tốc độ tăng trưởng lợi nhuận."
+          },
+          {
+            "id": "wc_stress",
+            "name": "Working Capital Stress",
+            "active": false,
+            "desc": "Vốn lưu động phình to bất thường so với tăng trưởng doanh số."
+          }
+        ]
+      },
+      "sevenPriceZones": {
+        "currentZone": "Fair Zone",
+        "zoneBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+        "safeBuyPrice": 15950,
+        "acceptableBuyPrice": 18077,
+        "bearPrice": 14887,
+        "bullPrice": 26584,
+        "boundaries": {
+          "deepValue": 14355,
+          "safeBuy": 15950,
+          "accumulate": 18077,
+          "fairLow": 19140,
+          "fairHigh": 23394,
+          "aboveFair": 25255,
+          "expensive": 30571
+        }
+      },
+      "threeLayerDecision": {
+        "compositeScore": 6.3,
+        "valuationLayerScore": 6.1,
+        "qualityLayerScore": 8.5,
+        "timingLayerScore": 3.5,
+        "roeCoeSpread": 6.19,
+        "buyRecommendation": "🟡 HOLD",
+        "decisionReason": "Thị giá dao động quanh vùng giá trị hợp lý",
+        "isGateOpen": true,
+        "isTrapCapped": false
+      },
+      "historicalBands": {
+        "band25": 24028,
+        "band50": 27624,
+        "band75": 33747,
+        "bandPosition": "Dưới P25 (Vùng Rẻ)",
+        "bandWidthPct": 35.2,
+        "peBand": {
+          "p25": 10.5,
+          "p50": 12,
+          "p75": 14.5,
+          "current": 7.31
+        },
+        "pbBand": {
+          "p25": 1.25,
+          "p50": 1.45,
+          "p75": 1.8,
+          "current": 1.31
+        },
+        "priceBands": {
+          "peP25Price": 28875,
+          "peP50Price": 33000,
+          "peP75Price": 39875,
+          "pbP25Price": 19180,
+          "pbP50Price": 22249,
+          "pbP75Price": 27619
+        }
+      },
+      "dividendSustainability": {
+        "score": 4.2,
+        "status": "✓✓ Rất an toàn",
+        "payoutRatio": 16.5,
+        "fcfPayoutRatio": 12.5,
+        "consistency": 50
+      },
+      "finvalLab": {
+        "items": [
+          {
+            "key": "eps",
+            "label": "EPS (Thu nhập mỗi CP)",
+            "unit": "đ",
+            "current": 2750,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "bvps",
+            "label": "BVPS (Giá trị sổ sách)",
+            "unit": "đ",
+            "current": 15344,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "pe",
+            "label": "Hệ số P/E",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "pb",
+            "label": "Hệ số P/B",
+            "unit": "x",
+            "current": 1.31,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "roe",
+            "label": "Tỷ suất ROE",
+            "unit": "%",
+            "current": 17.69,
+            "sma5y": 12.87,
+            "deltaPct": 37.5,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "roa",
+            "label": "Tỷ suất ROA",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "roic",
+            "label": "Tỷ suất ROIC",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "grossMargin",
+            "label": "Biên Lợi Nhuận Gộp",
+            "unit": "%",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "netMargin",
+            "label": "Biên Lợi Nhuận Ròng",
+            "unit": "%",
+            "current": 12.18,
+            "sma5y": 12.18,
+            "deltaPct": 0,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "revenue",
+            "label": "Doanh Thu Thuần",
+            "unit": "Tỷ",
+            "current": 190643.7,
+            "sma5y": 162810,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "netIncome",
+            "label": "Lợi Nhuận Sau Thuế",
+            "unit": "Tỷ",
+            "current": 23214.3,
+            "sma5y": 19824.6,
+            "deltaPct": 17.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "ebitda",
+            "label": "Chỉ số EBITDA",
+            "unit": "Tỷ",
+            "current": 36526,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "freeCashFlow",
+            "label": "Dòng Tiền Tự Do FCF",
+            "unit": "Tỷ",
+            "current": 30696,
+            "sma5y": 8524.8,
+            "deltaPct": 260.1,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
+            "invertLogic": false
+          },
+          {
+            "key": "debtToEquity",
+            "label": "Nợ / Vốn Chủ (D/E)",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": true
+          },
+          {
+            "key": "currentRatio",
+            "label": "Hệ Số Thanh Toán Hiện Hành",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          },
+          {
+            "key": "cashRatio",
+            "label": "Hệ Số Tiền Mặt",
+            "unit": "x",
+            "current": null,
+            "sma5y": null,
+            "deltaPct": null,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
+            "invertLogic": false
+          }
+        ]
+      },
+      "impliedFcfYieldPrice": 44069
+    },
+    "profitability": {
+      "roe": 17.69,
+      "roeFy": 12.44,
+      "roa": 8.91,
+      "roaFy": 6.28,
+      "eps": 2750,
+      "grossMargin": 16.29,
+      "operatingMargin": 13.5,
+      "netMargin": 12.18
+    },
+    "dupont": {
+      "roe": 17.69,
+      "netProfitMargin": 12.18,
+      "assetTurnover": 0.68,
+      "equityMultiplier": 1.55,
+      "qualityAssessment": "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn."
+    },
+    "dividends": {
+      "yield": 2.26,
+      "dps": 455,
+      "fcf": -269629611550,
+      "fcfMargin": -0.14
+    },
+    "health": {
+      "totalDebt": 98529977232553,
+      "totalAssets": 278929786015406,
+      "debtToEquity": 0.7,
+      "currentRatio": 1.14,
+      "quickRatio": 0.61,
+      "ebitda": 36525966096080
+    },
+    "scale": {
+      "revenue": 190643650555249,
+      "netIncome": 23214335169900,
+      "marketCap": 169703593359375,
+      "sharesOutstanding": 8442970000
+    },
+    "performance": {
+      "w1": 0,
+      "m1": -8.22,
+      "m3": -13.36,
+      "m6": -22.69,
+      "ytd": -16.25,
+      "y1": -24.8,
+      "y5": -32.01,
+      "high52w": 27000.0027,
+      "low52w": 19600,
+      "range52wPercent": 7,
+      "avgVol10d": 22484628,
+      "avgVol30d": 20788358,
+      "volatilityW": 1.79,
+      "volatilityM": 1.96
+    },
+    "technicals": {
+      "recommendScore": -0.51,
+      "recommendText": "Bán mạnh",
+      "recommendColor": "text-rose-500 font-bold",
+      "beta": 0.71,
+      "techScore": -1,
+      "techScoreVerdict": "Kém (Moderate Bearish)",
+      "techScoreColor": "text-rose-400 font-semibold",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
+        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
+      ]
+    },
+    "updatedAt": 1791720021659
+  },
+  "_meta": {
+    "lastSyncedAt": "2026-10-11T11:47:48Z",
+    "syncedCount": 6,
+    "symbolsCount": 6
+  },
+  "FUEVFVND": {
+    "symbol": "FUEVFVND",
+    "exchange": "HOSE",
+    "name": "FUEVFVND",
+    "description": "DCVFMVN DIAMOND ETF",
+    "close": 32450,
+    "change": 0.22,
+    "changeAbs": 70,
+    "volume": 263865,
+    "sector": "Miscellaneous",
+    "industry": "Investment trusts",
+    "valuation": {
+      "pe": null,
+      "pb": null,
+      "ps": null,
+      "evEbitda": null
+    },
+    "profitability": {
+      "roe": null,
+      "roeFy": null,
+      "roa": null,
+      "roaFy": null,
+      "eps": null,
+      "grossMargin": null,
+      "operatingMargin": null,
+      "netMargin": null
+    },
+    "dupont": {
+      "roe": null,
+      "netProfitMargin": null,
+      "assetTurnover": null,
+      "equityMultiplier": null,
+      "qualityAssessment": "Dữ liệu được chuẩn hóa và tính toán từ Python Valuation Engine"
+    },
+    "dividends": {
+      "yield": null,
+      "dps": 0,
+      "fcf": null,
+      "fcfMargin": null
+    },
+    "health": {
+      "totalDebt": null,
+      "totalAssets": null,
+      "debtToEquity": null,
+      "currentRatio": null,
+      "quickRatio": null,
+      "ebitda": null
+    },
+    "scale": {
+      "revenue": null,
+      "netIncome": null,
+      "marketCap": null,
+      "sharesOutstanding": null
+    },
+    "performance": {
+      "w1": -1.07,
+      "m1": -4.56,
+      "m3": -8.85,
+      "m6": -12.11,
+      "ytd": -15.27,
+      "y1": -17.93,
+      "y5": 24.81,
+      "high52w": 40820,
+      "low52w": 30600,
+      "range52wPercent": 18,
+      "avgVol10d": 737658,
+      "avgVol30d": 513965,
+      "volatilityW": 1.71,
+      "volatilityM": 1.66
+    },
+    "technicals": {
+      "recommendScore": -0.49,
+      "recommendText": "Bán",
+      "recommendColor": "text-rose-400 font-medium",
+      "beta": 0.68
+    },
+    "updatedAt": 1791720021659
   }
 }

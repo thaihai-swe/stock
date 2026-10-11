@@ -15,6 +15,12 @@ import MarketProfileCard from './valuation/MarketProfileCard.jsx';
 import NewsSentimentCard from './valuation/NewsSentimentCard.jsx';
 import StockRiskMetricsCard from './valuation/StockRiskMetricsCard.jsx';
 import ForensicAccountingCard from './valuation/ForensicAccountingCard.jsx';
+import ValuationSevenZonesCard from './valuation/ValuationSevenZonesCard.jsx';
+import ValuationTrapsCard from './valuation/ValuationTrapsCard.jsx';
+import HistoricalValuationBandCard from './valuation/HistoricalValuationBandCard.jsx';
+import FinValLabCard from './valuation/FinValLabCard.jsx';
+import DividendSustainabilityCard from './valuation/DividendSustainabilityCard.jsx';
+import ValuationFormulasDeconstructionCard from './valuation/ValuationFormulasDeconstructionCard.jsx';
 
 // Tính % chênh lệch giữa giá định giá và thị giá hiện tại (Upside / Downside %)
 function calcPriceDiff(fairPrice, currentPrice) {
@@ -277,7 +283,7 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 </span>
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Hội tụ 6 mô hình định giá Graham, DDM, EV/EBITDA, P/CF, DuPont 3 nhân tố và BCTC 8 quý - 5 năm.
+                Hội tụ 10 mô hình định lượng FAM v11.4P, Lọc ngoại lai ±60%, Bản đồ 7 vùng giá, 7 Bẫy định giá & Khung quyết định 3 tầng.
               </p>
             </div>
           </div>
@@ -462,14 +468,44 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                   <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider block">
                     🎯 Giá Trị Nội Tại Hội Tụ (Consensus Fair Value)
                   </span>
-                  <div className="flex items-baseline gap-3 mt-1">
+                  <div className="flex flex-wrap items-baseline gap-3 mt-1">
                     <span className="text-3xl sm:text-4xl font-black text-emerald-400">
                       {formatVND(currentStock.valuation?.fairValue || financials?.valuationMultiples?.consensusFairValue)}
                     </span>
                     <span className="text-xs text-indigo-200 font-medium">
-                      (Tổng hợp 6 phương pháp định giá)
+                      {(currentStock.valuation?.models10 || financials?.valuationMultiples?.models10)
+                        ? '(Hội tụ 10 mô hình định lượng & Lọc ngoại lai ±60%)'
+                        : '(Tổng hợp các phương pháp định giá)'}
                     </span>
                   </div>
+
+                  {/* Consensus Details Bar (Dispersion, Valid Count, Outlier Count) */}
+                  {(() => {
+                    const details = currentStock.valuation?.consensusDetails || financials?.valuationMultiples?.consensusDetails;
+                    if (!details) return null;
+                    return (
+                      <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-indigo-800/60 text-[11px] text-indigo-200">
+                        {details.dispersion != null && (
+                          <span className="px-2 py-0.5 rounded-md bg-white/10 font-semibold">
+                            Độ phân tán: <strong className={details.dispersion <= 20 ? 'text-emerald-300' : 'text-amber-300'}>{details.dispersion}%</strong>
+                          </span>
+                        )}
+                        {details.validCount != null && (
+                          <span className="px-2 py-0.5 rounded-md bg-white/10">
+                            Mô hình hợp lệ: <strong>{details.validCount}/10</strong>
+                            {details.outliersCount > 0 && (
+                              <span className="text-rose-300 ml-1">({details.outliersCount} ngoại lai đã lọc)</span>
+                            )}
+                          </span>
+                        )}
+                        {details.weightedPrice != null && (
+                          <span className="px-2 py-0.5 rounded-md bg-white/10">
+                            Gia quyền: <strong>{formatVND(details.weightedPrice)}</strong>
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {(() => {
@@ -553,78 +589,154 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 })()}
               </div>
 
-              {/* 6 Thẻ Mô Hình Định Giá Chi Tiết */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-1">
-                {(() => {
-                  const closePrice = currentStock.close;
-                  const models = [
-                    {
-                      label: '1. Giá Graham',
-                      val: currentStock.valuation?.grahamNumber || financials?.valuationMultiples?.grahamNumber,
-                      desc: '√(22.5 × EPS × BV)',
-                      diff: currentStock.valuation?.grahamDiffPercent ?? calcPriceDiff(currentStock.valuation?.grahamNumber || financials?.valuationMultiples?.grahamNumber, closePrice)
-                    },
-                    {
-                      label: '2. Giá DDM',
-                      val: currentStock.valuation?.ddmTarget || financials?.valuationMultiples?.ddmTarget,
-                      desc: 'Chiết khấu cổ tức',
-                      diff: currentStock.valuation?.ddmDiffPercent ?? calcPriceDiff(currentStock.valuation?.ddmTarget || financials?.valuationMultiples?.ddmTarget, closePrice)
-                    },
-                    {
-                      label: '3. EV/EBITDA',
-                      val: financials?.valuationMultiples?.evEbitdaFairPrice || currentStock.valuation?.evEbitdaFairPrice,
-                      desc: 'Multiple ngành 7.5x',
-                      diff: currentStock.valuation?.evEbitdaDiffPercent ?? calcPriceDiff(financials?.valuationMultiples?.evEbitdaFairPrice || currentStock.valuation?.evEbitdaFairPrice, closePrice)
-                    },
-                    {
-                      label: '4. Dòng Tiền P/CF',
-                      val: financials?.valuationMultiples?.pcfFairPrice || currentStock.valuation?.pcfFairPrice,
-                      desc: 'CFO tiền thật × 8.0x',
-                      diff: currentStock.valuation?.pcfDiffPercent ?? calcPriceDiff(financials?.valuationMultiples?.pcfFairPrice || currentStock.valuation?.pcfFairPrice, closePrice)
-                    },
-                    {
-                      label: '5. P/E Mục Tiêu',
-                      val: currentStock.valuation?.peTarget || financials?.valuationMultiples?.peTarget,
-                      desc: 'EPS × 11.5x',
-                      diff: currentStock.valuation?.peDiffPercent ?? calcPriceDiff(currentStock.valuation?.peTarget || financials?.valuationMultiples?.peTarget, closePrice)
-                    },
-                    {
-                      label: '6. P/B Mục Tiêu',
-                      val: financials?.valuationMultiples?.pbTarget || currentStock.valuation?.pbTarget,
-                      desc: 'BVPS × 1.35x',
-                      diff: currentStock.valuation?.pbDiffPercent ?? calcPriceDiff(financials?.valuationMultiples?.pbTarget || currentStock.valuation?.pbTarget, closePrice)
-                    },
-                  ];
+              {/* LƯỚI 10 MÔ HÌNH ĐỊNH LƯỢNG LƯỢNG HÓA HOẶC FALLBACK 6 MÔ HÌNH */}
+              {(() => {
+                const closePrice = currentStock.close;
+                const models10 = (currentStock.valuation?.models10 && currentStock.valuation.models10.length > 0)
+                  ? currentStock.valuation.models10
+                  : (financials?.valuationMultiples?.models10 && financials?.valuationMultiples?.models10.length > 0)
+                  ? financials.valuationMultiples.models10
+                  : null;
 
-                  return models.map((m, idx) => (
-                    <div key={idx} className="p-3 bg-white/10 rounded-2xl backdrop-blur-xs border border-white/10 text-center flex flex-col justify-between">
-                      <div>
-                        <div className="text-[10px] text-indigo-200 font-semibold uppercase">{m.label}</div>
-                        <div className="text-sm font-bold text-white mt-1">
-                          {formatVND(m.val)}
-                        </div>
-                      </div>
-                      <div className="mt-1.5 flex items-center justify-center">
-                        {m.diff != null ? (
-                          <span
-                            className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${m.diff >= 0
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                              }`}
-                            title={`Chênh lệch so với giá hiện tại (${formatVND(closePrice)}): ${m.diff >= 0 ? '+' : ''}${m.diff}%`}
+                if (Array.isArray(models10) && models10.length > 0) {
+                  return (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 pt-1">
+                      {models10.map((m, idx) => {
+                        const targetVal = m.value ?? m.targetPrice;
+                        const hasVal = targetVal != null && targetVal > 0;
+                        const isOutlier = m.isOutlier;
+                        const diff = m.diffPercent ?? (hasVal && closePrice ? calcPriceDiff(targetVal, closePrice) : null);
+                        const cleanName = (m.cleanName || m.name || '').replace(/^\d+\.\s*/, '');
+                        return (
+                          <div
+                            key={m.id || idx}
+                            className={`p-3 rounded-2xl backdrop-blur-xs border text-center flex flex-col justify-between transition-all ${
+                              isOutlier
+                                ? 'bg-rose-950/20 border-rose-800/40 opacity-70'
+                                : 'bg-white/10 border-white/10 hover:bg-white/15'
+                            }`}
                           >
-                            <span>{m.diff >= 0 ? '▲' : '▼'}</span>
-                            <span>{m.diff >= 0 ? '+' : ''}{m.diff}%</span>
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-indigo-300/50">—</span>
-                        )}
-                      </div>
-                      <div className="text-[10px] text-indigo-300 mt-1">{m.desc}</div>
+                            <div>
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-[10px] text-indigo-200 font-bold uppercase truncate" title={m.fullName || m.name || cleanName}>
+                                  {idx + 1}. {cleanName}
+                                </span>
+                                <span className="text-[9px] font-mono px-1 rounded bg-white/10 text-indigo-200">
+                                  w: {Math.round((m.weight || 0) * 100)}%
+                                </span>
+                              </div>
+
+                              <div className={`text-sm font-black mt-1 ${
+                                isOutlier ? 'line-through text-rose-300' : hasVal ? 'text-white' : 'text-indigo-200/60 font-medium text-xs'
+                              }`}>
+                                {hasVal ? formatVND(targetVal) : (m.statusNote || '—')}
+                              </div>
+                            </div>
+
+                            <div className="mt-1.5 flex flex-col items-center gap-1">
+                              {isOutlier ? (
+                                <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                  Lọc ±60% (Outlier)
+                                </span>
+                              ) : diff != null ? (
+                                <span
+                                  className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${
+                                    diff >= 0
+                                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                      : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                  }`}
+                                  title={`Chênh lệch so với thị giá (${formatVND(closePrice)}): ${diff >= 0 ? '+' : ''}${diff}%`}
+                                >
+                                  <span>{diff >= 0 ? '▲' : '▼'}</span>
+                                  <span>{diff >= 0 ? '+' : ''}{diff}%</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-indigo-300/50">—</span>
+                              )}
+
+                              <div className="text-[9px] text-indigo-300/80 truncate w-full" title={m.formulaDetail || m.formula || m.desc || m.note}>
+                                {m.formulaDetail || m.formula || m.desc || m.note || '—'}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ));
-                })()}
-              </div>
+                  );
+                }
+
+                // Fallback 6 mô hình cũ
+                const models = [
+                  {
+                    label: '1. Giá Graham',
+                    val: currentStock.valuation?.grahamNumber || financials?.valuationMultiples?.grahamNumber,
+                    desc: '√(22.5 × EPS × BV)',
+                    diff: currentStock.valuation?.grahamDiffPercent ?? calcPriceDiff(currentStock.valuation?.grahamNumber || financials?.valuationMultiples?.grahamNumber, closePrice)
+                  },
+                  {
+                    label: '2. Giá DDM',
+                    val: currentStock.valuation?.ddmTarget || financials?.valuationMultiples?.ddmTarget,
+                    desc: 'Chiết khấu cổ tức',
+                    diff: currentStock.valuation?.ddmDiffPercent ?? calcPriceDiff(currentStock.valuation?.ddmTarget || financials?.valuationMultiples?.ddmTarget, closePrice)
+                  },
+                  {
+                    label: '3. EV/EBITDA',
+                    val: financials?.valuationMultiples?.evEbitdaFairPrice || currentStock.valuation?.evEbitdaFairPrice,
+                    desc: 'Multiple ngành 7.5x',
+                    diff: currentStock.valuation?.evEbitdaDiffPercent ?? calcPriceDiff(financials?.valuationMultiples?.evEbitdaFairPrice || currentStock.valuation?.evEbitdaFairPrice, closePrice)
+                  },
+                  {
+                    label: '4. Dòng Tiền P/CF',
+                    val: financials?.valuationMultiples?.pcfFairPrice || currentStock.valuation?.pcfFairPrice,
+                    desc: 'CFO tiền thật × 8.0x',
+                    diff: currentStock.valuation?.pcfDiffPercent ?? calcPriceDiff(financials?.valuationMultiples?.pcfFairPrice || currentStock.valuation?.pcfFairPrice, closePrice)
+                  },
+                  {
+                    label: '5. P/E Mục Tiêu',
+                    val: currentStock.valuation?.peTarget || financials?.valuationMultiples?.peTarget,
+                    desc: 'EPS × 11.5x',
+                    diff: currentStock.valuation?.peDiffPercent ?? calcPriceDiff(currentStock.valuation?.peTarget || financials?.valuationMultiples?.peTarget, closePrice)
+                  },
+                  {
+                    label: '6. P/B Mục Tiêu',
+                    val: financials?.valuationMultiples?.pbTarget || currentStock.valuation?.pbTarget,
+                    desc: 'BVPS × 1.35x',
+                    diff: currentStock.valuation?.pbDiffPercent ?? calcPriceDiff(financials?.valuationMultiples?.pbTarget || currentStock.valuation?.pbTarget, closePrice)
+                  },
+                ];
+
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-1">
+                    {models.map((m, idx) => (
+                      <div key={idx} className="p-3 bg-white/10 rounded-2xl backdrop-blur-xs border border-white/10 text-center flex flex-col justify-between">
+                        <div>
+                          <div className="text-[10px] text-indigo-200 font-semibold uppercase">{m.label}</div>
+                          <div className="text-sm font-bold text-white mt-1">
+                            {formatVND(m.val)}
+                          </div>
+                        </div>
+                        <div className="mt-1.5 flex items-center justify-center">
+                          {m.diff != null ? (
+                            <span
+                              className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${m.diff >= 0
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                }`}
+                              title={`Chênh lệch so với giá hiện tại (${formatVND(closePrice)}): ${m.diff >= 0 ? '+' : ''}${m.diff}%`}
+                            >
+                              <span>{m.diff >= 0 ? '▲' : '▼'}</span>
+                              <span>{m.diff >= 0 ? '+' : ''}{m.diff}%</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-indigo-300/50">—</span>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-indigo-300 mt-1">{m.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Khối Kỹ Thuật & Hiệu Suất Chu Kỳ (Technicals & Performance) */}
@@ -716,6 +828,35 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           </div>
         )}
       </div>
+
+      {/* ── BẢN ĐỒ 7 VÙNG ĐỊNH GIÁ & KHUNG QUYẾT ĐỊNH 3 TẦNG (V40 / Q35 / T25) ── */}
+      {currentStock && (
+        <ValuationSevenZonesCard
+          sevenPriceZones={currentStock.valuation?.sevenPriceZones || financials?.valuationMultiples?.sevenPriceZones}
+          threeLayerDecision={currentStock.valuation?.threeLayerDecision || financials?.valuationMultiples?.threeLayerDecision}
+          currentPrice={currentStock.close}
+          symbol={selectedSymbol}
+        />
+      )}
+
+      {/* ── BỘ QUÉT 7 BẪY ĐỊNH GIÁ & BỘ LỌC GIÁ RẺ GIẢ TẠO ── */}
+      {currentStock && (
+        <ValuationTrapsCard
+          valuationTraps={currentStock.valuation?.valuationTraps || financials?.valuationMultiples?.valuationTraps}
+          symbol={selectedSymbol}
+        />
+      )}
+
+      {/* ── ĐỊNH GIÁ LỊCH SỬ 3 TẦNG PHÂN VỊ P/E & P/B (P25 - P50 - P75) ── */}
+      {currentStock && (
+        <HistoricalValuationBandCard
+          historicalBands={currentStock.valuation?.historicalBands || financials?.valuationMultiples?.historicalBands}
+          currentPrice={currentStock.close}
+          symbol={selectedSymbol}
+          eps={currentStock.valuation?.eps || currentStock.eps || financials?.valuationMultiples?.eps}
+          bvps={currentStock.valuation?.bvps || currentStock.bvps || financials?.valuationMultiples?.bvps}
+        />
+      )}
 
       {/* ── 4. KHỐI 3 & 4: PHÂN RÃ DUPONT 3 NHÂN TỐ & ACTIVE TECH SCORE ── */}
       {currentStock && (
@@ -1117,6 +1258,18 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             >
               <span>🛡️</span>
               <span>12. Kiểm Toán Gian Lận & Dòng Tiền</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMainReportView('finval')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${mainReportView === 'finval'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+            >
+              <span>🔬</span>
+              <span>13. FinVal Lab (20+ Chỉ Tiêu vs SMA 5Y)</span>
             </button>
           </div>
 
@@ -1730,255 +1883,70 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
 
           {/* ── VIEW 3: CỔ TỨC & CƠ CẤU CỔ ĐÔNG ── */}
           {mainReportView === 'events' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Lịch Sử Cổ Tức */}
-              <div className="p-5 bg-gray-50 dark:bg-gray-700/40 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-3">
-                <div className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                  <span>🎁</span> Lịch Sử Chi Trả Cổ Tức & Sự Kiện Doanh Nghiệp
-                </div>
-                <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                  {financials.corporateEvents?.map((ev, idx) => (
-                    <div key={idx} className="py-3 text-xs space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-gray-900 dark:text-white">{ev.type}</span>
-                        <span className="text-[11px] text-gray-400">{ev.date}</span>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300">{ev.content}</p>
-                      <div className="flex items-center gap-3 text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold pt-0.5">
-                        <span>Tỷ lệ: {ev.ratio}</span>
-                        {ev.value && <span>Giá trị: {formatVND(ev.value)}</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="space-y-6">
+              {/* Kiểm Toán Độ Bền Vững Cổ Tức Bằng FCF */}
+              <DividendSustainabilityCard
+                dividendSustainability={financials?.valuationMultiples?.dividendSustainability || currentStock?.valuation?.dividendSustainability}
+                symbol={selectedSymbol}
+              />
 
-              {/* Cơ Cấu Cổ Đông */}
-              <div className="p-5 bg-gray-50 dark:bg-gray-700/40 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-4">
-                <div className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                  <span>👥</span> Cơ Cấu Cổ Đông Lớn & Ban Lãnh Đạo
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Lịch Sử Cổ Tức */}
+                <div className="p-5 bg-gray-50 dark:bg-gray-700/40 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-3">
+                  <div className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                    <span>🎁</span> Lịch Sử Chi Trả Cổ Tức & Sự Kiện Doanh Nghiệp
+                  </div>
+                  <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                    {financials.corporateEvents?.map((ev, idx) => (
+                      <div key={idx} className="py-3 text-xs space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-gray-900 dark:text-white">{ev.type}</span>
+                          <span className="text-[11px] text-gray-400">{ev.date}</span>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300">{ev.content}</p>
+                        <div className="flex items-center gap-3 text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold pt-0.5">
+                          <span>Tỷ lệ: {ev.ratio}</span>
+                          {ev.value && <span>Giá trị: {formatVND(ev.value)}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {financials.shareholders?.map((sh, idx) => (
-                    <div key={idx} className="space-y-1">
-                      <div className="flex justify-between text-xs font-semibold">
-                        <span className="text-gray-800 dark:text-gray-200">{sh.name}</span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">{sh.percentage}%</span>
+
+                {/* Cơ Cấu Cổ Đông */}
+                <div className="p-5 bg-gray-50 dark:bg-gray-700/40 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-4">
+                  <div className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                    <span>👥</span> Cơ Cấu Cổ Đông Lớn & Ban Lãnh Đạo
+                  </div>
+                  <div className="space-y-3">
+                    {financials.shareholders?.map((sh, idx) => (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex justify-between text-xs font-semibold">
+                          <span className="text-gray-800 dark:text-gray-200">{sh.name}</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">{sh.percentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-600 h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-2 rounded-full"
+                            style={{ width: `${sh.percentage}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-600 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-emerald-500 h-2 rounded-full"
-                          style={{ width: `${sh.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {/* ── VIEW 4: GIẢI PHẪU CÔNG THỨC ĐỊNH GIÁ (FORMULA BREAKDOWN) ── */}
-          {mainReportView === 'formulas' && financials.valuationMultiples && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* 1. Benjamin Graham */}
-                <div className="p-5 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-2xl border border-indigo-100 dark:border-indigo-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">1. Benjamin Graham</span>
-                    <div className="text-right flex items-baseline gap-1.5">
-                      <span className="text-lg font-black text-indigo-700 dark:text-indigo-300">
-                        {formatVND(financials.valuationMultiples.grahamNumber)}
-                      </span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.grahamNumber, currentStock?.close);
-                        if (diff == null) return null;
-                        return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                            : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                            }`}>
-                            {diff >= 0 ? '+' : ''}{diff}%
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1 font-mono bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-indigo-50 dark:border-indigo-900">
-                    <div>V = √(22.5 × EPS × BVPS)</div>
-                    <div className="text-[11px] text-gray-400">
-                      = √(22.5 × {formatVND(financials.quarterly?.[financials.quarterly.length - 1]?.eps)} × BVPS)
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-gray-500">Mô hình giá trị nội tại cổ điển bảo vệ nhà đầu tư khỏi rủi ro trả quá đắt.</p>
-                </div>
-
-                {/* 2. Gordon DDM */}
-                <div className="p-5 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">2. Chiết Khấu Cổ Tức DDM</span>
-                    <div className="text-right flex items-baseline gap-1.5">
-                      <span className="text-lg font-black text-emerald-700 dark:text-emerald-300">
-                        {formatVND(financials.valuationMultiples.ddmTarget)}
-                      </span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.ddmTarget, currentStock?.close);
-                        if (diff == null) return null;
-                        return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                            : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                            }`}>
-                            {diff >= 0 ? '+' : ''}{diff}%
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1 font-mono bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-emerald-50 dark:border-emerald-900">
-                    <div>V = [DPS × (1 + g)] / (r - g)</div>
-                    <div className="text-[11px] text-gray-400">
-                      r = 11.5% (WACC), g = 3.5% tăng trưởng dài hạn
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-gray-500">Thích hợp cho doanh nghiệp có dòng tiền ổn định và chi trả cổ tức tiền mặt đều đặn.</p>
-                </div>
-
-                {/* 3. EV/EBITDA Fair Value */}
-                <div className="p-5 bg-blue-50/50 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">3. Mô Hình EV/EBITDA</span>
-                    <div className="text-right flex items-baseline gap-1.5">
-                      <span className="text-lg font-black text-blue-700 dark:text-blue-300">
-                        {formatVND(financials.valuationMultiples.evEbitdaFairPrice)}
-                      </span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.evEbitdaFairPrice, currentStock?.close);
-                        if (diff == null) return null;
-                        return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                            : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                            }`}>
-                            {diff >= 0 ? '+' : ''}{diff}%
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1 font-mono bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-blue-50 dark:border-blue-900">
-                    <div>V = [(EBITDA × 7.5x) - NetDebt] / Shares</div>
-                    <div className="text-[11px] text-gray-400">
-                      Loại trừ ảnh hưởng của khấu hao & cấu trúc vốn vay
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-gray-500">Chuẩn mực định giá cho các ngành sản xuất tư bản lớn (thép, sản xuất, công nghiệp nặng).</p>
-                </div>
-
-                {/* 4. P/CF Fair Value */}
-                <div className="p-5 bg-amber-50/50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">4. Dòng Tiền Kinh Doanh P/CF</span>
-                    <div className="text-right flex items-baseline gap-1.5">
-                      <span className="text-lg font-black text-amber-700 dark:text-amber-300">
-                        {formatVND(financials.valuationMultiples.pcfFairPrice)}
-                      </span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.pcfFairPrice, currentStock?.close);
-                        if (diff == null) return null;
-                        return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                            : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                            }`}>
-                            {diff >= 0 ? '+' : ''}{diff}%
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1 font-mono bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-amber-50 dark:border-amber-900">
-                    <div>V = (CFO × 8.0x) / Shares</div>
-                    <div className="text-[11px] text-gray-400">
-                      Dựa trên tiền thật chảy vào tài khoản, không bị bóp méo
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-gray-500">Phản ánh thực chất sức mạnh thanh khoản và khả năng tạo tiền của hoạt động kinh doanh.</p>
-                </div>
-
-                {/* 5. Target P/E & P/B */}
-                <div className="p-5 bg-purple-50/50 dark:bg-purple-950/30 rounded-2xl border border-purple-100 dark:border-purple-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">5. P/E & P/B Mục Tiêu</span>
-                    <div className="text-right flex items-baseline gap-1.5">
-                      <span className="text-lg font-black text-purple-700 dark:text-purple-300">
-                        {formatVND(financials.valuationMultiples.peTarget)}
-                      </span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.peTarget, currentStock?.close);
-                        if (diff == null) return null;
-                        return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                            : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
-                            }`}>
-                            {diff >= 0 ? '+' : ''}{diff}%
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1 font-mono bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-purple-50 dark:border-purple-900">
-                    <div>P/E Target = EPS × 11.5x</div>
-                    <div>P/B Target = BVPS × 1.35x</div>
-                  </div>
-                  <p className="text-[11px] text-gray-500">Mức định giá trung vị lịch sử 5 năm của các doanh nghiệp niêm yết đầu ngành.</p>
-                </div>
-
-                {/* 6. Giá Hội Tụ & Biên An Toàn */}
-                <div className="p-5 bg-slate-900 text-white rounded-2xl border border-slate-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">6. Giá Trị Hội Tụ (Consensus)</span>
-                    <div className="text-right flex items-baseline gap-1.5">
-                      <span className="text-xl font-black text-emerald-400">
-                        {formatVND(financials.valuationMultiples.consensusFairValue)}
-                      </span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.consensusFairValue, currentStock?.close);
-                        if (diff == null) return null;
-                        return (
-                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${diff >= 0
-                            ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/40'
-                            : 'bg-rose-500/30 text-rose-300 border border-rose-500/40'
-                            }`}>
-                            {diff >= 0 ? '+' : ''}{diff}%
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="text-xs space-y-1 font-mono bg-slate-800 p-2.5 rounded-xl border border-slate-700">
-                    <div className="flex items-center justify-between">
-                      <span>Biên an toàn (MoS):</span>
-                      <span className="font-bold text-emerald-400">{financials.valuationMultiples.marginOfSafety}%</span>
-                    </div>
-                    <div className="flex items-center justify-between text-gray-300">
-                      <span>Chênh lệch vs Thị giá:</span>
-                      {(() => {
-                        const diff = calcPriceDiff(financials.valuationMultiples.consensusFairValue, currentStock?.close);
-                        return (
-                          <span className={`font-bold ${diff != null && diff >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {diff != null ? `${diff >= 0 ? '+' : ''}${diff}%` : '—'}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                    <div className="text-gray-400 text-[11px] pt-0.5 border-t border-slate-700">Tổng hợp 6 mô hình định giá</div>
-                  </div>
-                  <p className="text-[11px] text-gray-400">Tổng hợp đa phương pháp giúp triệt tiêu sai lệch giả định của từng mô hình đơn lẻ.</p>
-                </div>
-              </div>
-            </div>
+          {mainReportView === 'formulas' && (
+            <ValuationFormulasDeconstructionCard
+              valuation={currentStock?.valuation || financials?.valuationMultiples}
+              financials={financials}
+              currentPrice={currentStock?.close}
+              symbol={selectedSymbol}
+            />
           )}
 
           {/* ── VIEW 5: SỨC KHỎE TÀI CHÍNH & CẢNH BÁO SỚM ── */}
@@ -2043,6 +2011,14 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <ForensicAccountingCard
               financials={financials}
               stockItem={currentStock}
+            />
+          )}
+
+          {/* ── VIEW 13: PHÒNG THÍ NGHIỆM FINVAL LAB (20+ CHỈ TIÊU VS SMA 5Y) ── */}
+          {mainReportView === 'finval' && (
+            <FinValLabCard
+              finvalLab={financials?.valuationMultiples?.finvalLab || currentStock?.valuation?.finvalLab}
+              symbol={selectedSymbol}
             />
           )}
         </div>

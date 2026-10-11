@@ -172,6 +172,27 @@ def normalize_row(row):
     shares_val = round(float(d["total_shares_outstanding_fundamental"])) if d.get("total_shares_outstanding_fundamental") is not None else None
     beta_val = round(float(d["beta_1_year"]), 2) if d.get("beta_1_year") is not None else None
 
+    # Đọc bổ sung từ kho BCTC cục bộ (nếu có) để làm giàu dữ liệu dòng tiền và lịch sử 5 năm
+    fin_file = FINANCIALS_DIR / f"{sym}.json"
+    yearly_history = []
+    capex_val = 0.0
+    effective_cfo = fcf_val
+
+    if fin_file.exists():
+        try:
+            with open(fin_file, "r", encoding="utf-8") as f_fin:
+                fin_data = json.load(f_fin)
+                yearly_history = fin_data.get("yearly", [])
+                latest_q = fin_data.get("quarterly", [{}])[-1] if fin_data.get("quarterly") else {}
+                if latest_q.get("capex"):
+                    capex_val = abs(float(latest_q["capex"])) * 1_000_000_000 * 4
+                if (effective_cfo is None or effective_cfo <= 0) and latest_q.get("cfo"):
+                    cfo_cand = float(latest_q["cfo"]) * 1_000_000_000 * 4
+                    if cfo_cand > 0:
+                        effective_cfo = cfo_cand
+        except Exception:
+            pass
+
     # Động cơ định giá doanh nghiệp tập trung (Enterprise Valuation Engine)
     val_eval = engine.evaluate({
         "close": close,
@@ -183,10 +204,14 @@ def normalize_row(row):
         "totalAssets": assets_val,
         "totalDebt": debt_val,
         "ebitda": ebitda_val,
-        "cfo": fcf_val,
+        "cfo": effective_cfo,
+        "capex": capex_val,
         "shares": shares_val,
         "roe": roe_val,
         "netMargin": net_margin_val,
+        "sector": d.get("sector.tr") or "Khác",
+        "industry": d.get("industry.tr") or "Khác",
+        "yearlyHistory": yearly_history,
         "high52w": h52,
         "low52w": l52,
         "recommendScore": rec_score,
@@ -236,7 +261,16 @@ def normalize_row(row):
             "valuationRating": val_eval["valuationRating"],
             "valuationRatingText": val_eval["valuationRatingText"],
             "valuationRatingBadge": val_eval["valuationRatingBadge"],
-            "validModelsCount": val_eval["validModelsCount"]
+            "validModelsCount": val_eval["validModelsCount"],
+            "models10": val_eval.get("models10", []),
+            "consensusDetails": val_eval.get("consensusDetails", {}),
+            "valuationTraps": val_eval.get("valuationTraps", {}),
+            "sevenPriceZones": val_eval.get("sevenPriceZones", {}),
+            "threeLayerDecision": val_eval.get("threeLayerDecision", {}),
+            "historicalBands": val_eval.get("historicalBands", {}),
+            "dividendSustainability": val_eval.get("dividendSustainability", {}),
+            "finvalLab": val_eval.get("finvalLab", {}),
+            "impliedFcfYieldPrice": val_eval.get("impliedFcfYieldPrice")
         },
         "profitability": {
             "roe": roe_val,
@@ -483,7 +517,16 @@ def main():
                 "valuationRating": val_eval["valuationRating"],
                 "valuationRatingText": val_eval["valuationRatingText"],
                 "valuationRatingBadge": val_eval["valuationRatingBadge"],
-                "validModelsCount": val_eval["validModelsCount"]
+                "validModelsCount": val_eval["validModelsCount"],
+                "models10": val_eval.get("models10", []),
+                "consensusDetails": val_eval.get("consensusDetails", {}),
+                "valuationTraps": val_eval.get("valuationTraps", {}),
+                "sevenPriceZones": val_eval.get("sevenPriceZones", {}),
+                "threeLayerDecision": val_eval.get("threeLayerDecision", {}),
+                "historicalBands": val_eval.get("historicalBands", {}),
+                "dividendSustainability": val_eval.get("dividendSustainability", {}),
+                "finvalLab": val_eval.get("finvalLab", {}),
+                "impliedFcfYieldPrice": val_eval.get("impliedFcfYieldPrice")
             })
             item["dupont"] = val_eval["dupont"]
             item.setdefault("technicals", {}).update(val_eval["technicals"])
