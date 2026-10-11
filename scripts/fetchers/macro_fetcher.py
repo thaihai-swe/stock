@@ -9,11 +9,15 @@ Module lấy dữ liệu kinh tế vĩ mô, lãi suất và thị trường hàn
 5. Giá vàng miếng SJC trong nước từ 24h.com.vn.
 """
 
+import io
 import re
 import json
+import time
 from pathlib import Path
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Dict, Any, Optional
+from bs4 import BeautifulSoup
+import pandas as pd
 from .base import BaseFetcher
 
 try:
@@ -29,6 +33,93 @@ class MacroFetcher(BaseFetcher):
 
     def __init__(self):
         super().__init__(default_source="MACRO")
+
+    def fetch_live_index_quote(self, symbol: str = "VNINDEX") -> Dict[str, Any]:
+        """
+        Lấy thị giá đóng cửa và biến động thời gian thực của chỉ số thị trường (VNINDEX, VN30).
+        Nguồn chính thức: DNSE Live Feed API (đồng nhất 100% với Biểu đồ Thị Trường Trực Tuyến).
+        """
+        code = symbol.strip().upper()
+        now_ts = int(time.time())
+        from_ts = now_ts - 86400 * 30  # Lấy 30 ngày gần nhất để luôn có phiên gần nhất hợp lệ
+
+        # 1. Nguồn chính thức: DNSE Live Chart API
+        try:
+            url = f"https://api.dnse.com.vn/chart-api/v2/ohlcs/index?symbol={code}&resolution=1D&from={from_ts}&to={now_ts}"
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)",
+                "Accept": "application/json"
+            }
+            raw = self.http_get(url, headers=headers, timeout=10, verify_ssl=False)
+            if raw:
+                data = json.loads(raw)
+                closes = data.get("c", [])
+                highs = data.get("h", [])
+                lows = data.get("l", [])
+                volumes = data.get("v", [])
+                if closes:
+                    current_close = round(float(closes[-1]), 2)
+                    prev_close = round(float(closes[-2]), 2) if len(closes) > 1 else current_close
+                    change = round(current_close - prev_close, 2)
+                    change_pct = round((change / prev_close) * 100, 2) if prev_close > 0 else 0.0
+                    high_val = round(float(highs[-1]), 2) if highs else current_close
+                    low_val = round(float(lows[-1]), 2) if lows else current_close
+                    vol_val = int(volumes[-1]) if volumes else 0
+
+                    print(f"  [DNSE] Lấy thành công thị giá {code}: {current_close:.2f} điểm ({'+' if change >= 0 else ''}{change:.2f} / {'+' if change_pct >= 0 else ''}{change_pct:.2f}%).")
+                    return {
+                        "symbol": code,
+                        "point": current_close,
+                        "prevPoint": prev_close,
+                        "change": change,
+                        "changePercent": change_pct,
+                        "high": high_val,
+                        "low": low_val,
+                        "volume": vol_val,
+                        "source": "DNSE_LIVE"
+                    }
+        except Exception as e:
+            print(f"  ⚠️ [MacroFetcher] Không thể lấy thị giá {code} từ DNSE: {e}")
+
+        # 2. Dự phòng cấp 2: Khôi phục từ cache gần nhất trong data/macro_valuation.json
+        try:
+            cache_file = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
+            if cache_file.exists():
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cdata = json.load(f)
+                    m_idx = cdata.get("marketIndex", {})
+                    if code == "VNINDEX" and m_idx.get("currentPoint"):
+                        pt = float(m_idx["currentPoint"])
+                        if pt > 500:
+                            print(f"  ℹ️ [MacroFetcher] Dùng snapshot cache gần nhất cho {code}: {pt:.2f} điểm.")
+                            return {
+                                "symbol": code,
+                                "point": pt,
+                                "prevPoint": pt,
+                                "change": float(m_idx.get("change", 0.0)),
+                                "changePercent": float(m_idx.get("changePercent", 0.0)),
+                                "high": pt,
+                                "low": pt,
+                                "volume": 0,
+                                "source": "LOCAL_SNAPSHOT_CACHE"
+                            }
+        except Exception:
+            pass
+
+        # 3. Giá trị fallback an toàn hợp lý hiện tại (quanh 1735 cho VNINDEX, 1870 cho VN30)
+        default_pt = 1735.09 if code == "VNINDEX" else 1873.43
+        print(f"  ⚠️ [MacroFetcher] Dùng fallback mặc định cho {code}: {default_pt:.2f} điểm.")
+        return {
+            "symbol": code,
+            "point": default_pt,
+            "prevPoint": default_pt,
+            "change": 0.0,
+            "changePercent": 0.0,
+            "high": default_pt,
+            "low": default_pt,
+            "volume": 0,
+            "source": "DEFAULT_FALLBACK"
+        }
 
     def fetch_global_commodities_fx(self) -> Dict[str, float]:
         """
@@ -67,51 +158,69 @@ class MacroFetcher(BaseFetcher):
 
     def fetch_hnx_yield_curve(self, target_date: Optional[date] = None) -> Dict[str, float]:
         """
-        Lấy đường cong lợi suất Trái phiếu Chính phủ Việt Nam 8 kỳ hạn từ HNX.
-        Trả về dictionary dạng { '1Y': 1.85, '5Y': 2.75, '10Y': 3.45, ... }
+        Lấy đường cong lợi suất Trái phiếu Chính phủ Việt Nam 8 kỳ hạn từ HNX Portal.
+        Sử dụng BeautifulSoup4 + pandas (pd.read_html) để bóc tách bảng dữ liệu chuẩn hóa.
+        Hỗ trợ tự động lùi ngày giao dịch (tối đa 5 ngày) nếu ngày hiện tại là cuối tuần hoặc nghỉ lễ.
+        Trả về dictionary dạng { '1Y': 3.93, '5Y': 4.29, '10Y': 4.47, ... }
         """
-        pdate = (target_date or date.today()).strftime("%d/%m/%Y")
+        start_date = target_date or date.today()
         default_yields = {
             "1Y": 1.85, "2Y": 2.10, "3Y": 2.35, "5Y": 2.75,
             "7Y": 3.10, "10Y": 3.45, "15Y": 3.80, "20Y": 4.10
         }
 
-        try:
-            html = self.http_post_form(HNX_YIELD_URL, {"pDate": pdate}, verify_ssl=False)
-            if not html or "Không tìm thấy dữ liệu" in html or len(html) < 500:
-                return default_yields
+        tenor_map = {
+            "1 năm": "1Y", "2 năm": "2Y", "3 năm": "3Y", "5 năm": "5Y",
+            "7 năm": "7Y", "10 năm": "10Y", "15 năm": "15Y", "20 năm": "20Y"
+        }
 
-            # Parse bảng HTML HNX
-            tbody_match = re.search(r"<tbody>(.*?)</tbody>", html, re.DOTALL | re.IGNORECASE)
-            if not tbody_match:
-                return default_yields
+        # Thử từ start_date lùi dần về trước tối đa 5 ngày giao dịch
+        for day_offset in range(5):
+            check_date = start_date - timedelta(days=day_offset)
+            pdate = check_date.strftime("%d/%m/%Y")
 
-            tr_list = re.findall(r"<tr[^>]*>(.*?)</tr>", tbody_match.group(1), re.DOTALL | re.IGNORECASE)
-            yields: Dict[str, float] = {}
+            try:
+                html = self.http_post_form(HNX_YIELD_URL, {"pDate": pdate}, verify_ssl=False)
+                if not html or "Không tìm thấy dữ liệu" in html or len(html) < 500:
+                    continue
 
-            tenor_map = {
-                "1 năm": "1Y", "2 năm": "2Y", "3 năm": "3Y", "5 năm": "5Y",
-                "7 năm": "7Y", "10 năm": "10Y", "15 năm": "15Y", "20 năm": "20Y"
-            }
+                soup = BeautifulSoup(html, "html.parser")
+                table = soup.find("table")
+                if not table:
+                    continue
 
-            for tr in tr_list:
-                tds = re.findall(r"<td[^>]*>(.*?)</td>", tr, re.DOTALL | re.IGNORECASE)
-                if len(tds) >= 3:
-                    tenor_text = re.sub(r"<[^>]+>", "", tds[1]).strip()
-                    yield_text = re.sub(r"<[^>]+>", "", tds[2]).strip().replace(",", ".")
-                    for t_name, t_code in tenor_map.items():
-                        if t_name in tenor_text:
-                            try:
-                                yields[t_code] = float(yield_text)
-                            except ValueError:
-                                pass
+                # HNX sử dụng định dạng số Việt Nam: dấu chấm phân tách hàng nghìn, dấu phẩy là thập phân
+                dfs = pd.read_html(io.StringIO(str(table)), thousands=".", decimal=",")
+                if not dfs or dfs[0].empty:
+                    continue
 
-            if yields:
-                default_yields.update(yields)
+                df = dfs[0]
+                yields: Dict[str, float] = {}
 
-            return default_yields
-        except Exception:
-            return default_yields
+                for _, row in df.iterrows():
+                    if len(row) >= 2:
+                        tenor_text = str(row.iloc[0]).strip().lower()
+                        # Ưu tiên Par yield (cột 2), fallback sang Spot rate (cột 1)
+                        raw_yield = row.iloc[2] if (len(row) > 2 and pd.notna(row.iloc[2])) else row.iloc[1]
+                        for t_name, t_code in tenor_map.items():
+                            if t_name == tenor_text:
+                                try:
+                                    val = float(raw_yield)
+                                    if not pd.isna(val) and 0.0 < val < 50.0:
+                                        yields[t_code] = round(val, 2)
+                                except (ValueError, TypeError):
+                                    pass
+
+                if len(yields) >= 4:
+                    default_yields.update(yields)
+                    print(f"  [HNX] Bóc tách thành công đường cong lợi suất TPCP ngày {pdate} ({len(yields)} kỳ hạn, 10Y={default_yields.get('10Y')}%) qua BeautifulSoup + Pandas.")
+                    return default_yields
+
+            except Exception as e:
+                print(f"  ⚠️ [HNX] Lỗi bóc tách bảng lợi suất ngày {pdate}: {e}")
+
+        print("  ⚠️ [HNX] Không tìm thấy dữ liệu bảng lợi suất gần nhất trong 5 ngày, sử dụng cấu hình mặc định an toàn.")
+        return default_yields
 
     def fetch_sbv_rates(self) -> Dict[str, float]:
         """

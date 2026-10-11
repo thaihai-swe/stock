@@ -137,32 +137,254 @@ def calc_ps_target(revenue: Optional[float], shares: Optional[float], multiple: 
 
 
 # ---------------------------------------------------------------------------
+# CÁC MÔ HÌNH ĐỊNH GIÁ CHIẾT KHẤU DÒNG TIỀN DCF & REVERSE DCF (REF-EQUITY-RESEARCH-VN)
+# ---------------------------------------------------------------------------
+
+SECTOR_WACC_BENCHMARKS = {
+    "BANKING": 0.100,
+    "MANUFACTURING": 0.105,
+    "STEEL": 0.105,
+    "HEAVY_INDUSTRY": 0.105,
+    "REAL_ESTATE": 0.115,
+    "RETAIL": 0.090,
+    "CONSUMER": 0.090,
+    "TECHNOLOGY": 0.090,
+    "ENERGY": 0.100,
+    "OIL_GAS": 0.100,
+    "GENERAL": 0.105
+}
+
+def get_sector_wacc(industry_category: str = "GENERAL", beta: Optional[float] = 1.0) -> float:
+    """
+    Xác định WACC tham chiếu theo ngành TTCK VN (từ wacc_estimates.md) và hiệu chỉnh theo Beta cổ phiếu:
+    WACC = Base_Sector_WACC + (beta - 1.0) * 1.5%
+    """
+    cat = (industry_category or "GENERAL").upper()
+    base_wacc = SECTOR_WACC_BENCHMARKS.get(cat, SECTOR_WACC_BENCHMARKS["GENERAL"])
+    b = float(beta) if beta is not None and beta > 0 else 1.0
+    adjusted = base_wacc + (b - 1.0) * 0.015
+    # Kẹp trong biên độ an toàn 7.5% - 16.0% cho TTCK VN
+    return round(max(0.075, min(0.160, adjusted)), 4)
+
+
+def calc_dcf_fcff(
+    base_fcff: Optional[float],
+    wacc: float = DEFAULT_WACC,
+    terminal_g: float = 0.03,
+    net_debt: Optional[float] = 0.0,
+    shares: Optional[float] = 1.0,
+    growth_rates: Optional[List[float]] = None,
+    projection_years: int = 5
+) -> Dict[str, Any]:
+    """
+    Định giá Chiết khấu Dòng tiền Tự do Doanh nghiệp DCF (FCFF) với 3 Kịch Bản (Base, Bull, Bear).
+    Sanity Check (Học từ LC-005): Nếu base_fcff <= 0, gắn cờ 'NEGATIVE_FCF' và không xuất giá âm.
+    """
+    if base_fcff is None or shares is None or shares <= 0:
+        return {
+            "status": "INVALID_INPUT",
+            "basePrice": None,
+            "bullPrice": None,
+            "bearPrice": None,
+            "fairPrice": None,
+            "wacc": round(wacc * 100, 2),
+            "terminalG": round(terminal_g * 100, 2),
+            "note": "Thiếu dữ liệu dòng tiền hoặc số lượng cổ phiếu"
+        }
+
+    debt = float(net_debt) if net_debt is not None else 0.0
+
+    # Sanity check: FCF âm
+    if base_fcff <= 0:
+        return {
+            "status": "NEGATIVE_FCF",
+            "basePrice": None,
+            "bullPrice": None,
+            "bearPrice": None,
+            "fairPrice": None,
+            "wacc": round(wacc * 100, 2),
+            "terminalG": round(terminal_g * 100, 2),
+            "note": "FCF0 âm — Khuyến nghị dùng phương pháp định giá EV/EBITDA hoặc P/B thay thế."
+        }
+
+    # Giả định tăng trưởng 5 năm mặc định: giảm dần từ 12% về 5%
+    base_growths = growth_rates if (growth_rates and len(growth_rates) >= projection_years) else [0.12, 0.10, 0.08, 0.06, 0.05]
+
+    def _compute_single_scenario(sc_growths: List[float], sc_wacc: float, sc_g: float) -> Optional[int]:
+        if sc_wacc <= sc_g:
+            return None
+        pv_explicit = 0.0
+        current_fcf = base_fcff
+        for i, g in enumerate(sc_growths[:projection_years]):
+            current_fcf *= (1.0 + g)
+            pv_explicit += current_fcf / ((1.0 + sc_wacc) ** (i + 1))
+        
+        terminal_val = (current_fcf * (1.0 + sc_g)) / (sc_wacc - sc_g)
+        pv_terminal = terminal_val / ((1.0 + sc_wacc) ** projection_years)
+        ev = pv_explicit + pv_terminal
+        equity = ev - debt
+        if equity <= 0:
+            return None
+        return round(equity / shares)
+
+    # 1. Base Case
+    base_val = _compute_single_scenario(base_growths, wacc, terminal_g)
+
+    # 2. Bull Case (Growths +3%, WACC -0.5%, g +0.5%)
+    bull_growths = [g + 0.03 for g in base_growths]
+    bull_val = _compute_single_scenario(bull_growths, max(0.06, wacc - 0.005), min(0.045, terminal_g + 0.005))
+
+    # 3. Bear Case (Growths -4%, WACC +1.0%, g -1.0%)
+    bear_growths = [max(0.01, g - 0.04) for g in base_growths]
+    bear_val = _compute_single_scenario(bear_growths, wacc + 0.010, max(0.015, terminal_g - 0.010))
+
+    return {
+        "status": "SUCCESS",
+        "basePrice": base_val,
+        "bullPrice": bull_val,
+        "bearPrice": bear_val,
+        "fairPrice": base_val,
+        "wacc": round(wacc * 100, 2),
+        "terminalG": round(terminal_g * 100, 2),
+        "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
+    }
+
+
+def calc_reverse_dcf(
+    current_ev: Optional[float],
+    base_fcff: Optional[float],
+    wacc: float = DEFAULT_WACC,
+    terminal_g: float = 0.03,
+    max_iter: int = 50
+) -> Optional[float]:
+    """
+    Reverse DCF: Dùng phương pháp Binary Search tìm tốc độ tăng trưởng ngụ ý g (Implied Growth Rate)
+    sao cho PV(FCFF, g, WACC) = Enterprise Value hiện tại.
+    Trả về: g_implied tính theo % (ví dụ: 6.5 nghĩa là 6.5%/năm).
+    """
+    if not current_ev or current_ev <= 0 or not base_fcff or base_fcff <= 0 or wacc <= terminal_g:
+        return None
+
+    def _calc_ev_for_g(g_rate: float) -> float:
+        pv = 0.0
+        cf = base_fcff
+        for i in range(1, 6):
+            cf = base_fcff * ((1.0 + g_rate) ** i)
+            pv += cf / ((1.0 + wacc) ** i)
+        tv = (cf * (1.0 + terminal_g)) / (wacc - terminal_g)
+        pv += tv / ((1.0 + wacc) ** 5)
+        return pv
+
+    lo = -0.30
+    hi = 0.60
+    for _ in range(max_iter):
+        mid = (lo + hi) / 2.0
+        ev_test = _calc_ev_for_g(mid)
+        if ev_test < current_ev:
+            lo = mid
+        else:
+            hi = mid
+
+    implied_g = round(((lo + hi) / 2.0) * 100, 2)
+    return implied_g
+
+
+def calc_dcf_sensitivity_matrix(
+    base_fcff: Optional[float],
+    net_debt: Optional[float] = 0.0,
+    shares: Optional[float] = 1.0,
+    wacc_list: Optional[List[float]] = None,
+    g_list: Optional[List[float]] = None
+) -> Dict[str, Any]:
+    """
+    Tính bảng phân tích độ nhạy cảm 2 chiều (2D Sensitivity Matrix) cho DCF:
+    WACC (Rows: 10.0%, 10.5%, 11.0%, 12.0%) vs Terminal g (Cols: 2.0%, 3.0%, 4.0%).
+    """
+    waccs = wacc_list or [0.100, 0.105, 0.110, 0.120]
+    gs = g_list or [0.020, 0.030, 0.040]
+
+    if not base_fcff or base_fcff <= 0 or not shares or shares <= 0:
+        return {
+            "waccList": [round(w * 100, 1) for w in waccs],
+            "gList": [round(g * 100, 1) for g in gs],
+            "matrix": []
+        }
+
+    debt = float(net_debt) if net_debt is not None else 0.0
+    matrix = []
+    default_growths = [0.10, 0.08, 0.07, 0.06, 0.05]
+
+    for w in waccs:
+        row = []
+        for g in gs:
+            if w <= g:
+                row.append(None)
+                continue
+            pv_explicit = 0.0
+            cf = base_fcff
+            for i, gr in enumerate(default_growths):
+                cf *= (1.0 + gr)
+                pv_explicit += cf / ((1.0 + w) ** (i + 1))
+            tv = (cf * (1.0 + g)) / (w - g)
+            pv_terminal = tv / ((1.0 + w) ** 5)
+            ev = pv_explicit + pv_terminal
+            eq = ev - debt
+            row.append(round(eq / shares) if eq > 0 else None)
+        matrix.append(row)
+
+    return {
+        "waccList": [round(w * 100, 1) for w in waccs],
+        "gList": [round(g * 100, 1) for g in gs],
+        "matrix": matrix
+    }
+
+
+# ---------------------------------------------------------------------------
 # 2. ĐỘNG CƠ TỔNG HỢP GIÁ HỢP LÝ HỘI TỤ (CONSENSUS FAIR VALUE) & BIÊN AN TOÀN
 # ---------------------------------------------------------------------------
 
-def calc_consensus_fair_value(candidates: List[Optional[int]], close: Optional[float] = None) -> Dict[str, Any]:
+def calc_consensus_fair_value(
+    candidates: List[Optional[int]], 
+    close: Optional[float] = None,
+    weights: Optional[List[float]] = None
+) -> Dict[str, Any]:
     """
     Tính Giá trị Hợp lý Hội tụ (Consensus Fair Value) và Biên An Toàn (Margin of Safety - MoS %).
     Nhận vào danh sách kết quả của các mô hình độc lập (đã lọc các giá trị > 0).
-    Trả về:
-    - fairValue: Giá hội tụ (trung bình cộng các mô hình hợp lệ)
-    - marginOfSafety: Biên an toàn % so với thị giá hiện tại
-    - rating, ratingText, ratingBadge: Phân loại định giá theo chuẩn Tailwind CSS
+    Hỗ trợ trọng số có điều kiện weights (cho Sector Prioritization).
     """
-    valid = [c for c in candidates if c is not None and c > 0]
-    if not valid:
-        return {
-            "fairValue": None,
-            "marginOfSafety": None,
-            "upside": None,
-            "diffPercent": None,
-            "rating": "NEUTRAL",
-            "ratingText": "Chưa đủ dữ liệu định giá",
-            "ratingBadge": "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-            "validModelsCount": 0
-        }
+    if weights and len(weights) == len(candidates):
+        valid_pairs = [(c, w) for c, w in zip(candidates, weights) if c is not None and c > 0 and w > 0]
+        if not valid_pairs:
+            return {
+                "fairValue": None,
+                "marginOfSafety": None,
+                "upside": None,
+                "diffPercent": None,
+                "rating": "NEUTRAL",
+                "ratingText": "Chưa đủ dữ liệu định giá",
+                "ratingBadge": "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+                "validModelsCount": 0
+            }
+        total_w = sum(w for _, w in valid_pairs)
+        fair_val = round(sum(c * w for c, w in valid_pairs) / total_w)
+        valid_count = len(valid_pairs)
+    else:
+        valid = [c for c in candidates if c is not None and c > 0]
+        if not valid:
+            return {
+                "fairValue": None,
+                "marginOfSafety": None,
+                "upside": None,
+                "diffPercent": None,
+                "rating": "NEUTRAL",
+                "ratingText": "Chưa đủ dữ liệu định giá",
+                "ratingBadge": "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+                "validModelsCount": 0
+            }
+        fair_val = round(sum(valid) / len(valid))
+        valid_count = len(valid)
 
-    fair_val = round(sum(valid) / len(valid))
     mos = None
     upside = None
     if close and close > 0 and fair_val > 0:
@@ -203,7 +425,7 @@ def calc_consensus_fair_value(candidates: List[Optional[int]], close: Optional[f
         "rating": rating,
         "ratingText": rating_text,
         "ratingBadge": rating_badge,
-        "validModelsCount": len(valid)
+        "validModelsCount": valid_count
     }
 
 

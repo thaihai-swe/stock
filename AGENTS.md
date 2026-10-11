@@ -91,7 +91,7 @@ Khi phát triển hoặc sửa đổi UI, các Agent phải tuân thủ nghiêm 
   1. **Nhiệt Kế Định Giá VN-Index**: P/E Bands 5 năm (Rất rẻ &lt;11.5x đến Rất đắt &gt;18x), P/B, Z-Score và các chỉ số liên thị trường (USD/VND, TPCP 10Y, Lãi suất SBV, SJC, Brent).
   2. **Chu Kỳ Kinh Tế 5 Pha (Macro Regime)**: Xác định pha hiện tại (Phục hồi, Mở rộng, Quá nhiệt, Suy thoái, Chậm lại), Tăng trưởng GDP vs Lạm phát, Tâm lý Risk-On / Risk-Off.
   3. **Điểm Rủi Ro Vĩ Mô (0-100)**: Phân rã 4 tầng rủi ro (Tiền tệ, Tài khóa, Lạm phát, Thanh khoản).
-  4. **Bản Đồ Luân Chuyển 11 Nhóm Ngành (Sector Rotation)**: Trạng thái khuyến nghị (Overweight, Neutral, Underweight), Điểm số tác động ròng (Net Impact Score) trước 6 động lực vĩ mô.
+  4. **Bản Đồ Luân Chuyển & Định Giá 10 Nhóm Ngành GICS (Sector Valuation & Rotation)**: Hợp nhất dữ liệu P/E Heatmap và 6 Động Lực Vĩ Mô vào 2 chế độ xem chất lượng cao: (1) Ma Trận Thiên Thời & Bản Đồ Nhiệt và (2) Bảng Số Liệu Toàn Diện & Phân Rã Vĩ Mô.
   5. **Cố Vấn Phân Bổ 4 Loại Tài Sản & Chênh Lệch Giá Vàng**: Phân bổ Cổ phiếu, Trái phiếu/Tiền mặt, Vàng, Ngoại tệ + Đo độ chênh lệch vàng miếng SJC & nhẫn PNJ 999.9 (từ PNJ Official Edge API) so với giá quốc tế quy đổi.
   6. **Kho 95 Chỉ Số TradingEconomics**: Tra cứu 10 phân nhóm kinh tế vĩ mô có tìm kiếm tức thì.
 
@@ -188,7 +188,7 @@ stock/
 │       ├── valuation_models.py        # Backward Compatibility Bridge re-exporting engine
 │       ├── market_valuation_analyzer.py # Động cơ phân tích thống kê 4 cửa sổ, Composite Signal & Cảnh báo Z>2
 │       ├── financial_taxonomy.py      # Từ điển chuẩn hóa chỉ tiêu BCTC Việt Nam
-│       ├── macro_regime.py            # Logic 5-pha Regime, Risk Score 4 tầng, Luân chuyển 11 ngành
+│       ├── macro_regime.py            # Logic 5-pha Regime, Risk Score 4 tầng, Luân chuyển 10 ngành GICS
 │       ├── macro_advisor.py           # Logic phân tích kinh tế vĩ mô & chu kỳ lãi suất
 │       └── rate_limiter.py            # Quản lý giới hạn tần suất gọi API
 ├── data/

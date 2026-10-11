@@ -68,7 +68,7 @@
       "recommendColor": "text-rose-400 font-medium",
       "beta": 0.68
     },
-    "updatedAt": 1791686771144,
+    "updatedAt": 1791692008405,
     "dupont": {
       "roe": null,
       "netProfitMargin": null,
@@ -146,7 +146,7 @@
       "recommendColor": "text-rose-400 font-medium",
       "beta": 0.85
     },
-    "updatedAt": 1791686771144,
+    "updatedAt": 1791692008405,
     "dupont": {
       "roe": 1.42,
       "netProfitMargin": 4.09,
@@ -244,7 +244,33 @@
       "pe": 7.31,
       "pb": 1.31,
       "ps": 1.09,
-      "evEbitda": null
+      "evEbitda": null,
+      "bvps": 15344,
+      "grahamNumber": 30812,
+      "marginOfSafetyGraham": 34.8,
+      "grahamDiffPercent": 53.3,
+      "ddmTarget": 5887,
+      "ddmDiffPercent": -70.7,
+      "peTarget": 31625,
+      "peDiffPercent": 57.3,
+      "pbTarget": 20714,
+      "pbDiffPercent": 3.1,
+      "evEbitdaFairPrice": 20776,
+      "evEbitdaDiffPercent": 3.4,
+      "pcfFairPrice": null,
+      "pcfDiffPercent": null,
+      "psFairPrice": 24838,
+      "psDiffPercent": 23.6,
+      "fairValue": 21963,
+      "consensusFairValue": 21963,
+      "marginOfSafety": 8.5,
+      "marginOfSafetyFairValue": 8.5,
+      "upside": 9.3,
+      "consensusDiffPercent": 9.3,
+      "valuationRating": "ATTRACTIVE",
+      "valuationRatingText": "Hấp Dẫn (Vùng Mua 5 - 20%)",
+      "valuationRatingBadge": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+      "validModelsCount": 5
     },
     "profitability": {
       "roe": 17.69,
@@ -255,6 +281,13 @@
       "grossMargin": 16.29,
       "operatingMargin": 13.5,
       "netMargin": 12.18
+    },
+    "dupont": {
+      "roe": 17.69,
+      "netProfitMargin": 12.18,
+      "assetTurnover": 0.68,
+      "equityMultiplier": 1.55,
+      "qualityAssessment": "Chất lượng cao: Tăng trưởng nhờ biên lợi nhuận cốt lõi vững chắc, nợ vay an toàn."
     },
     "dividends": {
       "yield": 2.26,
@@ -296,16 +329,16 @@
       "recommendScore": -0.51,
       "recommendText": "Bán mạnh",
       "recommendColor": "text-rose-500 font-bold",
-      "beta": 0.71
+      "beta": 0.71,
+      "techScore": -1,
+      "techScoreVerdict": "Kém (Moderate Bearish)",
+      "techScoreColor": "text-rose-400 font-semibold",
+      "factors": [
+        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
+        "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
+      ]
     },
-    "updatedAt": 1791686771144,
-    "dupont": {
-      "roe": 17.69,
-      "netProfitMargin": 12.18,
-      "assetTurnover": 0.68,
-      "equityMultiplier": 1.55,
-      "qualityAssessment": "Dữ liệu được chuẩn hóa và tính toán từ Python Valuation Engine"
-    }
+    "updatedAt": 1791692008405
   },
   "PNJ": {
     "symbol": "PNJ",
@@ -376,7 +409,7 @@
       "recommendColor": "text-rose-400 font-medium",
       "beta": 1.47
     },
-    "updatedAt": 1791686771144,
+    "updatedAt": 1791692008405,
     "dupont": {
       "roe": 22.41,
       "netProfitMargin": 6.67,
@@ -386,7 +419,7 @@
     }
   },
   "_meta": {
-    "lastSyncedAt": "2026-10-09T10:04:50Z",
+    "lastSyncedAt": "2026-10-11T03:56:33Z",
     "syncedCount": 5,
     "symbolsCount": 5
   }

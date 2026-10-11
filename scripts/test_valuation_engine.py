@@ -206,9 +206,201 @@ def test_stock_valuation_engine_evaluate():
     print("✅ test_stock_valuation_engine_evaluate: PASS")
 
 
+def test_calc_extended_dupont():
+    from lib.financial_analytics_engine import calculate_extended_dupont
+    mock_q = {
+        "netIncome": 3200,
+        "netIncomeParent": 3200,
+        "profitBeforeTax": 4000,
+        "interestExpense": 800,
+        "operatingProfit": 4800,
+        "revenue": 30000,
+        "totalAssets": 120000,
+        "equity": 60000,
+        "roe": 12.8
+    }
+    dupont = calculate_extended_dupont(mock_q)
+    assert dupont["taxBurden"] == 0.8
+    assert dupont["interestBurden"] == 0.833
+    assert dupont["operatingMargin"] == 16.0
+    assert dupont["assetTurnover"] == 1.0
+    assert dupont["financialLeverage"] == 2.0
+    assert len(dupont["components"]) == 5
+    assert "qualityAssessment" in dupont
+    print("✅ test_calc_extended_dupont: PASS")
+
+
+def test_calc_overall_health_score():
+    from lib.financial_analytics_engine import calculate_overall_health_score
+    mock_ratios = {
+        "profitability": {"roe": 18.5, "roa": 9.2, "netMargin": 12.0},
+        "efficiency": {"assetTurnover": 1.1, "inventoryTurnover": 7.5},
+        "leverage": {"debtToEquity": 0.45},
+        "liquidity": {"interestCoverage": 6.5, "currentRatio": 2.2, "quickRatio": 1.6}
+    }
+    health = calculate_overall_health_score(mock_ratios)
+    assert 0 <= health["overallScore"] <= 100
+    assert health["gradeEn"] in ["excellent", "good", "fair", "weak", "critical"]
+    assert "pillars" in health
+    assert len(health["pillars"]) == 4
+    assert health["overallScore"] >= 75.0
+    print("✅ test_calc_overall_health_score: PASS")
+
+
+def test_calc_early_warning():
+    from lib.financial_analytics_engine import calculate_early_warning
+    # Trường hợp lành mạnh
+    healthy_quarters = [
+        {"revenue": 10000, "equity": 20000, "totalDebt": 5000, "shortTermAssets": 8000, "shortTermDebt": 3000, "cfo": 1200, "netIncome": 1000, "cfoToNetIncome": 1.2, "netMargin": 10},
+        {"revenue": 11000, "equity": 21000, "totalDebt": 5200, "shortTermAssets": 8500, "shortTermDebt": 3100, "cfo": 1400, "netIncome": 1150, "cfoToNetIncome": 1.2, "netMargin": 10.5},
+        {"revenue": 12000, "equity": 22000, "totalDebt": 5400, "shortTermAssets": 9000, "shortTermDebt": 3200, "cfo": 1600, "netIncome": 1300, "cfoToNetIncome": 1.2, "netMargin": 11.0}
+    ]
+    ratios = {
+        "leverage": {"debtToEquity": 0.25},
+        "liquidity": {"currentRatio": 2.8}
+    }
+    ew_healthy = calculate_early_warning(healthy_quarters, ratios, altman_z=3.5, piotroski_f=8)
+    assert ew_healthy["riskScore"] <= 25.0
+    assert ew_healthy["riskLevelEn"] == "low"
+    assert len(ew_healthy["positiveSignals"]) > 0
+
+    # Trường hợp rủi ro cao (nợ tăng, thanh khoản kiệt quệ, Altman Z thấp)
+    distressed_quarters = [
+        {"revenue": 10000, "equity": 20000, "totalDebt": 15000, "shortTermAssets": 5000, "shortTermDebt": 6000, "cfo": -500, "netIncome": 300, "cfoToNetIncome": -1.6, "netMargin": 3},
+        {"revenue": 9500, "equity": 18000, "totalDebt": 22000, "shortTermAssets": 4500, "shortTermDebt": 6500, "cfo": -800, "netIncome": 200, "cfoToNetIncome": -4.0, "netMargin": 2},
+        {"revenue": 9000, "equity": 16000, "totalDebt": 32000, "shortTermAssets": 4000, "shortTermDebt": 7000, "cfo": -1200, "netIncome": 100, "cfoToNetIncome": -12.0, "netMargin": 1}
+    ]
+    ew_distressed = calculate_early_warning(distressed_quarters, {"leverage": {"debtToEquity": 2.0}, "liquidity": {"currentRatio": 0.6}}, altman_z=1.2, piotroski_f=2)
+    assert ew_distressed["riskScore"] > 50.0
+    assert ew_distressed["alertsCount"] >= 2
+    print("✅ test_calc_early_warning: PASS")
+
+
+def test_compute_industry_metrics():
+    from lib.industry_metrics import compute_industry_metrics
+    dummy_q = {"revenue": 40000, "totalAssets": 150000, "equity": 80000, "costOfGoodsSold": 32000, "capex": -4000, "depreciation": 2500}
+    dummy_ratios = {"efficiency": {"dso": 50, "dio": 100, "dpo": 40}, "profitability": {"grossMargin": 20.0}}
+
+    # 1. Ngân hàng
+    bank_res = compute_industry_metrics("VCB", dummy_q, dummy_ratios, "Ngân hàng Ngoại Thương", "Ngân hàng")
+    assert bank_res["category"] == "BANKING"
+    assert any(m["id"] == "nim" for m in bank_res["metrics"])
+    assert any(m["id"] == "npl" for m in bank_res["metrics"])
+
+    # 2. Bất động sản
+    re_res = compute_industry_metrics("VHM", dummy_q, dummy_ratios, "Vinhomes", "Bất động sản")
+    assert re_res["category"] == "REAL_ESTATE"
+    assert any(m["id"] == "inv_to_assets" for m in re_res["metrics"])
+
+    # 3. Sản xuất
+    mfg_res = compute_industry_metrics("HPG", dummy_q, dummy_ratios, "Hòa Phát", "Thép")
+    assert mfg_res["category"] == "MANUFACTURING"
+    assert any(m["id"] == "ccc" for m in mfg_res["metrics"])
+    print("✅ test_compute_industry_metrics: PASS")
+
+
+def test_calc_dcf_fcff():
+    from lib.valuation_engine import calc_dcf_fcff, get_sector_wacc
+    # 1. Trường hợp bình thường (HPG: FCF=10481 tỷ, NetDebt=37685 tỷ, Shares=5.8 tỷ CP, WACC=10.5%)
+    res = calc_dcf_fcff(
+        base_fcff=10481 * 1_000_000_000,
+        wacc=0.105,
+        terminal_g=0.03,
+        net_debt=37685 * 1_000_000_000,
+        shares=5_800_000_000
+    )
+    assert res["status"] == "SUCCESS"
+    assert res["basePrice"] is not None and res["basePrice"] > 0
+    assert res["bullPrice"] is not None and res["bullPrice"] > res["basePrice"]
+    assert res["bearPrice"] is not None and res["bearPrice"] < res["basePrice"]
+
+    # 2. Sanity Check FCF âm (Học từ LC-005)
+    neg_res = calc_dcf_fcff(
+        base_fcff=-5000 * 1_000_000_000,
+        wacc=0.105,
+        terminal_g=0.03,
+        net_debt=10000 * 1_000_000_000,
+        shares=1_000_000_000
+    )
+    assert neg_res["status"] == "NEGATIVE_FCF"
+    assert neg_res["basePrice"] is None
+    assert "âm" in neg_res["note"]
+    print("✅ test_calc_dcf_fcff: PASS")
+
+
+def test_calc_reverse_dcf():
+    from lib.valuation_engine import calc_reverse_dcf
+    # EV = 150.000 tỷ, FCF = 10.000 tỷ, WACC = 10.5%
+    implied_g = calc_reverse_dcf(
+        current_ev=150_000 * 1_000_000_000,
+        base_fcff=10_000 * 1_000_000_000,
+        wacc=0.105,
+        terminal_g=0.03
+    )
+    assert implied_g is not None
+    assert -20.0 < implied_g < 30.0, f"Implied g phải trong khoảng hợp lý: {implied_g}"
+    print("✅ test_calc_reverse_dcf: PASS")
+
+
+def test_calc_dcf_sensitivity_matrix():
+    from lib.valuation_engine import calc_dcf_sensitivity_matrix
+    mat_res = calc_dcf_sensitivity_matrix(
+        base_fcff=10_000 * 1_000_000_000,
+        net_debt=20_000 * 1_000_000_000,
+        shares=5_000_000_000,
+        wacc_list=[0.10, 0.105, 0.11, 0.12],
+        g_list=[0.02, 0.03, 0.04]
+    )
+    assert len(mat_res["waccList"]) == 4
+    assert len(mat_res["gList"]) == 3
+    assert len(mat_res["matrix"]) == 4
+    assert len(mat_res["matrix"][0]) == 3
+    # Kiểm tra tính chất: WACC thấp hơn -> Định giá cao hơn
+    assert mat_res["matrix"][0][1] > mat_res["matrix"][3][1]
+    print("✅ test_calc_dcf_sensitivity_matrix: PASS")
+
+
+def test_market_profile_engine():
+    from lib.market_profile_engine import compute_full_market_profile
+    dummy_candles = []
+    for i in range(50):
+        dummy_candles.append({
+            "date": f"2026-05-{i+1:02d}",
+            "open": 25000 + i * 50,
+            "high": 25500 + i * 50,
+            "low": 24800 + i * 50,
+            "close": 25200 + i * 50,
+            "volume": 2000000 + (i % 5) * 300000
+        })
+    mp = compute_full_market_profile("HPG", dummy_candles, {"technical": {"beta": 1.2}})
+    assert len(mp["volumeAtPrice"]["buckets"]) == 10
+    assert mp["volumeAtPrice"]["poc"] is not None
+    assert mp["moneyFlow"]["vpci"] > 0
+    assert mp["tailRisk"]["var95"] > 0
+    assert mp["archetype"]["archetype"] in ["TREND_FOLLOWING", "ACCUMULATION_BREAKOUT", "RANGE_BOUND_CYCLICAL", "TRAP_PRONE"]
+    print("✅ test_market_profile_engine: PASS")
+
+
+def test_news_sentiment_engine():
+    from lib.news_sentiment_engine import classify_news_category, calculate_news_sentiment_score, build_news_digest_doc
+    # 1. Phân loại danh mục
+    assert classify_news_category("Doanh thu quý 1 tăng trưởng kỷ lục") == "biz"
+    assert classify_news_category("Đại hội cổ đông chi trả cổ tức 15% tiền mặt") == "disclosure"
+    assert classify_news_category("Ngân hàng Nhà nước hạ trần lãi suất huy động") == "macro"
+    assert classify_news_category("Chứng khoán SSI khuyến nghị MUA giá mục tiêu 32.000 đ") == "analyst"
+
+    # 2. News Digest Build
+    news_doc = build_news_digest_doc("HPG")
+    assert len(news_doc["items"]) >= 3
+    assert -100.0 <= news_doc["sentiment"]["score"] <= 100.0
+    assert news_doc["tldr"]["summary"] is not None
+    assert len(news_doc["tldr"]["metricBoxes"]) == 4
+    print("✅ test_news_sentiment_engine: PASS")
+
+
 if __name__ == "__main__":
     print("\n=======================================================")
-    print("🧪 CHẠY UNIT TEST BỘ ĐỘNG CƠ ĐỊNH GIÁ (VALUATION ENGINE)")
+    print("🧪 CHẠY UNIT TEST BỘ ĐỘNG CƠ ĐỊNH GIÁ & PHÂN TÍCH TÀI CHÍNH")
     print("=======================================================\n")
     test_calc_graham()
     test_calc_ddm()
@@ -221,4 +413,13 @@ if __name__ == "__main__":
     test_calc_dupont()
     test_calc_tech_score()
     test_stock_valuation_engine_evaluate()
-    print("\n🎉 TẤT CẢ 11 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")
+    test_calc_extended_dupont()
+    test_calc_overall_health_score()
+    test_calc_early_warning()
+    test_compute_industry_metrics()
+    test_calc_dcf_fcff()
+    test_calc_reverse_dcf()
+    test_calc_dcf_sensitivity_matrix()
+    test_market_profile_engine()
+    test_news_sentiment_engine()
+    print("\n🎉 TẤT CẢ 20 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")

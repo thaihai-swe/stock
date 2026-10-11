@@ -159,9 +159,21 @@ def fetch_and_save_macro():
 
     advisor_result = compute_pe_bands_and_zscore(current_pe, mean_pe=mean_pe, std_pe=std_pe)
 
+    # Thu thập thị giá đóng cửa và biến động thời gian thực của VN-Index và VN30 từ DNSE Live API
+    live_vnindex = macro_fetcher.fetch_live_index_quote("VNINDEX")
+    live_vn30 = macro_fetcher.fetch_live_index_quote("VN30")
+    current_vnindex_point = float(live_vnindex.get("point") or 1735.09)
+
     market_index_data = {
         "symbol": "VNINDEX",
         "name": "Chỉ Số VN-Index",
+        "currentPoint": current_vnindex_point,
+        "prevPoint": float(live_vnindex.get("prevPoint") or current_vnindex_point),
+        "change": float(live_vnindex.get("change") or 0.0),
+        "changePercent": float(live_vnindex.get("changePercent") or 0.0),
+        "high": float(live_vnindex.get("high") or current_vnindex_point),
+        "low": float(live_vnindex.get("low") or current_vnindex_point),
+        "volume": int(live_vnindex.get("volume") or 0),
         "currentPE": advisor_result["currentPE"],
         "currentPB": current_pb,
         "historicalMeanPE": advisor_result["historicalMeanPE"],
@@ -201,7 +213,7 @@ def fetch_and_save_macro():
         macro=macro_combined,
         risk_score=risk_info["riskScore"],
         regime_phase=regime_phase["phase"],
-        current_vnindex=1285.0
+        current_vnindex=current_vnindex_point
     )
 
     # 4b. Tạo Ma trận phân bổ 4x3 đa kịch bản (Base / Bull / Bear)

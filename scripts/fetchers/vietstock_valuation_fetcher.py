@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
+from bs4 import BeautifulSoup
 from curl_cffi import requests
 
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -54,7 +55,7 @@ class VietstockValuationFetcher:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _get_session(self) -> Tuple[requests.Session, str]:
-        """Tạo session curl_cffi giả lập Chrome 120 và trích xuất Verification Token."""
+        """Tạo session curl_cffi giả lập Chrome 120 và trích xuất Verification Token bằng BeautifulSoup."""
         session = requests.Session(impersonate="chrome120")
         headers = {
             "User-Agent": (
@@ -66,8 +67,23 @@ class VietstockValuationFetcher:
         }
         pg = session.get(VIETSTOCK_URL, headers=headers, timeout=60)
         pg.raise_for_status()
-        token_match = re.search(r'name=__RequestVerificationToken[^>]*value=([^"\' >]+)', pg.text)
-        token = token_match.group(1) if token_match else ""
+
+        token = ""
+        try:
+            soup = BeautifulSoup(pg.text, "html.parser")
+            token_input = soup.find("input", {"name": "__RequestVerificationToken"})
+            if token_input:
+                token = token_input.get("value", "").strip()
+        except Exception as e:
+            print(f"  ⚠️ [Vietstock] Lỗi BeautifulSoup khi bóc tách token: {e}")
+
+        if not token:
+            token_match = re.search(r'name=__RequestVerificationToken[^>]*value=([^"\' >]+)', pg.text)
+            token = token_match.group(1).strip() if token_match else ""
+
+        if not token:
+            print("  ⚠️ [Vietstock] Không trích xuất được __RequestVerificationToken từ trang HTML.")
+
         return session, token
 
     def fetch_index_history(self, stock_code: str = "VNINDEX", duration: str = "ALL", force_refresh: bool = False) -> pd.DataFrame:

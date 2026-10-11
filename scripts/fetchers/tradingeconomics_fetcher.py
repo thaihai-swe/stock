@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from bs4 import BeautifulSoup
+import pandas as pd
 
 try:
     from .base import BaseFetcher
@@ -73,31 +74,57 @@ class TradingEconomicsFetcher(BaseFetcher):
 
         for idx, table in enumerate(data_tables):
             cat_key, cat_name = category_mapping[idx] if idx < len(category_mapping) else (f"cat_{idx+1}", f"Danh mục {idx+1}")
-            rows = table.select("tr")
             indicators = []
+            parsed_via_pandas = False
 
-            for r in rows:
-                cells = [td.get_text(" ", strip=True) for td in r.select("td")]
-                if len(cells) >= 5:
-                    name = cells[0].strip()
-                    last_val = self._parse_number(cells[1])
-                    prev_val = self._parse_number(cells[2])
-                    high_val = self._parse_number(cells[3])
-                    low_val = self._parse_number(cells[4])
-                    unit = cells[5].strip() if len(cells) > 5 else ""
-                    updated = cells[6].strip() if len(cells) > 6 else ""
+            # 1. Ưu tiên bóc tách bảng chuẩn hóa bằng Pandas read_html
+            try:
+                dfs = pd.read_html(io.StringIO(str(table)))
+                if dfs and not dfs[0].empty:
+                    df = dfs[0]
+                    for _, row in df.iterrows():
+                        if len(row) >= 5 and pd.notna(row.iloc[0]):
+                            name = str(row.iloc[0]).strip()
+                            raw_last = str(row.iloc[1]).strip() if pd.notna(row.iloc[1]) else ""
+                            raw_prev = str(row.iloc[2]).strip() if pd.notna(row.iloc[2]) else ""
+                            raw_high = str(row.iloc[3]).strip() if len(row) > 3 and pd.notna(row.iloc[3]) else ""
+                            raw_low = str(row.iloc[4]).strip() if len(row) > 4 and pd.notna(row.iloc[4]) else ""
+                            unit = str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else ""
+                            period = str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
 
-                    indicators.append({
-                        "name": name,
-                        "value": last_val,
-                        "previous": prev_val,
-                        "highest": high_val,
-                        "lowest": low_val,
-                        "unit": unit,
-                        "period": updated,
-                        "rawLast": cells[1],
-                        "rawPrevious": cells[2]
-                    })
+                            indicators.append({
+                                "name": name,
+                                "value": self._parse_number(raw_last),
+                                "previous": self._parse_number(raw_prev),
+                                "highest": self._parse_number(raw_high),
+                                "lowest": self._parse_number(raw_low),
+                                "unit": unit,
+                                "period": period,
+                                "rawLast": raw_last,
+                                "rawPrevious": raw_prev
+                            })
+                    parsed_via_pandas = True
+            except Exception as pe:
+                print(f"  ⚠️ [TradingEconomics] Không parse được bảng '{cat_name}' qua Pandas: {pe}. Fallback sang BeautifulSoup DOM.")
+
+            # 2. Fallback sang BeautifulSoup DOM nếu Pandas gặp lỗi
+            if not parsed_via_pandas or not indicators:
+                rows = table.select("tr")
+                for r in rows:
+                    cells = [td.get_text(" ", strip=True) for td in r.select("td")]
+                    if len(cells) >= 5:
+                        name = cells[0].strip()
+                        indicators.append({
+                            "name": name,
+                            "value": self._parse_number(cells[1]),
+                            "previous": self._parse_number(cells[2]),
+                            "highest": self._parse_number(cells[3]),
+                            "lowest": self._parse_number(cells[4]),
+                            "unit": cells[5].strip() if len(cells) > 5 else "",
+                            "period": cells[6].strip() if len(cells) > 6 else "",
+                            "rawLast": cells[1],
+                            "rawPrevious": cells[2]
+                        })
 
             if indicators:
                 categories_result[cat_key] = {
@@ -106,22 +133,32 @@ class TradingEconomicsFetcher(BaseFetcher):
                     "count": len(indicators),
                     "items": indicators
                 }
+            else:
+                print(f"  ⚠️ [TradingEconomics] Cảnh báo: Danh mục '{cat_name}' không trích xuất được chỉ số nào.")
 
         return categories_result
 
     def fetch_vn10y_yield(self) -> float:
-        """Cào lợi suất TPCP VN 10 năm từ TradingEconomics với fallback an toàn."""
+        """Cào lợi suất TPCP VN 10 năm từ TradingEconomics bằng BeautifulSoup + Pandas với fallback an toàn."""
         try:
             resp_text = self.http_get(YIELD_URL, timeout=15)
             if resp_text:
                 soup = BeautifulSoup(resp_text, "html.parser")
                 for table in soup.find_all("table"):
-                    for row in table.find_all("tr"):
-                        cols = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
-                        if cols and len(cols) > 1 and "Vietnam 10Y" in cols[0]:
-                            return float(cols[1])
-        except Exception:
-            pass
+                    try:
+                        dfs = pd.read_html(io.StringIO(str(table)))
+                        if dfs and not dfs[0].empty:
+                            df = dfs[0]
+                            for _, row in df.iterrows():
+                                if len(row) > 1 and "Vietnam 10Y" in str(row.iloc[0]):
+                                    val = float(str(row.iloc[1]).replace(",", "."))
+                                    if 0.0 < val < 20.0:
+                                        print(f"  [TradingEconomics] Bóc tách thành công lợi suất TPCP VN 10 năm: {val}%")
+                                        return val
+                    except Exception:
+                        pass
+        except Exception as e:
+            print(f"  ⚠️ [TradingEconomics] Không thể cào lợi suất TPCP VN 10 năm: {e}")
         return 3.45  # Fallback chuẩn theo HNX
 
     def fetch_all_indicators(self, force_refresh: bool = False) -> Dict[str, Any]:
@@ -144,8 +181,10 @@ class TradingEconomicsFetcher(BaseFetcher):
                 if resp_text and "GDP Annual Growth Rate" in resp_text:
                     html_content = resp_text
                     fetch_source = "TRADINGECONOMICS_LIVE"
-            except Exception:
-                pass
+                else:
+                    print("  ⚠️ [TradingEconomics] Trang cào trực tiếp bị chặn hoặc không có nội dung bảng hợp lệ.")
+            except Exception as e:
+                print(f"  ⚠️ [TradingEconomics] Thử cào trực tiếp thất bại: {e}")
 
         # 2. Sử dụng fallback raw cache nếu mạng bị chặn hoặc mặc định
         raw_cache_path = RAW_SOURCES_DIR / "tradingeconomics_vietnam.html"
@@ -154,8 +193,8 @@ class TradingEconomicsFetcher(BaseFetcher):
                 with open(raw_cache_path, "r", encoding="utf-8") as f:
                     html_content = f.read()
                 fetch_source = "LOCAL_RAW_SNAPSHOT_CACHE"
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"  ⚠️ [TradingEconomics] Lỗi đọc raw snapshot cache: {e}")
 
         if not html_content:
             if INDICATORS_CACHE_FILE.exists():
@@ -163,8 +202,8 @@ class TradingEconomicsFetcher(BaseFetcher):
                     with open(INDICATORS_CACHE_FILE, "r", encoding="utf-8") as f:
                         print("ℹ️ Dùng cache macro_indicators.json sẵn có.")
                         return json.load(f)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"  ⚠️ [TradingEconomics] Lỗi đọc cache macro_indicators.json: {e}")
             raise RuntimeError("Không tìm thấy dữ liệu HTML của TradingEconomics.")
 
         # 3. Phân tích bảng dữ liệu

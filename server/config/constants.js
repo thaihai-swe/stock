@@ -10,6 +10,7 @@ export const DATA_FILE = path.join(DATA_DIR, 'transactions.json');
 export const PRICES_CACHE_FILE = path.join(DATA_DIR, 'prices_cache.json');
 export const FUNDAMENTALS_CACHE_FILE = path.join(DATA_DIR, 'fundamentals_cache.json');
 export const SUPPORTED_STOCKS_FILE = path.join(DATA_DIR, 'supported_stocks.json');
+export const MACRO_VALUATION_FILE = path.join(DATA_DIR, 'macro_valuation.json');
 export const DIST_DIR = path.join(ROOT_DIR, 'dist');
 
 export const PORT = process.env.PORT || 3001;

@@ -551,5 +551,547 @@
       "netMargin": 12.18,
       "roe": 12.87
     }
-  ]
+  ],
+  "extendedDupont": {
+    "roe": 12.82,
+    "calculatedRoe": 12.82,
+    "taxBurden": 1.023,
+    "interestBurden": 1.0,
+    "operatingMargin": 10.8,
+    "assetTurnover": 0.75,
+    "financialLeverage": 1.55,
+    "components": [
+      {
+        "id": "taxBurden",
+        "name": "Gánh Nặng Thuế (Tax Burden)",
+        "formula": "LNST ÷ LNTT",
+        "value": 1.023,
+        "benchmark": "0.80x (Thuế suất 20%)",
+        "impact": "Tích cực",
+        "desc": "Tỷ lệ lợi nhuận giữ lại sau khi nộp thuế TNDN"
+      },
+      {
+        "id": "interestBurden",
+        "name": "Gánh Nặng Lãi Vay (Interest Burden)",
+        "formula": "LNTT ÷ EBIT",
+        "value": 1.0,
+        "benchmark": "> 0.80x",
+        "impact": "An toàn",
+        "desc": "Đo lường mức độ EBIT bị bào mòn bởi chi phí lãi vay"
+      },
+      {
+        "id": "operatingMargin",
+        "name": "Biên Hoạt Động (Operating Margin)",
+        "formula": "EBIT ÷ Doanh Thu",
+        "value": 10.8,
+        "unit": "%",
+        "benchmark": "> 10%",
+        "impact": "Bình thường",
+        "desc": "Hiệu quả sinh lời từ hoạt động kinh doanh cốt lõi"
+      },
+      {
+        "id": "assetTurnover",
+        "name": "Vòng Quay Tài Sản (Asset Turnover)",
+        "formula": "Doanh Thu 4Q ÷ Tổng Tài Sản",
+        "value": 0.75,
+        "unit": "lần",
+        "benchmark": "> 0.8x",
+        "impact": "Chậm",
+        "desc": "Tốc độ luân chuyển doanh thu trên 1 đồng tổng tài sản"
+      },
+      {
+        "id": "financialLeverage",
+        "name": "Đòn Bẩy Tài Chính (Financial Leverage)",
+        "formula": "Tổng Tài Sản ÷ Vốn Chủ Sở Hữu",
+        "value": 1.55,
+        "unit": "lần",
+        "benchmark": "< 2.5x",
+        "impact": "An toàn",
+        "desc": "Hệ số khuếch đại ROE nhờ cấu trúc nguồn vốn nợ"
+      }
+    ],
+    "qualityAssessment": "Ưu đãi thuế TNDN hỗ trợ tích cực LNST; Chi phí lãi vay an toàn, không tạo áp lực lên EBT; Cơ cấu vốn an toàn, đòn bẩy vừa phải"
+  },
+  "healthScore": {
+    "overallScore": 79.6,
+    "grade": "Mạnh",
+    "gradeEn": "good",
+    "badge": "bg-teal-500 text-white",
+    "description": "Doanh nghiệp khỏe mạnh, đáp ứng đầy đủ các tiêu chuẩn kiểm soát rủi ro khắt khe.",
+    "pillars": {
+      "profitability": {
+        "name": "Khả Năng Sinh Lời",
+        "weight": 30,
+        "score": 72,
+        "rating": "Tốt"
+      },
+      "efficiency": {
+        "name": "Hiệu Quả Hoạt Động",
+        "weight": 25,
+        "score": 60,
+        "rating": "Tốt"
+      },
+      "leverage": {
+        "name": "Đòn Bẩy & An Toàn Vốn",
+        "weight": 25,
+        "score": 100,
+        "rating": "An toàn"
+      },
+      "liquidity": {
+        "name": "Khả Năng Thanh Toán",
+        "weight": 20,
+        "score": 90,
+        "rating": "Dồi dào"
+      }
+    }
+  },
+  "earlyWarning": {
+    "riskScore": 5.0,
+    "riskLevel": "An Toàn",
+    "riskLevelEn": "low",
+    "riskBadge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200",
+    "criticalCount": 0,
+    "alertsCount": 0,
+    "positiveCount": 3,
+    "alerts": [],
+    "positiveSignals": [
+      {
+        "id": "LOW_DEBT",
+        "title": "Đòn bẩy nợ vay rất an toàn (0.55x)",
+        "detail": "Nợ vay chiếm tỷ trọng nhỏ, vùng đệm vốn chủ sở hữu dày dặn."
+      },
+      {
+        "id": "STRONG_LIQUIDITY",
+        "title": "Thanh khoản dồi dào (2.30x)",
+        "detail": "Khả năng thanh toán nợ ngắn hạn được bảo đảm vượt mức."
+      },
+      {
+        "id": "EXCELLENT_CASH_CONVERSION",
+        "title": "Chất lượng lợi nhuận cao (CFO/LNST = 1.25x)",
+        "detail": "Lợi nhuận kế toán chuyển hóa thực chất thành tiền mặt vật lý về tài khoản."
+      }
+    ],
+    "recommendation": "Sức khỏe tài chính vững chắc, không phát hiện rủi ro cơ cấu trọng yếu."
+  },
+  "industrySpecific": {
+    "category": "MANUFACTURING",
+    "categoryName": "Ngành Sản Xuất Công Nghiệp & Vật Liệu",
+    "categoryIcon": "🏭",
+    "highlights": "Đo lường vòng quay chu kỳ tiền mặt (CCC), biên lãi gộp công nghiệp và tốc độ tái đầu tư mở rộng CapEx.",
+    "metrics": [
+      {
+        "id": "ccc",
+        "name": "Chu Kỳ Tiền Mặt (CCC)",
+        "value": 127,
+        "unit": "ngày",
+        "benchmark": "< 90 ngày",
+        "rating": "Dài ngày",
+        "desc": "Thời gian từ lúc chi tiền mua NVL đến khi thu tiền bán hàng (DSO + DIO - DPO)"
+      },
+      {
+        "id": "capex_da",
+        "name": "CapEx / Khấu Hao (D&A)",
+        "value": 1.78,
+        "unit": "lần",
+        "benchmark": "> 1.0x",
+        "rating": "Mở rộng công suất",
+        "desc": "Tỷ lệ đầu tư tài sản cố định mới so với mức hao mòn khấu hao"
+      },
+      {
+        "id": "gross_margin",
+        "name": "Biên Lợi Nhuận Gộp",
+        "value": 18.0,
+        "unit": "%",
+        "benchmark": "> 15%",
+        "rating": "Cao",
+        "desc": "Sức mạnh chuyển chi phí nguyên liệu đầu vào sang giá bán thành phẩm"
+      },
+      {
+        "id": "fixed_asset_turnover",
+        "name": "Vòng Quay TSCĐ",
+        "value": 2.04,
+        "unit": "vòng",
+        "benchmark": "> 1.5x",
+        "rating": "Tối ưu",
+        "desc": "Hiệu suất tạo doanh thu trên quy mô nhà xưởng và máy móc thiết bị"
+      }
+    ]
+  },
+  "riskMetrics": {
+    "annualizedVolatility": 36.1,
+    "dailyVolatility": 2.27,
+    "maxDrawdown": 20.0,
+    "var95": 3.73,
+    "sharpeRatio": 0.8,
+    "sortinoRatio": 1.14,
+    "beta": 1.0,
+    "riskFreeRate": 4.47,
+    "ratings": {
+      "volatility": "Cao",
+      "drawdown": "Trung bình",
+      "sharpe": "Tốt"
+    }
+  },
+  "ttmSeries": [
+    {
+      "period": "TTM đến 2024-Q2",
+      "endPeriod": "2024-Q2",
+      "revenue": 175393.0,
+      "netIncome": 15091.0,
+      "cfo": 19249.0,
+      "freeCashFlow": 6929.0,
+      "netMargin": 8.6,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2024-Q3",
+      "endPeriod": "2024-Q3",
+      "revenue": 183495.0,
+      "netIncome": 16679.0,
+      "cfo": 21274.0,
+      "freeCashFlow": 7658.0,
+      "netMargin": 9.09,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2024-Q4",
+      "endPeriod": "2024-Q4",
+      "revenue": 193027.0,
+      "netIncome": 18593.0,
+      "cfo": 23716.0,
+      "freeCashFlow": 8537.0,
+      "netMargin": 9.63,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2025-Q1",
+      "endPeriod": "2025-Q1",
+      "revenue": 200176.0,
+      "netIncome": 20170.0,
+      "cfo": 25727.0,
+      "freeCashFlow": 9261.0,
+      "netMargin": 10.08,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2025-Q2",
+      "endPeriod": "2025-Q2",
+      "revenue": 206848.0,
+      "netIncome": 21838.0,
+      "cfo": 27855.0,
+      "freeCashFlow": 10028.0,
+      "netMargin": 10.56,
+      "revenueGrowthYoY": 17.93
+    }
+  ],
+  "dcfAnalysis": {
+    "sectorWacc": 10.5,
+    "industryCategory": "MANUFACTURING",
+    "baseFcff": 10481,
+    "dcfScenarios": {
+      "status": "SUCCESS",
+      "basePrice": 13966,
+      "bullPrice": 20076,
+      "bearPrice": 7373,
+      "fairPrice": 13966,
+      "wacc": 10.5,
+      "terminalG": 3.0,
+      "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
+    },
+    "reverseDcfImpliedGrowth": 14.69,
+    "sensitivityMatrix": {
+      "waccList": [
+        9.0,
+        10.5,
+        11.5,
+        12.5
+      ],
+      "gList": [
+        2.0,
+        3.0,
+        4.0
+      ],
+      "matrix": [
+        [
+          15288,
+          18251,
+          22398
+        ],
+        [
+          11210,
+          13058,
+          15475
+        ],
+        [
+          9209,
+          10616,
+          12399
+        ],
+        [
+          7590,
+          8689,
+          10047
+        ]
+      ]
+    },
+    "alternativeMethodFlag": false
+  },
+  "marketProfile": {
+    "symbol": "HPG",
+    "volumeAtPrice": {
+      "buckets": [
+        {
+          "index": 0,
+          "priceLow": 15075,
+          "priceHigh": 15710,
+          "priceMid": 15393,
+          "volume": 163538230.0,
+          "volumePercent": 20.1
+        },
+        {
+          "index": 1,
+          "priceLow": 15710,
+          "priceHigh": 16346,
+          "priceMid": 16028,
+          "volume": 79530753.0,
+          "volumePercent": 9.8
+        },
+        {
+          "index": 2,
+          "priceLow": 16346,
+          "priceHigh": 16981,
+          "priceMid": 16663,
+          "volume": 74351210.0,
+          "volumePercent": 9.1
+        },
+        {
+          "index": 3,
+          "priceLow": 16981,
+          "priceHigh": 17616,
+          "priceMid": 17299,
+          "volume": 105449792.0,
+          "volumePercent": 13.0
+        },
+        {
+          "index": 4,
+          "priceLow": 17616,
+          "priceHigh": 18252,
+          "priceMid": 17934,
+          "volume": 73952665.0,
+          "volumePercent": 9.1
+        },
+        {
+          "index": 5,
+          "priceLow": 18252,
+          "priceHigh": 18887,
+          "priceMid": 18569,
+          "volume": 70488858.0,
+          "volumePercent": 8.7
+        },
+        {
+          "index": 6,
+          "priceLow": 18887,
+          "priceHigh": 19522,
+          "priceMid": 19204,
+          "volume": 90886603.0,
+          "volumePercent": 11.2
+        },
+        {
+          "index": 7,
+          "priceLow": 19522,
+          "priceHigh": 20157,
+          "priceMid": 19840,
+          "volume": 30889754.0,
+          "volumePercent": 3.8
+        },
+        {
+          "index": 8,
+          "priceLow": 20157,
+          "priceHigh": 20793,
+          "priceMid": 20475,
+          "volume": 18208748.0,
+          "volumePercent": 2.2
+        },
+        {
+          "index": 9,
+          "priceLow": 20793,
+          "priceHigh": 21428,
+          "priceMid": 21110,
+          "volume": 106201509.0,
+          "volumePercent": 13.1
+        }
+      ],
+      "poc": {
+        "index": 0,
+        "priceLow": 15075,
+        "priceHigh": 15710,
+        "priceMid": 15393,
+        "volume": 163538230.0,
+        "volumePercent": 20.1
+      },
+      "hvn": [
+        {
+          "index": 0,
+          "priceLow": 15075,
+          "priceHigh": 15710,
+          "priceMid": 15393,
+          "volume": 163538230.0,
+          "volumePercent": 20.1
+        },
+        {
+          "index": 3,
+          "priceLow": 16981,
+          "priceHigh": 17616,
+          "priceMid": 17299,
+          "volume": 105449792.0,
+          "volumePercent": 13.0
+        },
+        {
+          "index": 9,
+          "priceLow": 20793,
+          "priceHigh": 21428,
+          "priceMid": 21110,
+          "volume": 106201509.0,
+          "volumePercent": 13.1
+        }
+      ],
+      "lvn": [
+        {
+          "index": 7,
+          "priceLow": 19522,
+          "priceHigh": 20157,
+          "priceMid": 19840,
+          "volume": 30889754.0,
+          "volumePercent": 3.8
+        },
+        {
+          "index": 8,
+          "priceLow": 20157,
+          "priceHigh": 20793,
+          "priceMid": 20475,
+          "volume": 18208748.0,
+          "volumePercent": 2.2
+        }
+      ],
+      "priceRange": {
+        "min": 15075,
+        "max": 21428
+      },
+      "totalVolume": 813498122
+    },
+    "moneyFlow": {
+      "vpci": 1.31,
+      "vpciStatus": "STRONG_CONFIRMATION",
+      "cmf": -0.0,
+      "cmfStatus": "BALANCED",
+      "obvTrend": "BULLISH_FLOW"
+    },
+    "wyckoffEffort": {
+      "effortWithoutResultDetected": false,
+      "recentSignals": [],
+      "state": "BALANCED_MARKET"
+    },
+    "tailRisk": {
+      "skewness": -0.09,
+      "kurtosis": -1.41,
+      "var95": 1.59,
+      "var99": 1.76,
+      "es95": 1.73,
+      "es99": 1.78,
+      "tailRiskAssessment": "Phân phối lợi suất bình thường"
+    },
+    "archetype": {
+      "archetype": "TREND_FOLLOWING",
+      "name": "Bám Xu Hướng (Trend Following)",
+      "description": "Khối lượng giao dịch đồng thuận cao với các bước sóng giá, thích hợp cho chiến lược theo xu hướng.",
+      "guardrail": "Phân tích mô tả lịch sử hành vi giá-khối lượng, không phải khuyến nghị mua/bán."
+    }
+  },
+  "newsDigest": {
+    "symbol": "HPG",
+    "items": [
+      {
+        "id": "news-HPG-1",
+        "title": "[HPG] Cổ tức tiền mặt: Chi trả cổ tức năm 2023 bằng tiền mặt tỷ lệ 10% (455 đ/cp)",
+        "summary": "Chi trả cổ tức năm 2023 bằng tiền mặt tỷ lệ 10% (455 đ/cp)",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2024-06-20",
+        "source": "Công Bố Thông Tin Doanh Nghiệp",
+        "link": "#",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-2",
+        "title": "[HPG] Đại hội cổ đông: Thông qua kế hoạch kinh doanh và mở rộng nhà máy/dự án mới",
+        "summary": "Thông qua kế hoạch kinh doanh và mở rộng nhà máy/dự án mới",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2024-05-15",
+        "source": "Công Bố Thông Tin Doanh Nghiệp",
+        "link": "#",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-3",
+        "title": "[HPG] Cổ tức cổ phiếu: Phát hành cổ phiếu trả cổ tức năm 2022 tỷ lệ 15%",
+        "summary": "Phát hành cổ phiếu trả cổ tức năm 2022 tỷ lệ 15%",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2023-06-25",
+        "source": "Công Bố Thông Tin Doanh Nghiệp",
+        "link": "#",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      }
+    ],
+    "sentiment": {
+      "score": 66.7,
+      "verdict": "BULLISH",
+      "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
+      "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+      "bullishCount": 2,
+      "neutralCount": 1,
+      "bearishCount": 0,
+      "totalCount": 3,
+      "categoryScores": {
+        "disclosure": 50.0,
+        "sector": 100.0
+      }
+    },
+    "tldr": {
+      "title": "HPG 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
+      "summary": "Trong 30 ngày qua, dòng thông tin về HPG nghiêng rõ rệt về chiều hướng tích cực với 2/3 tin tức mang gam màu tươi sáng (66.7%). Tâm điểm chú ý xoay quanh: '[HPG] Cổ tức tiền mặt: Chi trả cổ tức năm 2023 bằng tiền mặt tỷ lệ 10% (455 đ/cp)'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "metricBoxes": [
+        {
+          "label": "Tổng Tin & Sự Kiện",
+          "value": "3 tin",
+          "type": "neutral"
+        },
+        {
+          "label": "Tỷ Lệ Tích Cực",
+          "value": "66.7%",
+          "type": "positive"
+        },
+        {
+          "label": "Điểm Tâm Lý (Score)",
+          "value": "+66.7",
+          "type": "positive"
+        },
+        {
+          "label": "Trạng Thái Chủ Đạo",
+          "value": "BULLISH",
+          "type": "positive"
+        }
+      ]
+    }
+  }
 }

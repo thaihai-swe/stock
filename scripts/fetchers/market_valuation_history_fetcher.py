@@ -11,12 +11,14 @@ Bao gồm:
 Lưu trực tiếp ra data/market_valuation_history.json theo triết lý "Local JSON First".
 """
 
+import io
 import sys
 import json
 import math
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+import pandas as pd
 
 CURRENT_DIR = Path(__file__).resolve().parent
 SCRIPTS_DIR = CURRENT_DIR.parent
@@ -104,67 +106,84 @@ class MarketValuationHistoryFetcher(BaseFetcher):
         }
 
     def fetch_period_data(self, period: str) -> Optional[Dict[str, Any]]:
-        """Lấy và chuẩn hóa dữ liệu 1 sheet theo chu kỳ (1year, 3year, 5year, 10year)."""
+        """Lấy và chuẩn hóa dữ liệu 1 sheet theo chu kỳ (1year, 3year, 5year, 10year) bằng Pandas."""
         url = (
             f"https://docs.google.com/spreadsheets/d/{self.sheet_id}/gviz/tq"
-            f"?tqx=out:json&sheet={period}"
+            f"?tqx=out:csv&sheet={period}"
         )
-        print(f"📥 Đang tải chu kỳ [{period}] từ Google Sheets...")
+        print(f"📥 Đang tải chu kỳ [{period}] từ Google Sheets qua Pandas...")
 
         try:
-            raw_text = self.http_get(url, timeout=15, verify_ssl=False)
-            if not raw_text or "google.visualization.Query.setResponse" not in raw_text:
-                print(f"⚠️ Chu kỳ [{period}]: Không nhận được phản hồi GViz hợp lệ.")
+            raw_csv = self.http_get(url, timeout=15, verify_ssl=False)
+            if not raw_csv or len(raw_csv) < 50:
+                print(f"⚠️ Chu kỳ [{period}]: Không nhận được phản hồi CSV hợp lệ từ Google Sheets.")
                 return None
 
-            idx_start = raw_text.find("{")
-            idx_end = raw_text.rfind("}")
-            if idx_start == -1 or idx_end == -1:
+            df = pd.read_csv(io.StringIO(raw_csv))
+            if df.empty or "Date" not in df.columns:
+                print(f"⚠️ Chu kỳ [{period}]: Bảng không chứa cột 'Date' hợp lệ.")
                 return None
 
-            payload = json.loads(raw_text[idx_start:idx_end + 1])
-            table = payload.get("table", {})
-            rows = table.get("rows", [])
-            if len(rows) < 2:
-                print(f"⚠️ Chu kỳ [{period}]: Sheet không có đủ dữ liệu.")
+            target_cols = ['Date', 'Market Cap', 'Revenue', 'Earnings', 'PE', 'Absolute PE', 'PS']
+            existing_cols = [c for c in target_cols if c in df.columns]
+            df = df[existing_cols].dropna(subset=['Date'])
+            if len(df) < 2:
+                print(f"⚠️ Chu kỳ [{period}]: Sheet không có đủ dữ liệu (dưới 2 dòng).")
                 return None
 
-            # Cột theo thứ tự Google Sheet Simply Wall St:
-            # 0: Date, 1: Market Cap, 2: Revenue, 3: Earnings, 4: PE, 5: Absolute PE, 6: PS
-            metric_cols = ["marketCap", "revenue", "earnings", "pe", "absolutePe", "ps"]
-            points = []
+            col_mapping = {
+                'Market Cap': 'marketCap',
+                'Revenue': 'revenue',
+                'Earnings': 'earnings',
+                'PE': 'pe',
+                'Absolute PE': 'absolutePe',
+                'PS': 'ps'
+            }
 
-            for r in rows[1:]:  # Bỏ qua dòng tiêu đề
-                cells = r.get("c", [])
-                date_val = cells[0].get("v") if len(cells) > 0 and cells[0] else None
-                if not date_val:
-                    continue
+            for orig_col, new_col in col_mapping.items():
+                if orig_col in df.columns:
+                    df[new_col] = df[orig_col].apply(self._parse_num)
+                else:
+                    df[new_col] = None
 
-                point = {
-                    "date": str(date_val).strip()
-                }
+            # Đảo ngược thứ tự thành tăng dần theo thời gian (chronological) để vẽ biểu đồ từ trái qua phải
+            df_chrono = df.iloc[::-1].reset_index(drop=True)
 
-                for i, m_name in enumerate(metric_cols, start=1):
-                    cell = cells[i] if i < len(cells) and cells[i] else None
-                    val = cell.get("v") if cell else None
-                    str_val = cell.get("f") or str(val) if val is not None else ""
-
-                    point[m_name] = self._parse_num(val)
-                    point[f"{m_name}Raw"] = str_val.strip()
-
-                points.append(point)
-
-            # Sheet gốc lưu theo thứ tự giảm dần thời gian (mới nhất ở trên),
-            # ta đảo ngược thành tăng dần thời gian (chronological) để vẽ biểu đồ từ trái qua phải
-            points.reverse()
-
-            # Tính toán chỉ số thống kê cho từng metric
+            # Tính toán thống kê bằng vector hóa Pandas
             stats = {}
-            for m in metric_cols:
-                series_vals = [p.get(m) for p in points]
-                stats[m] = self._calc_stats(series_vals)
+            for m in col_mapping.values():
+                s = df_chrono[m].dropna()
+                if not s.empty:
+                    stats[m] = {
+                        "observations": int(len(s)),
+                        "current": round(float(s.iloc[-1]), 2),
+                        "mean": round(float(s.mean()), 2),
+                        "stdDev": round(float(s.std(ddof=1)), 2) if len(s) > 1 else 0.0,
+                        "min": round(float(s.min()), 2),
+                        "max": round(float(s.max()), 2)
+                    }
+                else:
+                    stats[m] = {
+                        "observations": 0,
+                        "current": None,
+                        "mean": None,
+                        "stdDev": None,
+                        "min": None,
+                        "max": None
+                    }
 
-            print(f"✅ Chu kỳ [{period}]: Thành công {len(points)} mốc quan sát. Absolute PE hiện tại: {stats.get('absolutePe', {}).get('current')}x.")
+            # Chuẩn hóa chuỗi thời gian series
+            points = []
+            for _, row in df_chrono.iterrows():
+                pt = {"date": str(row["Date"]).strip()}
+                for orig_col, m_name in col_mapping.items():
+                    val = row[m_name]
+                    orig_val = row[orig_col] if orig_col in row else ""
+                    pt[m_name] = round(float(val), 4) if pd.notna(val) else None
+                    pt[f"{m_name}Raw"] = str(orig_val).strip() if pd.notna(orig_val) else ""
+                points.append(pt)
+
+            print(f"✅ Chu kỳ [{period}]: Thành công {len(points)} mốc quan sát qua Pandas. Absolute PE hiện tại: {stats.get('absolutePe', {}).get('current')}x.")
             return {
                 "period": period,
                 "observationsCount": len(points),
@@ -173,7 +192,7 @@ class MarketValuationHistoryFetcher(BaseFetcher):
             }
 
         except Exception as e:
-            print(f"❌ Lỗi tải chu kỳ [{period}]: {e}")
+            print(f"❌ Lỗi tải chu kỳ [{period}] bằng Pandas: {e}")
             return None
 
     def fetch_all_and_save(self) -> Dict[str, Any]:

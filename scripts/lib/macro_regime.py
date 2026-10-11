@@ -207,38 +207,100 @@ def calculate_risk_score_and_layers(macro: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-SECTORS = {
-    "banking":      {"name": "Ngân Hàng", "icon": "🏦"},
-    "realestate":   {"name": "Bất Động Sản", "icon": "🏢"},
-    "securities":   {"name": "Chứng Khoán", "icon": "📈"},
-    "materials":    {"name": "Thép & Vật Liệu", "icon": "🏗️"},
-    "retail":       {"name": "Bán Lẻ & Tiêu Dùng", "icon": "🛒"},
-    "tech":         {"name": "Công Nghệ Thông Tin", "icon": "💻"},
-    "energy":       {"name": "Năng Lượng & Dầu Khí", "icon": "⚡"},
-    "construction": {"name": "Xây Dựng & Đầu Tư Công", "icon": "🚜"},
-    "fmcg":         {"name": "Tiêu Dùng Thiết Yếu", "icon": "🥛"},
-    "utilities":    {"name": "Điện, Nước & Tiện Ích", "icon": "💡"},
-    "healthcare":   {"name": "Dược Phẩm & Y Tế", "icon": "💊"},
+GICS_SECTORS = {
+    "VNFIN": {
+        "code": "VNFIN",
+        "name": "Tài Chính",
+        "label": "Tài chính (Ngân hàng, CK, Bảo hiểm)",
+        "icon": "🏦",
+        "gicsGroup": "Financials",
+    },
+    "VNREAL": {
+        "code": "VNREAL",
+        "name": "Bất Động Sản",
+        "label": "Bất động sản & KCN",
+        "icon": "🏢",
+        "gicsGroup": "Real Estate",
+    },
+    "VNIND": {
+        "code": "VNIND",
+        "name": "Công Nghiệp",
+        "label": "Công nghiệp & Xây dựng",
+        "icon": "🏗️",
+        "gicsGroup": "Industrials",
+    },
+    "VNCONS": {
+        "code": "VNCONS",
+        "name": "Tiêu Dùng Thiết Yếu",
+        "label": "Hàng hóa thiết yếu",
+        "icon": "🛒",
+        "gicsGroup": "Consumer Staples",
+    },
+    "VNDISCR": {
+        "code": "VNDISCR",
+        "name": "Tiêu Dùng Không Thiết Yếu",
+        "label": "Hàng không thiết yếu & Bán lẻ",
+        "icon": "🛍️",
+        "gicsGroup": "Consumer Discretionary",
+    },
+    "VNENE": {
+        "code": "VNENE",
+        "name": "Năng Lượng",
+        "label": "Năng lượng & Dầu khí",
+        "icon": "⚡",
+        "gicsGroup": "Energy",
+    },
+    "VNMAT": {
+        "code": "VNMAT",
+        "name": "Nguyên Vật Liệu",
+        "label": "Nguyên vật liệu & Thép",
+        "icon": "🧱",
+        "gicsGroup": "Materials",
+    },
+    "VNIT": {
+        "code": "VNIT",
+        "name": "Công Nghệ",
+        "label": "Công nghệ thông tin",
+        "icon": "💻",
+        "gicsGroup": "Information Technology",
+    },
+    "VNUT": {
+        "code": "VNUT",
+        "name": "Tiện Ích",
+        "label": "Tiện ích (Điện, Nước, Khí)",
+        "icon": "🚰",
+        "gicsGroup": "Utilities",
+    },
+    "VNHEAL": {
+        "code": "VNHEAL",
+        "name": "Chăm Sóc Sức Khỏe",
+        "label": "Y tế & Dược phẩm",
+        "icon": "💊",
+        "gicsGroup": "Healthcare",
+    },
 }
 
-_SENSITIVITY_MATRIX = {
-    # Ngành: (interbank, sbv_rate, cpi, usdvnd, oil, pmi)
-    "banking":      (-1.5, -1.5, -1.0, -1.0,  0.0, +1.0),
-    "realestate":   (-1.0, -2.0, -1.0, -1.0,  0.0, +1.0),
-    "construction": (-1.0, -1.0, -0.5, -0.5, -0.5, +1.5),
-    "retail":       (-0.5, -0.5, -1.0,  0.0,  0.0, +1.0),
-    "energy":       ( 0.0,  0.0, +1.0, +0.5, +2.0, +0.5),
-    "materials":    ( 0.0,  0.0, +0.5, -0.5, +1.5, +1.5),
-    "fmcg":         ( 0.0,  0.0, -0.5,  0.0,  0.0,  0.0),
-    "tech":         ( 0.0,  0.0,  0.0,  0.0,  0.0, +1.0),
-    "utilities":    (-1.0, -1.0,  0.0,  0.0, -1.0, -0.5),
-    "healthcare":   ( 0.0,  0.0,  0.0,  0.0,  0.0,  0.0),
-    "securities":   (-2.0, -1.5,  0.0, -0.5,  0.0, +1.5),
+_GICS_SENSITIVITY_MATRIX = {
+    # Mã GICS: (interbank, sbv_rate, cpi, usdvnd, oil, pmi)
+    "VNFIN":  (-1.8, -1.5, -0.8, -1.0,  0.0, +1.2),  # Nhạy cảm cao với thanh khoản, lãi suất và tỷ giá; hưởng lợi khi PMI cao
+    "VNREAL": (-1.0, -2.0, -1.0, -1.0,  0.0, +1.0),  # Chịu áp lực nặng khi lãi suất SBV tăng & tín dụng thắt chặt
+    "VNIND":  (-1.0, -1.0, -0.5, -0.5, -0.5, +1.5),  # Hưởng lợi mạnh mẽ khi PMI mở rộng và giải ngân đầu tư công
+    "VNCONS": ( 0.0,  0.0, -0.5,  0.0,  0.0,  0.0),  # Phòng thủ bền vững, ít nhạy cảm với chu kỳ lãi suất
+    "VNDISCR":(-0.5, -0.5, -1.0,  0.0,  0.0, +1.0),  # Hưởng lợi khi kinh tế tăng tốc; chịu áp lực khi lạm phát CPI tăng
+    "VNENE":  ( 0.0,  0.0, +1.0, +0.5, +2.0, +0.5),  # Hưởng lợi vượt trội khi giá dầu Brent tăng và lạm phát cao
+    "VNMAT":  ( 0.0,  0.0, +0.5, -0.5, +1.5, +1.5),  # Nhạy cảm với chu kỳ hàng hóa cơ bản và hoạt động sản xuất công nghiệp
+    "VNIT":   ( 0.0,  0.0,  0.0,  0.0,  0.0, +1.0),  # Tăng trưởng độc lập theo làn sóng chuyển đổi số, ít phụ thuộc lãi suất
+    "VNUT":   (-1.0, -1.0,  0.0,  0.0, -1.0, -0.5),  # Dòng tiền phòng thủ và cổ tức, chịu áp lực khi lãi suất điều hành tăng
+    "VNHEAL": ( 0.0,  0.0,  0.0,  0.0,  0.0,  0.0),  # Phòng thủ tuyệt đối, nhu cầu y tế phi chu kỳ
 }
+
+# Giữ alias tương thích ngược
+SECTORS = GICS_SECTORS
+_SENSITIVITY_MATRIX = _GICS_SENSITIVITY_MATRIX
 
 
 def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Tính toán ma trận tác động vĩ mô và xoay vòng 11 nhóm ngành HOSE."""
+    """Tính toán ma trận tác động vĩ mô và xoay vòng 10 nhóm ngành chuẩn GICS Việt Nam (HOSE)."""
     interbank = float(macro.get("interbank_rate") or 6.47)
     sbv_rate = float(macro.get("sbv_refinancing_rate") or 4.5)
     cpi = float(macro.get("cpi_yoy") or 5.08)
@@ -257,8 +319,8 @@ def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str,
     drivers = [str_interbank, str_sbv, str_cpi, str_fx, str_oil, str_pmi]
 
     results = []
-    for sector_key, info in SECTORS.items():
-        sens = _SENSITIVITY_MATRIX.get(sector_key, (0, 0, 0, 0, 0, 0))
+    for sector_code, info in GICS_SECTORS.items():
+        sens = _GICS_SENSITIVITY_MATRIX.get(sector_code, (0, 0, 0, 0, 0, 0))
 
         # Tính net impact score
         impacts = [
@@ -307,9 +369,12 @@ def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str,
         }
 
         results.append({
-            "key": sector_key,
+            "key": sector_code,
+            "code": sector_code,
             "name": info["name"],
+            "label": info.get("label", info["name"]),
             "icon": info["icon"],
+            "gicsGroup": info.get("gicsGroup", "Others"),
             "netScore": net_score,
             "action": action,
             "actionTag": action_tag,
@@ -705,7 +770,7 @@ def detect_scenarios_and_tail_risks(
     vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
     us10y = float(macro.get("us10yYield") or macro.get("us10y") or 4.3)
 
-    vn = current_vnindex if (current_vnindex and current_vnindex > 500) else 1280.0
+    vn = current_vnindex if (current_vnindex and current_vnindex > 500) else 1735.0
 
     # Phân bổ xác suất 3 kịch bản theo Risk Score
     if risk_score <= 40.0:
@@ -715,12 +780,21 @@ def detect_scenarios_and_tail_risks(
     else:
         base_p, bull_p, bear_p = 50, 20, 30
 
+    # Dải điểm kỳ vọng co giãn theo tỷ lệ phần trăm thị giá thời gian thực
+    base_low = int(round(vn * 0.98))     # -2.0%
+    base_high = int(round(vn * 1.035))   # +3.5%
+    bull_low = int(round(vn * 1.025))    # +2.5%
+    bull_high = int(round(vn * 1.085))   # +8.5%
+    bear_low = int(round(vn * 0.92))     # -8.0%
+    bear_high = int(round(vn * 0.975))   # -2.5%
+
     scenarios = {
         "base": {
             "name": "Kịch Bản Cơ Sở (Base Case)",
             "probability": base_p,
             "badgeColor": "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-            "vnIndexRange": f"{int(vn - 25)} - {int(vn + 45)}",
+            "currentPoint": round(vn, 2),
+            "vnIndexRange": f"{base_low} - {base_high}",
             "conditions": f"CPI duy trì quanh {cpi:.1f}%, PMI mở rộng trên 51 điểm, SBV giữ lãi suất điều hành {sbv_rate:.1f}%, tỷ giá ổn định trong biên độ quản lý.",
             "sectorBenefit": ["Ngân Hàng", "Bán Lẻ", "Công Nghệ Thông Tin"],
             "sectorImpacted": ["Hàng Tiêu Dùng Thiết Yếu", "Vật Liệu Nhạy Giá"],
@@ -730,7 +804,8 @@ def detect_scenarios_and_tail_risks(
             "name": "Kịch Bản Tích Cực (Bull Case)",
             "probability": bull_p,
             "badgeColor": "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-            "vnIndexRange": f"{int(vn + 35)} - {int(vn + 110)}",
+            "currentPoint": round(vn, 2),
+            "vnIndexRange": f"{bull_low} - {bull_high}",
             "conditions": "Fed tiếp tục chu kỳ hạ lãi suất, SBV nới lỏng room tín dụng, dòng vốn FDI & khối ngoại quay lại mua ròng, tỷ giá hạ nhiệt.",
             "sectorBenefit": ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Công Nghệ"],
             "sectorImpacted": ["Tiện Ích Điện Nước", "Dược Phẩm"],
@@ -740,7 +815,8 @@ def detect_scenarios_and_tail_risks(
             "name": "Kịch Bản Thận Trọng (Bear Case)",
             "probability": bear_p,
             "badgeColor": "bg-rose-500/20 text-rose-400 border border-rose-500/30",
-            "vnIndexRange": f"{int(vn - 100)} - {int(vn - 35)}",
+            "currentPoint": round(vn, 2),
+            "vnIndexRange": f"{bear_low} - {bear_high}",
             "conditions": "Lạm phát thế giới và giá dầu tăng vọt, SBV buộc phải hút ròng thanh khoản tiền đồng hoặc tăng lãi suất, USD/VND vượt đỉnh.",
             "sectorBenefit": ["Năng Lượng & Dầu Khí", "Hàng Tiêu Dùng Thiết Yếu", "Vàng"],
             "sectorImpacted": ["Bất Động Sản", "Chứng Khoán", "Ngân Hàng"],
@@ -1201,21 +1277,8 @@ def calculate_dual_sweet_spot_matrix(
     if not sector_valuations:
         return {"items": [], "quadrants": {}, "stats": {}}
 
-    # Bản đồ ánh xạ GICS code -> macro sector keys
-    ROTATION_KEY_MAP = {
-        "VNFIN": ["banking", "securities"],
-        "VNREAL": ["realestate"],
-        "VNIND": ["construction"],
-        "VNCONS": ["fmcg"],
-        "VNDISCR": ["retail"],
-        "VNENE": ["energy"],
-        "VNMAT": ["materials"],
-        "VNIT": ["tech"],
-        "VNUT": ["utilities"],
-        "VNHEAL": ["healthcare"],
-    }
-
-    rot_dict = {s["key"]: s for s in sector_rotations}
+    # Ánh xạ trực tiếp 1:1 theo mã code chuẩn GICS (VNFIN, VNREAL...)
+    rot_dict = {s.get("code") or s.get("key"): s for s in sector_rotations}
 
     items = []
     sweet_spot = []
@@ -1225,16 +1288,24 @@ def calculate_dual_sweet_spot_matrix(
 
     for sec in sector_valuations:
         code = sec.get("code")
-        rot_keys = ROTATION_KEY_MAP.get(code, [])
+        rot = rot_dict.get(code)
         
-        if rot_keys:
-            scores = [rot_dict[k]["netScore"] for k in rot_keys if k in rot_dict]
-            macro_score = round(sum(scores) / len(scores), 1) if scores else 0.0
-            macro_actions = [rot_dict[k]["action"] for k in rot_keys if k in rot_dict]
-            macro_action = macro_actions[0] if macro_actions else "TRUNG LẬP"
+        if rot:
+            macro_score = rot.get("netScore", 0.0)
+            macro_action = rot.get("action", "TRUNG LẬP")
+            action_tag = rot.get("actionTag", "Neutral")
+            rank = rot.get("rank", 5)
+            decomposition = rot.get("decomposition", {})
+            color_class = rot.get("colorClass", "text-gray-300 bg-gray-500/10 border-gray-500/20")
+            badge_color = rot.get("badgeColor", "bg-gray-400")
         else:
             macro_score = 0.0
             macro_action = "TRUNG LẬP"
+            action_tag = "Neutral"
+            rank = 5
+            decomposition = {}
+            color_class = "text-gray-300 bg-gray-500/10 border-gray-500/20"
+            badge_color = "bg-gray-400"
 
         pe = sec.get("pe") if sec.get("pe") is not None else 12.0
         pb = sec.get("pb") if sec.get("pb") is not None else 2.0
@@ -1272,6 +1343,11 @@ def calculate_dual_sweet_spot_matrix(
             **sec,
             "macroScore": macro_score,
             "macroAction": macro_action,
+            "actionTag": action_tag,
+            "rank": rank,
+            "decomposition": decomposition,
+            "colorClass": color_class,
+            "badgeColor": badge_color,
             "quadrantKey": quadrant_key,
             "quadrantTitle": quadrant_title,
             "quadrantIcon": quadrant_icon,

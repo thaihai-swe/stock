@@ -4,6 +4,11 @@ export function fmtMoney(value) {
   return new Intl.NumberFormat('vi-VN').format(Math.round(value));
 }
 
+export function formatVND(value) {
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  return Number(value).toLocaleString('vi-VN') + ' đ';
+}
+
 // Lấy ngày hôm nay định dạng YYYY-MM-DD
 export function getTodayDate() {
   const now = new Date();

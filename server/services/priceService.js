@@ -1,4 +1,5 @@
-import { IN_SESSION_TTL_MS } from '../config/constants.js';
+import fs from 'fs';
+import { IN_SESSION_TTL_MS, MACRO_VALUATION_FILE } from '../config/constants.js';
 import { loadPriceCache, savePriceCache } from '../storage/jsonStore.js';
 import { getMarketSessionInfo } from './marketSession.js';
 
@@ -176,6 +177,59 @@ export async function getStockPrice(symbol, force = false) {
   return res.prices[sym] || null;
 }
 
+async function fetchDnseIndex() {
+  const now = Date.now();
+  const nowSec = Math.floor(now / 1000);
+  const fromSec = nowSec - 86400 * 30;
+  const url = `https://api.dnse.com.vn/chart-api/v2/ohlcs/index?symbol=VNINDEX&resolution=1D&from=${fromSec}&to=${nowSec}`;
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
+    signal: AbortSignal.timeout(4000),
+  });
+  if (!res.ok) throw new Error(`DNSE index API error: ${res.status}`);
+  const data = await res.json();
+  if (!data || !Array.isArray(data.c) || data.c.length === 0) {
+    throw new Error('DNSE index data empty');
+  }
+  const closes = data.c;
+  const currentClose = parseFloat(Number(closes[closes.length - 1]).toFixed(2));
+  const prevClose = closes.length > 1 ? parseFloat(Number(closes[closes.length - 2]).toFixed(2)) : currentClose;
+  const change = parseFloat((currentClose - prevClose).toFixed(2));
+  const changePct = prevClose > 0 ? parseFloat(((change / prevClose) * 100).toFixed(2)) : 0;
+  return {
+    symbol: 'VNINDEX',
+    name: 'VN-Index',
+    point: currentClose,
+    prevPoint: prevClose,
+    change,
+    changePct,
+    updatedAt: now,
+    source: 'DNSE',
+  };
+}
+
+function getBaselineIndexFromMacro() {
+  try {
+    if (fs.existsSync(MACRO_VALUATION_FILE)) {
+      const raw = fs.readFileSync(MACRO_VALUATION_FILE, 'utf-8');
+      const doc = JSON.parse(raw);
+      if (doc?.marketIndex?.currentPoint) {
+        return {
+          symbol: 'VNINDEX',
+          name: 'VN-Index',
+          point: doc.marketIndex.currentPoint,
+          prevPoint: doc.marketIndex.prevPoint || doc.marketIndex.currentPoint,
+          change: doc.marketIndex.change || 0,
+          changePct: doc.marketIndex.changePercent || 0,
+          updatedAt: Date.now(),
+          source: 'MACRO_CACHE',
+        };
+      }
+    }
+  } catch {}
+  return null;
+}
+
 export async function getMarketIndexData(force = false) {
   const session = getMarketSessionInfo();
   const cached = memoryPriceCache['VNINDEX'];
@@ -186,6 +240,7 @@ export async function getMarketIndexData(force = false) {
     }
   }
 
+  // 1. Thử VPS Realtime Feed
   try {
     const res = await fetch('https://bgapidatafeed.vps.com.vn/getliststockdata/VNINDEX,VN30', {
       headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -197,34 +252,61 @@ export async function getMarketIndexData(force = false) {
         const item = list.find(x => (x.sym || '').toUpperCase() === 'VNINDEX') || list[0];
         const last = parseFloat(item.lastPrice || 0) || parseFloat(item.r || 0);
         const ref = parseFloat(item.r || 0) || last;
-        const change = parseFloat((last - ref).toFixed(2));
-        const changePct = ref > 0 ? parseFloat(((change / ref) * 100).toFixed(2)) : 0;
-        const indexData = {
-          symbol: 'VNINDEX',
-          name: 'VN-Index',
-          point: last > 0 ? last : 1285.5,
-          prevPoint: ref,
-          change,
-          changePct,
-          updatedAt: now,
-          source: 'VPS',
-        };
-        memoryPriceCache['VNINDEX'] = indexData;
-        savePriceCache(memoryPriceCache);
-        return { session, index: indexData };
+        if (last > 0) {
+          const change = parseFloat((last - ref).toFixed(2));
+          const changePct = ref > 0 ? parseFloat(((change / ref) * 100).toFixed(2)) : 0;
+          const indexData = {
+            symbol: 'VNINDEX',
+            name: 'VN-Index',
+            point: last,
+            prevPoint: ref,
+            change,
+            changePct,
+            updatedAt: now,
+            source: 'VPS',
+          };
+          memoryPriceCache['VNINDEX'] = indexData;
+          savePriceCache(memoryPriceCache);
+          return { session, index: indexData };
+        }
       }
     }
   } catch (err) {
-    // Network error or timeout, fallback gracefully
+    // Network error or timeout, fallback sang DNSE
   }
 
-  const fallback = cached || {
+  // 2. Fallback sang DNSE Live Chart API (hoạt động 24/7 kể cả ngoài giờ và cuối tuần)
+  try {
+    const dnseData = await fetchDnseIndex();
+    if (dnseData && dnseData.point > 0) {
+      memoryPriceCache['VNINDEX'] = dnseData;
+      savePriceCache(memoryPriceCache);
+      return { session, index: dnseData };
+    }
+  } catch (err) {
+    // DNSE fallback failed
+  }
+
+  // 3. Fallback sang cache bộ nhớ nếu có
+  if (cached && cached.point > 0) {
+    return { session, index: cached };
+  }
+
+  // 4. Fallback sang snapshot định giá vĩ mô gần nhất
+  const baseline = getBaselineIndexFromMacro();
+  if (baseline) {
+    memoryPriceCache['VNINDEX'] = baseline;
+    return { session, index: baseline };
+  }
+
+  // 5. Fallback an toàn cuối cùng
+  const fallback = {
     symbol: 'VNINDEX',
     name: 'VN-Index',
-    point: 1285.5,
-    prevPoint: 1279.2,
-    change: 6.3,
-    changePct: 0.49,
+    point: 1735.09,
+    prevPoint: 1730.0,
+    change: 5.09,
+    changePct: 0.29,
     updatedAt: now,
     source: 'ESTIMATED',
   };

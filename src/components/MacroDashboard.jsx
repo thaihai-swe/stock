@@ -16,7 +16,6 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
   const [indicatorCategory, setIndicatorCategory] = useState('overview');
   const [indicatorSearch, setIndicatorSearch] = useState('');
   const [valuationWindow, setValuationWindow] = useState('ten_year'); // 'five_year' | 'ten_year' | 'modern' | 'all_time'
-  const [selectedSectorKey, setSelectedSectorKey] = useState(null);
 
   const loadAllMacroData = async () => {
     setLoading(true);
@@ -92,7 +91,6 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
   const macro = macroData?.macro || {};
   const regime = macroData?.regime || {};
   const risk = macroData?.riskAssessment || {};
-  const sectors = macroData?.sectorRotation || [];
   const leading = macroData?.leadingSignals || {};
   const assetAlloc = macroData?.assetAllocation || {};
   const goldAdv = macroData?.goldAdvisor || {};
@@ -255,7 +253,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
         {[
           { id: 'overview', icon: '📊', shortLabel: 'VN-Index & Định Giá', fullLabel: 'Định Giá VN-Index & Tài Sản Thực' },
           { id: 'regime', icon: '🌀', shortLabel: 'Chu Kỳ 5 Pha', fullLabel: 'Chu Kỳ 5 Pha & Radar Dẫn Dắt' },
-          { id: 'sectors', icon: '🗺️', shortLabel: '11 Nhóm Ngành', fullLabel: 'Bản Đồ Xoay Vòng 11 Nhóm Ngành' },
+          { id: 'sectors', icon: '🗺️', shortLabel: '10 Nhóm Ngành', fullLabel: 'Bản Đồ Nhiệt 10 Nhóm Ngành GICS' },
           { id: 'allocation', icon: '⚖️', shortLabel: 'Phân Bổ & Giá Vàng', fullLabel: 'Phân Bổ 4 Tài Sản & Giá Vàng' },
           { id: 'indicators', icon: '📑', shortLabel: '95 Chỉ Số TradingEconomics', fullLabel: '95 Chỉ Số TradingEconomics', fullSpan: true },
         ].map((t) => (
@@ -713,8 +711,15 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
                   3 Kịch Bản Định Giá VN-Index & Phân Bổ Ngành
                 </h3>
               </div>
-              <div className="text-xs text-gray-400">
-                Mô hình phân bổ xác suất: <b className="text-indigo-600 dark:text-indigo-400">55% Base · 25% Bull · 20% Bear</b>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {(market?.currentPoint || scenarioMatrix?.base?.currentPoint) && (
+                  <span className="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/40">
+                    🎯 Điểm số làm gốc: <b>{Number(market?.currentPoint || scenarioMatrix?.base?.currentPoint).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> điểm
+                  </span>
+                )}
+                <span className="text-gray-400">
+                  Phân bổ xác suất: <b className="text-indigo-600 dark:text-indigo-400">{scenarioMatrix?.base?.probability || 55}% Base · {scenarioMatrix?.bull?.probability || 25}% Bull · {scenarioMatrix?.bear?.probability || 20}% Bear</b>
+                </span>
               </div>
             </div>
 
@@ -1230,127 +1235,16 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
         </div>
       )}
 
-      {/* ── 6. PHÂN HỆ 3: BẢN ĐỒ XOAY VÒNG 11 NHÓM NGÀNH HOSE ── */}
+      {/* ── 6. PHÂN HỆ 3: BẢN ĐỒ NHIỆT 10 NGÀNH & MA TRẬN THIÊN THỜI HỘI TỤ (GICS VIETNAM) ── */}
       {activeTab === 'sectors' && (
         <div className="space-y-6">
-          {/* 1. Bản Đồ Nhiệt 10 Ngành (GICS Vietnam) & Ma Trận Thiên Thời Hội Tụ (Dual Sweet Spot) */}
           <SectorValuationHeatmap
             dualMatrix={macroData?.dualMatrix}
             sectorValuations={macroData?.sectorValuations}
+            sectorRotation={macroData?.sectorRotation}
             vnindexPE={market.currentPE || peStats?.current || 10.72}
+            regime={regime}
           />
-
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
-              <div>
-                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                  Ma Trận Nhạy Cảm & Xoay Vòng Vĩ Mô (Sector Rotation)
-                </span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">
-                  Đánh Giá Tác Động Lên 11 Nhóm Ngành Niêm Yết
-                </h3>
-              </div>
-              <div className="text-xs text-gray-400">
-                Pha hiện tại: <b className="text-indigo-600 dark:text-indigo-400">{regime.titleVi}</b>
-              </div>
-            </div>
-
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Điểm số ròng (Net Impact Score) tính toán dựa trên ma trận nhạy cảm của từng ngành trước 6 động lực vĩ mô (Lãi suất liên ngân hàng, Lãi suất SBV, CPI, USD/VND, Dầu Brent, PMI).
-            </p>
-
-            {/* Lưới 11 Nhóm Ngành */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {sectors.map((sec) => {
-                const isSelected = selectedSectorKey === sec.key;
-                const dec = sec.decomposition || {};
-                return (
-                  <div
-                    key={sec.key}
-                    className={`p-5 rounded-2xl border transition space-y-3 ${
-                      isSelected
-                        ? 'bg-indigo-50/50 dark:bg-indigo-950/30 border-2 border-indigo-500 shadow-xs'
-                        : 'bg-gray-50/70 dark:bg-gray-700/30 border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{sec.icon}</span>
-                        <span className="text-sm font-bold text-gray-900 dark:text-white">{sec.name}</span>
-                      </div>
-                      <span className="text-xs font-black text-gray-400">#{sec.rank}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <span className={`px-2.5 py-1 rounded-xl text-xs font-black border ${sec.colorClass}`}>
-                        {sec.action}
-                      </span>
-                      <span className="text-xs font-black text-gray-700 dark:text-gray-300">
-                        Net Score: {sec.netScore > 0 ? `+${sec.netScore}` : sec.netScore}
-                      </span>
-                    </div>
-
-                    {/* Button Xem Chi Tiết Phân Rã */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSectorKey(isSelected ? null : sec.key)}
-                      className="w-full mt-2 py-1.5 px-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between cursor-pointer transition"
-                    >
-                      <span>{isSelected ? 'Thu gọn phân rã' : 'Xem 6 động lực vĩ mô'}</span>
-                      <span className="text-[10px]">{isSelected ? '▲' : '▼'}</span>
-                    </button>
-
-                    {/* Phân rã 6 Drivers khi được mở */}
-                    {isSelected && (
-                      <div className="pt-3 border-t border-gray-200/60 dark:border-gray-700 space-y-2 text-xs">
-                        <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                          Đóng góp của 6 Động Lực Vĩ Mô:
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-[11px]">
-                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span className="text-gray-500">⚡ Liên ngân hàng:</span>
-                            <b className={(dec.interbank || 0) > 0 ? 'text-emerald-600' : (dec.interbank || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
-                              {(dec.interbank || 0) > 0 ? `+${dec.interbank}` : (dec.interbank || 0)}
-                            </b>
-                          </div>
-                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span className="text-gray-500">🏦 Lãi suất SBV:</span>
-                            <b className={(dec.sbvRate || 0) > 0 ? 'text-emerald-600' : (dec.sbvRate || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
-                              {(dec.sbvRate || 0) > 0 ? `+${dec.sbvRate}` : (dec.sbvRate || 0)}
-                            </b>
-                          </div>
-                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span className="text-gray-500">📈 Lạm phát CPI:</span>
-                            <b className={(dec.cpi || 0) > 0 ? 'text-emerald-600' : (dec.cpi || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
-                              {(dec.cpi || 0) > 0 ? `+${dec.cpi}` : (dec.cpi || 0)}
-                            </b>
-                          </div>
-                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span className="text-gray-500">💵 Tỷ giá USD/VND:</span>
-                            <b className={(dec.usdVnd || 0) > 0 ? 'text-emerald-600' : (dec.usdVnd || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
-                              {(dec.usdVnd || 0) > 0 ? `+${dec.usdVnd}` : (dec.usdVnd || 0)}
-                            </b>
-                          </div>
-                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span className="text-gray-500">🛢️ Giá dầu Brent:</span>
-                            <b className={(dec.oil || 0) > 0 ? 'text-emerald-600' : (dec.oil || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
-                              {(dec.oil || 0) > 0 ? `+${dec.oil}` : (dec.oil || 0)}
-                            </b>
-                          </div>
-                          <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span className="text-gray-500">🏭 PMI Sản xuất:</span>
-                            <b className={(dec.pmi || 0) > 0 ? 'text-emerald-600' : (dec.pmi || 0) < 0 ? 'text-rose-600' : 'text-gray-400'}>
-                              {(dec.pmi || 0) > 0 ? `+${dec.pmi}` : (dec.pmi || 0)}
-                            </b>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
       )}
 

@@ -539,5 +539,528 @@
       "netMargin": 49.41,
       "roe": 11.26
     }
-  ]
+  ],
+  "extendedDupont": {
+    "roe": 2.76,
+    "calculatedRoe": 2.76,
+    "taxBurden": 1.03,
+    "interestBurden": 1.0,
+    "operatingMargin": 10.72,
+    "assetTurnover": 0.12,
+    "financialLeverage": 2.09,
+    "components": [
+      {
+        "id": "taxBurden",
+        "name": "Gánh Nặng Thuế (Tax Burden)",
+        "formula": "LNST ÷ LNTT",
+        "value": 1.03,
+        "benchmark": "0.80x (Thuế suất 20%)",
+        "impact": "Tích cực",
+        "desc": "Tỷ lệ lợi nhuận giữ lại sau khi nộp thuế TNDN"
+      },
+      {
+        "id": "interestBurden",
+        "name": "Gánh Nặng Lãi Vay (Interest Burden)",
+        "formula": "LNTT ÷ EBIT",
+        "value": 1.0,
+        "benchmark": "> 0.80x",
+        "impact": "An toàn",
+        "desc": "Đo lường mức độ EBIT bị bào mòn bởi chi phí lãi vay"
+      },
+      {
+        "id": "operatingMargin",
+        "name": "Biên Hoạt Động (Operating Margin)",
+        "formula": "EBIT ÷ Doanh Thu",
+        "value": 10.72,
+        "unit": "%",
+        "benchmark": "> 10%",
+        "impact": "Bình thường",
+        "desc": "Hiệu quả sinh lời từ hoạt động kinh doanh cốt lõi"
+      },
+      {
+        "id": "assetTurnover",
+        "name": "Vòng Quay Tài Sản (Asset Turnover)",
+        "formula": "Doanh Thu 4Q ÷ Tổng Tài Sản",
+        "value": 0.12,
+        "unit": "lần",
+        "benchmark": "> 0.8x",
+        "impact": "Chậm",
+        "desc": "Tốc độ luân chuyển doanh thu trên 1 đồng tổng tài sản"
+      },
+      {
+        "id": "financialLeverage",
+        "name": "Đòn Bẩy Tài Chính (Financial Leverage)",
+        "formula": "Tổng Tài Sản ÷ Vốn Chủ Sở Hữu",
+        "value": 2.09,
+        "unit": "lần",
+        "benchmark": "< 2.5x",
+        "impact": "An toàn",
+        "desc": "Hệ số khuếch đại ROE nhờ cấu trúc nguồn vốn nợ"
+      }
+    ],
+    "qualityAssessment": "Ưu đãi thuế TNDN hỗ trợ tích cực LNST; Chi phí lãi vay an toàn, không tạo áp lực lên EBT; Hiệu suất khai thác tài sản chậm"
+  },
+  "healthScore": {
+    "overallScore": 49.5,
+    "grade": "Yếu",
+    "gradeEn": "weak",
+    "badge": "bg-amber-500 text-white",
+    "description": "Tài chính suy yếu, đòn bẩy hoặc thanh khoản đang tạo áp lực lên hoạt động kinh doanh.",
+    "pillars": {
+      "profitability": {
+        "name": "Khả Năng Sinh Lời",
+        "weight": 30,
+        "score": 35,
+        "rating": "Trung bình"
+      },
+      "efficiency": {
+        "name": "Hiệu Quả Hoạt Động",
+        "weight": 25,
+        "score": 20,
+        "rating": "Trung bình"
+      },
+      "leverage": {
+        "name": "Đòn Bẩy & An Toàn Vốn",
+        "weight": 25,
+        "score": 80,
+        "rating": "An toàn"
+      },
+      "liquidity": {
+        "name": "Khả Năng Thanh Toán",
+        "weight": 20,
+        "score": 70,
+        "rating": "Đủ chuẩn"
+      }
+    }
+  },
+  "earlyWarning": {
+    "riskScore": 8.0,
+    "riskLevel": "An Toàn",
+    "riskLevelEn": "low",
+    "riskBadge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200",
+    "criticalCount": 0,
+    "alertsCount": 0,
+    "positiveCount": 1,
+    "alerts": [],
+    "positiveSignals": [
+      {
+        "id": "EXCELLENT_CASH_CONVERSION",
+        "title": "Chất lượng lợi nhuận cao (CFO/LNST = 1.25x)",
+        "detail": "Lợi nhuận kế toán chuyển hóa thực chất thành tiền mặt vật lý về tài khoản."
+      }
+    ],
+    "recommendation": "Sức khỏe tài chính vững chắc, không phát hiện rủi ro cơ cấu trọng yếu."
+  },
+  "industrySpecific": {
+    "category": "GENERAL",
+    "categoryName": "Doanh Nghiệp Thương Mại & Tổng Hợp",
+    "categoryIcon": "🏢",
+    "highlights": "Đánh giá qua các chỉ số hiệu quả kinh doanh cơ bản và cấu trúc vốn an toàn.",
+    "metrics": [
+      {
+        "id": "roe",
+        "name": "Tỷ Suất Sinh Lời ROE",
+        "value": 2.88,
+        "unit": "%",
+        "benchmark": "> 15%",
+        "rating": "Tốt",
+        "desc": "Hiệu quả sử dụng vốn chủ sở hữu"
+      },
+      {
+        "id": "net_margin",
+        "name": "Biên Lợi Nhuận Ròng",
+        "value": 11.5,
+        "unit": "%",
+        "benchmark": "> 8%",
+        "rating": "Khá",
+        "desc": "Tỷ lệ lợi nhuận sau thuế trên doanh thu"
+      },
+      {
+        "id": "debt_to_equity",
+        "name": "Nợ Vay / Vốn Chủ",
+        "value": 1.08,
+        "unit": "lần",
+        "benchmark": "< 1.5x",
+        "rating": "An toàn",
+        "desc": "Mức độ sử dụng nợ tài trợ cho hoạt động kinh doanh"
+      }
+    ]
+  },
+  "riskMetrics": {
+    "annualizedVolatility": 36.1,
+    "dailyVolatility": 2.27,
+    "maxDrawdown": 20.0,
+    "var95": 3.73,
+    "sharpeRatio": 0.8,
+    "sortinoRatio": 1.14,
+    "beta": 1.0,
+    "riskFreeRate": 4.47,
+    "ratings": {
+      "volatility": "Cao",
+      "drawdown": "Trung bình",
+      "sharpe": "Tốt"
+    }
+  },
+  "ttmSeries": [
+    {
+      "period": "TTM đến 2024-Q2",
+      "endPeriod": "2024-Q2",
+      "revenue": 5025.0,
+      "netIncome": 432.0,
+      "cfo": 551.0,
+      "freeCashFlow": 198.0,
+      "netMargin": 8.6,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2024-Q3",
+      "endPeriod": "2024-Q3",
+      "revenue": 5257.0,
+      "netIncome": 477.0,
+      "cfo": 609.0,
+      "freeCashFlow": 219.0,
+      "netMargin": 9.07,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2024-Q4",
+      "endPeriod": "2024-Q4",
+      "revenue": 5531.0,
+      "netIncome": 532.0,
+      "cfo": 679.0,
+      "freeCashFlow": 245.0,
+      "netMargin": 9.62,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2025-Q1",
+      "endPeriod": "2025-Q1",
+      "revenue": 5736.0,
+      "netIncome": 578.0,
+      "cfo": 738.0,
+      "freeCashFlow": 266.0,
+      "netMargin": 10.08,
+      "revenueGrowthYoY": null
+    },
+    {
+      "period": "TTM đến 2025-Q2",
+      "endPeriod": "2025-Q2",
+      "revenue": 5928.0,
+      "netIncome": 626.0,
+      "cfo": 799.0,
+      "freeCashFlow": 288.0,
+      "netMargin": 10.56,
+      "revenueGrowthYoY": 17.97
+    }
+  ],
+  "dcfAnalysis": {
+    "sectorWacc": 10.5,
+    "industryCategory": "GENERAL",
+    "baseFcff": 1219,
+    "dcfScenarios": {
+      "status": "SUCCESS",
+      "basePrice": 1376,
+      "bullPrice": 7375,
+      "bearPrice": null,
+      "fairPrice": 1376,
+      "wacc": 10.5,
+      "terminalG": 3.0,
+      "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
+    },
+    "reverseDcfImpliedGrowth": 24.74,
+    "sensitivityMatrix": {
+      "waccList": [
+        9.0,
+        10.5,
+        11.5,
+        12.5
+      ],
+      "gList": [
+        2.0,
+        3.0,
+        4.0
+      ],
+      "matrix": [
+        [
+          2674,
+          5583,
+          9656
+        ],
+        [
+          null,
+          484,
+          2857
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    "alternativeMethodFlag": false
+  },
+  "marketProfile": {
+    "symbol": "VND",
+    "volumeAtPrice": {
+      "buckets": [
+        {
+          "index": 0,
+          "priceLow": 15000,
+          "priceHigh": 15632,
+          "priceMid": 15316,
+          "volume": 10000149.0,
+          "volumePercent": 20.1
+        },
+        {
+          "index": 1,
+          "priceLow": 15632,
+          "priceHigh": 16264,
+          "priceMid": 15948,
+          "volume": 4863201.0,
+          "volumePercent": 9.8
+        },
+        {
+          "index": 2,
+          "priceLow": 16264,
+          "priceHigh": 16896,
+          "priceMid": 16580,
+          "volume": 4546480.0,
+          "volumePercent": 9.1
+        },
+        {
+          "index": 3,
+          "priceLow": 16896,
+          "priceHigh": 17528,
+          "priceMid": 17212,
+          "volume": 6448118.0,
+          "volumePercent": 13.0
+        },
+        {
+          "index": 4,
+          "priceLow": 17528,
+          "priceHigh": 18160,
+          "priceMid": 17844,
+          "volume": 4522109.0,
+          "volumePercent": 9.1
+        },
+        {
+          "index": 5,
+          "priceLow": 18160,
+          "priceHigh": 18793,
+          "priceMid": 18477,
+          "volume": 4310302.0,
+          "volumePercent": 8.7
+        },
+        {
+          "index": 6,
+          "priceLow": 18793,
+          "priceHigh": 19425,
+          "priceMid": 19109,
+          "volume": 5557598.0,
+          "volumePercent": 11.2
+        },
+        {
+          "index": 7,
+          "priceLow": 19425,
+          "priceHigh": 20057,
+          "priceMid": 19741,
+          "volume": 1888868.0,
+          "volumePercent": 3.8
+        },
+        {
+          "index": 8,
+          "priceLow": 20057,
+          "priceHigh": 20689,
+          "priceMid": 20373,
+          "volume": 1113441.0,
+          "volumePercent": 2.2
+        },
+        {
+          "index": 9,
+          "priceLow": 20689,
+          "priceHigh": 21321,
+          "priceMid": 21005,
+          "volume": 6494084.0,
+          "volumePercent": 13.1
+        }
+      ],
+      "poc": {
+        "index": 0,
+        "priceLow": 15000,
+        "priceHigh": 15632,
+        "priceMid": 15316,
+        "volume": 10000149.0,
+        "volumePercent": 20.1
+      },
+      "hvn": [
+        {
+          "index": 0,
+          "priceLow": 15000,
+          "priceHigh": 15632,
+          "priceMid": 15316,
+          "volume": 10000149.0,
+          "volumePercent": 20.1
+        },
+        {
+          "index": 3,
+          "priceLow": 16896,
+          "priceHigh": 17528,
+          "priceMid": 17212,
+          "volume": 6448118.0,
+          "volumePercent": 13.0
+        },
+        {
+          "index": 9,
+          "priceLow": 20689,
+          "priceHigh": 21321,
+          "priceMid": 21005,
+          "volume": 6494084.0,
+          "volumePercent": 13.1
+        }
+      ],
+      "lvn": [
+        {
+          "index": 7,
+          "priceLow": 19425,
+          "priceHigh": 20057,
+          "priceMid": 19741,
+          "volume": 1888868.0,
+          "volumePercent": 3.8
+        },
+        {
+          "index": 8,
+          "priceLow": 20057,
+          "priceHigh": 20689,
+          "priceMid": 20373,
+          "volume": 1113441.0,
+          "volumePercent": 2.2
+        }
+      ],
+      "priceRange": {
+        "min": 15000,
+        "max": 21321
+      },
+      "totalVolume": 49744350
+    },
+    "moneyFlow": {
+      "vpci": 1.31,
+      "vpciStatus": "STRONG_CONFIRMATION",
+      "cmf": 0.001,
+      "cmfStatus": "BALANCED",
+      "obvTrend": "BULLISH_FLOW"
+    },
+    "wyckoffEffort": {
+      "effortWithoutResultDetected": false,
+      "recentSignals": [],
+      "state": "BALANCED_MARKET"
+    },
+    "tailRisk": {
+      "skewness": -0.09,
+      "kurtosis": -1.41,
+      "var95": 1.58,
+      "var99": 1.77,
+      "es95": 1.74,
+      "es99": 1.79,
+      "tailRiskAssessment": "Phân phối lợi suất bình thường"
+    },
+    "archetype": {
+      "archetype": "TREND_FOLLOWING",
+      "name": "Bám Xu Hướng (Trend Following)",
+      "description": "Khối lượng giao dịch đồng thuận cao với các bước sóng giá, thích hợp cho chiến lược theo xu hướng.",
+      "guardrail": "Phân tích mô tả lịch sử hành vi giá-khối lượng, không phải khuyến nghị mua/bán."
+    }
+  },
+  "newsDigest": {
+    "symbol": "VND",
+    "items": [
+      {
+        "id": "news-VND-1",
+        "title": "[VND] Cổ tức tiền mặt: Chi trả cổ tức năm 2023 bằng tiền mặt tỷ lệ 10% (500 đ/cp)",
+        "summary": "Chi trả cổ tức năm 2023 bằng tiền mặt tỷ lệ 10% (500 đ/cp)",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2024-06-20",
+        "source": "Công Bố Thông Tin Doanh Nghiệp",
+        "link": "#",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VND-2",
+        "title": "[VND] Đại hội cổ đông: Thông qua kế hoạch kinh doanh và mở rộng nhà máy/dự án mới",
+        "summary": "Thông qua kế hoạch kinh doanh và mở rộng nhà máy/dự án mới",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2024-05-15",
+        "source": "Công Bố Thông Tin Doanh Nghiệp",
+        "link": "#",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VND-3",
+        "title": "[VND] Cổ tức cổ phiếu: Phát hành cổ phiếu trả cổ tức năm 2022 tỷ lệ 15%",
+        "summary": "Phát hành cổ phiếu trả cổ tức năm 2022 tỷ lệ 15%",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2023-06-25",
+        "source": "Công Bố Thông Tin Doanh Nghiệp",
+        "link": "#",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      }
+    ],
+    "sentiment": {
+      "score": 66.7,
+      "verdict": "BULLISH",
+      "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
+      "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+      "bullishCount": 2,
+      "neutralCount": 1,
+      "bearishCount": 0,
+      "totalCount": 3,
+      "categoryScores": {
+        "disclosure": 50.0,
+        "sector": 100.0
+      }
+    },
+    "tldr": {
+      "title": "VND 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
+      "summary": "Trong 30 ngày qua, dòng thông tin về VND nghiêng rõ rệt về chiều hướng tích cực với 2/3 tin tức mang gam màu tươi sáng (66.7%). Tâm điểm chú ý xoay quanh: '[VND] Cổ tức tiền mặt: Chi trả cổ tức năm 2023 bằng tiền mặt tỷ lệ 10% (500 đ/cp)'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "metricBoxes": [
+        {
+          "label": "Tổng Tin & Sự Kiện",
+          "value": "3 tin",
+          "type": "neutral"
+        },
+        {
+          "label": "Tỷ Lệ Tích Cực",
+          "value": "66.7%",
+          "type": "positive"
+        },
+        {
+          "label": "Điểm Tâm Lý (Score)",
+          "value": "+66.7",
+          "type": "positive"
+        },
+        {
+          "label": "Trạng Thái Chủ Đạo",
+          "value": "BULLISH",
+          "type": "positive"
+        }
+      ]
+    }
+  }
 }

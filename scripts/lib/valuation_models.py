@@ -24,6 +24,10 @@ from .valuation_engine import (
     calc_tech_score,
     calc_fcf,
     calc_cagr,
+    get_sector_wacc,
+    calc_dcf_fcff,
+    calc_reverse_dcf,
+    calc_dcf_sensitivity_matrix,
     StockValuationEngine
 )
 
@@ -47,5 +51,9 @@ __all__ = [
     "calc_tech_score",
     "calc_fcf",
     "calc_cagr",
+    "get_sector_wacc",
+    "calc_dcf_fcff",
+    "calc_reverse_dcf",
+    "calc_dcf_sensitivity_matrix",
     "StockValuationEngine"
 ]

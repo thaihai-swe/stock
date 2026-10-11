@@ -11,6 +11,7 @@ from .macro_fetcher import MacroFetcher
 from .tradingeconomics_fetcher import TradingEconomicsFetcher
 from .market_valuation_history_fetcher import MarketValuationHistoryFetcher
 from .vietstock_valuation_fetcher import VietstockValuationFetcher
+from .sector_valuation_fetcher import SectorValuationFetcher
 
 __all__ = [
     "BaseFetcher",
@@ -20,4 +21,5 @@ __all__ = [
     "TradingEconomicsFetcher",
     "MarketValuationHistoryFetcher",
     "VietstockValuationFetcher",
+    "SectorValuationFetcher",
 ]

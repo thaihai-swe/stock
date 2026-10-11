@@ -132,6 +132,137 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
   2. Tối ưu hóa hiệu suất sử dụng tài sản (bán hàng nhanh, vòng quay cao).
   3. Hay rủi ro do lạm dụng đòn bẩy tài chính vay nợ ngân hàng quá mức.
 
+#### Phân Rã DuPont 5 Nhân Tố Mở Rộng (Extended 5-Factor DuPont):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `extendedDupont`.
+* **Công thức toán học 5 tầng**:
+  $$ROE = \text{Tax Burden} \times \text{Interest Burden} \times \text{EBIT Margin} \times \text{Asset Turnover} \times \text{Financial Leverage}$$
+  $$\frac{LNST}{VCSH} = \frac{LNST}{EBT} \times \frac{EBT}{EBIT} \times \frac{EBIT}{Revenue} \times \frac{Revenue}{Assets} \times \frac{Assets}{Equity}$$
+* **Ý nghĩa 5 nhân tố**:
+  1. `taxBurden` ($LNST / EBT$): Khả năng giữ lại lợi nhuận sau nghĩa vụ thuế thu nhập (chuẩn $\approx 0.80$ tương ứng thuế 20%).
+  2. `interestBurden` ($EBT / EBIT$): Tỷ lệ bảo toàn lợi nhuận trước chi phí lãi vay (càng gần 1.0 nghĩa là gánh nặng lãi vay càng thấp).
+  3. `operatingMargin` ($EBIT / Revenue$): Biên lợi nhuận hoạt động thuần túy trước thuế và lãi vay, phản ánh sức mạnh cốt lõi.
+  4. `assetTurnover` ($Revenue / Assets$): Vòng quay tổng tài sản, phản ánh hiệu suất khai thác tài sản tạo doanh thu.
+  5. `equityMultiplier` ($Assets / Equity$): Đòn bẩy tài chính đo bằng tỷ số Tổng tài sản trên Vốn chủ sở hữu.
+* **Đánh giá tổng hợp**: Gán nhãn chất lượng nguồn sinh lời (`HIGH_QUALITY_OPERATING`, `FINANCIAL_LEVERAGE_DRIVEN`, `TAX_INTEREST_PRESSURE`, hoặc `BALANCED`).
+
+#### Điểm Sức Khỏe Tài Chính 4 Trụ Cột (Financial Health Score 0–100):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `healthScore`.
+* **Cấu trúc 4 trụ cột trọng số**:
+  | Trụ Cột | Trọng Số | Các Chỉ Số Đầu Vào | Ý Nghĩa Đánh Giá |
+  | :--- | :---: | :--- | :--- |
+  | **Thanh khoản (Liquidity)** | 25% | `currentRatio`, `quickRatio`, `cashRatio` | Khả năng đáp ứng nghĩa vụ nợ ngắn hạn |
+  | **Khả năng sinh lời (Profitability)** | 30% | `roe`, `roa`, `netMargin`, `grossMargin` | Sức mạnh tạo lợi nhuận từ vốn và doanh thu |
+  | **Cấu trúc vốn & Đòn bẩy (Leverage)** | 25% | `debtToEquity`, `financialLeverage`, `icr` | Mức độ an toàn nợ vay và năng lực trả lãi |
+  | **Hiệu quả hoạt động (Operating Efficiency)** | 20% | `assetTurnover`, `receivablesTurnover`, `inventoryTurnover` | Tốc độ luân chuyển dòng vốn và hàng tồn kho |
+* **Phân cấp xếp hạng**:
+  * 80–100: `XUẤT SẮC` (Hạng AAA / Cực kỳ an toàn).
+  * 65–79: `KHỎE MẠNH` (Hạng AA / Vững chắc).
+  * 50–64: `TRUNG BÌNH` (Hạng BBB / Đạt chuẩn).
+  * 35–49: `YẾU` (Hạng BB / Cần thận trọng).
+  * < 35: `BÁO ĐỘNG` (Hạng C / Rủi ro cao).
+
+#### Ma Trận Cảnh Báo Sớm & 6 Cờ Đỏ Rủi Ro (Early Warning & Red Flags):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `earlyWarning`.
+* **Thang điểm rủi ro**: `riskScore` (0–100, càng cao càng nguy hiểm) cùng trạng thái `riskLevel` (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
+* **6 Cờ Đỏ Tự Động Quét**:
+  1. `NEGATIVE_CFO`: Dòng tiền hoạt động kinh doanh (CFO) âm dù báo cáo LNST dương (lợi nhuận trên giấy tờ).
+  2. `HIGH_DEBT_LEVERAGE`: Nợ vay chịu lãi / Vốn chủ sở hữu vượt ngưỡng nguy hiểm ($D/E > 2.0x$ với DN phi tài chính).
+  3. `LOW_INTEREST_COVERAGE`: Hệ số bao phủ lãi vay $ICR < 1.5x$, có nguy cơ mất khả năng thanh toán nợ ngân hàng.
+  4. `RAPID_RECEIVABLES_GROWTH`: Tốc độ tăng trưởng khoản phải thu vượt xa doanh thu (nguy cơ doanh thu ảo/chiếm dụng vốn).
+  5. `INVENTORY_ACCUMULATION`: Tồn kho phình to bất thường trong khi vòng quay tồn kho suy giảm mạnh (ứ đọng vốn).
+  6. `LIQUIDITY_PRESSURE`: Hệ số thanh toán hiện hành $Current\ Ratio < 1.0x$ (mất cân đối dòng tiền ngắn hạn).
+
+#### Phân Tích Chỉ Số Đặc Thù Theo Ngành (Industry-Specific Metrics Router):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `industrySpecific`.
+* **Cơ chế Router tự động**: Nhận diện ngành từ sector/industry metadata và mã cổ phiếu (VD: `BANKING` cho VCB, MBB, ACB...; `REAL_ESTATE` cho VHM, DXG, NVL...; `MANUFACTURING` cho HPG, HSG...; `RETAIL` cho MWG, PNJ, FRT...; `TECHNOLOGY` cho FPT, CMG...).
+* **Bộ chỉ số chuyên sâu từng ngành**:
+  * **Ngân Hàng (Banking)**:
+    * `nimProxy`: Biên lãi thuần ước tính ($Thu\ nhập\ lãi\ thuần / Tổng\ tài\ sản$).
+    * `nplProxy`: Tỷ lệ nợ xấu ước tính.
+    * `llrProxy`: Tỷ lệ bao phủ nợ xấu ($Dự\ phòng / Nợ\ xấu$).
+    * `cirProxy`: Tỷ lệ chi phí trên thu nhập ($Chi\ phí\ HĐ / Tổng\ TOI$).
+    * `casaProxy`: Tỷ lệ tiền gửi không kỳ hạn ước tính.
+    * `ldrProxy`: Tỷ lệ dư nợ cho vay trên tiền gửi huy động.
+  * **Bất Động Sản (Real Estate)**:
+    * `inventoryToAssets`: Tỷ trọng quỹ đất & hàng tồn kho trên tổng tài sản.
+    * `unearnedRevenueToDebt`: Tỷ lệ người mua trả tiền trước / Nợ vay (sức khỏe hấp thụ dự án).
+    * `netDebtToEquity`: Nợ ròng / Vốn chủ sở hữu.
+  * **Sản Xuất & Công Nghiệp (Manufacturing)**:
+    * `cccDays`: Chu kỳ chuyển đổi tiền mặt Cash Conversion Cycle ($DIO + DSO - DPO$).
+    * `capexToDepreciation`: Tỷ lệ đầu tư tái tài sản $CapEx / Khấu\ hao$ (mở rộng năng lực sản xuất).
+    * `fixedAssetTurnover`: Vòng quay tài sản cố định nhà xưởng máy móc.
+  * **Bán Lẻ & Hàng Tiêu Dùng (Retail)**:
+    * `inventoryTurnoverDays`: Số ngày tồn kho trung bình ($DIO$).
+    * `cashConversionDays`: Chu kỳ xoay vòng vốn lưu động.
+    * `grossMarginTrend`: Xu hướng biên lợi nhuận gộp theo quý.
+  * **Công Nghệ (Technology)**:
+    * `revenuePerEmployee`: Doanh thu ước tính trên nhân sự.
+    * `rdIntensityProxy`: Tỷ trọng đầu tư tài sản vô hình & công nghệ.
+    * `softwareRecurringQuality`: Đánh giá biên ròng và chất lượng dòng tiền từ hợp đồng dịch vụ.
+
+#### Bộ Chỉ Số Rủi Ro & Biến Động Thị Giá (Stock Risk & Performance Engine):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `riskMetrics`.
+* **Các chỉ tiêu định lượng tài chính cao cấp**:
+  * `volatility30d`, `volatility90d`, `volatility1y`: Độ biến động giá hàng năm hóa (Annualized Historical Volatility) qua các khung thời gian 30 ngày, 90 ngày và 1 năm.
+  * `maxDrawdown`: Mức sụt giảm tối đa từ đỉnh xuống đáy gần nhất trong chu kỳ 1 năm ($MDD \le 0\%$).
+  * `var95`: Giá trị chịu rủi ro tham số ở mức tin cậy 95% (Value at Risk 95% theo ngày).
+  * `sharpeRatio`: Tỷ suất Sharpe vượt trội so với lãi suất phi rủi ro TPCP 10Y Việt Nam ($R_f \approx 3.5\%$).
+  * `sortinoRatio`: Tỷ suất Sortino chỉ phạt các biến động chiều giảm (Downside Deviation).
+  * `beta`: Hệ số nhạy biến động thị giá so với VN-Index.
+
+#### Chuỗi Dữ Liệu TTM Lăn 4 Quý (Trailing Twelve Months - TTM Rolling Series):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong mảng `ttmSeries`.
+* **Ý nghĩa**: Tính toán tổng trượt 4 quý liên tiếp cho các chỉ tiêu P&L (Doanh thu, Lợi nhuận gộp, EBIT, LNST, CFO, CapEx) và lấy giá trị cuối kỳ cho Bảng cân đối kế toán. Giúp triệt tiêu hoàn toàn yếu tố mùa vụ kinh doanh (VD: DN thủy sản, bán lẻ tiêu dùng cao điểm Q4) và phản ánh bức tranh kinh doanh 12 tháng gần nhất chân thực nhất.
+
+#### Mô Hình DCF (FCFF) 3 Kịch Bản, Reverse DCF & Ma Trận Độ Nhạy Cảm:
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `dcfAnalysis`.
+* **Công thức & Kiến trúc**:
+  * **DCF 3 Kịch Bản**:
+    $$PV_{\text{explicit}} = \sum_{t=1}^5 \frac{FCFF_t}{(1 + WACC)^t}, \quad Terminal\ Value = \frac{FCFF_5 \times (1 + g)}{WACC - g}, \quad PV_{\text{terminal}} = \frac{Terminal\ Value}{(1 + WACC)^5}$$
+    $$Enterprise\ Value (EV) = PV_{\text{explicit}} + PV_{\text{terminal}}, \quad Equity\ Value = EV - NetDebt, \quad Fair\ Price = \frac{Equity\ Value}{Shares}$$
+    - `basePrice`: Tăng trưởng theo CAGR kế hoạch, WACC theo ngành, $g_{\text{terminal}} = 3.0\%$.
+    - `bullPrice`: Tăng trưởng $+3\%$, WACC $-0.5\%$, $g_{\text{terminal}} = 3.5\%$.
+    - `bearPrice`: Tăng trưởng $-4\%$, WACC $+1.0\%$, $g_{\text{terminal}} = 2.0\%$.
+    - **Sanity Check (Học từ LC-005)**: Nếu $FCF_0 \le 0$, kích hoạt cờ `NEGATIVE_FCF` và khuyến nghị dùng phương pháp thay thế EV/EBITDA, tuyệt đối không xuất giá âm.
+  * **Reverse DCF (Tốc độ tăng trưởng ngụ ý)**:
+    - Thuật toán Binary Search tìm $g_{\text{implied}}$ sao cho $PV(FCFF, g, WACC) = \text{EV hiện tại}$.
+    - Đưa ra góc nhìn trực quan: thị trường đang bi quan thái quá ($g_{\text{implied}} < 6\%$) hay kỳ vọng quá cao ($g_{\text{implied}} > 18\%$).
+  * **Bảng Độ Nhạy Cảm 2 Chiều (Sensitivity Matrix)**:
+    - Ma trận 4 mức WACC ($10.0\%, 10.5\%, 11.0\%, 12.0\%$) $\times$ 3 mức Terminal Growth ($2.0\%, 3.0\%, 4.0\%$).
+  * **WACC Chuẩn Theo Ngành**:
+    - Ngân hàng: $10.0\%$, Thép/SX: $10.5\%$, BĐS: $11.5\%$, Bán lẻ: $9.0\%$, Công nghệ: $9.0\%$, Dầu khí: $10.0\%$. Hiệu chỉnh theo Beta: $WACC = WACC_{\text{base}} + (\beta - 1.0) \times 1.5\%$.
+
+#### Hồ Sơ Hành Vi Thị Trường Định Lượng & Wyckoff VAP (Quantitative Market Profile):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `marketProfile`.
+* **5 Nhóm Phân Tích Định Lượng (15-Block Methodology)**:
+  1. **Volume at Price (VAP / Volume Profile)**: 10 dải giá với tổng khối lượng giao dịch tích lũy, xác định **Point of Control (POC)** (vùng kiểm soát thanh khoản lớn nhất), **HVN** (hỗ trợ/kháng cự cứng) và **LVN** (vùng trượt giá).
+  2. **Xác Nhận Khối Lượng VPCI & Dòng Tiền**:
+     - `vpci`: So sánh Vol ngắn hạn 5 phiên vs dài hạn 20 phiên ($VPCI > 1.05$: khối lượng xác nhận xu hướng).
+     - `cmf`: Chaikin Money Flow ($CMF \ge 0.05$: tích lũy gom hàng; $CMF \le -0.05$: phân phối xả hàng).
+     - `obvTrend`: Xu hướng dòng tiền On-Balance Volume.
+  3. **Wyckoff Effort vs Result**: Nhận diện hiện tượng nỗ lực lớn nhưng kết quả giá co hẹp ($Volume \ge 1.7x$ nhưng biên độ giá $\le 0.75x$) $\rightarrow$ cảnh báo giai đoạn Hấp Thụ Cung (Absorption) hoặc Phân Phối đỉnh.
+  4. **Rủi Ro Đuôi & Phân Phối Lợi Suất (Tail Risk)**:
+     - `skewness` (độ lệch) & `kurtosis` (độ nhọn đuôi béo).
+     - `var95`, `var99`: Giá trị chịu rủi ro lịch sử (VaR).
+     - `es95`, `es99`: Expected Shortfall (CVaR - mức lỗ bình quân khi chạm 5% kịch bản xấu nhất).
+  5. **Archetype Phân Loại Tính Cách Cổ Phiếu**:
+     - `TREND_FOLLOWING` (Bám xu hướng), `ACCUMULATION_BREAKOUT` (Tích lũy bùng nổ), `RANGE_BOUND_CYCLICAL` (Dao động hộp), `TRAP_PRONE` (Biến động cao / Dễ bẫy giá). Tuân thủ nguyên tắc `neutral_descriptive_non_advice`.
+
+#### Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (Corporate News Digest & Sentiment):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `newsDigest`.
+* **Đặc tả cấu trúc**:
+  * `items`: 50 tin tức được phân loại vào 5 nhóm chức năng:
+    - `biz`: Kết quả kinh doanh, doanh thu, lợi nhuận, sản lượng.
+    - `sector`: Ngành nghề, đối thủ cạnh tranh, giá nguyên vật liệu, dự án.
+    - `macro`: Vĩ mô, thuế, tỷ giá, chính sách Ngân hàng Nhà nước.
+    - `disclosure`: Công bố thông tin, cổ tức, ESOP, giao dịch nội bộ.
+    - `analyst`: Báo cáo phân tích CTCK & khuyến nghị giá mục tiêu.
+  * `sentiment`:
+    - `score`: Điểm số tâm lý tổng hợp từ $-100$ đến $+100$ dựa trên trọng số tác động (Rất cao: 2.0, Cao: 1.5, TB: 1.0, Thấp: 0.5).
+    - `verdict`: `BULLISH` ($\ge +25$), `NEUTRAL` ($-25$ đến $+25$), `BEARISH` ($\le -25$).
+    - `categoryScores`: Phân rã điểm tâm lý theo từng nhóm để phát hiện phân kỳ.
+  * `tldr`: Executive Summary 3-4 câu tóm tắt toàn cảnh bản tin thời sự 30 ngày và 4 KPI highlight boxes.
+
 ---
 
 ### PHÂN HỆ 3: CỔ TỨC, CỔ ĐÔNG & BAN LÃNH ĐẠO (CORPORATE PROFILE)
@@ -357,6 +488,12 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
           * ETF / Phân khúc: Chuyển đổi mã ảo `VNDIAMOND` $\to$ mã ETF `FUEVFVND`, và `VNMIDCAP` $\to$ mã ETF `FUEDCMID` để nạp dữ liệu nến intraday và lịch sử chuẩn xác.
     20. **Dữ Liệu Định Giá 10 Ngành Thực Tế & Ma Trận Thiên Thời Hội Tụ (`sectorValuations` & `dualMatrix`)**:
         * *Nguồn trích xuất chính thức*: Cổng dữ liệu phân ngành chuẩn hóa quốc tế GICS Vietnam (`https://simplize.vn/co-phieu/nganh`) qua module độc lập `SectorValuationFetcher` (`scripts/fetchers/sector_valuation_fetcher.py`).
+        * *Công nghệ bóc tách dữ liệu chuẩn hóa*: Sử dụng **BeautifulSoup4** và **pandas (`pd.read_html`)** bóc tách bảng HTML SSR trực tiếp (`<table>`), đồng nhất 100% với chuẩn kiến trúc của `TradingEconomicsFetcher`.
+        * *Cơ chế dự phòng & Báo lỗi đa tầng*:
+          * **Primary**: Thẻ HTML `<table>` parse bằng BeautifulSoup + pandas.
+          * **Secondary Fallback**: Trích xuất JSON nội bộ `<script id="__NEXT_DATA__">`.
+          * **Tertiary Fallback**: Phục hồi từ snapshot local cache (`data/sector_valuation_cache.json`, TTL 24h).
+          * **Console Error Logging**: Bất kỳ trường dữ liệu nào (`P/E`, `P/B`, `Vốn hóa`, `% biến động`) bị rỗng, `NaN`, hoặc không ép kiểu số được đều được in cảnh báo chi tiết ra console kèm tên ngành, tên chỉ tiêu và giá trị thô gốc.
         * *Quy mô bao phủ*: Hơn 2.000 cổ phiếu trên cả 3 sàn (HOSE, HNX, UPCoM), tuyệt đối không lấy mẫu hay ngoại suy từ vài cổ phiếu lẻ.
         * *10 Nhóm ngành chuẩn GICS*:
           1. `VNFIN` (Tài chính - Ngân hàng, Chứng khoán, Bảo hiểm): 87 mã, Vốn hóa 3,17 triệu tỷ VNĐ.
@@ -377,12 +514,21 @@ Toàn bộ dữ liệu của hệ thống được tổ chức theo triết lý 
           * `netIncomeLtmGrowth`, `netIncomeEstGrowth`: Tốc độ tăng trưởng LNST trailing và dự phóng (%).
           * `pricePctChgYtd`, `pricePctChg1y`, `pricePctChg3y`, `pricePctChg5y`: Hiệu suất giá ngành theo các chu kỳ.
           * `valuationBand`, `valuationBadge`: Dải định giá ngành so với tương quan VN-Index (*Rất rẻ*, *Rẻ*, *Hợp lý*, *Hơi đắt*, *Đắt đỏ*).
-        * *Ma Trận Thiên Thời Hội Tụ 4 Góc Phần Tư (`dualMatrix`)*:
-          * Kết hợp Trục Hoành (P/E ngành so với VN-Index) và Trục Tung (Net Impact Score từ 6 biến số vĩ mô).
-          * `sweetSpot` (💎 Vùng Vàng Gom Mua): Vĩ mô ủng hộ ($Net > 0$) $\times$ Định giá rẻ ($P/E \le 11.5x$).
-          * `valueTrap` (⚠️ Vùng Bẫy Giá Rẻ): Định giá rẻ nhưng vĩ mô bất lợi ($Net < 0$).
-          * `momentum` (🔥 Vùng Quá Nhiệt): Vĩ mô mạnh mẽ nhưng định giá đắt ($P/E \ge 13.5x$).
-          * `defense` (🛡️ Vùng Phòng Thủ / Tránh Né): Vĩ mô bất lợi và định giá không hấp dẫn.
+        * *Ma Trận Thiên Thời Hội Tụ 4 Góc Phần Tư & Tác Động Vĩ Mô Hợp Nhất (`dualMatrix` & `sectorRotation`)*:
+          * Chuẩn hóa 100% danh mục toàn hệ thống về đúng **10 Nhóm Ngành Chuẩn GICS Việt Nam (HOSE)** (`VNFIN`, `VNREAL`, `VNIND`, `VNCONS`, `VNDISCR`, `VNENE`, `VNMAT`, `VNIT`, `VNUT`, `VNHEAL`), loại bỏ triệt để danh sách 11 ngành tùy biến cũ.
+          * Hợp nhất 2 chiều định lượng: Định Giá BCTC Toàn Sàn ($P/E$, $P/B$, Vốn hóa, Cổ tức) $\times$ Động Lực Vĩ Mô Chu Kỳ (Net Impact Score & Phân rã 6 biến số: Liên ngân hàng, SBV, CPI, USD/VND, Dầu Brent, PMI).
+          * Mỗi nhóm ngành trong `dualMatrix.items` chứa trọn vẹn:
+            - `decomposition`: Điểm tác động chi tiết của từng biến số trong 6 động lực vĩ mô (`interbank`, `sbvRate`, `cpi`, `usdVnd`, `oil`, `pmi`).
+            - `rank`: Thứ hạng sức mạnh vĩ mô (#1 đến #10).
+            - `actionTag`: Khuyến nghị vĩ mô (*Overweight*, *Accumulate*, *Neutral*, *Underweight*, *Reduce*).
+          * 4 Phân vùng chiến lược:
+            - `sweetSpot` (💎 Vùng Vàng Gom Mua): Vĩ mô ủng hộ ($Net \ge 0$) $\times$ Định giá rẻ ($P/E \le 11.5x$).
+            - `valueTrap` (⚠️ Vùng Bẫy Giá Rẻ): Định giá rẻ nhưng vĩ mô bất lợi ($Net < 0$).
+            - `momentum` (🔥 Vùng Quá Nhiệt): Vĩ mô mạnh mẽ nhưng định giá đắt ($P/E \ge 13.5x$).
+            - `defense` (🛡️ Vùng Phòng Thủ / Tránh Né): Vĩ mô bất lợi và định giá không hấp dẫn.
+          * *Giao diện người dùng (`SectorValuationHeatmap.jsx`)*: Hợp nhất toàn bộ dữ liệu định giá P/E và 6 động lực vĩ mô vào đúng **2 chế độ xem trực quan & bảng số liệu chuyên sâu**:
+            1. **`💎 Ma Trận Thiên Thời & Bản Đồ Nhiệt`**: 4 Phân vùng chiến lược, tích hợp thẻ P/E Heatmap so sánh % chênh lệch với VN-Index, P/E Rank, Macro Rank và widget bung mở xem 6 động lực vĩ mô.
+            2. **`📋 Bảng Toàn Diện & Phân Rã Vĩ Mô`**: Bảng tổng hợp đa chiều BCTC & vĩ mô, hỗ trợ mở rộng dòng (Expandable Row) phân tích chi tiết 6 động lực chu kỳ.
 
 ---
 
@@ -451,10 +597,11 @@ scripts/
 │   ├── base.py                       # BaseFetcher: HTTP session, Rate Limiting, SSL bypass, Auto-retry
 │   ├── market_fetcher.py             # MarketFetcher: TradingView Scanner API, Realtime Quotes
 │   ├── financial_fetcher.py          # FinancialFetcher: vnstock Finance/Company (KQKD, CĐKT, LCTT, Ratios, Events)
-│   ├── macro_fetcher.py              # MacroFetcher: HNX Yield Curve, SBV Rates, Yahoo Finance, PNJ Edge API (SJC & PNJ Gold)
-│   ├── vietstock_valuation_fetcher.py # VietstockValuationFetcher: Lịch sử định giá P/E, P/B VN-Index 25 năm từ Vietstock
-│   ├── market_valuation_history_fetcher.py # MarketValuationHistoryFetcher: Lịch sử định giá P/E, P/S, Vốn hóa Google Sheets
-│   └── tradingeconomics_fetcher.py   # TradingEconomicsFetcher: 95 chỉ số vĩ mô 10 danh mục
+│   ├── macro_fetcher.py              # MacroFetcher: HNX Yield Curve (BeautifulSoup + Pandas pd.read_html + 5D Fallback), SBV Rates, Yahoo Finance, PNJ Edge API (SJC & PNJ Gold)
+│   ├── vietstock_valuation_fetcher.py # VietstockValuationFetcher: Lịch sử định giá P/E, P/B VN-Index 25 năm từ Vietstock (BeautifulSoup Token Extraction)
+│   ├── market_valuation_history_fetcher.py # MarketValuationHistoryFetcher: Lịch sử định giá P/E, P/S, Vốn hóa Google Sheets (Pandas pd.read_csv & Vectorized Statistics)
+│   ├── sector_valuation_fetcher.py   # SectorValuationFetcher: Định giá 10 ngành GICS chuẩn hóa bằng BeautifulSoup + Pandas (Error Logging)
+│   └── tradingeconomics_fetcher.py   # TradingEconomicsFetcher: 95 chỉ số vĩ mô 10 danh mục (BeautifulSoup + Pandas pd.read_html & Error Logging)
 ├── lib/                              # 🧮 TẦNG NGHIỆP VỤ & CHUẨN HÓA TOÁN HỌC
 │   ├── financial_taxonomy.py         # Từ điển chuẩn hóa chỉ tiêu kế toán VN
 │   ├── valuation_models.py           # Graham, DDM, EV/EBITDA, DuPont, CAGR
@@ -483,7 +630,7 @@ scripts/
 | **Định Giá Phân Khúc (VN30, Diamond, Midcap) & 4x3 Ma Trận** | `scripts/lib/macro_regime.py` & Vietstock (`VN30`) | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Định Giá 10 Ngành Thực Tế & Ma Trận Thiên Thời (GICS)** | `scripts/fetchers/sector_valuation_fetcher.py` (`SectorValuationFetcher`) | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` & `data/sector_valuation_cache.json` |
 | **Báo Cáo Điều Hành Trọng Yếu (Executive Summary)** | `scripts/lib/macro_regime.py` | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
-| **Mô Hình 5 Pha Chu Kỳ, 11 Nhóm Ngành & Vàng Arbitrage** | `scripts/lib/macro_regime.py` | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
+| **Mô Hình 5 Pha Chu Kỳ, 10 Nhóm Ngành GICS & Vàng Arbitrage** | `scripts/lib/macro_regime.py` | `scripts/fetch_macro_valuation.py` | `data/macro_valuation.json` |
 | **Điều Phối Toàn Bộ Pipeline Tự Động** | Toàn bộ các Fetchers trên | `scripts/run_full_pipeline.py` | Toàn bộ thư mục `data/` |
 | **Sổ Lệnh Giao Dịch & Quản Trị Danh Mục** | Người dùng & Khớp lệnh FIFO | Server routes (`server/routes/`) | `data/stock.db` / Turso Cloud |
 
@@ -520,6 +667,7 @@ scripts/
 | Nhóm Trường Thông Tin | Single Source of Truth (SSOT) | Phân Hệ Tiêu Thụ | Fallback Khi Gián Đoạn |
 | :--- | :--- | :--- | :--- |
 | **Thị Giá Khớp Lệnh Realtime** (`price`, `change`, `changePct`) | **VPS Market Datafeed API** (`server/services/priceService.js`) | Dashboard Hero Card, Sổ Cái FIFO, Header Mã | DNSE Entrade 1m $\rightarrow$ TradingView Close $\rightarrow$ `prices_cache.json` |
+| **Thị Giá Chỉ Số VN-Index / VN30 & Scenario Matrix** | **DNSE Live Chart API** (`scripts/fetchers/macro_fetcher.py` & `priceService.js`) | Tab Vĩ Mô: Biểu đồ Intraday, Thước đo VN-Index, 3 Kịch Bản Scenario Matrix | VPS $\rightarrow$ DNSE $\rightarrow$ `data/macro_valuation.json` (`marketIndex.currentPoint`) |
 | **Thị Giá Đóng Cửa & 52 Chỉ Báo Kỹ Thuật TTM** | **TradingView Scanner API** (`scripts/fetchers/market_fetcher.py`) | Screener, Xung lực kỹ thuật, Lưới định giá nhanh | Snapshot hợp lệ trong `data/fundamentals_cache.json` |
 | **BCTC 122+ Chỉ Tiêu, 54 Ratios, Cổ Tức & Cổ Đông** | **`fetch_financial_reports.py`** (`vnstock/VCI`, `TCBS`) | Deep Dive BCTC 8Q/5Y, Phân rã DuPont, Lịch sử cổ tức | **Bảo toàn 100%** file `data/financials/<MÃ>.json` đã có. Chỉ dựng Baseline cho mã mới. |
 | **Giá Vàng SJC & Nhẫn PNJ 999.9** | **PNJ Official Edge API** (`scripts/fetchers/macro_fetcher.py`) | Tab Vĩ Mô: Tư vấn chênh lệch vàng (Gold Arbitrage) | Snapshot gần nhất trong `data/macro_valuation.json` (Sanity bounds: 50-300 Tr) |
@@ -623,6 +771,6 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   * $MoS < -20\%$: `RISKY` — **Rất Đắt / Rủi Ro** (Thị giá cao hơn giá trị nội tại $> 20\%$, màu đỏ hồng `rose`).
 
 ### D. Kiểm Thử Đơn Vị Tự Động (Unit Testing):
-* Script thực thi: `scripts/test_valuation_engine.py` (bao phủ 11 test cases cho toàn bộ 7 mô hình toán học, các trường hợp biên âm/rỗng, DuPont, Tech Score và Engine class).
+* Script thực thi: `scripts/test_valuation_engine.py` (bao phủ 20 test cases toàn diện cho: 7 mô hình toán học cơ bản, DuPont 3 nhân tố, DuPont 5 nhân tố mở rộng, Điểm Sức khỏe Tài chính 4 trụ cột, Cảnh báo sớm Red Flags, Phân tích đặc thù ngành, Mô hình DCF FCFF 3 kịch bản, Reverse DCF Implied Growth, Ma trận độ nhạy cảm WACC/g, Hồ sơ thị trường định lượng VAP/Wyckoff, Bản tin thời sự & Sentiment 30 ngày, Tech Score và Engine class).
 * Lệnh chạy: `.venv/bin/python scripts/test_valuation_engine.py`.
 
