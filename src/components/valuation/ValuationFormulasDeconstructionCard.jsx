@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { formatVND } from '../../utils/format.js';
 
 export default function ValuationFormulasDeconstructionCard({
@@ -35,7 +35,7 @@ export default function ValuationFormulasDeconstructionCard({
               Giải Phẫu Định Lượng Chuyên Sâu
             </span>
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              FAM v11.4P & Quantitative Framework
+              Quantitative Framework
             </span>
           </div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-1">
@@ -51,11 +51,10 @@ export default function ValuationFormulasDeconstructionCard({
           <button
             type="button"
             onClick={() => setSelectedModelId('all')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
-              selectedModelId === 'all'
+            className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${selectedModelId === 'all'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
-            }`}
+              }`}
           >
             Tất cả 10 mô hình
           </button>
@@ -115,13 +114,12 @@ export default function ValuationFormulasDeconstructionCard({
             return (
               <div
                 key={m.id || idx}
-                className={`p-5 rounded-2xl border transition-all space-y-3.5 flex flex-col justify-between ${
-                  isOutlier
+                className={`p-5 rounded-2xl border transition-all space-y-3.5 flex flex-col justify-between ${isOutlier
                     ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/60'
                     : hasVal
-                    ? 'bg-gray-50/60 dark:bg-gray-900/40 border-gray-200/80 dark:border-gray-700/80'
-                    : 'bg-gray-50/30 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800 opacity-75'
-                }`}
+                      ? 'bg-gray-50/60 dark:bg-gray-900/40 border-gray-200/80 dark:border-gray-700/80'
+                      : 'bg-gray-50/30 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800 opacity-75'
+                  }`}
               >
                 {/* Header Thẻ Mô Hình */}
                 <div>
@@ -267,9 +265,8 @@ export default function ValuationFormulasDeconstructionCard({
           <div className="flex items-center gap-4">
             <div>
               <span className="text-gray-500 dark:text-gray-400 text-[10px] block">Độ phân tán (Dispersion):</span>
-              <span className={`font-black ${
-                (consensusDetails.dispersionPct || 0) <= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
-              }`}>
+              <span className={`font-black ${(consensusDetails.dispersionPct || 0) <= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                }`}>
                 {consensusDetails.dispersionPct != null ? `${consensusDetails.dispersionPct}%` : '—'}
               </span>
             </div>
