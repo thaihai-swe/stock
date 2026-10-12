@@ -708,6 +708,96 @@ export default function SellForm({
             </div>
           )}
 
+          {/* 🌟 THẺ TỔNG HỢP LÃI/LỖ THỜI GIAN THỰC (LIVE P/L HERO CARD) */}
+          {costPreview && costPreview.sellPrice && (
+            <div className={`p-4 sm:p-5 rounded-3xl border-2 transition-all shadow-sm ${
+              costPreview.estPL >= 0
+                ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-500/60 text-emerald-950 dark:text-emerald-100 ring-4 ring-emerald-500/10'
+                : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-500/60 text-rose-950 dark:text-rose-100 ring-4 ring-rose-500/10'
+            }`}>
+              {/* Header: Trạng thái & ROI % */}
+              <div className="flex items-center justify-between pb-3 border-b border-current/15">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl sm:text-2xl">{costPreview.estPL >= 0 ? '🎉' : '📉'}</span>
+                  <div>
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider block">
+                      {costPreview.estPL >= 0 ? 'Dự Kiến Chốt Lời Thành Công' : 'Dự Kiến Cắt Lỗ Bảo Toàn Vốn'}
+                    </span>
+                    <span className="text-[11px] opacity-75">
+                      Khớp theo {form.matchMethod === 'highest' ? 'Giá vốn cao nhất' : form.matchMethod === 'fifo' ? 'FIFO Mua trước' : 'Giá vốn thấp nhất'}
+                    </span>
+                  </div>
+                </div>
+                <span className={`text-xs sm:text-sm font-black px-3 py-1 rounded-full ${
+                  costPreview.estPL >= 0
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-rose-600 text-white shadow-xs'
+                }`}>
+                  {costPreview.estPLPct >= 0 ? '+' : ''}{costPreview.estPLPct}%
+                </span>
+              </div>
+
+              {/* Con số Lãi/Lỗ trung tâm cực đại */}
+              <div className="py-3 sm:py-4 text-center">
+                <span className="text-[11px] sm:text-xs opacity-75 font-semibold block mb-0.5">
+                  Lãi / Lỗ Ròng Dự Kiến (Sau phí {form.feePct || 0.1}%):
+                </span>
+                <span className={`text-2xl sm:text-4xl font-black tracking-tight ${
+                  costPreview.estPL >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
+                }`}>
+                  {costPreview.estPL >= 0 ? '+' : ''}{fmtMoney(costPreview.estPL)} <span className="text-base sm:text-xl font-bold">đồng</span>
+                </span>
+              </div>
+
+              {/* 3 Trụ cột tài chính */}
+              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-current/15 text-center">
+                <div className="bg-white/70 dark:bg-slate-800/70 p-2 sm:p-2.5 rounded-2xl border border-current/10">
+                  <span className="text-[10px] sm:text-[11px] opacity-75 block font-medium">Tiền Thực Nhận</span>
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 mt-0.5 block truncate">
+                    {fmtMoney(costPreview.netRevenue)}đ
+                  </span>
+                </div>
+                <div className="bg-white/70 dark:bg-slate-800/70 p-2 sm:p-2.5 rounded-2xl border border-current/10">
+                  <span className="text-[10px] sm:text-[11px] opacity-75 block font-medium">Vốn Gốc Khớp</span>
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 mt-0.5 block truncate">
+                    {fmtMoney(costPreview.totalCost)}đ
+                  </span>
+                </div>
+                <div className="bg-white/70 dark:bg-slate-800/70 p-2 sm:p-2.5 rounded-2xl border border-current/10">
+                  <span className="text-[10px] sm:text-[11px] opacity-75 block font-medium">Chênh Lệch / CP</span>
+                  <span className={`text-xs sm:text-sm font-extrabold mt-0.5 block truncate ${
+                    costPreview.sellPrice >= costPreview.avgCost ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
+                  }`}>
+                    {costPreview.sellPrice >= costPreview.avgCost ? '+' : ''}{fmtMoney(costPreview.sellPrice - costPreview.avgCost)}đ
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Gợi ý khi đã chọn mã & SL nhưng chưa nhập giá */}
+          {costPreview && !costPreview.sellPrice && (
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/80 text-indigo-900 dark:text-indigo-200 flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-lg shrink-0">💡</span>
+                <div className="truncate">
+                  <span className="font-extrabold block">Đã chọn {Number(form.quantity).toLocaleString()} cp {form.symbol}</span>
+                  <span className="text-indigo-600/80 dark:text-indigo-300/80 text-[11px] block mt-0.5">
+                    Giá vốn TB: <b>{fmtMoney(costPreview.avgCost)}đ</b> · Nhập giá bán để xem Lãi/Lỗ ngay
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm(f => ({ ...f, price: String((costPreview.avgCost / 1000).toFixed(2)) }))}
+                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-bold shrink-0 cursor-pointer shadow-xs transition-colors"
+                title="Lấy giá vốn làm giá bán tham khảo (Hòa vốn)"
+              >
+                Lấy Giá Vốn
+              </button>
+            </div>
+          )}
+
           {/* NÚT SUBMIT */}
           <button
             type="submit"
@@ -720,7 +810,10 @@ export default function SellForm({
               </>
             ) : (
               <>
-                <span>💸</span> Xác Nhận Bán & Tính Lãi/Lỗ
+                <span>💸</span>{' '}
+                {form.symbol && Number(form.quantity) > 0
+                  ? `Xác Nhận Bán ${Number(form.quantity).toLocaleString()} ${form.symbol}`
+                  : 'Xác Nhận Bán'}
               </>
             )}
           </button>
