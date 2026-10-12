@@ -24,7 +24,7 @@ jobs:
       - name: 📥 1. Checkout mã nguồn
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: 🐍 2. Cài đặt Python 3.11
         uses: actions/setup-python@v5
@@ -52,6 +52,7 @@ jobs:
             echo "ℹ️ Không có thay đổi dữ liệu vĩ mô mới."
           else
             git commit -m "chore(data): weekly macro & sector valuation sync [skip ci]"
-            git push
+            git pull --rebase origin main || (git rebase --abort && git pull -X theirs --no-edit origin main)
+            git push origin main
             echo "✅ Đã commit và push dữ liệu vĩ mô mới lên GitHub thành công!"
           fi

@@ -167,6 +167,22 @@ export async function initDatabase() {
     );
   `);
 
+  // 6b. Tạo bảng requested_stocks (Hàng đợi yêu cầu tải mã cổ phiếu mới)
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS requested_stocks (
+      symbol TEXT PRIMARY KEY,
+      requested_at TEXT NOT NULL,
+      status TEXT DEFAULT 'PENDING',
+      synced_at TEXT,
+      error_message TEXT
+    );
+  `);
+  try {
+    await db.execute(`CREATE INDEX IF NOT EXISTS idx_requested_stocks_status ON requested_stocks(status);`);
+  } catch (e) {
+    // bỏ qua nếu index đã tồn tại
+  }
+
   // 7. Migration an toàn: Bổ sung cột user_id vào các database đã có sẵn dữ liệu
   await addColumnSafe('buy_orders', 'user_id TEXT DEFAULT "demo"');
   await addColumnSafe('sell_orders', 'user_id TEXT DEFAULT "demo"');

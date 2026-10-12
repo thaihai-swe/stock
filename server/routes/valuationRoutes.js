@@ -2,7 +2,8 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
-import { ROOT_DIR, DATA_DIR } from '../config/constants.js';
+import { ROOT_DIR, DATA_DIR, REQUESTED_STOCKS_FILE } from '../config/constants.js';
+import { db } from '../storage/db.js';
 
 const router = express.Router();
 
@@ -17,6 +18,57 @@ const dnseCache = new Map();
 const CACHE_TTL_INTRADAY = 60 * 60 * 1000; // 1 giờ (60 phút)
 const CACHE_TTL_DAILY = 60 * 60 * 1000; // 1 giờ (60 phút)
 
+// Ghi nhận mã cổ phiếu vào hàng đợi requested_stocks (đúng 5 trường)
+export async function queueRequestedStock(symbol) {
+  if (!symbol || typeof symbol !== 'string') return null;
+  const sym = symbol.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!sym || sym.length < 2 || sym.length > 8) return null;
+
+  const now = new Date().toISOString();
+
+  // 1. Ghi nhận vào SQLite / Turso DB
+  try {
+    await db.execute({
+      sql: `INSERT OR IGNORE INTO requested_stocks (symbol, requested_at, status, synced_at, error_message)
+            VALUES (?, ?, 'PENDING', NULL, NULL);`,
+      args: [sym, now]
+    });
+  } catch (err) {
+    console.warn(`Lỗi ghi nhận requested_stocks vào DB cho ${sym}:`, err.message);
+  }
+
+  // 2. Đồng bộ file snapshot data/requested_stocks.json
+  try {
+    let requestsMap = {};
+    if (fs.existsSync(REQUESTED_STOCKS_FILE)) {
+      try {
+        requestsMap = JSON.parse(fs.readFileSync(REQUESTED_STOCKS_FILE, 'utf-8'));
+      } catch {
+        requestsMap = {};
+      }
+    }
+    if (!requestsMap[sym]) {
+      requestsMap[sym] = {
+        symbol: sym,
+        requested_at: now,
+        status: 'PENDING',
+        synced_at: null,
+        error_message: null
+      };
+      fs.writeFileSync(REQUESTED_STOCKS_FILE, JSON.stringify(requestsMap, null, 2), 'utf-8');
+    }
+  } catch (err) {
+    // bỏ qua lỗi file nếu đang trên môi trường read-only
+  }
+
+  return {
+    symbol: sym,
+    requested_at: now,
+    status: 'PENDING',
+    synced_at: null,
+    error_message: null
+  };
+}
 
 // Ưu tiên sử dụng môi trường ảo uv (.venv/bin/python) nếu tồn tại
 const VENV_PYTHON = path.join(ROOT_DIR, '.venv', 'bin', 'python');
@@ -210,7 +262,7 @@ router.get('/valuation/market-history', (req, res) => {
  * 3. GET /api/valuation/financials/:symbol
  * Lấy báo cáo tài chính 8 quý và 5 năm chi tiết của từng mã cổ phiếu (Income, Balance, Cash Flow)
  */
-router.get('/valuation/financials/:symbol', (req, res) => {
+router.get('/valuation/financials/:symbol', async (req, res) => {
   const sym = (req.params.symbol || '').trim().toUpperCase();
   if (!sym) {
     return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
@@ -222,9 +274,15 @@ router.get('/valuation/financials/:symbol', (req, res) => {
       const raw = fs.readFileSync(filePath, 'utf-8');
       return res.json(JSON.parse(raw));
     }
+
+    // Tự động đưa mã vào hàng đợi requested_stocks nếu chưa có trong kho
+    await queueRequestedStock(sym);
+
     return res.status(404).json({
-      error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
-      symbol: sym
+      error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống.`,
+      queueMessage: `Hệ thống đã tự động ghi nhận mã ${sym} vào hàng đợi yêu cầu dữ liệu. Dữ liệu sẽ tự động được thu thập trong phiên đồng bộ EOD lúc 18:00 tiếp theo!`,
+      symbol: sym,
+      isQueued: true
     });
   } catch (error) {
     console.error(`Lỗi đọc BCTC cho mã ${sym}:`, error);
@@ -396,8 +454,12 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
       });
     }
 
-    return res.status(404).json({
-      error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
+    queueRequestedStock(sym).catch(() => {});
+
+    return res.status(202).json({
+      success: false,
+      isQueued: true,
+      message: `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Hệ thống sẽ tự động thu thập BCTC và định giá trong phiên đồng bộ EOD lúc 18:00 tiếp theo!`,
       symbol: sym
     });
   }
@@ -412,8 +474,11 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
       const { finData, fundData } = readLocalData();
 
       if (!finData) {
-        return res.status(404).json({
-          error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
+        queueRequestedStock(sym).catch(() => {});
+        return res.status(202).json({
+          success: false,
+          isQueued: true,
+          message: `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Hệ thống sẽ tự động thu thập BCTC và định giá trong phiên đồng bộ EOD tiếp theo!`,
           symbol: sym
         });
       }
@@ -427,6 +492,37 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
       });
     });
   });
+});
+
+/**
+ * 7. GET /api/valuation/requested-stocks
+ * Lấy danh sách các mã cổ phiếu trong hàng đợi yêu cầu (chuẩn 5 trường)
+ */
+router.get('/valuation/requested-stocks', async (req, res) => {
+  try {
+    const result = await db.execute(`
+      SELECT symbol, requested_at, status, synced_at, error_message
+      FROM requested_stocks
+      ORDER BY requested_at DESC;
+    `);
+    const rows = result.rows || [];
+    return res.json({
+      total: rows.length,
+      requested_stocks: rows
+    });
+  } catch (err) {
+    // Fallback đọc từ file JSON nếu DB tạm thời chưa sẵn sàng
+    if (fs.existsSync(REQUESTED_STOCKS_FILE)) {
+      try {
+        const raw = JSON.parse(fs.readFileSync(REQUESTED_STOCKS_FILE, 'utf-8'));
+        const list = Object.values(raw);
+        return res.json({ total: list.length, requested_stocks: list });
+      } catch {
+        // ignore
+      }
+    }
+    return res.json({ total: 0, requested_stocks: [] });
+  }
 });
 
 export default router;

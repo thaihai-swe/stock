@@ -2,52 +2,55 @@
   "_meta": {
     "symbol": "DXG",
     "companyName": "Bluemarq Group Joint Stock Company",
-    "updatedAt": "2026-10-12T04:44:34Z",
+    "updatedAt": "2026-10-12T16:48:57Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
-    "source": "Yahoo Finance Audit Statements & VAS TT200",
+    "source": "Yahoo Finance & vnstock Guest Mode Official Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 6550,
+    "grahamNumber": 1481,
     "ddmTarget": null,
-    "peTarget": 1944,
-    "pbTarget": 15229,
+    "peTarget": 7475,
+    "pbTarget": 20811,
     "evEbitdaFairPrice": null,
-    "pcfFairPrice": null,
-    "psFairPrice": 2734,
-    "consensusFairValue": 11682,
-    "marginOfSafety": 14.0,
-    "upside": 16.2,
-    "consensusDiffPercent": 16.2,
-    "valuationRating": "🟡 HOLD",
-    "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
-    "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-    "validModelsCount": 2,
+    "pcfFairPrice": 4340,
+    "psFairPrice": 4054,
+    "consensusFairValue": 7311,
+    "marginOfSafety": -35.4,
+    "upside": -26.2,
+    "consensusDiffPercent": -26.2,
+    "valuationRating": "🟠 AVOID",
+    "valuationRatingText": "Thị giá cao hơn định giá cơ sở",
+    "valuationRatingBadge": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+    "validModelsCount": 3,
     "models10": [
       {
         "id": "graham",
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 6550,
-        "targetPrice": 6550,
-        "diffPercent": -34.8,
-        "weight": 0.08,
-        "baseWeight": 0.08,
+        "value": 1481,
+        "targetPrice": 1481,
+        "diffPercent": -85.0,
+        "weight": 0.05,
+        "baseWeight": 0.05,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": false,
-        "outlierGapPct": 39.9,
-        "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
-        "formulaDetail": "V = √(22.5 × 169 × 11,281) | Hệ số = Min(22.5, 45.6x × 1.29x = 58.81)",
+        "isOutlier": true,
+        "outlierGapPct": 80.7,
+        "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
+        "formulaDetail": "V = 169 × (7.0x + 0.8 × 3.5%) × (4.47% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.894",
         "parameters": {
           "eps": 169.0,
-          "bvps": 11281,
-          "multiplier": 22.5,
-          "peAvg": 45.59,
-          "pbAvg": 1.29,
-          "maxMultiplier": 22.5
+          "epsAvg": 298,
+          "peBase": 7.0,
+          "peMedian": 44.23,
+          "hs": 0.8,
+          "gCagr": 3.5,
+          "constantVn": 4.47,
+          "yVn": 5.0,
+          "vn10yYield": 4.47
         },
         "statusNote": "Phù hợp"
       },
@@ -56,20 +59,24 @@
         "name": "P/E Chuẩn Hóa",
         "fullName": "2. P/E Chuẩn Hóa",
         "cleanName": "P/E Chuẩn Hóa",
-        "value": 1944,
-        "targetPrice": 1944,
-        "diffPercent": -80.7,
-        "weight": 0.15,
-        "baseWeight": 0.15,
+        "value": 7475,
+        "targetPrice": 7475,
+        "diffPercent": -24.5,
+        "weight": 0.1,
+        "baseWeight": 0.1,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": true,
-        "outlierGapPct": 82.1,
-        "formula": "EPS × P/E Mục Tiêu (11.5x)",
-        "formulaDetail": "V = 169 × 11.5x (Median chu kỳ 5Y)",
+        "isOutlier": false,
+        "outlierGapPct": 2.8,
+        "formula": "EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)",
+        "formulaDetail": "V = 169 × 44.2x (Trung vị 4 năm | PE Trung bình: 44.7x)",
         "parameters": {
           "eps": 169.0,
-          "targetPe": 11.5
+          "targetPe": 44.23,
+          "peMedian": 44.23,
+          "peAvg": 44.68,
+          "yearsUsed": 4,
+          "isFallback": false
         },
         "statusNote": "Phù hợp"
       },
@@ -78,22 +85,27 @@
         "name": "P/B Ngành & Gordon",
         "fullName": "3. P/B Ngành & Gordon",
         "cleanName": "P/B Ngành & Gordon",
-        "value": 15229,
-        "targetPrice": 15229,
-        "diffPercent": 51.5,
-        "weight": 0.15,
-        "baseWeight": 0.15,
+        "value": 20811,
+        "targetPrice": 20811,
+        "diffPercent": 110.2,
+        "weight": 0.18,
+        "baseWeight": 0.18,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": false,
-        "outlierGapPct": 39.9,
-        "formula": "BVPS × [(ROE - g)/(r - g)]",
-        "formulaDetail": "V = 11,281 × Gordon Multiple",
+        "isOutlier": true,
+        "outlierGapPct": 170.6,
+        "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
+        "formulaDetail": "V = 16,649 × 1.25x (Trung vị 4 năm | PB Trung bình: 1.18x)",
         "parameters": {
-          "bvps": 11281,
-          "roe": 1.48,
+          "bvps": 16649,
+          "roe": 0.66,
           "coe": 0.115,
-          "terminalG": 0.035
+          "terminalG": 0.035,
+          "targetPb": 1.25,
+          "pbMedian": 1.25,
+          "pbAvg": 1.18,
+          "yearsUsed": 4,
+          "isFallback": false
         },
         "statusNote": "Phù hợp"
       },
@@ -102,25 +114,25 @@
         "name": "DCF Đa Giai Đoạn",
         "fullName": "4. DCF Đa Giai Đoạn",
         "cleanName": "DCF Đa Giai Đoạn",
-        "value": null,
-        "targetPrice": null,
-        "diffPercent": null,
-        "weight": 0.15,
-        "baseWeight": 0.15,
+        "value": 7907,
+        "targetPrice": 7907,
+        "diffPercent": -20.1,
+        "weight": 0.1,
+        "baseWeight": 0.1,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 0.0,
+        "outlierGapPct": 2.8,
         "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
         "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
         "parameters": {
-          "baseFcf": -3340000000000.0,
+          "baseFcf": 688000000000.0,
           "shares": 1268110000.0,
           "wacc": 0.115,
           "g1": 0.07,
           "terminalG": 0.035
         },
-        "statusNote": "FCF âm hoặc đang chu kỳ đầu tư lớn"
+        "statusNote": "Phù hợp"
       },
       {
         "id": "ddm",
@@ -150,98 +162,107 @@
         "name": "FCFF Doanh Nghiệp",
         "fullName": "6. FCFF Doanh Nghiệp",
         "cleanName": "FCFF Doanh Nghiệp",
-        "value": null,
-        "targetPrice": null,
-        "diffPercent": null,
-        "weight": 0.12,
-        "baseWeight": 0.12,
+        "value": 2438,
+        "targetPrice": 2438,
+        "diffPercent": -75.4,
+        "weight": 0.07,
+        "baseWeight": 0.07,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": false,
-        "outlierGapPct": 0.0,
+        "isOutlier": true,
+        "outlierGapPct": 68.3,
         "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
-        "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+        "formulaDetail": "FCFF chiết khấu WACC=11.5%, Terminal g=3.5%",
         "parameters": {
-          "fcff": -3340000000000.0,
+          "fcff": 546000000000.0,
           "netDebt": 5167000000000.0,
           "wacc": 0.115,
-          "shares": 1268110000.0
+          "shares": 1268110000.0,
+          "scenarios": {
+            "status": "SUCCESS",
+            "basePrice": 2438,
+            "bullPrice": 4217,
+            "bearPrice": 508,
+            "fairPrice": 2438,
+            "wacc": 11.5,
+            "terminalG": 3.5,
+            "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
+          }
         },
-        "statusNote": "Dòng tiền FCFF âm"
+        "statusNote": "Phù hợp"
       },
       {
         "id": "fcfe",
         "name": "FCFE Cổ Đông",
         "fullName": "7. FCFE Cổ Đông",
         "cleanName": "FCFE Cổ Đông",
-        "value": null,
-        "targetPrice": null,
-        "diffPercent": null,
-        "weight": 0.08,
-        "baseWeight": 0.08,
+        "value": 5243,
+        "targetPrice": 5243,
+        "diffPercent": -47.0,
+        "weight": 0.05,
+        "baseWeight": 0.05,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 0.0,
+        "outlierGapPct": 31.8,
         "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
         "formulaDetail": "FCFE chiết khấu CoE=11.5%",
         "parameters": {
-          "cfo": -3340000000000.0,
-          "capex": 176000000000.0,
+          "cfo": 688000000000.0,
+          "capex": 142000000000.0,
           "coe": 0.115,
           "shares": 1268110000.0
         },
-        "statusNote": "Dòng tiền FCFE âm"
+        "statusNote": "Phù hợp"
       },
       {
         "id": "rim",
         "name": "Residual Income RIM/EVA",
         "fullName": "8. Residual Income RIM/EVA",
         "cleanName": "Residual Income RIM/EVA",
-        "value": null,
-        "targetPrice": null,
-        "diffPercent": null,
+        "value": 660574,
+        "targetPrice": 660574,
+        "diffPercent": 6572.5,
         "weight": 0.044,
         "baseWeight": 0.08,
         "suitability": 0.55,
         "suitabilityNote": "Thứ cấp phi TC",
-        "isOutlier": false,
-        "outlierGapPct": 0.0,
+        "isOutlier": true,
+        "outlierGapPct": 8488.9,
         "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
-        "formulaDetail": "BVPS=11,281 đ, ROE=1.5%, CoE=11.5%",
+        "formulaDetail": "BVPS=16,649 đ, ROE=0.7%, CoE=11.5%",
         "parameters": {
           "equity": 34602000000000.0,
-          "bvps": 11281,
-          "roe": 1.48,
+          "bvps": 16649,
+          "roe": 0.66,
           "coe": 0.115,
           "shares": 1268110000.0
         },
-        "statusNote": "Vốn chủ âm hoặc ROE < CoE"
+        "statusNote": "Thứ cấp phi TC"
       },
       {
         "id": "nav",
-        "name": "Book NAV / RNAV",
-        "fullName": "9. Book NAV / RNAV",
-        "cleanName": "Book NAV / RNAV",
-        "value": 21829,
-        "targetPrice": 21829,
-        "diffPercent": 117.2,
-        "weight": 0.032,
-        "baseWeight": 0.07,
-        "suitability": 0.45,
-        "suitabilityNote": "Thứ cấp phi TC/BĐS",
+        "name": "Book NAV / P/B Chuẩn Hóa",
+        "fullName": "9. Book NAV / P/B Chuẩn Hóa",
+        "cleanName": "Book NAV / P/B Chuẩn Hóa",
+        "value": 20811,
+        "targetPrice": 20811,
+        "diffPercent": 110.2,
+        "weight": 0.32,
+        "baseWeight": 0.32,
+        "suitability": 1.0,
+        "suitabilityNote": "Trọng yếu ngành Tài sản/TC",
         "isOutlier": true,
-        "outlierGapPct": 100.5,
-        "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
-        "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+        "outlierGapPct": 170.6,
+        "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
+        "formulaDetail": "V = 16,649 đ × 1.25x (Median P/B chu kỳ)",
         "parameters": {
+          "bvps": 16649,
+          "targetPb": 1.25,
           "equity": 34602000000000.0,
-          "totalAssets": 39769000000000.0,
-          "totalDebt": 5167000000000.0,
-          "inventory": null,
           "shares": 1268110000.0
         },
-        "statusNote": "Thứ cấp phi TC/BĐS"
+        "statusNote": "Phù hợp"
       },
       {
         "id": "evebitda",
@@ -251,8 +272,8 @@
         "value": null,
         "targetPrice": null,
         "diffPercent": null,
-        "weight": 0.07,
-        "baseWeight": 0.07,
+        "weight": 0.0,
+        "baseWeight": 0.0,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
@@ -260,9 +281,9 @@
         "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
         "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
         "parameters": {
-          "ebitda": 544000000000.0,
+          "ebitda": 312000000000.0,
           "multiple": 7.5,
-          "revenue": 3152000000000.0,
+          "revenue": 4674000000000.0,
           "salesMultiple": 1.1,
           "netDebt": 5167000000000.0,
           "shares": 1268110000.0
@@ -271,17 +292,20 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 12210,
-      "cleanMedian": 10890,
-      "dispersionPct": 12.1,
+      "cleanWeightedAvg": 7201,
+      "cleanMedian": 7475,
+      "dispersionPct": 3.7,
       "consensusLevel": "HIGH",
-      "coveragePct": 22.2,
-      "confidenceScore": 54.9,
-      "modelsUsed": 2,
-      "modelsValid": 4,
+      "coveragePct": 37.5,
+      "confidenceScore": 64.0,
+      "modelsUsed": 3,
+      "modelsValid": 8,
       "excludedOutliers": [
-        "P/E Chuẩn Hóa",
-        "Book NAV / RNAV"
+        "Benjamin Graham",
+        "P/B Ngành & Gordon",
+        "FCFF Doanh Nghiệp",
+        "Residual Income RIM/EVA",
+        "Book NAV / P/B Chuẩn Hóa"
       ]
     },
     "valuationTraps": {
@@ -335,58 +359,67 @@
       ]
     },
     "sevenPriceZones": {
-      "currentZone": "Accumulate",
-      "zoneBadge": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-      "safeBuyPrice": 8762,
-      "acceptableBuyPrice": 9930,
-      "bearPrice": 8177,
-      "bullPrice": 14602,
+      "currentZone": "Expensive",
+      "zoneBadge": "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
+      "safeBuyPrice": 5483,
+      "acceptableBuyPrice": 6214,
+      "bearPrice": 5118,
+      "bullPrice": 9139,
       "boundaries": {
-        "deepValue": 7886,
-        "safeBuy": 8762,
-        "accumulate": 9930,
-        "fairLow": 10514,
-        "fairHigh": 12850,
-        "aboveFair": 13872,
-        "expensive": 16793
+        "deepValue": 4935,
+        "safeBuy": 5483,
+        "accumulate": 6214,
+        "fairLow": 6945,
+        "fairHigh": 8042,
+        "aboveFair": 8682,
+        "expensive": 10510
       }
     },
     "threeLayerDecision": {
-      "compositeScore": 4.9,
-      "valuationLayerScore": 6.8,
-      "qualityLayerScore": 1.5,
+      "compositeScore": 3.2,
+      "valuationLayerScore": 0.0,
+      "qualityLayerScore": 4.5,
       "timingLayerScore": 6.5,
-      "roeCoeSpread": -10.02,
-      "buyRecommendation": "🟡 HOLD",
-      "decisionReason": "Thiếu độ phủ mô hình hoặc phân tán cao",
+      "roeCoeSpread": -10.84,
+      "buyRecommendation": "🟠 AVOID",
+      "decisionReason": "Thị giá cao hơn định giá cơ sở",
       "isGateOpen": false,
       "isTrapCapped": false
     },
     "historicalBands": {
-      "band25": 9845,
-      "band50": 11129,
-      "band75": 12029,
-      "bandPosition": "P25–P50 (Hợp lý thấp)",
-      "bandWidthPct": 19.6,
+      "band25": 12490,
+      "band50": 14101,
+      "band75": 15168,
+      "bandPosition": "Dưới P25 (Vùng Rẻ)",
+      "bandWidthPct": 19.0,
+      "peYearsUsed": 4,
+      "pbYearsUsed": 4,
+      "peMean": 44.68,
+      "pbMean": 1.18,
+      "isFallbackToSector": false,
       "peBand": {
-        "p25": 40.41,
-        "p50": 45.59,
-        "p75": 51.24,
-        "current": 59.47
+        "p25": 39.2,
+        "p50": 44.23,
+        "p75": 49.71,
+        "mean": 44.68,
+        "current": 58.58,
+        "yearsUsed": 4
       },
       "pbBand": {
-        "p25": 1.14,
-        "p50": 1.29,
-        "p75": 1.36,
-        "current": 0.89
+        "p25": 1.1,
+        "p50": 1.25,
+        "p75": 1.32,
+        "mean": 1.18,
+        "current": 0.59,
+        "yearsUsed": 4
       },
       "priceBands": {
-        "peP25Price": 6829,
-        "peP50Price": 7706,
-        "peP75Price": 8660,
-        "pbP25Price": 12860,
-        "pbP50Price": 14552,
-        "pbP75Price": 15399
+        "peP25Price": 6625,
+        "peP50Price": 7475,
+        "peP75Price": 8401,
+        "pbP25Price": 18356,
+        "pbP50Price": 20728,
+        "pbP75Price": 21935
       }
     },
     "dividendSustainability": {
@@ -403,19 +436,19 @@
           "label": "EPS (Thu nhập mỗi CP)",
           "unit": "đ",
           "current": 169.0,
-          "sma5y": 178,
-          "deltaPct": -4.8,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "sma5y": 239,
+          "deltaPct": -29.2,
+          "status": "Suy giảm so với TB",
+          "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": false
         },
         {
           "key": "bvps",
           "label": "BVPS (Giá trị sổ sách)",
           "unit": "đ",
-          "current": 11281.0,
+          "current": 16649.0,
           "sma5y": 6836,
-          "deltaPct": 65.0,
+          "deltaPct": 143.5,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
@@ -424,9 +457,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 59.3,
-          "sma5y": 46.05,
-          "deltaPct": 28.8,
+          "current": 58.42,
+          "sma5y": 44.68,
+          "deltaPct": 30.8,
           "status": "Suy giảm so với TB",
           "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": true
@@ -435,9 +468,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 0.9,
-          "sma5y": 1.22,
-          "deltaPct": -25.9,
+          "current": 0.88,
+          "sma5y": 1.18,
+          "deltaPct": -25.1,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -446,31 +479,31 @@
           "key": "roe",
           "label": "Tỷ suất ROE",
           "unit": "%",
-          "current": 1.48,
-          "sma5y": 1.65,
-          "deltaPct": -10.1,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "current": 0.66,
+          "sma5y": 2.14,
+          "deltaPct": -69.1,
+          "status": "Suy giảm so với TB",
+          "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": false
         },
         {
           "key": "roa",
           "label": "Tỷ suất ROA",
           "unit": "%",
-          "current": 0.53,
-          "sma5y": 0.56,
-          "deltaPct": -5.4,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "current": 0.35,
+          "sma5y": 1.08,
+          "deltaPct": -67.6,
+          "status": "Suy giảm so với TB",
+          "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": false
         },
         {
           "key": "roic",
           "label": "Tỷ suất ROIC",
           "unit": "%",
-          "current": 1.99,
+          "current": -0.18,
           "sma5y": 2.88,
-          "deltaPct": -31.0,
+          "deltaPct": -106.2,
           "status": "Suy giảm so với TB",
           "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": false
@@ -490,64 +523,64 @@
           "key": "netMargin",
           "label": "Biên Lợi Nhuận Ròng",
           "unit": "%",
-          "current": 6.73,
-          "sma5y": 3.87,
-          "deltaPct": 73.7,
-          "status": "Cải thiện rõ rệt",
-          "badgeColor": "text-emerald-500 font-semibold",
+          "current": 4.44,
+          "sma5y": 7.47,
+          "deltaPct": -40.6,
+          "status": "Suy giảm so với TB",
+          "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": false
         },
         {
           "key": "revenue",
           "label": "Doanh Thu Thuần",
           "unit": "Tỷ",
-          "current": 3152.0,
+          "current": 4674.0,
           "sma5y": 3644.8,
-          "deltaPct": -13.5,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "deltaPct": 28.2,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
         },
         {
           "key": "netIncome",
           "label": "Lợi Nhuận Sau Thuế",
           "unit": "Tỷ",
-          "current": 212.0,
-          "sma5y": 174.8,
-          "deltaPct": 21.3,
-          "status": "Cải thiện rõ rệt",
-          "badgeColor": "text-emerald-500 font-semibold",
+          "current": 192.0,
+          "sma5y": 346.4,
+          "deltaPct": -44.6,
+          "status": "Suy giảm so với TB",
+          "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": false
         },
         {
           "key": "ebitda",
           "label": "Chỉ số EBITDA",
           "unit": "Tỷ",
-          "current": 544.0,
-          "sma5y": 594.2,
-          "deltaPct": -8.4,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "current": 312.0,
+          "sma5y": 63.6,
+          "deltaPct": 390.6,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
         },
         {
           "key": "freeCashFlow",
           "label": "Dòng Tiền Tự Do FCF",
           "unit": "Tỷ",
-          "current": -3340.0,
+          "current": 688.0,
           "sma5y": -1041.2,
-          "deltaPct": -220.8,
-          "status": "Suy giảm so với TB",
-          "badgeColor": "text-rose-400 font-semibold",
+          "deltaPct": 166.1,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
         },
         {
           "key": "debtToEquity",
           "label": "Nợ / Vốn Chủ (D/E)",
           "unit": "x",
-          "current": 0.36,
-          "sma5y": 0.43,
-          "deltaPct": -16.3,
+          "current": 0.24,
+          "sma5y": 0.29,
+          "deltaPct": -16.7,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -576,63 +609,63 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": null
+    "impliedFcfYieldPrice": 6576
   },
   "financialRatios": {
     "valuation": {
-      "pe": 59.3,
-      "pb": 0.9,
-      "ps": 2.88,
-      "pCf": -3.8,
-      "evEbitda": 23.5,
+      "pe": 58.42,
+      "pb": 0.88,
+      "ps": 2.84,
+      "pCf": -3.6,
+      "evEbitda": null,
       "dividendYield": 0.0
     },
     "profitability": {
-      "roe": 1.48,
-      "roa": 0.53,
-      "roic": 1.99,
+      "roe": 0.66,
+      "roa": 0.35,
+      "roic": -0.18,
       "grossMargin": 46.07,
-      "netMargin": 6.73,
-      "ebitda": 136,
-      "ebit": 121
+      "netMargin": 4.44,
+      "ebitda": 0,
+      "ebit": -15
     },
     "liquidity": {
       "currentRatio": 15.36,
       "quickRatio": 8.42,
       "cashRatio": 2.21,
-      "interestCoverage": 1.8
+      "interestCoverage": null
     },
     "efficiency": {
       "assetTurnover": 0.08,
-      "inventoryTurnover": 0.11,
-      "dso": 0,
-      "dio": 3385,
-      "dpo": 146,
-      "ccc": 3239
+      "inventoryTurnover": -0.11,
+      "dso": 1570,
+      "dio": null,
+      "dpo": null,
+      "ccc": null
     },
     "leverage": {
-      "debtToEquity": 0.36,
-      "borrowingsToEquity": 0.36,
-      "financialLeverage": 2.78,
+      "debtToEquity": 0.24,
+      "borrowingsToEquity": 0.24,
+      "financialLeverage": 1.88,
       "netDebt": 61
     }
   },
   "cagr": {
     "cagr3YRevenue": 6.1,
-    "cagr3YNetIncome": 15.9,
+    "cagr3YNetIncome": 99.2,
     "cagr5YRevenue": null,
     "cagr5YNetIncome": null
   },
   "cashflowHealth": {
-    "latestFcf": -879,
+    "latestFcf": -924,
     "cfoVsNetIncomeRatio": -15.75,
     "qualityAssessment": "Cần theo dõi (Dòng tiền yếu)"
   },
   "dupontAnalysis": {
-    "roe": 1.48,
-    "netProfitMargin": 6.73,
+    "roe": 0.66,
+    "netProfitMargin": 4.44,
     "assetTurnover": 0.08,
-    "equityMultiplier": 2.78,
+    "equityMultiplier": 1.88,
     "qualityAssessment": "Ổn định: Biên lợi nhuận khá, hiệu quả sử dụng tài sản hợp lý."
   },
   "corporateEvents": [
@@ -664,6 +697,20 @@
       "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOblVWZjcwUllSTzdmNWRkUDh1YzRTYlNaazRiZXBQX0FDdkNlRUVtclZ2X1JqaHBocUxtdGtPaFU1QjdnWDFIeVpCbGktLTEyZUVEeWVCbHhjQng2VzhCRlpxYzJ2cFUzTnFsSVZkRnlYVkQ3UEhJTi1LQlp3UnN1V1prbjR5MktqSEhzQlh6a1pNanNvdGIzcW5UeUY4dmJRUUthRnRMd0x3Q2w0QXJiV2N30gGuAUFVX3lxTE1GWDVteUhMdkZLbXpnOXF1TVB2QWo0X28wSVp5WEk4QjZiSlg3N2JVcHFpTWpma09oeXFNSGg5SUhCbU40NjlITTE2TXJISXdLTFlfdG0zd3FIS09iaVlfMTFTM1VPZzlEaVRhbGRSRWhudjlRUldkeWU2ZHAtdy1MZjR3RzdXREExcEU1MDNtYjl1VGpUNHh6Ml9sQ0hMOG9tYWtCVjdMc1RCNU11UQ?oc=5"
     },
     {
+      "date": "2026-07-17",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-06-23",
+      "type": "Niêm yết thêm",
+      "content": "DXG - Niêm yết bổ sung 155.720.776 cổ phiếu",
+      "ratio": null,
+      "value": null
+    },
+    {
       "date": "2026-06-17",
       "type": "Giao dịch nội bộ",
       "content": "Nhóm Dragon Capital bán ra 2,6 triệu cổ phiếu Bluemarq Group (DXG)",
@@ -671,6 +718,13 @@
       "value": null,
       "source": "Tin nhanh chứng khoán",
       "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxObmVucTZPbXZHT1g1UGFSaHZDWGdzSFprMjhpYl9xRWExWUFKQVVsYkVLdV9BRnd2bW55VGJwazVoa3JBb1NtR05DTkJLcng5UGtTU1g4emN2RlpPRWVvWFNlRmVJQW55WDBpUWtScnZQNVlUTjJEd3N6T0tTaGJ0eklLZHdGU1A5WjBBTENKcGpWOVNGZVk2UVIwblZqajR2dHp2bGxpU2xabGpHSU01VnN0RdIBrwFBVV95cUxPU1M2R3RDTmNud2pJR2xGRFhpZENscnNOSnl4ODAyMkhrYW5wMU1qWlB0amZNOHUxQTRYRlBoMENWaVBTcmlIbEFLeG1DRmxEazk3cjRGOW1MYmRBazRZTWtLMlF6QzZyeGhkZHRTdjRqRFhqOURqT0N4eThMR0pnU3lwUktqMUhVOUpkZHR0cnVBTzJWeWVoZ0hCS292MDNFWm52SS12SFVBZXZCeE0w?oc=5"
+    },
+    {
+      "date": "2026-06-17",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Samsung Vietnam Securities Master Investment Trust - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
     },
     {
       "date": "2026-06-05",
@@ -689,6 +743,13 @@
       "value": null,
       "source": "CafeF",
       "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPZ3locHJKbUU1RS1zb0lWUjlwWXEwbW5WV2RjWXVpdENSbk0zbG43QURQZ2ltRVRDYXVSS0ljaDVEdmtaUkp1MEFMbjVLQ1VtcnduWU1XbHVMcHA0bmd3MnlGcnpMRlJ4YmJSMC0yeUk4UFJaS1V1cmZ3TmFJX3pyVHVvSUxELXFfRjZzWC0zbFF5aEd4bHhobExSX2hhWXZ2U3ppUmh3?oc=5"
+    },
+    {
+      "date": "2026-05-22",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Cổ phiếu thưởng tỉ lệ 14.0%",
+      "ratio": "0.14",
+      "value": null
     },
     {
       "date": "2026-05-20",
@@ -736,6 +797,13 @@
       "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNQmVGSnNTQndfY3k5RHhYaGs0dUdzWkxfa1NuOHVidGhQTEpJclhiQVpCeGNqdVNMZUNEcllxUW9uNUNOX25aeVIxc0Jrdk5XLUlwNUZ6S0c4U29iTzJPZUlBNjZtT0dmS0k4MVlIbHpVQkdTRnl4LVNVZkJzSjVmVjBLbGFxODlWUGIwTw?oc=5"
     },
     {
+      "date": "2026-04-29",
+      "type": "Giao dịch nội bộ: Giao dịch cá nhân",
+      "content": "Nguyễn Trường Sơn - Đăng kí Bán 351,098 DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
       "date": "2026-04-17",
       "type": "Đại hội cổ đông",
       "content": "ĐHĐCĐ Đất Xanh (DXG) 2026: Đặt mục tiêu doanh thu 5.000 tỷ, tái cấu trúc cho chiến lược tăng trưởng bền vững",
@@ -761,26 +829,410 @@
       "value": null,
       "source": "VnEconomy",
       "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPbmliYzN6TGFyRF9DOFZucWpXaUI2by1DeGVsTS1PVHpzdzdqbzQteXNfTE5HOVlTbkZ4U3dQU2VCSjV1LW1CRU9GSW1zUG1BcTBmOEdjRldqVklkdkNnN2UwNnBfXzNwSm1Yazl4N1BxWHhGaU4xTzZYZlVqQTYtdW1yay1GUk9oLW9OMFItY29Wd1N4YzZHVUVn?oc=5"
+    },
+    {
+      "date": "2026-03-26",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-03-09",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-02-13",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Samsung Vietnam Securities Master Investment Trust - Đăng kí Mua DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-02-13",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "DXG - Tổ chức ĐHĐCĐ thường niên 2026",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-01-29",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-01-16",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-12-31",
+      "type": "Sự kiện khác",
+      "content": "DXG - Thay đổi địa chỉ",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-12-31",
+      "type": "Niêm yết thêm",
+      "content": "DXG - Niêm yết bổ sung 93.500.000 cổ phiếu",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-12-16",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Mua DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-12-12",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Victory Holding Investment Limited - Đăng kí Mua DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-12-10",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Phát hành riêng lẻ tỉ lệ 10.7%",
+      "ratio": "0.107366",
+      "value": null
+    },
+    {
+      "date": "2025-12-04",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-11-25",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-11-14",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Vietnam Enterprise Investments Limited - Đăng kí Bán DXG",
+      "ratio": null,
+      "value": null
     }
   ],
   "shareholders": [
     {
-      "share_holder": "Cổ đông lớn nội bộ & Sáng lập DXG",
-      "quantity": 2500000000,
-      "share_own_percent": 32.5,
-      "update_date": "2026-06-30"
+      "name": "Lương Trí Thìn",
+      "percentage": 15.53,
+      "quantity": 197225132,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
     },
     {
-      "share_holder": "Nhà đầu tư tổ chức nước ngoài (Quỹ ngoại)",
-      "quantity": 1800000000,
-      "share_own_percent": 23.4,
-      "update_date": "2026-06-30"
+      "name": "Victory Holding Investment Limited",
+      "percentage": 5.88,
+      "quantity": 65430000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-12-12",
+      "update_date": "2025-12-12"
     },
     {
-      "share_holder": "Cổ đông đại chúng khác",
-      "quantity": 3390000000,
-      "share_own_percent": 44.1,
-      "update_date": "2026-06-30"
+      "name": "Prusix Asian Smaller Companies Fund Public Limited Company",
+      "percentage": 4.79,
+      "quantity": 5594290,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-06-15",
+      "update_date": "2015-06-15"
+    },
+    {
+      "name": "Công ty cổ phần Ngọn Hải Đăng",
+      "percentage": 4.28,
+      "quantity": 5000000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-06-15",
+      "update_date": "2015-06-15"
+    },
+    {
+      "name": "Công ty Cổ Phần Đầu Tư Thương Mại Quốc Tế Hà Thành",
+      "percentage": 4.28,
+      "quantity": 5000000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-06-15",
+      "update_date": "2015-06-15"
+    },
+    {
+      "name": "Lê Thị Tư",
+      "percentage": 3.15,
+      "quantity": 3680100,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-09-14",
+      "update_date": "2015-09-14"
+    },
+    {
+      "name": "Công ty Cổ Phần Tập Đoàn Đầu Tư Việt Phương",
+      "percentage": 2.0,
+      "quantity": 2340000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-06-15",
+      "update_date": "2015-06-15"
+    },
+    {
+      "name": "Hanoi Investments Holdings Limited",
+      "percentage": 1.94,
+      "quantity": 24650000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "CTBC Vietnam Equity Fund",
+      "percentage": 1.8,
+      "quantity": 11000000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "Công ty Cổ phần Quản lý quỹ đầu tư FPT",
+      "percentage": 0.93,
+      "quantity": 1092312,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-06-15",
+      "update_date": "2015-06-15"
+    },
+    {
+      "name": "Wareham Group Limited",
+      "percentage": 0.79,
+      "quantity": 9959631,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Norges Bank",
+      "percentage": 0.74,
+      "quantity": 9365022,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Amersham Industries Limited",
+      "percentage": 0.57,
+      "quantity": 7216557,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Quỹ Đầu tư Tăng trưởng Thiên Việt 2",
+      "percentage": 0.46,
+      "quantity": 2370000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2020-07-14",
+      "update_date": "2020-07-14"
+    },
+    {
+      "name": "DC Developing Markets Strategies Public Limited Company",
+      "percentage": 0.35,
+      "quantity": 4461740,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Vietnam Enterprise Investments Limited",
+      "percentage": 0.32,
+      "quantity": 4045000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "KB Vietnam Focus Balanced Fund",
+      "percentage": 0.17,
+      "quantity": 1200000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "Saigon Investments Limited",
+      "percentage": 0.17,
+      "quantity": 2102796,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Nguyễn Khánh Hưng",
+      "percentage": 0.16,
+      "quantity": 855849,
+      "type": "Cổ đông lớn",
+      "updateDate": "2021-01-28",
+      "update_date": "2021-01-28"
+    },
+    {
+      "name": "Trần Khánh Quang",
+      "percentage": 0.13,
+      "quantity": 156000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-09-14",
+      "update_date": "2015-09-14"
+    },
+    {
+      "name": "Lương Trí Tú",
+      "percentage": 0.12,
+      "quantity": 1510118,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
+    },
+    {
+      "name": "Venner Group Limited",
+      "percentage": 0.1,
+      "quantity": 700000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "Bùi Ngọc Đức",
+      "percentage": 0.09,
+      "quantity": 1085280,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
+    },
+    {
+      "name": "Gates Foundation Trust",
+      "percentage": 0.06,
+      "quantity": 767421,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Lương Ngọc Huy",
+      "percentage": 0.06,
+      "quantity": 733590,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
+    },
+    {
+      "name": "Đỗ Thị Thái",
+      "percentage": 0.05,
+      "quantity": 479785,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-04-15",
+      "update_date": "2026-04-15"
+    },
+    {
+      "name": "Grinling International Limited",
+      "percentage": 0.04,
+      "quantity": 441485,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "Trần Văn Ánh",
+      "percentage": 0.04,
+      "quantity": 50250,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-09-14",
+      "update_date": "2015-09-14"
+    },
+    {
+      "name": "Hà Đức Hiếu",
+      "percentage": 0.04,
+      "quantity": 471997,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
+    },
+    {
+      "name": "Lê Đặng Quốc Hùng",
+      "percentage": 0.03,
+      "quantity": 429776,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
+    },
+    {
+      "name": "Lê Văn Như Hải",
+      "percentage": 0.02,
+      "quantity": 25000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-09-14",
+      "update_date": "2015-09-14"
+    },
+    {
+      "name": "Samsung Vietnam Securities Master Investment Trust",
+      "percentage": 0.02,
+      "quantity": 268800,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Bùi Thanh Thảo",
+      "percentage": 0.01,
+      "quantity": 124096,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-03",
+      "update_date": "2026-08-03"
+    },
+    {
+      "name": "Nguyễn Hoàng Đức",
+      "percentage": 0.01,
+      "quantity": 93451,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "Trần Minh Toàn",
+      "percentage": 0.01,
+      "quantity": 10000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-09-14",
+      "update_date": "2015-09-14"
+    },
+    {
+      "name": "Danang Investments Limited",
+      "percentage": 0.0,
+      "quantity": 28000,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-07-20",
+      "update_date": "2026-07-20"
+    },
+    {
+      "name": "Vũ Thị Bảo Tuyên",
+      "percentage": 0.0,
+      "quantity": 1908,
+      "type": "Cổ đông lớn",
+      "updateDate": "2015-09-14",
+      "update_date": "2015-09-14"
+    },
+    {
+      "name": "Quỹ Đầu tư Lợi Thế Cạnh Tranh Bền Vững SSI",
+      "percentage": 0.0,
+      "quantity": 843,
+      "type": "Cổ đông lớn",
+      "updateDate": "2020-07-14",
+      "update_date": "2020-07-14"
     }
   ],
   "quarterly": [
@@ -823,8 +1275,9 @@
       "dividendsPaid": -1,
       "cff": 2789,
       "netCashChange": 0,
-      "freeCashFlow": 0,
-      "cfoToNetIncome": 0.0
+      "freeCashFlow": -3,
+      "cfoToNetIncome": 0.0,
+      "ebitda": 192
     },
     {
       "period": "2025-Q2",
@@ -866,74 +1319,76 @@
       "cff": -1636,
       "netCashChange": -2492,
       "freeCashFlow": -1480,
-      "cfoToNetIncome": -18.02
+      "cfoToNetIncome": -18.02,
+      "ebitda": 137
     },
     {
       "period": "2025-Q3",
-      "revenue": 0,
-      "costOfGoodsSold": 0,
-      "grossProfit": 0,
-      "financialIncome": 0,
-      "financialExpense": 0,
-      "interestExpense": 0,
-      "sellingExpense": 0,
-      "adminExpense": 0,
+      "revenue": 1068,
+      "costOfGoodsSold": -470,
+      "grossProfit": 599,
+      "financialIncome": 42,
+      "financialExpense": -62,
+      "interestExpense": -60,
+      "sellingExpense": -244,
+      "adminExpense": -122,
       "operatingExpense": 0,
       "operatingProfit": 0,
-      "profitBeforeTax": 0,
+      "profitBeforeTax": 196,
       "taxExpense": 0,
-      "netIncome": 0,
-      "netIncomeParent": 0,
-      "eps": 87,
-      "netMargin": 0.0,
-      "cashAndEquivalents": 0,
+      "netIncome": 164,
+      "netIncomeParent": 93,
+      "eps": 99,
+      "netMargin": 15.36,
+      "cashAndEquivalents": 3928,
       "shortTermInvestments": 0,
-      "accountsReceivable": 0,
-      "inventory": 0,
-      "shortTermAssets": 0,
-      "fixedAssets": 0,
-      "constructionInProgress": 0,
-      "totalAssets": 0,
-      "shortTermDebt": 0,
-      "longTermDebt": 0,
-      "totalDebt": 0,
-      "shareCapital": 0,
-      "retainedEarnings": 0,
-      "equity": 0,
-      "depreciation": 0,
-      "cfo": 1564,
-      "capex": 0,
-      "cfi": 0,
-      "dividendsPaid": 0,
-      "cff": 0,
+      "accountsReceivable": 13108,
+      "inventory": 14635,
+      "shortTermAssets": 32123,
+      "fixedAssets": 375,
+      "constructionInProgress": 751,
+      "totalAssets": 35210,
+      "shortTermDebt": 2154,
+      "longTermDebt": 4185,
+      "totalDebt": 6339,
+      "shareCapital": 10206,
+      "retainedEarnings": 506,
+      "equity": 18952,
+      "depreciation": 15,
+      "cfo": 907,
+      "capex": -23,
+      "cfi": -579,
+      "dividendsPaid": -95,
+      "cff": 329,
       "netCashChange": 1313,
-      "freeCashFlow": 1541,
-      "cfoToNetIncome": 1.0
+      "freeCashFlow": 884,
+      "cfoToNetIncome": 1.0,
+      "ebitda": 119
     },
     {
       "period": "2025-Q4",
-      "revenue": 1437,
-      "costOfGoodsSold": 597,
-      "grossProfit": 840,
-      "financialIncome": 55,
-      "financialExpense": 61,
-      "interestExpense": 61,
-      "sellingExpense": 199,
-      "adminExpense": 221,
+      "revenue": 1465,
+      "costOfGoodsSold": -752,
+      "grossProfit": 712,
+      "financialIncome": 61,
+      "financialExpense": -71,
+      "interestExpense": -58,
+      "sellingExpense": -278,
+      "adminExpense": -312,
       "operatingExpense": 725,
       "operatingProfit": 115,
-      "profitBeforeTax": 91,
+      "profitBeforeTax": 106,
       "taxExpense": 28,
-      "netIncome": 6,
-      "netIncomeParent": 6,
+      "netIncome": 84,
+      "netIncomeParent": 8,
       "eps": 5,
-      "netMargin": 0.42,
-      "cashAndEquivalents": 3386,
+      "netMargin": 5.73,
+      "cashAndEquivalents": 3391,
       "shortTermInvestments": 423,
-      "accountsReceivable": 0,
+      "accountsReceivable": 14169,
       "inventory": 15658,
       "shortTermAssets": 33913,
-      "fixedAssets": 1074,
+      "fixedAssets": 377,
       "constructionInProgress": 762,
       "totalAssets": 38015,
       "shortTermDebt": 2145,
@@ -941,7 +1396,7 @@
       "totalDebt": 4796,
       "shareCapital": 11141,
       "retainedEarnings": 510,
-      "equity": 14229,
+      "equity": 20883,
       "depreciation": 20,
       "cfo": 156,
       "capex": -60,
@@ -950,40 +1405,41 @@
       "cff": 332,
       "netCashChange": -537,
       "freeCashFlow": 96,
-      "cfoToNetIncome": 26.0
+      "cfoToNetIncome": 26.0,
+      "ebitda": 46
     },
     {
       "period": "2026-Q1",
       "revenue": 1353,
-      "costOfGoodsSold": 718,
+      "costOfGoodsSold": -718,
       "grossProfit": 634,
       "financialIncome": 46,
-      "financialExpense": 62,
-      "interestExpense": 62,
-      "sellingExpense": 161,
-      "adminExpense": 37,
+      "financialExpense": -78,
+      "interestExpense": -63,
+      "sellingExpense": -231,
+      "adminExpense": -122,
       "operatingExpense": 346,
       "operatingProfit": 288,
       "profitBeforeTax": 245,
       "taxExpense": 31,
-      "netIncome": 38,
+      "netIncome": 214,
       "netIncomeParent": 38,
-      "eps": 35,
-      "netMargin": 2.81,
+      "eps": 40,
+      "netMargin": 15.82,
       "cashAndEquivalents": 1797,
       "shortTermInvestments": 481,
-      "accountsReceivable": 0,
+      "accountsReceivable": 12465,
       "inventory": 15801,
       "shortTermAssets": 34319,
-      "fixedAssets": 1081,
+      "fixedAssets": 372,
       "constructionInProgress": 773,
       "totalAssets": 38493,
       "shortTermDebt": 2202,
       "longTermDebt": 2619,
-      "totalDebt": 4820,
+      "totalDebt": 4821,
       "shareCapital": 11141,
       "retainedEarnings": 552,
-      "equity": 14270,
+      "equity": 21100,
       "depreciation": 14,
       "cfo": 505,
       "capex": -15,
@@ -992,49 +1448,51 @@
       "cff": 24,
       "netCashChange": -1594,
       "freeCashFlow": 490,
-      "cfoToNetIncome": 13.29
+      "cfoToNetIncome": 13.29,
+      "ebitda": 165
     },
     {
       "period": "2026-Q2",
       "revenue": 788,
-      "costOfGoodsSold": 425,
+      "costOfGoodsSold": -425,
       "grossProfit": 363,
       "financialIncome": 75,
-      "financialExpense": 68,
-      "interestExpense": 68,
-      "sellingExpense": 139,
-      "adminExpense": 53,
+      "financialExpense": -70,
+      "interestExpense": -68,
+      "sellingExpense": -210,
+      "adminExpense": -146,
       "operatingExpense": 349,
       "operatingProfit": 13,
       "profitBeforeTax": 53,
       "taxExpense": 18,
-      "netIncome": 53,
+      "netIncome": 35,
       "netIncomeParent": 53,
-      "eps": 42,
-      "netMargin": 6.73,
+      "eps": 30,
+      "netMargin": 4.44,
       "cashAndEquivalents": 1872,
       "shortTermInvestments": 3234,
-      "accountsReceivable": 0,
-      "inventory": 15986,
+      "accountsReceivable": 13750,
+      "inventory": 15985,
       "shortTermAssets": 35410,
-      "fixedAssets": 1086,
+      "fixedAssets": 371,
       "constructionInProgress": 777,
       "totalAssets": 39769,
       "shortTermDebt": 2306,
       "longTermDebt": 2861,
       "totalDebt": 5167,
       "shareCapital": 12699,
-      "retainedEarnings": -70,
-      "equity": 14306,
+      "retainedEarnings": 65,
+      "equity": 21113,
       "depreciation": 15,
-      "cfo": -835,
+      "cfo": -880,
       "capex": -44,
       "cfi": 576,
       "dividendsPaid": -4,
-      "cff": 578,
+      "cff": 378,
       "netCashChange": 319,
-      "freeCashFlow": -879,
-      "cfoToNetIncome": -15.75
+      "freeCashFlow": -924,
+      "cfoToNetIncome": -15.75,
+      "ebitda": -18
     }
   ],
   "yearly": [
@@ -1073,140 +1531,204 @@
     {
       "year": "2022",
       "revenue": 5512,
-      "costOfGoodsSold": 2542,
+      "costOfGoodsSold": -2542,
       "grossProfit": 2970,
       "grossMargin": 53.88,
-      "interestExpense": 533,
-      "netIncome": 215,
-      "netIncomeParent": 208,
+      "interestExpense": -462,
+      "netIncome": 534,
+      "netIncomeParent": 215,
       "depreciation": 86,
-      "ebitda": 834,
+      "ebitda": 158,
       "inventory": 14031,
-      "accountsReceivable": 0,
+      "accountsReceivable": 11948,
       "constructionInProgress": 711,
       "totalAssets": 30321,
       "totalDebt": 5771,
-      "equity": 9245,
+      "equity": 14085,
       "cfo": -3904,
       "capex": -148,
       "freeCashFlow": -4052,
-      "netMargin": 3.9,
-      "roe": 2.33,
-      "roa": 0.71,
+      "netMargin": 9.69,
+      "roe": 3.79,
+      "roa": 1.76,
       "roic": 4.27,
-      "debtToEquity": 0.62,
+      "debtToEquity": 0.41,
       "currentRatio": 13.53,
-      "eps": 247,
+      "eps": 355,
       "bvps": 7290,
-      "pe": 40.69,
-      "pb": 1.38,
-      "cashRatio": 0.97
+      "pe": 39.47,
+      "pb": 1.34,
+      "cashRatio": 0.97,
+      "financialIncome": 464,
+      "financialExpense": -521,
+      "sellingExpense": -1057,
+      "adminExpense": -1083,
+      "profitBeforeTax": 768,
+      "cashAndEquivalents": 919,
+      "shortTermInvestments": 0,
+      "shortTermAssets": 27371,
+      "fixedAssets": 394,
+      "shortTermDebt": 2023,
+      "longTermDebt": 3748,
+      "shareCapital": 6118,
+      "retainedEarnings": 2308,
+      "cfi": 237,
+      "cff": 1848,
+      "dividendsPaid": -338
     },
     {
       "year": "2023",
       "revenue": 3725,
-      "costOfGoodsSold": 2014,
+      "costOfGoodsSold": -2014,
       "grossProfit": 1710,
       "grossMargin": 45.91,
-      "interestExpense": 569,
-      "netIncome": 172,
-      "netIncomeParent": 167,
+      "interestExpense": -537,
+      "netIncome": 150,
+      "netIncomeParent": 172,
       "depreciation": 82,
-      "ebitda": 823,
+      "ebitda": -305,
       "inventory": 14139,
-      "accountsReceivable": 0,
+      "accountsReceivable": 11423,
       "constructionInProgress": 723,
       "totalAssets": 28786,
-      "totalDebt": 5289,
-      "equity": 9403,
+      "totalDebt": 5290,
+      "equity": 14186,
       "cfo": -850,
       "capex": -129,
       "freeCashFlow": -979,
-      "netMargin": 4.62,
-      "roe": 1.83,
-      "roa": 0.6,
+      "netMargin": 4.03,
+      "roe": 1.06,
+      "roa": 0.52,
       "roic": 4.27,
-      "debtToEquity": 0.56,
+      "debtToEquity": 0.37,
       "currentRatio": 10.12,
-      "eps": 199,
+      "eps": 273,
       "bvps": 7415,
-      "pe": 50.5,
-      "pb": 1.36,
-      "cashRatio": 1.0
+      "pe": 48.99,
+      "pb": 1.31,
+      "cashRatio": 1.0,
+      "financialIncome": 409,
+      "financialExpense": -593,
+      "sellingExpense": -586,
+      "adminExpense": -391,
+      "profitBeforeTax": 453,
+      "cashAndEquivalents": 276,
+      "shortTermInvestments": 0,
+      "shortTermAssets": 26230,
+      "fixedAssets": 372,
+      "shortTermDebt": 2591,
+      "longTermDebt": 2699,
+      "shareCapital": 6118,
+      "retainedEarnings": 1736,
+      "cfi": 268,
+      "cff": -61,
+      "dividendsPaid": -76
     },
     {
       "year": "2024",
       "revenue": 4795,
-      "costOfGoodsSold": 2490,
+      "costOfGoodsSold": -2490,
       "grossProfit": 2306,
       "grossMargin": 48.09,
-      "interestExpense": 414,
-      "netIncome": 256,
-      "netIncomeParent": 251,
+      "interestExpense": -420,
+      "netIncome": 453,
+      "netIncomeParent": 256,
       "depreciation": 58,
-      "ebitda": 728,
+      "ebitda": 91,
       "inventory": 13406,
-      "accountsReceivable": 0,
+      "accountsReceivable": 11090,
       "constructionInProgress": 735,
       "totalAssets": 29183,
-      "totalDebt": 6556,
-      "equity": 10467,
+      "totalDebt": 6555,
+      "equity": 15202,
       "cfo": -1389,
       "capex": -70,
       "freeCashFlow": -1459,
-      "netMargin": 5.34,
-      "roe": 2.45,
-      "roa": 0.88,
+      "netMargin": 9.45,
+      "roe": 2.98,
+      "roa": 1.55,
       "roic": 3.45,
-      "debtToEquity": 0.63,
+      "debtToEquity": 0.43,
       "currentRatio": 8.09,
-      "eps": 254,
+      "eps": 352,
       "bvps": 8254,
-      "pe": 39.57,
-      "pb": 1.22,
-      "cashRatio": 0.82
+      "pe": 38.39,
+      "pb": 1.18,
+      "cashRatio": 0.82,
+      "financialIncome": 48,
+      "financialExpense": -470,
+      "sellingExpense": -735,
+      "adminExpense": -431,
+      "profitBeforeTax": 730,
+      "cashAndEquivalents": 1249,
+      "shortTermInvestments": 0,
+      "shortTermAssets": 26133,
+      "fixedAssets": 370,
+      "shortTermDebt": 3230,
+      "longTermDebt": 3325,
+      "shareCapital": 7225,
+      "retainedEarnings": 1487,
+      "cfi": -114,
+      "cff": 2476,
+      "dividendsPaid": -10
     },
     {
       "year": "2025",
       "revenue": 4192,
-      "costOfGoodsSold": 1903,
+      "costOfGoodsSold": -1903,
       "grossProfit": 2289,
       "grossMargin": 54.6,
-      "interestExpense": 288,
-      "netIncome": 231,
-      "netIncomeParent": 226,
+      "interestExpense": -288,
+      "netIncome": 595,
+      "netIncomeParent": 231,
       "depreciation": 67,
-      "ebitda": 586,
+      "ebitda": 374,
       "inventory": 15658,
-      "accountsReceivable": 0,
+      "accountsReceivable": 14169,
       "constructionInProgress": 762,
       "totalAssets": 38015,
       "totalDebt": 4796,
-      "equity": 14229,
+      "equity": 20883,
       "cfo": 1390,
       "capex": -106,
       "freeCashFlow": 1284,
-      "netMargin": 5.51,
-      "roe": 1.62,
-      "roa": 0.61,
+      "netMargin": 14.19,
+      "roe": 2.85,
+      "roa": 1.57,
       "roic": 2.43,
-      "debtToEquity": 0.34,
+      "debtToEquity": 0.23,
       "currentRatio": 15.81,
-      "eps": 188,
+      "eps": 214,
       "bvps": 11221,
-      "pe": 53.46,
-      "pb": 0.9,
-      "cashRatio": 1.46
+      "pe": 51.86,
+      "pb": 0.87,
+      "cashRatio": 1.46,
+      "financialIncome": 152,
+      "financialExpense": -315,
+      "sellingExpense": -818,
+      "adminExpense": -598,
+      "profitBeforeTax": 724,
+      "cashAndEquivalents": 3391,
+      "shortTermInvestments": 0,
+      "shortTermAssets": 33913,
+      "fixedAssets": 377,
+      "shortTermDebt": 2145,
+      "longTermDebt": 2651,
+      "shareCapital": 11141,
+      "retainedEarnings": 510,
+      "cfi": -1062,
+      "cff": 1815,
+      "dividendsPaid": -100
     }
   ],
   "extendedDupont": {
-    "roe": 0.36,
-    "calculatedRoe": 0.36,
+    "roe": 0.25,
+    "calculatedRoe": 0.25,
     "taxBurden": 1.0,
     "interestBurden": 1.0,
     "operatingMargin": 1.65,
     "assetTurnover": 0.08,
-    "financialLeverage": 2.78,
+    "financialLeverage": 1.88,
     "components": [
       {
         "id": "taxBurden",
@@ -1250,26 +1772,26 @@
         "id": "financialLeverage",
         "name": "Đòn Bẩy Tài Chính (Financial Leverage)",
         "formula": "Tổng Tài Sản ÷ Vốn Chủ Sở Hữu",
-        "value": 2.78,
+        "value": 1.88,
         "unit": "lần",
         "benchmark": "< 2.5x",
-        "impact": "Đòn bẩy cao",
+        "impact": "An toàn",
         "desc": "Hệ số khuếch đại ROE nhờ cấu trúc nguồn vốn nợ"
       }
     ],
     "qualityAssessment": "Ưu đãi thuế TNDN hỗ trợ tích cực LNST; Chi phí lãi vay an toàn, không tạo áp lực lên EBT; Biên lợi nhuận hoạt động mỏng"
   },
   "healthScore": {
-    "overallScore": 51.5,
-    "grade": "Trung Bình",
-    "gradeEn": "fair",
-    "badge": "bg-blue-500 text-white",
-    "description": "Tài chính ở mức khá, cần lưu ý cải thiện tốc độ quay vòng vốn hoặc tối ưu chi phí.",
+    "overallScore": 47.5,
+    "grade": "Yếu",
+    "gradeEn": "weak",
+    "badge": "bg-amber-500 text-white",
+    "description": "Tài chính suy yếu, đòn bẩy hoặc thanh khoản đang tạo áp lực lên hoạt động kinh doanh.",
     "pillars": {
       "profitability": {
         "name": "Khả Năng Sinh Lời",
         "weight": 30,
-        "score": 30,
+        "score": 25,
         "rating": "Trung bình"
       },
       "efficiency": {
@@ -1281,8 +1803,8 @@
       "leverage": {
         "name": "Đòn Bẩy & An Toàn Vốn",
         "weight": 25,
-        "score": 70,
-        "rating": "An toàn"
+        "score": 60,
+        "rating": "Vừa phải"
       },
       "liquidity": {
         "name": "Khả Năng Thanh Toán",
@@ -1293,30 +1815,25 @@
     }
   },
   "earlyWarning": {
-    "riskScore": 10.0,
+    "riskScore": 17.0,
     "riskLevel": "An Toàn",
     "riskLevelEn": "low",
     "riskBadge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200",
     "criticalCount": 0,
     "alertsCount": 1,
-    "positiveCount": 3,
+    "positiveCount": 2,
     "alerts": [
       {
         "id": "NEGATIVE_CFO_WITH_PROFIT",
         "severity": "high",
         "title": "Dòng tiền HĐKD âm dù vẫn ghi nhận lãi kế toán",
-        "detail": "CFO đạt -835 tỷ trong khi LNST là 53 tỷ. Doanh thu có thể bị ứ đọng ở các khoản phải thu."
+        "detail": "CFO đạt -880 tỷ trong khi LNST là 53 tỷ. Doanh thu có thể bị ứ đọng ở các khoản phải thu."
       }
     ],
     "positiveSignals": [
       {
-        "id": "ROE_EXPANDING",
-        "title": "Hiệu suất sinh lời ROE mở rộng liên tục 3 kỳ",
-        "detail": "Khả năng tạo lợi nhuận trên vốn chủ sở hữu tăng trưởng bền bỉ."
-      },
-      {
         "id": "LOW_DEBT",
-        "title": "Đòn bẩy nợ vay rất an toàn (0.36x)",
+        "title": "Đòn bẩy nợ vay rất an toàn (0.24x)",
         "detail": "Nợ vay chiếm tỷ trọng nhỏ, vùng đệm vốn chủ sở hữu dày dặn."
       },
       {
@@ -1344,17 +1861,17 @@
       },
       {
         "id": "unearned_revenue",
-        "name": "Người Mua Trả Tiền Trước",
-        "value": 34.5,
-        "unit": "% vốn hóa",
-        "benchmark": "> 20%",
-        "rating": "Của để dành lớn",
-        "desc": "Khoản tiền đặt cọc từ khách hàng sẽ ghi nhận thành doanh thu khi bàn giao"
+        "name": "Người Mua Trả Tiền Trước / Tổng TS",
+        "value": null,
+        "unit": "%",
+        "benchmark": "> 15%",
+        "rating": "Cần bổ sung CĐKT",
+        "desc": "Khoản tiền đặt cọc từ khách hàng mua nhà/đất ghi nhận doanh thu khi bàn giao"
       },
       {
         "id": "net_debt_equity",
         "name": "Nợ Vay Ròng / Vốn Chủ (Net Debt/E)",
-        "value": 0.23,
+        "value": 0.16,
         "unit": "lần",
         "benchmark": "< 1.2x",
         "rating": "An toàn",
@@ -1390,86 +1907,58 @@
     {
       "period": "TTM đến 2025-Q4",
       "endPeriod": "2025-Q4",
-      "revenue": 3096.0,
-      "netIncome": 135.0,
-      "cfo": 260.0,
-      "freeCashFlow": 157.0,
-      "netMargin": 4.36,
+      "revenue": 4192.0,
+      "netIncome": 230.0,
+      "cfo": -397.0,
+      "freeCashFlow": -503.0,
+      "netMargin": 5.49,
       "revenueGrowthYoY": null
     },
     {
       "period": "TTM đến 2026-Q1",
       "endPeriod": "2026-Q1",
-      "revenue": 3524.0,
-      "netIncome": 125.0,
-      "cfo": 765.0,
-      "freeCashFlow": 647.0,
-      "netMargin": 3.55,
+      "revenue": 4620.0,
+      "netIncome": 220.0,
+      "cfo": 108.0,
+      "freeCashFlow": -10.0,
+      "netMargin": 4.76,
       "revenueGrowthYoY": null
     },
     {
       "period": "TTM đến 2026-Q2",
       "endPeriod": "2026-Q2",
-      "revenue": 3578.0,
-      "netIncome": 97.0,
-      "cfo": 1390.0,
-      "freeCashFlow": 1248.0,
-      "netMargin": 2.71,
+      "revenue": 4674.0,
+      "netIncome": 192.0,
+      "cfo": 688.0,
+      "freeCashFlow": 546.0,
+      "netMargin": 4.11,
       "revenueGrowthYoY": null
     }
   ],
   "dcfAnalysis": {
     "sectorWacc": 11.5,
     "industryCategory": "REAL_ESTATE",
-    "baseFcff": 1284,
+    "baseFcff": 0,
+    "isNormalizedFcf": false,
+    "isFinancialSector": true,
     "historicalCagr": null,
     "dcfScenarios": {
-      "status": "SUCCESS",
-      "basePrice": 12039,
-      "bullPrice": 15873,
-      "bearPrice": 7827,
-      "fairPrice": 12039,
+      "status": "NOT_APPLICABLE_FINANCIAL",
+      "basePrice": null,
+      "bullPrice": null,
+      "bearPrice": null,
+      "fairPrice": null,
       "wacc": 11.5,
       "terminalG": 3.0,
-      "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
+      "note": "Mô hình DCF (FCFF) không áp dụng cho nhóm ngành Ngân hàng / Tài chính do đặc thù cấu trúc vốn và dòng tiền gửi. Khuyến nghị sử dụng mô hình DDM (Cổ tức), Gordon P/B hoặc Residual Income (RIM/EVA)."
     },
-    "reverseDcfImpliedGrowth": 3.15,
+    "reverseDcfImpliedGrowth": null,
     "sensitivityMatrix": {
-      "waccList": [
-        10.0,
-        11.5,
-        12.5,
-        13.5
-      ],
-      "gList": [
-        2.0,
-        3.0,
-        4.0
-      ],
-      "matrix": [
-        [
-          13487,
-          15226,
-          17544
-        ],
-        [
-          10897,
-          12039,
-          13486
-        ],
-        [
-          9582,
-          10474,
-          11576
-        ],
-        [
-          8497,
-          9208,
-          10070
-        ]
-      ]
+      "waccList": [],
+      "gList": [],
+      "matrix": []
     },
-    "alternativeMethodFlag": false
+    "alternativeMethodFlag": true
   },
   "marketProfile": {
     "symbol": "DXG",
@@ -1488,8 +1977,8 @@
           "priceLow": 9869,
           "priceHigh": 10128,
           "priceMid": 9998,
-          "volume": 66884600.0,
-          "volumePercent": 10.7
+          "volume": 73208100.0,
+          "volumePercent": 11.7
         },
         {
           "index": 2,
@@ -1545,15 +2034,15 @@
           "priceHigh": 11941,
           "priceMid": 11812,
           "volume": 64819800.0,
-          "volumePercent": 10.3
+          "volumePercent": 10.4
         },
         {
           "index": 9,
           "priceLow": 11941,
           "priceHigh": 12200,
           "priceMid": 12070,
-          "volume": 54617000.0,
-          "volumePercent": 8.7
+          "volume": 47366400.0,
+          "volumePercent": 7.6
         }
       ],
       "poc": {
@@ -1596,12 +2085,12 @@
         "min": 9610,
         "max": 12200
       },
-      "totalVolume": 626790400
+      "totalVolume": 625863300
     },
     "moneyFlow": {
-      "vpci": 1.17,
-      "vpciStatus": "STRONG_CONFIRMATION",
-      "cmf": -0.003,
+      "vpci": 1.06,
+      "vpciStatus": "NORMAL",
+      "cmf": -0.021,
       "cmfStatus": "BALANCED",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -1611,8 +2100,8 @@
       "state": "BALANCED_MARKET"
     },
     "tailRisk": {
-      "skewness": 0.26,
-      "kurtosis": 1.23,
+      "skewness": 0.23,
+      "kurtosis": 1.14,
       "var95": 4.28,
       "var99": 5.8,
       "es95": 5.46,
@@ -1620,9 +2109,9 @@
       "tailRiskAssessment": "Phân phối lợi suất bình thường"
     },
     "archetype": {
-      "archetype": "TREND_FOLLOWING",
-      "name": "Bám Xu Hướng (Trend Following)",
-      "description": "Khối lượng giao dịch đồng thuận cao với các bước sóng giá, thích hợp cho chiến lược theo xu hướng.",
+      "archetype": "RANGE_BOUND_CYCLICAL",
+      "name": "Dao Động Hộp / Chu Kỳ (Range-Bound)",
+      "description": "Cổ phiếu biến động trong biên độ tích lũy, khối lượng và dòng tiền duy trì mức cân bằng.",
       "guardrail": "Phân tích mô tả lịch sử hành vi giá-khối lượng, không phải khuyến nghị mua/bán."
     }
   },
@@ -1673,6 +2162,34 @@
       },
       {
         "id": "news-DXG-4",
+        "title": "DXG: Bảng báo cáo tài chính chi tiết - tải báo cáo tài chính",
+        "summary": "Bản tin phân tích về DXG từ nguồn 24HMoney. Cập nhật ngày 2026-09-18.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-09-18",
+        "source": "24HMoney",
+        "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1JYVRzYUhhNXVBXzNYSWppX0ZDcThHeEExOTYtc1Z2UTNZQTRTQjlSaTd3dE9tUExvVy1RVUt5MWhDa2FLaHM4Rzc1blZma1otcG5YelYySHZ6dw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-5",
+        "title": "DXG quý II-2026: Nền tảng tài chính vững, kỳ vọng tăng trưởng từ năm 2027",
+        "summary": "Bản tin phân tích về DXG từ nguồn MoneyF. Cập nhật ngày 2026-09-08.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-09-08",
+        "source": "MoneyF",
+        "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQQm1Bcm52Q2NsOXFSNUhpNG1oX0hZRXJfQWQyN01VMnN5S09EYnBZY2JfT0FZWEtOMXlfZ3FCVUJwWjM2S2thVWk4RHFyWmxmSTJSWFZqOGFIZE1kRmthakNnN0h0UFBoQzY1TlJwZ1FoMnFkeDNHeW9vS1lPb21TZGpB?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-DXG-6",
         "title": "Hơn 1.500 căn The Privé đã bán, Bluemarq Group (DXG) được dự báo lãi hơn 1.500 tỷ đồng năm 2027",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-08-25.",
         "category": "biz",
@@ -1686,7 +2203,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-5",
+        "id": "news-DXG-7",
         "title": "Cổ phiếu DXG bất ngờ tăng cận trần, thanh khoản đột biến trong phiên cuối tuần “rực lửa”",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-08-15.",
         "category": "biz",
@@ -1700,7 +2217,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-6",
+        "id": "news-DXG-8",
         "title": "VN-Index mất thêm 36 điểm, DXG ngược dòng tăng mạnh",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-14.",
         "category": "biz",
@@ -1714,7 +2231,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-7",
+        "id": "news-DXG-9",
         "title": "Cổ phiếu DXG có diễn biến mới",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-08-03.",
         "category": "biz",
@@ -1728,7 +2245,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-8",
+        "id": "news-DXG-10",
         "title": "Bluemarq Group công bố KQKD quý II: Hé lộ “điểm tựa” đáng chú ý cho giai đoạn phục hồi sắp tới",
         "summary": "Bản tin phân tích về DXG từ nguồn MoneyF. Cập nhật ngày 2026-08-03.",
         "category": "biz",
@@ -1742,7 +2259,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-9",
+        "id": "news-DXG-11",
         "title": "Chi phí tăng cao khiến lợi nhuận DXG giảm sâu",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -1756,7 +2273,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-10",
+        "id": "news-DXG-12",
         "title": "DXG cập nhật kết quả kinh doanh đáng chú ý trong quý II/2026",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1770,7 +2287,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-11",
+        "id": "news-DXG-13",
         "title": "Bluemarq Group đạt 93% kế hoạch lợi nhuận sau nửa năm, cắt giảm gần 330 nhân sự",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -1784,7 +2301,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-12",
+        "id": "news-DXG-14",
         "title": "Cổ phiếu bất động sản 'rơi' mạnh, có mã rẻ như trà đá",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-07-28.",
         "category": "sector",
@@ -1798,7 +2315,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-13",
+        "id": "news-DXG-15",
         "title": "Cổ phiếu DXG giảm sàn sau khi mất cổ đông lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn VnBusiness. Cập nhật ngày 2026-07-20.",
         "category": "disclosure",
@@ -1812,7 +2329,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-14",
+        "id": "news-DXG-16",
         "title": "Dragon Capital tiếp tục bán cổ phiếu DXG, không còn là cổ đông lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn Znews. Cập nhật ngày 2026-07-19.",
         "category": "disclosure",
@@ -1826,7 +2343,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-15",
+        "id": "news-DXG-17",
         "title": "Dragon Capital không còn là cổ đông lớn tại Bluemarq Group (DXG)",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-17.",
         "category": "disclosure",
@@ -1840,7 +2357,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-16",
+        "id": "news-DXG-18",
         "title": "Dự báo lợi nhuận quý II/2026 nhóm bất động sản: 2 ông lớn tăng 6x%, KDH, DXG hụt hơi",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-08.",
         "category": "biz",
@@ -1854,7 +2371,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-17",
+        "id": "news-DXG-19",
         "title": "Dự báo lợi nhuận quý 2/2026 nhóm doanh nghiệp bất động sản lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-06-20.",
         "category": "biz",
@@ -1868,7 +2385,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-18",
+        "id": "news-DXG-20",
         "title": "Nhóm quỹ Dragon Capital tiếp tục bán hàng triệu cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-06-18.",
         "category": "biz",
@@ -1882,7 +2399,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-19",
+        "id": "news-DXG-21",
         "title": "Dragon Capital giảm sở hữu tại DXG xuống dưới 6% sau giao dịch lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn VnEconomy. Cập nhật ngày 2026-06-18.",
         "category": "disclosure",
@@ -1896,7 +2413,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-20",
+        "id": "news-DXG-22",
         "title": "Doanh thu quý I của Bluemarq Group tăng vọt 46%, quỹ ngoại Dragon Capital cơ cấu cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-06-18.",
         "category": "biz",
@@ -2050,34 +2567,6 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-31",
-        "title": "Tập đoàn Đất Xanh công bố tái cấu trúc và giới thiệu thương hiệu mới",
-        "summary": "Bản tin phân tích về DXG từ nguồn thuonghieucongluan.com.vn. Cập nhật ngày 2026-05-20.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-05-20",
-        "source": "thuonghieucongluan.com.vn",
-        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPS1gxbFExYVFLazhoREE1RGM4YlpfYmpBanAtN3R4aDN1R3RZemRfWjgxbEFBcEZ6bndkQl9TUmpjQ3pfaTcyd0ZVT2V5TExzYUkzSVBHUDRHdE5CNmF4Y2poNmoxLU1KcGNwR2FWeUVKZ2hKSHFGRUYtMmpGbjZKZUc2ajlRTXJHRkZaV28xaGdNTFV5TTk1TUY2d0xrWkp4bGZiT0pkcXJmMGtIczZpSGZVTWVTQQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-32",
-        "title": "DXG được khuyến nghị mua, kỳ vọng bước vào chu kỳ tăng trưởng mạnh từ năm 2026",
-        "summary": "Bản tin phân tích về DXG từ nguồn thuonghieucongluan.com.vn. Cập nhật ngày 2026-05-20.",
-        "category": "analyst",
-        "categoryLabel": "Phân Tích CTCK",
-        "date": "2026-05-20",
-        "source": "thuonghieucongluan.com.vn",
-        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPZFVZSUNENUxyS0J6U3djMmlXZnNha0NGTUhfdlcxN2V6TkwtVkpFNWFaZkRuQlJaSlYwMHBnYjRTZ1p4SkQ3R3lmemxUbk56VkhLZGwtUEZiVWdoamlpWkpzb3FkdkZIX0o5RVRCREVYZnhLd2gtQWxkcl9nTVJTcUxEbHByM2FUZHI4ckZ4TmtaMm9MTFJlYldGenBXY0pZZS1yUzN4Z05YVTJzcU9SbW15aVpkNXBwajhzRjVYZWFzUQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
         "id": "news-DXG-33",
         "title": "DXG triển khai phát hành hơn 155 triệu cổ phiếu thưởng sau đổi tên",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-05-13.",
@@ -2218,6 +2707,20 @@
         "weight": 1.5
       },
       {
+        "id": "news-DXG-42",
+        "title": "ĐHĐCĐ Đất Xanh: Thưởng cổ phiếu, đổi tên công ty",
+        "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-17.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-17",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQZ1psOGttS1lqbWZMSjhQTVhmanlJMl94WVRUalh2NkI5WTg4aEJFZzFCUWxia2FYREJpRkI0MlhoeHlHaU93WHpCdEZJblI2VmJmc3JPX2lMSmtsOEFqMDRvRWI5Mng5Qm1lOWhrRDdtOVVrZEdjTklYVE8yOW5aWjZFSTFmaWs?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
         "id": "news-DXG-43",
         "title": "ĐHĐCĐ Tập đoàn Đất Xanh 2026: Đặt mục tiêu doanh thu 5.000 tỉ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Laodong.vn. Cập nhật ngày 2026-04-17.",
@@ -2331,24 +2834,24 @@
       }
     ],
     "sentiment": {
-      "score": 23.3,
+      "score": 21.0,
       "verdict": "NEUTRAL",
       "verdictText": "Trung Lập (Thông tin đan xen hai chiều)",
       "verdictBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-      "bullishCount": 14,
-      "neutralCount": 32,
+      "bullishCount": 13,
+      "neutralCount": 33,
       "bearishCount": 4,
       "totalCount": 50,
       "categoryScores": {
-        "analyst": 85.7,
-        "biz": 24.1,
+        "analyst": 80.0,
+        "biz": 25.4,
         "sector": 0.0,
-        "disclosure": 4.8
+        "disclosure": 4.5
       }
     },
     "tldr": {
       "title": "DXG 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về DXG nghiêng rõ rệt về chiều hướng tích cực với 14/50 tin tức mang gam màu tươi sáng (28.0%). Tâm điểm chú ý xoay quanh: 'DXG: Khuyến nghị MUA với giá mục tiêu 14,332 đồng/cổ phiếu'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về DXG nghiêng rõ rệt về chiều hướng tích cực với 13/50 tin tức mang gam màu tươi sáng (26.0%). Tâm điểm chú ý xoay quanh: 'DXG: Khuyến nghị MUA với giá mục tiêu 14,332 đồng/cổ phiếu'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2357,12 +2860,12 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "28.0%",
+          "value": "26.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+23.3",
+          "value": "+21.0",
           "type": "positive"
         },
         {
@@ -2374,37 +2877,37 @@
     }
   },
   "beneishMScore": {
-    "mScore": -2.42,
-    "manipulationProbability": "Rất thấp / An toàn",
-    "status": "SAFE",
-    "riskLevel": "low",
+    "mScore": -1.91,
+    "manipulationProbability": "Trung bình / Cần theo dõi",
+    "status": "GREY",
+    "riskLevel": "medium",
     "isManipulator": false,
     "periodComparison": "2025 vs 2024",
     "indices": [
       {
         "id": "DSRI",
         "name": "Chỉ số Khoản Phải Thu (DSRI)",
-        "value": 1.0,
+        "value": 1.461,
         "benchmark": "< 1.03",
-        "status": "Bình thường",
-        "isAlert": false,
+        "status": "Cảnh báo nới tín dụng / ảo",
+        "isAlert": true,
         "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
       },
       {
         "id": "GMI",
         "name": "Chỉ số Biên Gộp (GMI)",
-        "value": 0.88,
+        "value": 1.045,
         "benchmark": "< 1.00",
-        "status": "Biên gộp cải thiện",
+        "status": "Biên gộp xói mòn",
         "isAlert": false,
         "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
       },
       {
         "id": "AQI",
         "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
-        "value": 1.0,
+        "value": 1.067,
         "benchmark": "< 1.05",
-        "status": "Chất lượng tốt",
+        "status": "Chi phí hóa tài sản cao",
         "isAlert": false,
         "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
       },
@@ -2420,9 +2923,9 @@
       {
         "id": "DEPI",
         "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
-        "value": 1.127,
+        "value": 0.898,
         "benchmark": "< 1.00",
-        "status": "Khấu hao chậm lại",
+        "status": "Khấu hao bình thường",
         "isAlert": false,
         "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
       },
@@ -2447,28 +2950,28 @@
       {
         "id": "TATA",
         "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
-        "value": -0.031,
+        "value": -0.03,
         "benchmark": "< 0.05",
         "status": "Dòng tiền thực tốt",
         "isAlert": false,
         "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
       }
     ],
-    "summary": "M-Score = -2.42 (< -2.22). Báo cáo tài chính lành mạnh, không có dấu hiệu thao túng kế toán bất thường."
+    "summary": "M-Score = -1.91 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
   },
   "magicFormula": {
-    "earningsYield": 1.05,
-    "roic": 0.45,
-    "compositeScore": 4.3,
+    "earningsYield": 1.55,
+    "roic": 0.68,
+    "compositeScore": 6.3,
     "category": "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)",
     "tier": "UNDERPERFORM",
     "recommendation": "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá.",
     "parameters": {
-      "ebitTTM": 131.0,
+      "ebitTTM": 192.0,
       "enterpriseValue": 12425.0,
       "marketCap": 12364.0,
       "netDebt": 61.0,
-      "capitalEmployed": 29084.0
+      "capitalEmployed": 28369.0
     },
     "benchmarks": {
       "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
@@ -2480,50 +2983,50 @@
     "signalLevel": "warning",
     "isInflection": false,
     "statusTitle": "⚠️ Cảnh Báo Thâm Hụt Tiền Mặt (Earnings Not Backed By Cash)",
-    "narrative": "Dòng tiền kinh doanh yếu so với lợi nhuận kế toán (CFO/NI chỉ đạt -15.75x < 0.7x). Lợi nhuận chủ yếu nằm ở công nợ hoặc tồn kho, rủi ro thanh khoản cần được giám sát chặt chẽ.",
-    "cfoToNiRatio": -15.75,
+    "narrative": "Dòng tiền kinh doanh yếu so với lợi nhuận kế toán (CFO/NI chỉ đạt -16.60x < 0.7x). Lợi nhuận chủ yếu nằm ở công nợ hoặc tồn kho, rủi ro thanh khoản cần được giám sát chặt chẽ.",
+    "cfoToNiRatio": -16.6,
     "capexToRevenueRatio": 5.58,
-    "accrualsRatio": 0.022,
+    "accrualsRatio": 0.023,
     "accrualsRating": "Cảnh Báo - Lợi nhuận sổ sách kế toán cao hơn tiền mặt",
     "cipRatio": 2.0,
-    "latestFcf": -879.0,
-    "latestCfo": -835.0,
+    "latestFcf": -924.0,
+    "latestCfo": -880.0,
     "latestCapex": 44.0,
     "constructionInProgress": 777.0
   },
   "forensicAnalysis": {
     "beneish": {
-      "mScore": -2.42,
-      "manipulationProbability": "Rất thấp / An toàn",
-      "status": "SAFE",
-      "riskLevel": "low",
+      "mScore": -1.91,
+      "manipulationProbability": "Trung bình / Cần theo dõi",
+      "status": "GREY",
+      "riskLevel": "medium",
       "isManipulator": false,
       "periodComparison": "2025 vs 2024",
       "indices": [
         {
           "id": "DSRI",
           "name": "Chỉ số Khoản Phải Thu (DSRI)",
-          "value": 1.0,
+          "value": 1.461,
           "benchmark": "< 1.03",
-          "status": "Bình thường",
-          "isAlert": false,
+          "status": "Cảnh báo nới tín dụng / ảo",
+          "isAlert": true,
           "desc": "Tỷ lệ Phải thu / Doanh thu. DSRI > 1 cho thấy phải thu tăng nhanh hơn doanh số."
         },
         {
           "id": "GMI",
           "name": "Chỉ số Biên Gộp (GMI)",
-          "value": 0.88,
+          "value": 1.045,
           "benchmark": "< 1.00",
-          "status": "Biên gộp cải thiện",
+          "status": "Biên gộp xói mòn",
           "isAlert": false,
           "desc": "Biên gộp kỳ trước / Biên gộp kỳ này. GMI > 1 phản ánh tỷ suất sinh lời gộp đang đi xuống."
         },
         {
           "id": "AQI",
           "name": "Chỉ số Chất Lượng Tài Sản (AQI)",
-          "value": 1.0,
+          "value": 1.067,
           "benchmark": "< 1.05",
-          "status": "Chất lượng tốt",
+          "status": "Chi phí hóa tài sản cao",
           "isAlert": false,
           "desc": "Tỷ lệ tài sản phi hữu hình & dở dang. AQI > 1 nghi vấn doanh nghiệp vốn hóa chi phí vào tài sản."
         },
@@ -2539,9 +3042,9 @@
         {
           "id": "DEPI",
           "name": "Chỉ số Tỷ Lệ Khấu Hao (DEPI)",
-          "value": 1.127,
+          "value": 0.898,
           "benchmark": "< 1.00",
-          "status": "Khấu hao chậm lại",
+          "status": "Khấu hao bình thường",
           "isAlert": false,
           "desc": "Tỷ lệ khấu hao kỳ trước / kỳ này. DEPI > 1 nghi vấn kéo dài niên hạn TSCĐ để giảm chi phí."
         },
@@ -2566,28 +3069,28 @@
         {
           "id": "TATA",
           "name": "Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)",
-          "value": -0.031,
+          "value": -0.03,
           "benchmark": "< 0.05",
           "status": "Dòng tiền thực tốt",
           "isAlert": false,
           "desc": "(LNST - CFO) / Tổng tài sản. TATA âm sâu chứng minh lợi nhuận được bảo chứng bằng tiền mặt thật."
         }
       ],
-      "summary": "M-Score = -2.42 (< -2.22). Báo cáo tài chính lành mạnh, không có dấu hiệu thao túng kế toán bất thường."
+      "summary": "M-Score = -1.91 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
     },
     "magicFormula": {
-      "earningsYield": 1.05,
-      "roic": 0.45,
-      "compositeScore": 4.3,
+      "earningsYield": 1.55,
+      "roic": 0.68,
+      "compositeScore": 6.3,
       "category": "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)",
       "tier": "UNDERPERFORM",
       "recommendation": "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá.",
       "parameters": {
-        "ebitTTM": 131.0,
+        "ebitTTM": 192.0,
         "enterpriseValue": 12425.0,
         "marketCap": 12364.0,
         "netDebt": 61.0,
-        "capitalEmployed": 29084.0
+        "capitalEmployed": 28369.0
       },
       "benchmarks": {
         "earningsYieldTarget": "> 8.5% (Earning Yield cao chứng tỏ cổ phiếu đang rẻ so với EV)",
@@ -2599,14 +3102,14 @@
       "signalLevel": "warning",
       "isInflection": false,
       "statusTitle": "⚠️ Cảnh Báo Thâm Hụt Tiền Mặt (Earnings Not Backed By Cash)",
-      "narrative": "Dòng tiền kinh doanh yếu so với lợi nhuận kế toán (CFO/NI chỉ đạt -15.75x < 0.7x). Lợi nhuận chủ yếu nằm ở công nợ hoặc tồn kho, rủi ro thanh khoản cần được giám sát chặt chẽ.",
-      "cfoToNiRatio": -15.75,
+      "narrative": "Dòng tiền kinh doanh yếu so với lợi nhuận kế toán (CFO/NI chỉ đạt -16.60x < 0.7x). Lợi nhuận chủ yếu nằm ở công nợ hoặc tồn kho, rủi ro thanh khoản cần được giám sát chặt chẽ.",
+      "cfoToNiRatio": -16.6,
       "capexToRevenueRatio": 5.58,
-      "accrualsRatio": 0.022,
+      "accrualsRatio": 0.023,
       "accrualsRating": "Cảnh Báo - Lợi nhuận sổ sách kế toán cao hơn tiền mặt",
       "cipRatio": 2.0,
-      "latestFcf": -879.0,
-      "latestCfo": -835.0,
+      "latestFcf": -924.0,
+      "latestCfo": -880.0,
       "latestCapex": 44.0,
       "constructionInProgress": 777.0
     }

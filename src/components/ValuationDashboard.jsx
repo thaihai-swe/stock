@@ -166,6 +166,13 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     setSyncMessage(null);
     try {
       const res = await triggerSingleFinancialSync(selectedSymbol);
+      if (res?.isQueued) {
+        setSyncMessage({
+          type: 'info',
+          text: res.message || `Mã ${selectedSymbol} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Bot sẽ tự động thu thập BCTC trong phiên đồng bộ EOD lúc 18:00 hôm nay!`
+        });
+        return;
+      }
       setSyncMessage({
         type: 'success',
         text: res.message || `Đã tải lại BCTC & Định giá cho ${selectedSymbol} thành công!`
@@ -208,6 +215,15 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
 
     try {
       const res = await triggerSingleFinancialSync(sym);
+      if (res?.isQueued) {
+        setSyncMessage({
+          type: 'info',
+          text: res.message || `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Bot sẽ tự động thu thập BCTC trong phiên đồng bộ EOD lúc 18:00 hôm nay!`
+        });
+        setInputSymbol('');
+        return;
+      }
+
       setSyncMessage({
         type: 'success',
         text: res.message || `Đã tra cứu và định giá thành công cho mã ${sym}!`

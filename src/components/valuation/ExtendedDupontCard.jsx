@@ -5,11 +5,11 @@ export default function ExtendedDupontCard({ extendedDupont }) {
 
   const {
     roe = 0,
-    taxBurden = 0.8,
-    interestBurden = 0.85,
-    operatingMargin = 10.0,
-    assetTurnover = 0.8,
-    financialLeverage = 1.6,
+    taxBurden,
+    interestBurden,
+    operatingMargin,
+    assetTurnover,
+    financialLeverage,
     components = [],
     qualityAssessment = ''
   } = extendedDupont;
@@ -33,7 +33,7 @@ export default function ExtendedDupontCard({ extendedDupont }) {
         </div>
         <div className="text-right">
           <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
-            ROE = {roe}%
+            ROE = {roe != null ? `${roe}%` : '—'}
           </div>
           <div className="text-[11px] font-bold text-gray-400">
             Tỷ suất sinh lời trên vốn chủ sở hữu
@@ -48,27 +48,27 @@ export default function ExtendedDupontCard({ extendedDupont }) {
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs font-black text-gray-800 dark:text-gray-200">
           <span className="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border shadow-xs">
-            ROE <span className="text-indigo-600 dark:text-indigo-400 font-black">({roe}%)</span>
+            ROE <span className="text-indigo-600 dark:text-indigo-400 font-black">({roe != null ? `${roe}%` : '—'})</span>
           </span>
           <span>=</span>
           <span className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 border">
-            Tax Burden <span className="text-emerald-600 dark:text-emerald-400">({taxBurden}x)</span>
+            Tax Burden <span className="text-emerald-600 dark:text-emerald-400">({taxBurden != null ? `${taxBurden}x` : '—'})</span>
           </span>
           <span>×</span>
           <span className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 border">
-            Interest Burden <span className="text-teal-600 dark:text-teal-400">({interestBurden}x)</span>
+            Interest Burden <span className="text-teal-600 dark:text-teal-400">({interestBurden != null ? `${interestBurden}x` : '—'})</span>
           </span>
           <span>×</span>
           <span className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 border">
-            Operating Margin <span className="text-blue-600 dark:text-blue-400">({operatingMargin}%)</span>
+            Operating Margin <span className="text-blue-600 dark:text-blue-400">({operatingMargin != null ? `${operatingMargin}%` : '—'})</span>
           </span>
           <span>×</span>
           <span className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 border">
-            Asset Turnover <span className="text-purple-600 dark:text-purple-400">({assetTurnover}x)</span>
+            Asset Turnover <span className="text-purple-600 dark:text-purple-400">({assetTurnover != null ? `${assetTurnover}x` : '—'})</span>
           </span>
           <span>×</span>
           <span className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 border">
-            Financial Leverage <span className="text-pink-600 dark:text-pink-400">({financialLeverage}x)</span>
+            Financial Leverage <span className="text-pink-600 dark:text-pink-400">({financialLeverage != null ? `${financialLeverage}x` : '—'})</span>
           </span>
         </div>
       </div>

@@ -4,14 +4,14 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
   if (!riskMetrics) return null;
 
   const {
-    annualizedVolatility = 25.0,
-    dailyVolatility = 1.5,
-    maxDrawdown = 15.0,
-    var95 = 2.5,
-    sharpeRatio = 0.8,
-    sortinoRatio = 1.1,
-    beta = 1.0,
-    riskFreeRate = 4.47,
+    annualizedVolatility,
+    dailyVolatility,
+    maxDrawdown,
+    var95,
+    sharpeRatio,
+    sortinoRatio,
+    beta,
+    riskFreeRate,
     ratings = {}
   } = riskMetrics;
 
@@ -33,7 +33,7 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
           </h3>
         </div>
         <div className="text-xs text-gray-400">
-          Lãi suất phi rủi ro: <b className="text-indigo-600 dark:text-indigo-400">{riskFreeRate}%</b> (TPCP 10Y HNX)
+          Lãi suất phi rủi ro: <b className="text-indigo-600 dark:text-indigo-400">{riskFreeRate != null ? `${riskFreeRate}%` : '—'}</b> (TPCP 10Y HNX)
         </div>
       </div>
 
@@ -45,24 +45,26 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Biến Động Hàng Năm (Vol)
             </span>
-            <span
-              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                ratings.volatility === 'Thấp'
-                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                  : ratings.volatility === 'Trung bình'
-                  ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                  : 'bg-amber-50 text-amber-600 border border-amber-200'
-              }`}
-            >
-              {ratings.volatility || 'Trung bình'}
-            </span>
+            {ratings.volatility && (
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  ratings.volatility === 'Thấp'
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                    : ratings.volatility === 'Trung bình'
+                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                    : 'bg-amber-50 text-amber-600 border border-amber-200'
+                }`}
+              >
+                {ratings.volatility}
+              </span>
+            )}
           </div>
           <div className="text-2xl font-black text-gray-900 dark:text-white mt-1">
-            {annualizedVolatility}%
-            <span className="text-xs font-bold text-gray-400 ml-1">/ năm</span>
+            {annualizedVolatility != null ? `${annualizedVolatility}%` : '—'}
+            {annualizedVolatility != null && <span className="text-xs font-bold text-gray-400 ml-1">/ năm</span>}
           </div>
           <div className="text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200/50 dark:border-gray-600/50">
-            Biến động ngày: <b className="text-gray-700 dark:text-gray-300">±{dailyVolatility}%</b> · Beta: <b className="text-indigo-600 dark:text-indigo-400">{beta}x</b>
+            Biến động ngày: <b className="text-gray-700 dark:text-gray-300">{dailyVolatility != null ? `±${dailyVolatility}%` : '—'}</b> · Beta: <b className="text-indigo-600 dark:text-indigo-400">{beta != null ? `${beta}x` : '—'}</b>
           </div>
         </div>
 
@@ -72,18 +74,20 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Sụt Giảm Từ Đỉnh (MDD)
             </span>
-            <span
-              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                ratings.drawdown === 'An toàn'
-                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                  : 'bg-rose-50 text-rose-600 border border-rose-200'
-              }`}
-            >
-              {ratings.drawdown || 'Vừa phải'}
-            </span>
+            {ratings.drawdown && (
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  ratings.drawdown === 'An toàn'
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-600 border border-rose-200'
+                }`}
+              >
+                {ratings.drawdown}
+              </span>
+            )}
           </div>
           <div className="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">
-            -{maxDrawdown}%
+            {maxDrawdown != null ? `-${maxDrawdown}%` : '—'}
           </div>
           <div className="text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200/50 dark:border-gray-600/50">
             Mức điều chỉnh sâu nhất từ đỉnh 52 tuần
@@ -101,7 +105,7 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
             </span>
           </div>
           <div className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">
-            -{var95}%
+            {var95 != null ? `-${var95}%` : '—'}
           </div>
           <div className="text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200/50 dark:border-gray-600/50">
             Mức lỗ tối đa trong 1 phiên ở điều kiện chuẩn
@@ -114,16 +118,18 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Lợi Nhuận / Rủi Ro
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
-              {ratings.sharpe || 'Khá'}
-            </span>
+            {ratings.sharpe && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+                {ratings.sharpe}
+              </span>
+            )}
           </div>
           <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
-            {sharpeRatio}x
-            <span className="text-xs font-bold text-gray-400 ml-1">Sharpe</span>
+            {sharpeRatio != null ? `${sharpeRatio}x` : '—'}
+            {sharpeRatio != null && <span className="text-xs font-bold text-gray-400 ml-1">Sharpe</span>}
           </div>
           <div className="text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200/50 dark:border-gray-600/50">
-            Sortino Ratio: <b className="text-teal-600 dark:text-teal-400">{sortinoRatio}x</b> (trừ rủi ro giảm giá)
+            Sortino Ratio: <b className="text-teal-600 dark:text-teal-400">{sortinoRatio != null ? `${sortinoRatio}x` : '—'}</b> (trừ rủi ro giảm giá)
           </div>
         </div>
       </div>

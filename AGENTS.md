@@ -111,14 +111,18 @@ Khi phát triển hoặc sửa đổi UI, các Agent phải tuân thủ nghiêm 
   * Bảng định giá đa mã (Multi-stock table) rườm rà.
 * **Giao diện tập trung chuyên sâu cho 1 mã đang tra cứu**:
   1. **Khung Tra Cứu Tự Do**: Cho phép nhập bất kỳ mã cổ phiếu nào trên cả 3 sàn (HOSE, HNX, UPCoM). Nếu là mã mới chưa có trong cache, hệ thống tự động kích hoạt pipeline cào dữ liệu thời gian thực và sinh BCTC.
-  2. **Hero Card Giá Trị Nội Tại Hội Tụ**: Điểm hội tụ từ 6 mô hình định giá, tính toán Biên An Toàn (MoS %) và đưa ra khuyến nghị hành động (*Mua gom tích luỹ*, *Theo dõi nắm giữ*, *Cân nhắc chốt lời*).
-  3. **Lưới 6 Mô Hình Định Giá Độc Lập**:
-     * Benjamin Graham Formula ($V = EPS \times (8.5 + 2g) \times \frac{4.4}{Y}$)
-     * Chiết khấu Cổ tức Gordon DDM ($V = \frac{D_1}{r - g}$)
-     * EV / EBITDA Multiple
+  2. **Hero Card Giá Trị Nội Tại Hội Tụ**: Điểm hội tụ từ 10 mô hình định lượng (sau khi lọc ngoại lai ±60% và trọng số ngành), tính toán Biên An Toàn (MoS %) và đưa ra khuyến nghị hành động (*Mua gom tích luỹ*, *Theo dõi nắm giữ*, *Cân nhắc chốt lời*).
+  3. **Lưới 10 Mô Hình Định Lượng Độc Lập**:
+     * Benjamin Graham Dynamic Formula ($V = EPS \times (PE_{\text{base}} + hs \times g) \times \frac{\text{Hằng số}_{\text{vn}}}{y}$)
+     * Chiết khấu Cổ tức Gordon DDM (Fade Rate & Cash Flow Backed)
+     * Target P/E Multiple (Median chu kỳ 5Y)
+     * Target P/B Ngành & Gordon Growth ($V = BVPS \times \frac{ROE - g}{r - g}$)
      * Price / Cash Flow (P/CF Multiple)
-     * Target P/E Multiple
-     * Target P/B Multiple
+     * Price / Sales (P/S Target Multiple)
+     * Chiết khấu Dòng tiền Tự do Vốn chủ FCFE ($CFO - CapEx + \Delta\text{Debt}$)
+     * Thu nhập Thặng dư Residual Income (RIM / EVA)
+     * Book NAV / P/B Chuẩn Hóa ($V = BVPS \times PB_{\text{norm}}$)
+     * EV / EBITDA ($7.5x$) & EV / Sales ($1.5x$) Multiple
   4. **Mô Tả Doanh Nghiệp, Xung Lực Kỹ Thuật & Thước Đo Vị Thế 52 Tuần**: Tên đầy đủ, mô tả ngành nghề kinh doanh, sàn niêm yết, khối lượng khớp lệnh, Thước đo vị thế giá 52 tuần (Đáy 52W — Thị giá hiện tại — Đỉnh 52W kèm % từ đáy), Beta, Tech Score, Hiệu suất từ 1 tuần đến 5 năm.
   5. **4 Chế Độ Xem Báo Cáo Tài Chính Chuyên Sâu**:
      * *BCTC Chi Tiết*: 122+ chỉ tiêu KQKD, CĐKT, LCTT trong 8 quý và 5 năm.

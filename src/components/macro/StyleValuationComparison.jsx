@@ -1,14 +1,16 @@
 import React from 'react';
 
-export default function StyleValuationComparison({ styleIndices = [], vnindexPE = 10.72, vnindexPB = 1.8 }) {
+export default function StyleValuationComparison({ styleIndices = [], vnindexPE = null, vnindexPB = null }) {
   if (!styleIndices || styleIndices.length === 0) {
     return null;
   }
 
   // Benjamin Graham metric cho VN-Index
-  const grahamIndex = +(vnindexPE * vnindexPB).toFixed(2);
-  const grahamSafe = grahamIndex <= 22.5;
-  const roeProxy = +((vnindexPB / vnindexPE) * 100).toFixed(2);
+  const hasPe = vnindexPE != null && Number(vnindexPE) > 0;
+  const hasPb = vnindexPB != null && Number(vnindexPB) > 0;
+  const grahamIndex = (hasPe && hasPb) ? +(Number(vnindexPE) * Number(vnindexPB)).toFixed(2) : null;
+  const grahamSafe = grahamIndex != null ? grahamIndex <= 22.5 : null;
+  const roeProxy = (hasPe && hasPb) ? +((Number(vnindexPB) / Number(vnindexPE)) * 100).toFixed(2) : null;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs p-5 sm:p-7 space-y-6">
@@ -39,17 +41,21 @@ export default function StyleValuationComparison({ styleIndices = [], vnindexPE 
             </span>
             <div className="flex items-center gap-2">
               <span className="text-lg font-black text-gray-900 dark:text-white">
-                {grahamIndex}
+                {grahamIndex != null ? grahamIndex : '—'}
               </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
-                grahamSafe
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
-              }`}>
-                {grahamSafe ? '≤ 22.5 (Vùng An Toàn)' : '> 22.5 (Đắt Đỏ)'}
-              </span>
+              {grahamSafe != null && (
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
+                  grahamSafe
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                }`}>
+                  {grahamSafe ? '≤ 22.5 (Vùng An Toàn)' : '> 22.5 (Đắt Đỏ)'}
+                </span>
+              )}
             </div>
-            <span className="text-[10px] text-gray-400">P/E ({vnindexPE}x) × P/B ({vnindexPB}x)</span>
+            <span className="text-[10px] text-gray-400">
+              {hasPe && hasPb ? `P/E (${vnindexPE}x) × P/B (${vnindexPB}x)` : 'Chưa có đủ số liệu VN-Index'}
+            </span>
           </div>
 
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 hidden sm:block" />
@@ -59,7 +65,7 @@ export default function StyleValuationComparison({ styleIndices = [], vnindexPE 
               ROE Proxy Thị Trường
             </span>
             <div className="text-lg font-black text-indigo-600 dark:text-indigo-400">
-              {roeProxy}%
+              {roeProxy != null ? `${roeProxy}%` : '—'}
             </div>
             <span className="text-[10px] text-gray-400">(P/B ÷ P/E) × 100%</span>
           </div>

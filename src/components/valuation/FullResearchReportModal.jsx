@@ -57,38 +57,33 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
     { id: 'LVGI', name: 'Chỉ số Đòn Bẩy Tài Chính (LVGI)', value: 1.0, benchmark: '< 1.05', desc: 'Tỷ lệ Nợ / Tổng tài sản so với kỳ trước.' },
     { id: 'TATA', name: 'Tỷ Lệ Dồn Tích Trên Tổng Tài Sản (TATA)', value: -0.015, benchmark: '< 0.05', desc: '(LNST - CFO) / Tổng tài sản. TATA âm chứng minh lợi nhuận bằng tiền mặt thật.' }
   ];
-  const beneishScore = beneish.mScore != null ? beneish.mScore : -2.12;
-  const beneishStatus = beneish.status || (beneishScore < -2.22 ? 'SAFE' : beneishScore < -1.78 ? 'GREY' : 'MANIPULATOR');
-  const beneishProb = beneish.manipulationProbability || (beneishStatus === 'SAFE' ? 'An toàn / Không phát hiện gian lận' : 'Trung bình / Vùng xám cần theo dõi');
-  const beneishSummary = beneish.summary || `M-Score = ${beneishScore} (${beneishProb}). Các chỉ số kế toán phản ánh hoạt động kinh doanh bình thường, không có bất thường trọng yếu.`;
-  const beneishIndices = Array.isArray(beneish.indices) && beneish.indices.length > 0 ? beneish.indices : defaultBeneishIndices;
+  const beneishScore = beneish.mScore != null ? beneish.mScore : null;
+  const beneishStatus = beneish.status || (beneishScore != null ? (beneishScore < -2.22 ? 'SAFE' : beneishScore < -1.78 ? 'GREY' : 'MANIPULATOR') : 'INSUFFICIENT_DATA');
+  const beneishProb = beneish.manipulationProbability || (beneishStatus === 'SAFE' ? 'An toàn / Không phát hiện gian lận' : beneishStatus === 'INSUFFICIENT_DATA' ? 'Chưa đủ dữ liệu' : 'Vùng xám cần theo dõi');
+  const beneishSummary = beneish.summary || (beneishScore != null ? `M-Score = ${beneishScore} (${beneishProb}). Các chỉ số kế toán phản ánh hoạt động kinh doanh bình thường.` : 'Chưa đủ dữ liệu BCTC tối thiểu 2 năm để tính toán các hệ số Beneish.');
+  const beneishIndices = Array.isArray(beneish.indices) && beneish.indices.length > 0 ? beneish.indices : [];
 
   // 3. Magic Formula
-  const magicEy = magic.earningsYield != null ? magic.earningsYield : (ratios.valuation?.earningsYield ?? (multiples.peTarget > 0 ? +(100 / multiples.peTarget).toFixed(1) : 12.5));
-  const magicRoic = magic.roic != null ? magic.roic : (ratios.profitability?.roic ?? ratios.profitability?.roe ?? 20.0);
-  const magicScore = magic.compositeScore != null ? magic.compositeScore : Math.min(99, Math.round(Number(magicEy) * 2.5 + Number(magicRoic) * 2.0));
-  const magicCategory = magic.category || (magicRoic >= 15 && magicEy >= 8.5 ? 'Hạng 1: Siêu Phẩm (Chất Lượng Cao & Định Giá Hời)' : 'Doanh Nghiệp Chất Lượng Tốt');
-  const magicRec = magic.recommendation || (magicRoic >= 15 ? 'Đạt chuẩn Joel Greenblatt Magic Formula: Tỷ suất sinh lời trên vốn cao và định giá hợp lý.' : 'Cổ phiếu duy trì tỷ suất sinh lời vốn ở mức khá.');
+  const magicEy = magic.earningsYield != null ? magic.earningsYield : (ratios.valuation?.earningsYield ?? (multiples.peTarget > 0 ? +(100 / multiples.peTarget).toFixed(1) : null));
+  const magicRoic = magic.roic != null ? magic.roic : (ratios.profitability?.roic ?? ratios.profitability?.roe ?? null);
+  const magicScore = magic.compositeScore != null ? magic.compositeScore : (magicEy != null && magicRoic != null ? Math.min(99, Math.round(Number(magicEy) * 2.5 + Number(magicRoic) * 2.0)) : null);
+  const magicCategory = magic.category || (magicRoic != null && magicEy != null ? (magicRoic >= 15 && magicEy >= 8.5 ? 'Hạng 1: Siêu Phẩm (Chất Lượng Cao & Định Giá Hời)' : 'Doanh Nghiệp Chất Lượng Tốt') : 'Chưa đủ dữ liệu xếp hạng');
+  const magicRec = magic.recommendation || (magicRoic != null ? (magicRoic >= 15 ? 'Đạt chuẩn Joel Greenblatt Magic Formula: Tỷ suất sinh lời trên vốn cao và định giá hợp lý.' : 'Cổ phiếu duy trì tỷ suất sinh lời vốn ở mức khá.') : 'Cần bổ sung thêm BCTC để phân tích Magic Formula.');
 
   // 4. FCF Inflection Point
-  const inflectionCfoToNi = inflection.cfoToNiRatio != null ? inflection.cfoToNiRatio : (ratios.cashFlow?.cfoToNi ?? 1.25);
-  const inflectionCapexRatio = inflection.capexToRevenueRatio != null ? inflection.capexToRevenueRatio : (ratios.efficiency?.capexToRevenue ?? 9.2);
-  const inflectionCipRatio = inflection.cipRatio != null ? inflection.cipRatio : (ratios.efficiency?.cipRatio ?? 15.0);
-  const inflectionCipBn = inflection.constructionInProgress != null ? inflection.constructionInProgress : (financials.quarterly?.[financials.quarterly.length - 1]?.constructionInProgress ?? 0);
-  const inflectionAccruals = inflection.accrualsRatio != null ? inflection.accrualsRatio : -0.008;
-  const inflectionAccrualsRating = inflection.accrualsRating || (inflectionAccruals <= 0 ? 'Tốt - Lợi nhuận phản ánh tiền mặt thực tế' : 'Cần theo dõi các khoản phải thu');
-  const inflectionTitle = inflection.statusTitle || '💎 Cỗ Máy In Tiền Mặt (Cash Cow Generation)';
-  const inflectionNarrative = inflection.narrative || `Doanh nghiệp tạo tiền mặt dồi dào (CFO/LNST = ${inflectionCfoToNi}x), lợi nhuận được bảo chứng bằng dòng tiền thực tế, nguồn tiền ổn định cho tái đầu tư hoặc cổ tức.`;
+  const inflectionCfoToNi = inflection.cfoToNiRatio != null ? inflection.cfoToNiRatio : (ratios.cashFlow?.cfoToNi ?? null);
+  const inflectionCapexRatio = inflection.capexToRevenueRatio != null ? inflection.capexToRevenueRatio : (ratios.efficiency?.capexToRevenue ?? null);
+  const inflectionCipRatio = inflection.cipRatio != null ? inflection.cipRatio : (ratios.efficiency?.cipRatio ?? null);
+  const inflectionCipBn = inflection.constructionInProgress != null ? inflection.constructionInProgress : (financials.quarterly?.[financials.quarterly.length - 1]?.constructionInProgress ?? null);
+  const inflectionAccruals = inflection.accrualsRatio != null ? inflection.accrualsRatio : null;
+  const inflectionAccrualsRating = inflection.accrualsRating || (inflectionAccruals != null ? (inflectionAccruals <= 0 ? 'Tốt - Lợi nhuận phản ánh tiền mặt thực tế' : 'Cần theo dõi các khoản phải thu') : 'Chưa đủ dữ liệu');
+  const inflectionTitle = inflection.statusTitle || 'Dòng Tiền Doanh Nghiệp';
+  const inflectionNarrative = inflection.narrative || (inflectionCfoToNi != null ? `Doanh nghiệp tạo tiền mặt dồi dào (CFO/LNST = ${inflectionCfoToNi}x).` : 'Chưa đủ dữ liệu dòng tiền LCTT.');
 
   // 5. Health Score & Early Warning
-  const healthOverall = health.overallScore != null ? health.overallScore : 80;
-  const healthGrade = health.grade || health.rating || (healthOverall >= 80 ? 'Xuất Sắc' : healthOverall >= 65 ? 'Mạnh' : 'Đạt Chuẩn');
-  const healthPillars = health.pillars || {
-    profitability: { name: 'Khả Năng Sinh Lời', score: 75, rating: 'Tốt' },
-    efficiency: { name: 'Hiệu Quả Hoạt Động', score: 70, rating: 'Tốt' },
-    leverage: { name: 'Đòn Bẩy & An Toàn Vốn', score: 90, rating: 'An toàn' },
-    liquidity: { name: 'Khả Năng Thanh Toán', score: 85, rating: 'Dồi dào' }
-  };
+  const healthOverall = health.overallScore != null ? health.overallScore : null;
+  const healthGrade = health.grade || health.rating || (healthOverall != null ? (healthOverall >= 80 ? 'Xuất Sắc' : healthOverall >= 65 ? 'Mạnh' : 'Đạt Chuẩn') : 'Chưa đủ dữ liệu');
+  const healthPillars = health.pillars || {};
   const earlyScore = earlyWarn.riskScore != null ? earlyWarn.riskScore : 5;
   const earlyLevel = earlyWarn.riskLevel || (earlyScore <= 20 ? 'An Toàn' : earlyScore <= 40 ? 'Trung Bình' : 'Cảnh Báo');
   const positiveSignals = Array.isArray(earlyWarn.positiveSignals) ? earlyWarn.positiveSignals : [];
@@ -230,7 +225,7 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
           <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/60 text-center">
             <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase">Health Score</div>
             <div className="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">
-              {healthOverall}/100
+              {healthOverall != null ? `${healthOverall}/100` : '—'}
             </div>
           </div>
         </div>
@@ -244,16 +239,16 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
           <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs text-gray-700 dark:text-gray-200 leading-relaxed space-y-2">
             <p>
               Cổ phiếu <strong>{symbol}</strong> ghi nhận mức điểm sức khỏe tài chính tổng hợp đạt{' '}
-              <strong className="text-emerald-600 dark:text-emerald-400">{healthOverall}/100 ({healthGrade})</strong>{' '}
+              <strong className="text-emerald-600 dark:text-emerald-400">{healthOverall != null ? `${healthOverall}/100 (${healthGrade})` : 'Chưa đủ dữ liệu'}</strong>{' '}
               với rủi ro vận hành ở mức thấp ({earlyLevel}). Giá trị nội tại hội tụ từ các mô hình định giá chuyên sâu ước đạt{' '}
               <strong className="text-emerald-600 dark:text-emerald-400">{formatVND(multiples.consensusFairValue || currentPrice)}</strong>, tương ứng Biên An Toàn (MoS) đạt{' '}
               <strong>{multiples.marginOfSafety != null ? `${multiples.marginOfSafety}%` : '0%'}</strong>.
             </p>
             <p>
-              Hệ thống kiểm toán gian lận Beneish cho kết quả an toàn với điểm <strong>M-Score = {beneishScore}</strong> ({beneishProb}).
+              Hệ thống kiểm toán gian lận Beneish cho kết quả đánh giá <strong>{beneishScore != null ? `M-Score = ${beneishScore}` : 'Chưa đủ dữ liệu'}</strong> ({beneishProb}).
               Mô hình Magic Formula xếp hạng cổ phiếu vào nhóm <strong>{magicCategory}</strong> với ROIC đạt{' '}
-              <strong className="text-indigo-600 dark:text-indigo-400">{magicRoic}%</strong> và Earnings Yield đạt{' '}
-              <strong className="text-emerald-600 dark:text-emerald-400">{magicEy}%</strong>.
+              <strong className="text-indigo-600 dark:text-indigo-400">{magicRoic != null ? `${magicRoic}%` : '—'}</strong> và Earnings Yield đạt{' '}
+              <strong className="text-emerald-600 dark:text-emerald-400">{magicEy != null ? `${magicEy}%` : '—'}</strong>.
             </p>
           </div>
         </section>
@@ -272,29 +267,63 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
             )}
           </div>
 
-          {/* Lưới 10 Mô Hình Định Lượng (hoặc Fallback 6 Mô Hình) */}
+          {/* Lưới 10 Mô Hình Định Lượng Độc Lập */}
           {Array.isArray(multiples.models10) && multiples.models10.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 text-xs">
               {multiples.models10.map((m, idx) => {
                 const targetVal = m.value ?? m.targetPrice;
                 const hasVal = targetVal != null && targetVal > 0;
+                const isOutlier = m.isOutlier;
+                const isContributing = hasVal && !isOutlier && (m.weight || 0) > 0;
                 const cleanName = (m.cleanName || m.name || '').replace(/^\d+\.\s*/, '');
                 return (
                   <div
                     key={m.id || idx}
-                    className={`p-3 rounded-xl border flex flex-col justify-between ${
-                      m.isOutlier
+                    className={`p-3 rounded-xl border flex flex-col justify-between transition-all ${
+                      isOutlier
                         ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40 opacity-70'
-                        : 'bg-gray-50/80 dark:bg-gray-800/60 border-gray-200 dark:border-gray-700'
+                        : isContributing
+                          ? 'bg-white dark:bg-gray-800 border-indigo-200 dark:border-indigo-700/60 shadow-2xs ring-1 ring-indigo-500/15'
+                          : 'bg-gray-50/70 dark:bg-gray-800/40 border-gray-200/70 dark:border-gray-700/50'
                     }`}
                   >
                     <div>
-                      <div className="flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
-                        <span className="font-bold truncate" title={m.fullName || m.name || cleanName}>{idx + 1}. {cleanName}</span>
-                        <span className="font-mono">w: {Math.round((m.weight || 0) * 100)}%</span>
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span
+                          className={`truncate font-bold ${
+                            isContributing
+                              ? 'text-gray-900 dark:text-white'
+                              : 'text-gray-700 dark:text-gray-300'
+                          }`}
+                          title={m.fullName || m.name || cleanName}
+                        >
+                          {idx + 1}. {cleanName}
+                        </span>
+                        <span
+                          className={`font-mono px-1.5 py-0.5 rounded text-[9px] transition-all ${
+                            isContributing
+                              ? 'font-bold bg-indigo-600 text-white dark:bg-indigo-500 shadow-2xs'
+                              : isOutlier
+                                ? 'font-medium bg-rose-100 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400 line-through'
+                                : 'font-medium bg-gray-100/70 dark:bg-gray-800/70 text-gray-400 dark:text-gray-500 border border-gray-200/60 dark:border-gray-700/60 opacity-60'
+                          }`}
+                          title={
+                            isContributing
+                              ? `Được tính vào Giá Trị Nội Tại (Trọng số ${Math.round((m.weight || 0) * 100)}%)`
+                              : isOutlier
+                                ? 'Bị loại trừ do lệch quá ±60% so với median'
+                                : 'Chưa đủ dữ liệu hoặc miễn trừ theo phân ngành'
+                          }
+                        >
+                          w: {Math.round((m.weight || 0) * 100)}%
+                        </span>
                       </div>
                       <div className={`text-sm font-black mt-1 ${
-                        m.isOutlier ? 'line-through text-rose-500 dark:text-rose-300' : hasVal ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500 font-normal text-xs'
+                        isOutlier
+                          ? 'line-through text-rose-500 dark:text-rose-300'
+                          : hasVal
+                            ? (isContributing ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white font-bold')
+                            : 'text-gray-500 dark:text-gray-400 font-medium text-xs'
                       }`}>
                         {hasVal ? formatVND(targetVal) : (m.statusNote || '—')}
                       </div>
@@ -316,31 +345,13 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
               })}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">1. GIÁ HỘI TỤ (CONSENSUS)</span>
-                <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">{formatVND(multiples.consensusFairValue || currentPrice)}</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">2. DCF BASE CASE</span>
-                <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">{formatVND(dcf.dcfScenarios?.basePrice || multiples.consensusFairValue || currentPrice)}</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">3. BENJAMIN GRAHAM</span>
-                <span className="text-base font-bold text-gray-900 dark:text-white">{formatVND(multiples.grahamNumber || currentPrice)}</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">4. EV / EBITDA MULTIPLE</span>
-                <span className="text-base font-bold text-gray-900 dark:text-white">{formatVND(multiples.evEbitdaFairPrice || currentPrice)}</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">5. DÒNG TIỀN P/CF</span>
-                <span className="text-base font-bold text-gray-900 dark:text-white">{formatVND(multiples.pcfFairPrice || currentPrice)}</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">6. P/E & P/B TARGET</span>
-                <span className="text-base font-bold text-gray-900 dark:text-white">{formatVND(multiples.peTarget || multiples.pbTarget || currentPrice)}</span>
-              </div>
+            <div className="p-6 rounded-2xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-center space-y-1">
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-300 block">
+                📊 Đang tính toán 10 mô hình định lượng độc lập
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 block">
+                Chưa đủ dữ liệu tài chính tối thiểu để hội tụ 10 mô hình hoặc đang đồng bộ BCTC.
+              </span>
             </div>
           )}
 
@@ -386,7 +397,7 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
           </div>
 
           <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
-            • Reverse DCF (Tăng trưởng ngụ ý thị giá): <strong className="text-gray-800 dark:text-gray-200">{dcf.reverseDcfImpliedGrowth != null ? `${dcf.reverseDcfImpliedGrowth}%/năm` : '12.5%/năm'}</strong> · WACC: {dcf.sectorWacc || 10.5}%
+            • Reverse DCF (Tăng trưởng ngụ ý thị giá): <strong className="text-gray-800 dark:text-gray-200">{dcf.reverseDcfImpliedGrowth != null ? `${dcf.reverseDcfImpliedGrowth}%/năm` : '—'}</strong> · WACC: {dcf.sectorWacc ? `${dcf.sectorWacc}%` : (dcf.wacc ? `${dcf.wacc}%` : '—')}
             {multiples.threeLayerDecision?.roeCoeSpread != null && (
               <span className="ml-3">
                 • ROE - CoE Spread: <strong className={multiples.threeLayerDecision.roeCoeSpread > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
@@ -452,18 +463,18 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
               <span>Chương 4: Joel Greenblatt Magic Formula (EY% & ROIC%)</span>
             </h3>
             <span className="text-xs px-2.5 py-0.5 rounded-md font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-              Điểm: {magicScore}/100
+              Điểm: {magicScore != null ? `${magicScore}/100` : '—'}
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
               <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">EARNINGS YIELD (EY%)</span>
-              <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{magicEy}%</span>
+              <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{magicEy != null ? `${magicEy}%` : '—'}</span>
               <span className="text-[10px] text-gray-500 dark:text-gray-400 block mt-0.5">EBIT ÷ EV (&gt; 8.5% là rẻ)</span>
             </div>
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
               <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">RETURN ON CAPITAL (ROIC%)</span>
-              <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">{magicRoic}%</span>
+              <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">{magicRoic != null ? `${magicRoic}%` : '—'}</span>
               <span className="text-[10px] text-gray-500 dark:text-gray-400 block mt-0.5">Hiệu quả sử dụng vốn (&gt; 15%)</span>
             </div>
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
@@ -589,7 +600,7 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
               <span className="text-[10px] text-gray-500 dark:text-gray-400 block font-bold">HEALTH SCORE (0-100)</span>
-              <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{healthOverall}/100</span>
+              <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{healthOverall != null ? `${healthOverall}/100` : '—'}</span>
               <span className="text-[10px] text-gray-500 dark:text-gray-400 block mt-0.5">Xếp hạng: {healthGrade}</span>
             </div>
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">

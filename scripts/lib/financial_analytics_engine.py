@@ -55,36 +55,51 @@ def calculate_extended_dupont(
     5. Financial Leverage = Total Assets / Equity (Đòn bẩy tài chính)
     """
     net_income = _safe_float(latest_quarter.get("netIncomeParent") or latest_quarter.get("netIncome"))
-    ebt = _safe_float(latest_quarter.get("profitBeforeTax"))
-    interest_expense = _safe_float(latest_quarter.get("interestExpense"))
-    operating_profit = _safe_float(latest_quarter.get("operatingProfit"))
-    ebit = operating_profit if operating_profit > 0 else (ebt + interest_expense if ebt > 0 else net_income * 1.3)
-    revenue = _safe_float(latest_quarter.get("revenue"))
     total_assets = _safe_float(latest_quarter.get("totalAssets"))
     equity = _safe_float(latest_quarter.get("equity"))
+    revenue = _safe_float(latest_quarter.get("revenue"))
 
-    # Tránh giá trị 0 làm gãy chuỗi nhân
-    if ebt <= 0 and net_income > 0:
-        ebt = net_income * 1.25
-    if ebit <= 0 and ebt > 0:
-        ebit = ebt + max(1.0, interest_expense)
+    if not latest_quarter or not net_income or not total_assets or not equity or not revenue:
+        return {
+            "status": "INSUFFICIENT_DATA",
+            "roe": None,
+            "calculatedRoe": None,
+            "taxBurden": None,
+            "interestBurden": None,
+            "operatingMargin": None,
+            "assetTurnover": None,
+            "financialLeverage": None,
+            "components": [],
+            "qualityAssessment": "Chưa đủ dữ liệu báo cáo tài chính để phân rã Extended DuPont."
+        }
+
+    ebt = _safe_float(latest_quarter.get("profitBeforeTax"))
+    interest_expense = _safe_float(latest_quarter.get("interestExpense"), 0.0)
+    operating_profit = _safe_float(latest_quarter.get("operatingProfit"))
+
+    if operating_profit and operating_profit > 0:
+        ebit = operating_profit
+    elif ebt and ebt > 0:
+        ebit = ebt + interest_expense
+    else:
+        ebit = net_income * 1.25
 
     # 1. Tax Burden (Thường trong khoảng 0.75 - 0.85 ứng với thuế TNDN 20%)
-    tax_burden = _safe_divide(net_income, ebt, default=0.80)
+    tax_burden = _safe_divide(net_income, ebt) if (ebt and ebt > 0) else 0.80
     tax_burden = min(1.2, max(0.2, tax_burden))
 
     # 2. Interest Burden (Càng gần 1.0 càng ít nợ vay)
-    interest_burden = _safe_divide(ebt, ebit, default=0.85)
+    interest_burden = _safe_divide(ebt, ebit) if (ebt and ebit and ebit > 0) else 0.85
     interest_burden = min(1.0, max(0.1, interest_burden))
 
     # 3. Operating Margin
-    operating_margin = _safe_divide(ebit, revenue, default=0.10)
+    operating_margin = _safe_divide(ebit, revenue) if (ebit and revenue) else 0.10
 
     # 4. Asset Turnover (Chuẩn hóa năm bằng cách x 4 doanh thu quý)
-    asset_turnover = _safe_divide(revenue * 4.0, total_assets, default=0.75)
+    asset_turnover = _safe_divide(revenue * 4.0, total_assets) if (revenue and total_assets) else 0.75
 
     # 5. Financial Leverage
-    financial_leverage = _safe_divide(total_assets, equity, default=1.65)
+    financial_leverage = _safe_divide(total_assets, equity) if (total_assets and equity) else 1.65
 
     # Tích số ROE tính toán
     calculated_roe = tax_burden * interest_burden * operating_margin * asset_turnover * financial_leverage * 100.0
@@ -369,58 +384,93 @@ def calculate_early_warning(
     }
 
 
-# ==============================================================================
-# 3. THƯỚC ĐO SỨC KHỎE TỔNG THỂ (OVERALL HEALTH SCORE 0-100)
-# ==============================================================================
-def calculate_overall_health_score(ratios: Dict[str, Any]) -> Dict[str, Any]:
+def calculate_overall_health_score(ratios: Dict[str, Any], industry_category: str = "GENERAL") -> Dict[str, Any]:
     """
-    Tính điểm sức khỏe tài chính toàn diện 4 trụ cột có trọng số:
-    Score = 0.30 x Profitability + 0.25 x Efficiency + 0.25 x Leverage + 0.20 x Liquidity
+    Tính điểm sức khỏe tài chính toàn diện 4 trụ cột có trọng số theo chuẩn ngành:
+    - Phi tài chính: 30% Sinh lời + 25% Hiệu quả + 25% Đòn bẩy + 20% Thanh khoản
+    - Ngân hàng/Tài chính: 45% Sinh lời + 20% Hiệu quả + 35% Đòn bẩy/CAR + 0% Thanh khoản corporate
     """
+    try:
+        from lib.config_loader import get_financial_analytics_config
+    except ImportError:
+        from scripts.lib.config_loader import get_financial_analytics_config
+
+    fa_cfg = get_financial_analytics_config()
+    hs_cfg = fa_cfg.get("healthScore", {})
+    weights_corp = hs_cfg.get("pillarWeightsCorporate", {"profitability": 0.30, "efficiency": 0.25, "leverage": 0.25, "liquidity": 0.20})
+    weights_bank = hs_cfg.get("pillarWeightsBanking", {"profitability": 0.45, "efficiency": 0.20, "leverage": 0.35, "liquidity": 0.00})
+    thresholds = hs_cfg.get("gradeThresholds", {"excellent": 80, "good": 65, "fair": 50, "weak": 35})
+
+    cat = (industry_category or "GENERAL").upper()
+    is_bank = cat in ["BANKING", "FINANCIAL_SERVICES", "INSURANCE"]
+    weights = weights_bank if is_bank else weights_corp
+
     prof = ratios.get("profitability", {})
     eff = ratios.get("efficiency", {})
     lev = ratios.get("leverage", {})
     liq = ratios.get("liquidity", {})
 
-    # 1. Trụ cột Sinh Lời (Profitability - 30%)
+    # 1. Trụ cột Sinh Lời (Profitability)
     roe = _safe_float(prof.get("roe"))
     roa = _safe_float(prof.get("roa"))
     net_margin = _safe_float(prof.get("netMargin"))
 
-    p_roe = 40 if roe >= 20 else 32 if roe >= 15 else 24 if roe >= 10 else 16 if roe >= 5 else 8
-    p_roa = 35 if roa >= 10 else 28 if roa >= 7 else 21 if roa >= 5 else 14 if roa >= 3 else 7
-    p_margin = 25 if net_margin >= 15 else 20 if net_margin >= 10 else 15 if net_margin >= 5 else 10 if net_margin >= 2 else 5
-    profitability_score = p_roe + p_roa + p_margin  # Max 100
+    if is_bank:
+        p_roe = 55 if roe >= 20 else 45 if roe >= 16 else 35 if roe >= 12 else 25 if roe >= 8 else 12
+        p_roa = 45 if roa >= 2.0 else 38 if roa >= 1.5 else 30 if roa >= 1.0 else 20 if roa >= 0.6 else 10
+        profitability_score = min(100, p_roe + p_roa)
+    else:
+        p_roe = 40 if roe >= 20 else 32 if roe >= 15 else 24 if roe >= 10 else 16 if roe >= 5 else 8
+        p_roa = 35 if roa >= 10 else 28 if roa >= 7 else 21 if roa >= 5 else 14 if roa >= 3 else 7
+        p_margin = 25 if net_margin >= 15 else 20 if net_margin >= 10 else 15 if net_margin >= 5 else 10 if net_margin >= 2 else 5
+        profitability_score = p_roe + p_roa + p_margin
 
-    # 2. Trụ cột Hiệu Quả (Efficiency - 25%)
+    # 2. Trụ cột Hiệu Quả (Efficiency)
     asset_turn = _safe_float(eff.get("assetTurnover"))
     inv_turn = _safe_float(eff.get("inventoryTurnover"))
 
-    e_asset = 50 if asset_turn >= 1.2 else 40 if asset_turn >= 0.9 else 30 if asset_turn >= 0.7 else 20 if asset_turn >= 0.5 else 10
-    e_inv = 50 if inv_turn >= 8.0 else 40 if inv_turn >= 5.0 else 30 if inv_turn >= 3.0 else 20 if inv_turn >= 1.5 else 10
-    efficiency_score = e_asset + e_inv  # Max 100
+    if is_bank:
+        efficiency_score = 100 if asset_turn >= 0.08 else 85 if asset_turn >= 0.06 else 70 if asset_turn >= 0.04 else 50
+    else:
+        e_asset = 50 if asset_turn >= 1.2 else 40 if asset_turn >= 0.9 else 30 if asset_turn >= 0.7 else 20 if asset_turn >= 0.5 else 10
+        e_inv = 50 if inv_turn >= 8.0 else 40 if inv_turn >= 5.0 else 30 if inv_turn >= 3.0 else 20 if inv_turn >= 1.5 else 10
+        efficiency_score = e_asset + e_inv
 
-    # 3. Trụ cột Đòn Bẩy (Leverage - 25%)
+    # 3. Trụ cột Đòn Bẩy (Leverage)
     debt_equity = _safe_float(lev.get("debtToEquity"))
     interest_cov = _safe_float(liq.get("interestCoverage"))
 
-    l_de = 50 if debt_equity <= 0.6 else 40 if debt_equity <= 1.0 else 30 if debt_equity <= 1.5 else 20 if debt_equity <= 2.2 else 10
-    l_ic = 50 if interest_cov >= 5.0 else 40 if interest_cov >= 3.0 else 30 if interest_cov >= 2.0 else 20 if interest_cov >= 1.2 else 10
-    leverage_score = l_de + l_ic  # Max 100
+    if is_bank:
+        l_de = 50 if debt_equity <= 9.0 else 42 if debt_equity <= 11.0 else 32 if debt_equity <= 13.5 else 20 if debt_equity <= 16.0 else 10
+        l_ic = 50 if interest_cov >= 1.5 else 40 if interest_cov >= 1.2 else 30 if interest_cov >= 1.0 else 20
+        leverage_score = l_de + l_ic
+    else:
+        l_de = 50 if debt_equity <= 0.6 else 40 if debt_equity <= 1.0 else 30 if debt_equity <= 1.5 else 20 if debt_equity <= 2.2 else 10
+        l_ic = 50 if interest_cov >= 5.0 else 40 if interest_cov >= 3.0 else 30 if interest_cov >= 2.0 else 20 if interest_cov >= 1.2 else 10
+        leverage_score = l_de + l_ic
 
-    # 4. Trụ cột Thanh Khoản (Liquidity - 20%)
+    # 4. Trụ cột Thanh Khoản (Liquidity)
     curr_r = _safe_float(liq.get("currentRatio"))
     quick_r = _safe_float(liq.get("quickRatio"))
 
-    q_curr = 50 if curr_r >= 2.0 else 40 if curr_r >= 1.5 else 30 if curr_r >= 1.2 else 20 if curr_r >= 1.0 else 10
-    q_quick = 50 if quick_r >= 1.5 else 40 if quick_r >= 1.2 else 30 if quick_r >= 1.0 else 20 if quick_r >= 0.7 else 10
-    liquidity_score = q_curr + q_quick  # Max 100
+    if is_bank:
+        cash_ratio = _safe_float(liq.get("cashRatio"))
+        liquidity_score = 100 if cash_ratio >= 0.05 else 80 if cash_ratio >= 0.03 else 60
+    else:
+        q_curr = 50 if curr_r >= 2.0 else 40 if curr_r >= 1.5 else 30 if curr_r >= 1.2 else 20 if curr_r >= 1.0 else 10
+        q_quick = 50 if quick_r >= 1.5 else 40 if quick_r >= 1.2 else 30 if quick_r >= 1.0 else 20 if quick_r >= 0.7 else 10
+        liquidity_score = q_curr + q_quick
+
+    w_prof = float(weights.get("profitability", 0.30))
+    w_eff = float(weights.get("efficiency", 0.25))
+    w_lev = float(weights.get("leverage", 0.25))
+    w_liq = float(weights.get("liquidity", 0.20))
 
     overall_score = round(
-        0.30 * profitability_score +
-        0.25 * efficiency_score +
-        0.25 * leverage_score +
-        0.20 * liquidity_score,
+        w_prof * profitability_score +
+        w_eff * efficiency_score +
+        w_lev * leverage_score +
+        w_liq * liquidity_score,
         1
     )
 
@@ -502,27 +552,33 @@ def calculate_stock_risk_metrics(
     - VaR 95% (Mức sụt giảm tối đa 1 ngày độ tin cậy 95%)
     - Sharpe Ratio & Sortino Ratio
     """
-    cur = _safe_float(current_price, 20000)
-    h52 = _safe_float(high_52w, cur * 1.25)
-    l52 = _safe_float(low_52w, cur * 0.75)
+    if current_price is None or float(current_price) <= 0:
+        return None
+
+    cur = float(current_price)
+    h52 = _safe_float(high_52w, 0.0)
+    l52 = _safe_float(low_52w, 0.0)
     b = _safe_float(beta, 1.0)
 
     # Max Drawdown từ đỉnh 52 tuần
-    mdd = round(((h52 - cur) / h52) * 100.0, 2) if h52 > 0 else 0.0
+    mdd = round(((h52 - cur) / h52) * 100.0, 2) if (h52 > 0 and h52 >= cur) else 0.0
 
     # Ước lượng volatility hàng năm dựa trên range 52W và Beta
-    # Parkinson Volatility Proxy: sigma ~ ln(High / Low) / (2 * sqrt(ln(2)))
-    parkinson_vol = (math.log(max(1.01, h52 / max(1.0, l52))) / 1.665) * 100.0 if h52 > l52 else 25.0
+    if h52 > 0 and l52 > 0 and h52 > l52:
+        parkinson_vol = (math.log(max(1.01, h52 / l52)) / 1.665) * 100.0
+    else:
+        parkinson_vol = 25.0
+
     ann_vol = round(max(15.0, min(80.0, parkinson_vol * 0.85 + b * 10.0)), 1)
     daily_vol = round(ann_vol / math.sqrt(252.0), 2)
 
     # VaR 95% (Parametric: Z_0.95 = 1.645)
     var_95 = round(1.645 * daily_vol, 2)
 
-    # Lợi nhuận ước lượng 1 năm (từ đáy hoặc mức tăng chuẩn)
-    est_return = round(((cur - l52) / l52) * 100.0, 2) if l52 > 0 else 12.0
-    sharpe = round((est_return - rf_rate) / ann_vol, 2) if ann_vol > 0 else 0.5
-    sortino = round((est_return - rf_rate) / (ann_vol * 0.7), 2) if ann_vol > 0 else 0.7
+    # Lợi nhuận ước lượng 1 năm (từ đáy nếu có)
+    est_return = round(((cur - l52) / l52) * 100.0, 2) if l52 > 0 else 0.0
+    sharpe = round((est_return - rf_rate) / ann_vol, 2) if ann_vol > 0 else 0.0
+    sortino = round((est_return - rf_rate) / (ann_vol * 0.7), 2) if ann_vol > 0 else 0.0
 
     return {
         "annualizedVolatility": ann_vol,
@@ -845,24 +901,64 @@ def calculate_magic_formula(
 
     Phân hạng cổ phiếu: Doanh Nghiệp Xuất Sắc (ROIC cao) giao dịch tại Mức Giá Rẻ (EY cao).
     """
-    close = _safe_float(stock_item.get("close") or latest_quarter.get("close"), 20000.0)
-    shares = _safe_float(stock_item.get("scale", {}).get("sharesOutstanding"), 1_000_000_000.0)
-    market_cap = _safe_float(stock_item.get("scale", {}).get("marketCap"), close * shares)
+    try:
+        from lib.config_loader import get_financial_analytics_config
+    except ImportError:
+        from scripts.lib.config_loader import get_financial_analytics_config
+
+    fa_cfg = get_financial_analytics_config()
+    mf_cfg = fa_cfg.get("magicFormula", {})
+    min_ey_top = float(mf_cfg.get("minEarningsYieldTopTier", 9.0))
+    min_roic_top = float(mf_cfg.get("minRoicTopTier", 18.0))
+    ey_bench = float(mf_cfg.get("eyBenchmark", 15.0))
+    roic_bench = float(mf_cfg.get("roicBenchmark", 30.0))
+
+    close = _safe_float(stock_item.get("close") or latest_quarter.get("close"), 0.0)
+    shares = _safe_float(stock_item.get("scale", {}).get("sharesOutstanding") or stock_item.get("shares"), 0.0)
+    market_cap = _safe_float(stock_item.get("scale", {}).get("marketCap"), close * shares if (close > 0 and shares > 0) else 0.0)
+
+    if close <= 0 or (market_cap <= 0 and shares <= 0):
+        return {
+            "status": "INSUFFICIENT_DATA",
+            "earningsYield": None,
+            "roic": None,
+            "compositeScore": None,
+            "category": "Chưa đủ dữ liệu thị giá/vốn hóa",
+            "tier": "UNKNOWN",
+            "recommendation": "Cần dữ liệu thị giá và quy mô cổ phiếu để xếp hạng Magic Formula.",
+            "parameters": {}
+        }
 
     # EBIT TTM 4 quý hoặc chuẩn hóa năm từ quý gần nhất
+    ebit = 0.0
     if ttm_series and len(ttm_series) > 0:
         latest_ttm = ttm_series[-1]
-        ebit = _safe_float(latest_ttm.get("operatingProfit") or (latest_ttm.get("netIncome", 0) * 1.35))
+        op = latest_ttm.get("operatingProfit")
+        if op is not None:
+            ebit = _safe_float(op)
+        elif latest_ttm.get("netIncome") is not None:
+            ebit = _safe_float(latest_ttm.get("netIncome"))
     else:
         q_ebit = _safe_float(latest_quarter.get("operatingProfit"))
         if q_ebit <= 0:
             q_pbt = _safe_float(latest_quarter.get("profitBeforeTax"))
-            q_interest = _safe_float(latest_quarter.get("interestExpense"))
-            q_ebit = q_pbt + q_interest if q_pbt > 0 else _safe_float(latest_quarter.get("netIncomeParent"), 500.0) * 1.3
+            q_interest = _safe_float(latest_quarter.get("interestExpense"), 0.0)
+            q_ebit = (q_pbt + q_interest) if q_pbt > 0 else 0.0
         ebit = q_ebit * 4.0
 
+    if ebit <= 0:
+        return {
+            "status": "INSUFFICIENT_DATA",
+            "earningsYield": None,
+            "roic": None,
+            "compositeScore": None,
+            "category": "EBIT không đủ điều kiện (âm hoặc thiếu)",
+            "tier": "UNKNOWN",
+            "recommendation": "Doanh nghiệp không có lợi nhuận hoạt động EBIT dương để tính Magic Formula.",
+            "parameters": {}
+        }
+
     # Enterprise Value (EV) = Market Cap + Net Debt
-    # Đơn vị: Chuyển về cùng hệ số Tỷ VNĐ (scale 1 tỷ đồng nếu marketCap tính theo VND lẻ)
     market_cap_bn = market_cap / 1_000_000_000.0 if market_cap > 100_000_000 else market_cap
     total_debt_bn = _safe_float(latest_quarter.get("totalDebt"), 0.0)
     cash_bn = _safe_float(latest_quarter.get("cashAndEquivalents"), 0.0) + _safe_float(latest_quarter.get("shortTermInvestments"), 0.0)
@@ -871,10 +967,9 @@ def calculate_magic_formula(
     ev_bn = max(market_cap_bn * 0.5, market_cap_bn + net_debt_bn)
 
     # 1. Earnings Yield (EY %)
-    earnings_yield = round(_safe_divide(ebit, ev_bn, 0.08) * 100.0, 2)
+    earnings_yield = round(_safe_divide(ebit, ev_bn, 0.0) * 100.0, 2)
 
     # 2. Return on Capital (ROIC %)
-    # Capital Employed = Net Working Capital + Net Fixed Assets
     st_assets = _safe_float(latest_quarter.get("shortTermAssets"), 0.0)
     st_debt = _safe_float(latest_quarter.get("shortTermDebt"), 0.0)
     fixed_assets = _safe_float(latest_quarter.get("fixedAssets"), 0.0)
@@ -885,23 +980,22 @@ def calculate_magic_formula(
     if capital_employed <= 0:
         capital_employed = max(100.0, equity + net_debt_bn)
 
-    roic = round(_safe_divide(ebit, capital_employed, 0.15) * 100.0, 2)
+    roic = round(_safe_divide(ebit, capital_employed, 0.0) * 100.0, 2)
 
     # Đánh giá phân hạng Magic Formula
-    # Điểm Composite Score (0 - 100): EY chuẩn hóa (trên 12% = 50đ) + ROIC chuẩn hóa (trên 25% = 50đ)
-    ey_score = min(50.0, max(0.0, (earnings_yield / 15.0) * 50.0))
-    roic_score = min(50.0, max(0.0, (roic / 30.0) * 50.0))
+    ey_score = min(50.0, max(0.0, (earnings_yield / ey_bench) * 50.0))
+    roic_score = min(50.0, max(0.0, (roic / roic_bench) * 50.0))
     composite_score = round(ey_score + roic_score, 1)
 
-    if earnings_yield >= 9.0 and roic >= 18.0:
+    if earnings_yield >= min_ey_top and roic >= min_roic_top:
         category = "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)"
         recommendation = "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula."
         tier = "TOP_TIER"
-    elif roic >= 18.0 and earnings_yield < 9.0:
+    elif roic >= min_roic_top and earnings_yield < min_ey_top:
         category = "Hạng 2: Cổ Phiếu Tăng Trưởng Chất Lượng (Định Giá Cao)"
         recommendation = "Cổ phiếu sinh lời vốn tuyệt vời, có thể canh mua khi thị trường điều chỉnh."
         tier = "QUALITY_GROWTH"
-    elif earnings_yield >= 9.0 and roic < 18.0:
+    elif earnings_yield >= min_ey_top and roic < min_roic_top:
         category = "Hạng 3: Định Giá Rẻ nhưng Hiệu Quả Vốn Trung Bình"
         recommendation = "Cổ phiếu định giá hời, cần kiểm tra thêm nguy cơ bẫy giá trị (Value Trap)."
         tier = "VALUE_PLAY"

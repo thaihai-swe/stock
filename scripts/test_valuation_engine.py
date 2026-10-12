@@ -23,7 +23,7 @@ from lib.valuation_engine import (
     calc_multi_stage_dcf,
     calc_fcfe,
     calc_rim_eva,
-    calc_rnav_real_estate,
+    calc_book_nav_target,
     calc_advanced_multiples,
     calc_implied_fcf_yield,
     calc_ev_ebitda,
@@ -47,7 +47,7 @@ from lib.valuation_engine import (
 
 
 def test_calc_graham():
-    # 1. Trường hợp mặc định không truyền multiples (Hệ số trần 22.5)
+    # 1. Trường hợp mặc định không truyền multiples (Hệ số trần 22.5 legacy)
     val_default = calc_graham(2750, 15344)
     expected_default = round(math.sqrt(22.5 * 2750 * 15344))
     assert val_default == expected_default, f"Graham thất bại: {val_default} != {expected_default}"
@@ -58,18 +58,31 @@ def test_calc_graham():
     expected_dyn = round(math.sqrt(17.40 * 2750 * 15344))
     assert val_dyn == expected_dyn == 27096, f"Graham động thất bại: {val_dyn} != 27096"
 
-    # 3. Trường hợp bội số cao vượt trần (pe=20.0, pb=2.0 -> 40.0 > 22.5 -> chặn trần 22.5)
-    val_capped = calc_graham(2750, 15344, pe_avg=20.0, pb_avg=2.0)
-    assert val_capped == 30812, f"Graham trần 22.5 thất bại: {val_capped} != 30812"
+    # 3. Trường hợp Bảng tính BENJAMIN 1 (Chuẩn tham số tĩnh): EPS=2750, pe_base=7.0, hs=1.0, g=5.0, constant=4.4, y=5.0
+    # V = 2750 * (7.0 + 1.0 * 5.0) * (4.4 / 5.0) = 2750 * 12.0 * 0.88 = 29040
+    val_b1 = calc_graham(eps=2750, pe_base=7.0, hs=1.0, g=5.0, constant=4.4, y=5.0)
+    assert val_b1 == 29040, f"Graham BENJAMIN 1 chuẩn phải bằng 29040, ra {val_b1}"
 
-    # 4. Trường hợp sàn an toàn (pe=3.0, pb=0.8 -> 2.4 < 4.0 -> kẹp sàn 4.0)
-    val_floored = calc_graham(2750, 15344, pe_avg=3.0, pb_avg=0.8)
-    expected_floor = round(math.sqrt(4.0 * 2750 * 15344))
-    assert val_floored == expected_floor, f"Graham sàn thất bại: {val_floored} != {expected_floor}"
+    # 4. Trường hợp Graham Dynamic 100% Dữ Liệu Thật HPG (pe_median=6.8 < 7.0):
+    # EPS=2750, pe_median=6.8, hs=1.0, cagr_ni=5.8%, vn10y=4.47% -> Hằng số=4.47, y=5.0 -> Tỷ số LS=0.894
+    # V = 2750 * (6.8 + 1.0 * 5.8) * (4.47 / 5.0) = 2750 * 12.6 * 0.894 = 30977
+    val_real_hpg = calc_graham(eps=2750, pe_median=6.8, hs=1.0, cagr_ni=5.8, vn10y=4.47)
+    assert val_real_hpg == 30977, f"Graham Dynamic HPG phải bằng 30977, ra {val_real_hpg}"
 
-    # 5. Trường hợp biên âm hoặc bằng 0
+    # 5. Trường hợp FPT tăng trưởng cao: EPS=4500, pe_median=15.0 -> pe_base=7.0 (trần an toàn Graham), hs=1.0, cagr_ni=18.2% -> g=12.0%, vn10y=4.47%
+    # Bội số = 7.0 + 1.0 * 12.0 = 19.0, Tỷ số LS = 4.47 / 5.0 = 0.894
+    # V = 4500 * 19.0 * 0.894 = 76437
+    val_real_fpt = calc_graham(eps=4500, pe_median=15.0, hs=1.0, cagr_ni=18.2, vn10y=4.47)
+    assert val_real_fpt == 76437, f"Graham Dynamic FPT phải bằng 76437, ra {val_real_fpt}"
+
+    # 5b. Trường hợp HPG chu kỳ chuẩn hóa g=5.0%: EPS=2750, pe_median=13.84 -> pe_base=7.0, g=5.0%, vn10y=4.47%
+    # Bội số = 7.0 + 1.0 * 5.0 = 12.0, Tỷ số LS = 4.47 / 5.0 = 0.894
+    # V = 2750 * 12.0 * 0.894 = 29502
+    val_hpg_cycle = calc_graham(eps=2750, pe_median=13.84, hs=1.0, g=5.0, vn10y=4.47)
+    assert val_hpg_cycle == 29502, f"Graham HPG chu kỳ phải bằng 29502, ra {val_hpg_cycle}"
+
+    # 6. Trường hợp biên âm hoặc bằng 0
     assert calc_graham(-1000, 15000) is None, "EPS âm phải trả về None"
-    assert calc_graham(1000, -5000) is None, "BVPS âm phải trả về None"
     assert calc_graham(0, 15000) is None, "EPS = 0 phải trả về None"
     assert calc_graham(None, 15000) is None, "None phải trả về None"
     print("✅ test_calc_graham: PASS")
@@ -219,7 +232,8 @@ def test_stock_valuation_engine_evaluate():
     eval_result = engine.evaluate(stock_payload)
     assert eval_result["grahamNumber"] is not None
     assert eval_result["grahamDiffPercent"] is not None
-    assert eval_result["ddmTarget"] == 5887
+    assert eval_result["ddmTarget"] == 6523
+    assert eval_result["sectorWacc"] == 10.72
     assert eval_result["ddmDiffPercent"] is not None
     assert eval_result["peTarget"] == 31625
     assert eval_result["peDiffPercent"] == 57.3 # (31625 - 20100) / 20100 * 100 = 57.34%
@@ -232,6 +246,15 @@ def test_stock_valuation_engine_evaluate():
     assert eval_result["valuationRating"] is not None
     assert eval_result["dupont"]["equityMultiplier"] is not None
     assert eval_result["technicals"]["techScore"] is not None
+    # Xác thực chuẩn 10 mô hình định lượng và không có fallback ngầm
+    assert len(eval_result["models10"]) == 10, f"Phải có đúng 10 mô hình, thực tế: {len(eval_result['models10'])}"
+    assert eval_result["validModelsCount"] >= 3, f"Số mô hình hợp lệ phải >= 3, ra {eval_result['validModelsCount']}"
+
+    # Kiểm tra trường hợp thiếu toàn bộ dữ liệu: fairValue phải là None, không fallback về 6 mô hình cũ
+    empty_res = engine.evaluate({"symbol": "EMPTY", "close": 10000.0})
+    assert empty_res["fairValue"] is None, "Khi thiếu dữ liệu, fairValue phải là None và tuyệt đối không fallback về 6 mô hình cũ"
+    assert empty_res["models10"] is not None and len(empty_res["models10"]) == 10
+
     print("✅ test_stock_valuation_engine_evaluate: PASS")
 
 
@@ -559,11 +582,22 @@ def test_calc_rim_eva():
     print("✅ test_calc_rim_eva: PASS")
 
 
-def test_calc_rnav_real_estate():
-    # Assets = 50000, Debt = 20000, Inventory = 28000 (>50% assets -> thưởng +10%), Shares = 1000
-    val = calc_rnav_real_estate(50000, 20000, 28000, 1000, current_liabilities=8000, discount_pct=0.20, is_real_estate=True)
-    assert val is not None and val > 0, "RNAV BĐS phải trả về giá trị hợp lệ"
-    print("✅ test_calc_rnav_real_estate: PASS")
+def test_calc_book_nav_target():
+    # BVPS = 25000, Target PB = 1.2 => 30000
+    val = calc_book_nav_target(25000, 1.2)
+    assert val == 30000, f"Expected 30000, got {val}"
+
+    # Fallback to pure Book NAV if pb is None: BVPS = 25000 => 25000
+    val_pure = calc_book_nav_target(25000, None)
+    assert val_pure == 25000, f"Expected 25000, got {val_pure}"
+
+    # Calculate from equity and shares if BVPS missing: Equity = 50e9, Shares = 2e6 => 25000
+    val_eq = calc_book_nav_target(None, 1.0, shares=2_000_000, equity=50_000_000_000)
+    assert val_eq == 25000, f"Expected 25000, got {val_eq}"
+
+    # Negative BVPS returns None
+    assert calc_book_nav_target(-100, 1.2) is None
+    print("✅ test_calc_book_nav_target: PASS")
 
 
 def test_calc_advanced_multiples():
@@ -683,6 +717,64 @@ def test_historical_bands_and_dividend_sustainability():
     print("✅ test_historical_bands_and_dividend_sustainability: PASS")
 
 
+def test_method_suitability_normalization():
+    # Kiểm tra chuẩn hóa tên phương pháp: EV/EBITDA vs EVEBITDA vs evebitda
+    mult1, note1 = get_method_suitability("EVEBITDA", "Ngân Hàng")
+    mult2, note2 = get_method_suitability("EV/EBITDA", "Ngân Hàng")
+    mult3, note3 = get_method_suitability("evebitda", "Ngân Hàng")
+    assert mult1 == mult2 == mult3 == 0.0, f"EV/EBITDA cho Ngân Hàng phải bằng 0.0, ra {mult1}, {mult2}, {mult3}"
+    assert "N/A ngành TC" in note1
+
+    # Graham cho Ngân Hàng
+    g_mult, g_note = get_method_suitability("graham", "Ngân Hàng")
+    assert g_mult == 0.35, f"Graham cho Ngân Hàng phải có trọng số 0.35, ra {g_mult}"
+    assert "Ít phù hợp NH/CK" in g_note
+
+    # DDM khi dps = 0
+    d_mult, d_note = get_method_suitability("DDM", "Bất động sản", dps=0)
+    assert d_mult == 0.0, f"DDM dps=0 phải có trọng số 0.0, ra {d_mult}"
+    assert "Không có DPS" in d_note
+    print("✅ test_method_suitability_normalization: PASS")
+
+
+def test_bvps_hierarchy_and_accounting_integrity():
+    engine = StockValuationEngine()
+
+    # Case 1: Equity tính bằng Tỷ đồng (< 100M), shares = 100M
+    res1 = engine.evaluate({
+        "close": 30000,
+        "equity": 5000, # 5,000 Tỷ VNĐ
+        "shares": 100_000_000
+    })
+    # BVPS = 5,000 * 1e9 / 100M = 50,000
+    assert res1["bvps"] == 50_000, f"BVPS Case 1 mong đợi 50,000, ra {res1['bvps']}"
+
+    # Case 2: Equity đã là VNĐ chuẩn
+    res2 = engine.evaluate({
+        "close": 30000,
+        "equity": 5_000_000_000_000, # 5,000 Tỷ VNĐ
+        "shares": 100_000_000
+    })
+    assert res2["bvps"] == 50_000, f"BVPS Case 2 mong đợi 50,000, ra {res2['bvps']}"
+
+    # Case 3: Không có equity, nhưng có close=30000 và pb=1.5
+    res3 = engine.evaluate({
+        "close": 30000,
+        "pb": 1.5
+    })
+    assert res3["bvps"] == 20_000, f"BVPS Case 3 mong đợi 20,000, ra {res3['bvps']}"
+
+    # Case 4: Đã truyền trực tiếp bvps
+    res4 = engine.evaluate({
+        "close": 30000,
+        "bvps": 25000,
+        "equity": 5000,
+        "shares": 100_000_000
+    })
+    assert res4["bvps"] == 25000, f"BVPS Case 4 mong đợi 25,000, ra {res4['bvps']}"
+    print("✅ test_bvps_hierarchy_and_accounting_integrity: PASS")
+
+
 if __name__ == "__main__":
     print("\n=======================================================")
     print("🧪 CHẠY UNIT TEST BỘ ĐỘNG CƠ ĐỊNH GIÁ & PHÂN TÍCH TÀI CHÍNH")
@@ -715,11 +807,13 @@ if __name__ == "__main__":
     test_calc_multi_stage_dcf()
     test_calc_fcfe()
     test_calc_rim_eva()
-    test_calc_rnav_real_estate()
+    test_calc_book_nav_target()
     test_calc_advanced_multiples()
     test_sector_weights_and_outlier_filtering()
     test_detect_valuation_traps()
     test_calc_7_price_zones_and_3_layer_decision()
     test_historical_bands_and_dividend_sustainability()
-    print("\n🎉 TẤT CẢ 34 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")
+    test_method_suitability_normalization()
+    test_bvps_hierarchy_and_accounting_integrity()
+    print("\n🎉 TẤT CẢ 36 TEST CASE ĐÃ VƯỢT QUA 100% THÀNH CÔNG!\n")
 

@@ -203,9 +203,7 @@ export default function StockCockpitHeader({
                 {formatVND(consensusFair)}
               </span>
               <span className="text-xs text-gray-500 dark:text-indigo-200 font-medium">
-                {models10
-                  ? '(Hội tụ 10 mô hình định lượng & Lọc ngoại lai ±60%)'
-                  : '(Tổng hợp các phương pháp định giá)'}
+                (Hội tụ 10 mô hình định lượng & Lọc ngoại lai ±60%)
               </span>
             </div>
 
@@ -300,6 +298,7 @@ export default function StockCockpitHeader({
               const targetVal = m.value ?? m.targetPrice;
               const hasVal = targetVal != null && targetVal > 0;
               const isOutlier = m.isOutlier;
+              const isContributing = hasVal && !isOutlier && (m.weight || 0) > 0;
               const diff =
                 m.diffPercent ??
                 (hasVal && closePrice ? calcPriceDiff(targetVal, closePrice) : null);
@@ -309,18 +308,37 @@ export default function StockCockpitHeader({
                   key={m.id || idx}
                   className={`p-3 rounded-2xl border text-center flex flex-col justify-between transition-all ${isOutlier
                       ? 'bg-rose-50/80 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40 opacity-70'
-                      : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-white/15 shadow-2xs dark:shadow-none'
+                      : isContributing
+                        ? 'bg-white/95 dark:bg-white/12 border-indigo-200/90 dark:border-indigo-600/40 hover:bg-white dark:hover:bg-white/18 shadow-2xs dark:shadow-none ring-1 ring-indigo-500/15'
+                        : 'bg-white/70 dark:bg-white/5 border-gray-200/70 dark:border-white/10'
                     }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1">
                       <span
-                        className="text-[10px] text-indigo-700 dark:text-indigo-200 font-bold uppercase truncate"
+                        className={`text-[10px] uppercase truncate ${isContributing
+                            ? 'text-indigo-700 dark:text-indigo-200 font-black'
+                            : 'text-gray-700 dark:text-gray-300 font-bold'
+                          }`}
                         title={m.fullName || m.name || cleanName}
                       >
                         {idx + 1}. {cleanName}
                       </span>
-                      <span className="text-[9px] font-mono px-1 rounded bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-indigo-200">
+                      <span
+                        className={`text-[9px] font-mono px-1.5 py-0.5 rounded transition-all ${isContributing
+                            ? 'font-black bg-indigo-600 text-white dark:bg-indigo-500 shadow-2xs'
+                            : isOutlier
+                              ? 'font-medium bg-rose-100 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400 line-through border border-rose-200/60 dark:border-rose-900/40'
+                              : 'font-medium bg-gray-100/70 text-gray-400 dark:bg-white/5 dark:text-gray-500 opacity-60'
+                          }`}
+                        title={
+                          isContributing
+                            ? `Được tính vào Giá Trị Nội Tại (Trọng số ${Math.round((m.weight || 0) * 100)}%)`
+                            : isOutlier
+                              ? 'Bị loại trừ do lệch quá ±60% so với median'
+                              : 'Chưa đủ dữ liệu tài chính hoặc miễn trừ theo ngành'
+                        }
+                      >
                         w: {Math.round((m.weight || 0) * 100)}%
                       </span>
                     </div>
@@ -330,7 +348,7 @@ export default function StockCockpitHeader({
                           ? 'line-through text-rose-600 dark:text-rose-300'
                           : hasVal
                             ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-400 dark:text-indigo-200/60 font-medium text-xs'
+                            : 'text-gray-500 dark:text-gray-400 font-medium text-xs'
                         }`}
                     >
                       {hasVal ? formatVND(targetVal) : m.statusNote || '—'}

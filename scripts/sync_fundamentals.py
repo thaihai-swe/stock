@@ -178,6 +178,7 @@ def normalize_row(row):
     capex_val = 0.0
     effective_cfo = fcf_val
     fin_ratios = {}
+    bvps_val = round(close / pb_val) if (close and pb_val and pb_val > 0) else None
 
     if fin_file.exists():
         try:
@@ -185,15 +186,40 @@ def normalize_row(row):
                 fin_data = json.load(f_fin)
                 yearly_history = fin_data.get("yearly", [])
                 fin_ratios = fin_data.get("financialRatios", {})
-                latest_q = fin_data.get("quarterly", [{}])[-1] if fin_data.get("quarterly") else {}
-                if latest_q.get("capex"):
-                    capex_val = abs(float(latest_q["capex"])) * 1_000_000_000 * 4
-                if (effective_cfo is None or effective_cfo <= 0) and latest_q.get("cfo"):
+                q_list = fin_data.get("quarterly", [])
+                latest_q = q_list[-1] if q_list else {}
+                latest_ttm = fin_data.get("ttmSeries", [])[-1] if fin_data.get("ttmSeries") else None
+
+                # Tính BVPS theo chuẩn kế toán: Equity / Shares (nếu có BCTC)
+                eq_cand = latest_q.get("equity")
+                sh_cand = shares_val or fin_data.get("overview", {}).get("shares")
+                if eq_cand and sh_cand and float(sh_cand) > 0:
+                    eq_vnd = float(eq_cand) * 1_000_000_000 if float(eq_cand) < 100_000_000 else float(eq_cand)
+                    bvps_val = round(eq_vnd / float(sh_cand))
+
+                # Tính CFO và CapEx TTM trượt 4 quý (hoặc từ latest_ttm)
+                if len(q_list) >= 4:
+                    last4 = q_list[-4:]
+                    cfo_sum = sum(float(q.get("cfo") or 0) for q in last4) * 1_000_000_000
+                    if cfo_sum != 0 and (effective_cfo is None or effective_cfo <= 0):
+                        effective_cfo = cfo_sum
+                    capex_sum = sum(abs(float(q.get("capex") or 0)) for q in last4) * 1_000_000_000
+                    if capex_sum > 0:
+                        capex_val = capex_sum
+                elif latest_ttm and latest_ttm.get("cfo") and (effective_cfo is None or effective_cfo <= 0):
+                    effective_cfo = float(latest_ttm["cfo"]) * 1_000_000_000
+                elif (effective_cfo is None or effective_cfo <= 0) and latest_q.get("cfo"):
                     cfo_cand = float(latest_q["cfo"]) * 1_000_000_000 * 4
                     if cfo_cand > 0:
                         effective_cfo = cfo_cand
+
+                if capex_val == 0.0 and latest_q.get("capex"):
+                    capex_val = abs(float(latest_q["capex"])) * 1_000_000_000 * 4
         except Exception:
             pass
+
+    if not bvps_val and close and pb_val and pb_val > 0:
+        bvps_val = round(close / pb_val)
 
     # Động cơ định giá doanh nghiệp tập trung (Enterprise Valuation Engine)
     val_eval = engine.evaluate({
@@ -201,6 +227,7 @@ def normalize_row(row):
         "eps": eps_val,
         "pe": pe_val,
         "pb": pb_val,
+        "bvps": bvps_val,
         "dps": dps_val,
         "revenue": rev_val,
         "netIncome": ni_val,

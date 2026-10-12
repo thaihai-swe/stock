@@ -4,7 +4,7 @@ export default function SectorValuationHeatmap({
   dualMatrix = {},
   sectorValuations = [],
   sectorRotation = [],
-  vnindexPE = 10.72,
+  vnindexPE = null,
   regime = {},
 }) {
   const [viewMode, setViewMode] = useState('dual_matrix'); // 'dual_matrix' | 'table'
@@ -153,8 +153,8 @@ export default function SectorValuationHeatmap({
   // Render thẻ ngành hợp nhất (Toàn diện P/E Heatmap + BCTC + 6 Động Lực Vĩ Mô)
   const renderSectorCard = (sec) => {
     const isExpanded = expandedSectorCode === sec.code;
-    const diffVNIndex = +((((sec.pe || 12) - vnindexPE) / vnindexPE) * 100).toFixed(1);
-    const isCheaper = diffVNIndex <= 0;
+    const diffVNIndex = vnindexPE ? +((((sec.pe || 12) - vnindexPE) / vnindexPE) * 100).toFixed(1) : null;
+    const isCheaper = diffVNIndex != null ? diffVNIndex <= 0 : false;
     const pRank = peRankMap[sec.code] || '-';
     const mRank = macroRankMap[sec.code] || '-';
 
@@ -198,28 +198,32 @@ export default function SectorValuationHeatmap({
               </span>
             </div>
 
-            <div className="text-right">
-              <span className={`text-xs font-black flex items-center justify-end gap-1 ${isCheaper ? 'text-emerald-500' : 'text-rose-500'}`}>
-                <span>{isCheaper ? '📉' : '📈'}</span>
-                <span>{diffVNIndex > 0 ? `+${diffVNIndex}` : diffVNIndex}%</span>
-                <span className="text-[10px] font-bold">({isCheaper ? 'Rẻ hơn' : 'Đắt hơn'})</span>
-              </span>
-            </div>
+            {diffVNIndex != null && (
+              <div className="text-right">
+                <span className={`text-xs font-black flex items-center justify-end gap-1 ${isCheaper ? 'text-emerald-500' : 'text-rose-500'}`}>
+                  <span>{isCheaper ? '📉' : '📈'}</span>
+                  <span>{diffVNIndex > 0 ? `+${diffVNIndex}` : diffVNIndex}%</span>
+                  <span className="text-[10px] font-bold">({isCheaper ? 'Rẻ hơn' : 'Đắt hơn'})</span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Thanh so sánh tương quan P/E so với mốc VN-Index */}
-          <div className="space-y-1">
-            <div className="flex justify-between text-[10px] text-gray-400">
-              <span>Độ lệch P/E vs VN-Index ({vnindexPE}x):</span>
-              <span className="font-bold">{isCheaper ? `Thấp hơn ${(vnindexPE - (sec.pe || 0)).toFixed(1)}x` : `Cao hơn ${((sec.pe || 0) - vnindexPE).toFixed(1)}x`}</span>
+          {vnindexPE != null && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-[10px] text-gray-400">
+                <span>Độ lệch P/E vs VN-Index ({vnindexPE}x):</span>
+                <span className="font-bold">{isCheaper ? `Thấp hơn ${(vnindexPE - (sec.pe || 0)).toFixed(1)}x` : `Cao hơn ${((sec.pe || 0) - vnindexPE).toFixed(1)}x`}</span>
+              </div>
+              <div className="w-full h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${isCheaper ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                  style={{ width: `${Math.min(100, Math.max(10, ((sec.pe || 10) / 20) * 100))}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${isCheaper ? 'bg-emerald-500' : 'bg-rose-500'}`}
-                style={{ width: `${Math.min(100, Math.max(10, ((sec.pe || 10) / 20) * 100))}%` }}
-              />
-            </div>
-          </div>
+          )}
         </div>
 
         {/* 4 Chỉ số BCTC cơ bản */}
@@ -339,8 +343,8 @@ export default function SectorValuationHeatmap({
         <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700/60 space-y-1">
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">P/E TB 10 Ngành</div>
           <div className="text-xl font-black text-gray-900 dark:text-white flex items-baseline gap-1.5">
-            <span>{stats.avgSectorPE || 11.14}x</span>
-            <span className="text-[10px] font-bold text-gray-400">vs VN-Index {vnindexPE}x</span>
+            <span>{stats.avgSectorPE ? `${stats.avgSectorPE}x` : '—'}</span>
+            {vnindexPE != null && <span className="text-[10px] font-bold text-gray-400">vs VN-Index {vnindexPE}x</span>}
           </div>
           <div className="text-[10px] text-gray-500 dark:text-gray-400">Trung vị toàn thị trường</div>
         </div>
@@ -348,7 +352,7 @@ export default function SectorValuationHeatmap({
         <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700/60 space-y-1">
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">P/B TB 10 Ngành</div>
           <div className="text-xl font-black text-gray-900 dark:text-white">
-            {stats.avgSectorPB || 2.38}x
+            {stats.avgSectorPB ? `${stats.avgSectorPB}x` : '—'}
           </div>
           <div className="text-[10px] text-gray-500 dark:text-gray-400">Hệ số giá trên giá trị sổ sách</div>
         </div>
@@ -358,7 +362,7 @@ export default function SectorValuationHeatmap({
             <span>💎</span> Vùng Vàng Gom Mua
           </div>
           <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-            {stats.sweetSpotCount || 4} Ngành
+            {stats.sweetSpotCount != null ? `${stats.sweetSpotCount} Ngành` : '—'}
           </div>
           <div className="text-[10px] text-emerald-700 dark:text-emerald-300">Vĩ mô ủng hộ & P/E hấp dẫn</div>
         </div>
@@ -366,7 +370,7 @@ export default function SectorValuationHeatmap({
         <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 space-y-1">
           <div className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Ngành Định Giá Rẻ Nhất</div>
           <div className="text-base font-black text-blue-600 dark:text-blue-400 truncate">
-            {stats.cheapestSector || 'Tiện ích (8.26x)'}
+            {stats.cheapestSector || '—'}
           </div>
           <div className="text-[10px] text-blue-700 dark:text-blue-300">Biên an toàn định giá cao nhất</div>
         </div>
@@ -466,7 +470,9 @@ export default function SectorValuationHeatmap({
             <div className="space-y-3">
               <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between px-1">
                 <span>Hiển thị 10 nhóm ngành đã sắp xếp theo tiêu chí đã chọn:</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400">Mốc VN-Index P/E: {vnindexPE}x</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                  {vnindexPE != null ? `Mốc VN-Index P/E: ${vnindexPE}x` : 'Chưa có mốc P/E VN-Index'}
+                </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {processedItems.map((sec) => renderSectorCard(sec))}
@@ -481,7 +487,9 @@ export default function SectorValuationHeatmap({
         <div className="space-y-3">
           <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between px-1">
             <span>Bảng tổng hợp chi tiết 10 nhóm ngành GICS. Nhấp vào <b>▼ Chi tiết</b> để mở xem phân rã 6 động lực vĩ mô:</span>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400">VN-Index P/E: {vnindexPE}x</span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400">
+              {vnindexPE != null ? `VN-Index P/E: ${vnindexPE}x` : 'VN-Index P/E: —'}
+            </span>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-gray-100 dark:border-gray-700 shadow-2xs">
@@ -505,8 +513,8 @@ export default function SectorValuationHeatmap({
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700/60 text-gray-700 dark:text-gray-300">
                 {items.map((sec) => {
                   const isRowExpanded = expandedTableRowCode === sec.code;
-                  const diffVNIndex = +((((sec.pe || 12) - vnindexPE) / vnindexPE) * 100).toFixed(1);
-                  const isCheaper = diffVNIndex <= 0;
+                  const diffVNIndex = vnindexPE ? +((((sec.pe || 12) - vnindexPE) / vnindexPE) * 100).toFixed(1) : null;
+                  const isCheaper = diffVNIndex != null ? diffVNIndex <= 0 : false;
 
                   return (
                     <React.Fragment key={sec.code}>
@@ -526,9 +534,13 @@ export default function SectorValuationHeatmap({
                         </td>
 
                         <td className="p-3.5 text-center font-bold">
-                          <span className={`text-[11px] ${isCheaper ? 'text-emerald-500' : 'text-rose-500'}`}>
-                            {diffVNIndex > 0 ? `+${diffVNIndex}` : diffVNIndex}% {isCheaper ? 'Rẻ hơn' : 'Đắt hơn'}
-                          </span>
+                          {diffVNIndex != null ? (
+                            <span className={`text-[11px] ${isCheaper ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {diffVNIndex > 0 ? `+${diffVNIndex}` : diffVNIndex}% {isCheaper ? 'Rẻ hơn' : 'Đắt hơn'}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-gray-400">—</span>
+                          )}
                         </td>
 
                         <td className="p-3.5 text-center font-bold">{sec.pb}x</td>

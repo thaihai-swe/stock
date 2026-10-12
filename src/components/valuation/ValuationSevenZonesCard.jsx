@@ -27,10 +27,10 @@ export default function ValuationSevenZonesCard({
   const bull = sevenPriceZones?.bullPrice;
 
   const decision = threeLayerDecision || {};
-  const composite = decision.compositeScore ?? 5.0;
-  const vScore = decision.valuationLayerScore ?? 5.0;
-  const qScore = decision.qualityLayerScore ?? 5.0;
-  const tScore = decision.timingLayerScore ?? 5.0;
+  const composite = decision.compositeScore ?? null;
+  const vScore = decision.valuationLayerScore ?? null;
+  const qScore = decision.qualityLayerScore ?? null;
+  const tScore = decision.timingLayerScore ?? null;
   const roeCoe = decision.roeCoeSpread;
   const rec = decision.buyRecommendation || '🟡 HOLD';
   const reason = decision.decisionReason || '';
@@ -202,7 +202,7 @@ export default function ValuationSevenZonesCard({
             <div className="text-right">
               <span className="text-[10px] text-gray-400 block">Điểm Tổng Hợp</span>
               <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
-                {composite} <span className="text-xs text-gray-400 font-normal">/ 10</span>
+                {composite != null ? composite : '—'} <span className="text-xs text-gray-400 font-normal">/ 10</span>
               </span>
             </div>
             {isCapped && (
@@ -219,12 +219,12 @@ export default function ValuationSevenZonesCard({
           <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-gray-700 dark:text-gray-300">Tầng 1: Định Giá (V₄₀)</span>
-              <span className="font-black text-indigo-600 dark:text-indigo-400">{vScore}/10</span>
+              <span className="font-black text-indigo-600 dark:text-indigo-400">{vScore != null ? `${vScore}/10` : '—'}</span>
             </div>
             <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-indigo-500 rounded-full transition-all"
-                style={{ width: `${Math.min(100, vScore * 10)}%` }}
+                style={{ width: `${vScore != null ? Math.min(100, vScore * 10) : 0}%` }}
               />
             </div>
             <span className="text-[10px] text-gray-400 block">Trọng số 40% · Độ rẻ so với hội tụ & lịch sử</span>
@@ -234,12 +234,12 @@ export default function ValuationSevenZonesCard({
           <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-gray-700 dark:text-gray-300">Tầng 2: Chất Lượng (Q₃₅)</span>
-              <span className="font-black text-emerald-600 dark:text-emerald-400">{qScore}/10</span>
+              <span className="font-black text-emerald-600 dark:text-emerald-400">{qScore != null ? `${qScore}/10` : '—'}</span>
             </div>
             <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-emerald-500 rounded-full transition-all"
-                style={{ width: `${Math.min(100, qScore * 10)}%` }}
+                style={{ width: `${qScore != null ? Math.min(100, qScore * 10) : 0}%` }}
               />
             </div>
             <span className="text-[10px] text-gray-400 block">Trọng số 35% · Sức khỏe tài chính & Quản trị</span>
@@ -249,12 +249,12 @@ export default function ValuationSevenZonesCard({
           <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-gray-700 dark:text-gray-300">Tầng 3: Thời Điểm (T₂₅)</span>
-              <span className="font-black text-amber-600 dark:text-amber-400">{tScore}/10</span>
+              <span className="font-black text-amber-600 dark:text-amber-400">{tScore != null ? `${tScore}/10` : '—'}</span>
             </div>
             <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-amber-500 rounded-full transition-all"
-                style={{ width: `${Math.min(100, tScore * 10)}%` }}
+                style={{ width: `${tScore != null ? Math.min(100, tScore * 10) : 0}%` }}
               />
             </div>
             <span className="text-[10px] text-gray-400 block">Trọng số 25% · Xung lực kỹ thuật & Vị thế chu kỳ</span>
