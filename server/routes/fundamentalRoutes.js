@@ -54,6 +54,23 @@ router.post('/fundamentals/supported-stocks', (req, res) => {
  * 4. Kích hoạt đồng bộ nền bằng Python (kèm fallback JS an toàn)
  */
 router.post('/fundamentals/sync', (req, res) => {
+  const isServerlessOrNoPython = Boolean(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    !fs.existsSync(VENV_PYTHON)
+  );
+
+  if (isServerlessOrNoPython) {
+    const config = loadSupportedStocks();
+    return res.json({
+      success: true,
+      message: 'Hệ thống đang hoạt động trên dữ liệu đồng bộ định kỳ mới nhất. Để cập nhật dữ liệu thị trường mới, vui lòng thông báo cho người quản lý.',
+      syncedCount: config.syncedCount || 0,
+      lastSyncedAt: config.lastSyncedAt,
+      runner: 'Cached'
+    });
+  }
+
   const pythonScript = path.join(ROOT_DIR, 'scripts', 'sync_fundamentals.py');
 
   // Ưu tiên chạy Python sync script

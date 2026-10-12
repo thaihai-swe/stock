@@ -223,7 +223,7 @@ router.get('/valuation/financials/:symbol', (req, res) => {
       return res.json(JSON.parse(raw));
     }
     return res.status(404).json({
-      error: `Chưa có file BCTC cục bộ cho mã ${sym} trong data/financials/`,
+      error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
       symbol: sym
     });
   } catch (error) {
@@ -270,8 +270,15 @@ router.get('/valuation/raw-json/:type', (req, res) => {
       });
     }
 
+    if (type === 'financials') {
+      return res.status(404).json({
+        error: `Dữ liệu phân tích và BCTC cho mã ${symbol} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
+        path: targetPath
+      });
+    }
+
     return res.status(404).json({
-      error: `File ${fileName} không tồn tại`,
+      error: `File ${fileName} không tồn tại trong kho lưu trữ`,
       path: targetPath
     });
   } catch (error) {
@@ -284,9 +291,7 @@ router.get('/valuation/raw-json/:type', (req, res) => {
  * Kích hoạt đồng bộ toàn bộ pipeline: TradingView + BCTC + Vĩ Mô VN-Index
  */
 router.post('/valuation/sync', (req, res) => {
-  const scriptPath = path.join(ROOT_DIR, 'scripts', 'run_full_pipeline.py');
-
-  execFile(PYTHON_CMD, [scriptPath], (error, stdout, stderr) => {
+  const getLatestFundamentals = () => {
     let latestData = {};
     if (fs.existsSync(FUNDAMENTALS_FILE)) {
       try {
@@ -295,14 +300,37 @@ router.post('/valuation/sync', (req, res) => {
         // ignore
       }
     }
+    return latestData;
+  };
+
+  const isServerlessOrNoPython = Boolean(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    !fs.existsSync(VENV_PYTHON)
+  );
+
+  if (isServerlessOrNoPython) {
+    const latestData = getLatestFundamentals();
+    return res.json({
+      success: true,
+      message: 'Hệ thống đang hoạt động trên dữ liệu đồng bộ định kỳ mới nhất. Để cập nhật dữ liệu thị trường mới, vui lòng thông báo cho người quản lý.',
+      data: latestData,
+      note: 'Dữ liệu kho lưu trữ định kỳ'
+    });
+  }
+
+  const scriptPath = path.join(ROOT_DIR, 'scripts', 'run_full_pipeline.py');
+
+  execFile(PYTHON_CMD, [scriptPath], (error, stdout, stderr) => {
+    const latestData = getLatestFundamentals();
 
     if (error) {
       console.warn('Python sync execution note:', stderr || error.message);
       return res.json({
         success: true,
-        message: 'Đã hoàn tất đồng bộ và nạp dữ liệu Local JSON an toàn!',
+        message: 'Hệ thống đang hoạt động trên dữ liệu đồng bộ định kỳ mới nhất. Để cập nhật dữ liệu thị trường mới, vui lòng thông báo cho người quản lý.',
         data: latestData,
-        note: 'Đã cập nhật bộ nhớ cache cục bộ'
+        note: 'Đã nạp bộ nhớ cache cục bộ'
       });
     }
 
@@ -325,6 +353,55 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
     return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
   }
 
+  const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
+
+  const readLocalData = () => {
+    let finData = null;
+    if (fs.existsSync(filePath)) {
+      try {
+        finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    let fundData = null;
+    if (fs.existsSync(FUNDAMENTALS_FILE)) {
+      try {
+        const allFunds = JSON.parse(fs.readFileSync(FUNDAMENTALS_FILE, 'utf-8'));
+        fundData = allFunds[sym] || null;
+      } catch (e) {
+        // ignore
+      }
+    }
+    return { finData, fundData };
+  };
+
+  const isServerlessOrNoPython = Boolean(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    !fs.existsSync(VENV_PYTHON)
+  );
+
+  // Nếu môi trường không thể chạy Python hoặc là môi trường read-only
+  if (isServerlessOrNoPython) {
+    const { finData, fundData } = readLocalData();
+    if (finData) {
+      return res.json({
+        success: true,
+        message: `Đã nạp dữ liệu phân tích và BCTC cho mã ${sym} từ kho lưu trữ của hệ thống!`,
+        symbol: sym,
+        fundamentals: fundData,
+        data: finData
+      });
+    }
+
+    return res.status(404).json({
+      error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
+      symbol: sym
+    });
+  }
+
   const syncScript = path.join(ROOT_DIR, 'scripts', 'sync_fundamentals.py');
   const reportScript = path.join(ROOT_DIR, 'scripts', 'fetch_financial_reports.py');
 
@@ -332,24 +409,13 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
   execFile(PYTHON_CMD, [syncScript, '--symbols', sym], (err1, out1, errOut1) => {
     // Bước 2: Đồng bộ BCTC toàn diện (8Q, 5Y, 54 Ratios, Cổ tức, Cổ đông)
     execFile(PYTHON_CMD, [reportScript, '--symbols', sym], (err2, out2, errOut2) => {
-      const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
-      let finData = null;
-      if (fs.existsSync(filePath)) {
-        try {
-          finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        } catch (e) {
-          // ignore
-        }
-      }
+      const { finData, fundData } = readLocalData();
 
-      let fundData = null;
-      if (fs.existsSync(FUNDAMENTALS_FILE)) {
-        try {
-          const allFunds = JSON.parse(fs.readFileSync(FUNDAMENTALS_FILE, 'utf-8'));
-          fundData = allFunds[sym] || null;
-        } catch (e) {
-          // ignore
-        }
+      if (!finData) {
+        return res.status(404).json({
+          error: `Dữ liệu phân tích và BCTC cho mã ${sym} hiện chưa có sẵn trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.`,
+          symbol: sym
+        });
       }
 
       return res.json({

@@ -37,17 +37,17 @@ export default function StockCockpitHeader({
     currentStock.valuation?.upside != null
       ? currentStock.valuation.upside
       : financials?.valuationMultiples?.upside != null
-      ? financials.valuationMultiples.upside
-      : calcPriceDiff(consensusFair, closePrice);
+        ? financials.valuationMultiples.upside
+        : calcPriceDiff(consensusFair, closePrice);
 
   const mosValue =
     currentStock.valuation?.marginOfSafetyFairValue != null
       ? currentStock.valuation.marginOfSafetyFairValue
       : financials?.valuationMultiples?.marginOfSafety != null
-      ? financials.valuationMultiples.marginOfSafety
-      : consensusFair && closePrice
-      ? Math.round(((consensusFair - closePrice) / consensusFair) * 100)
-      : null;
+        ? financials.valuationMultiples.marginOfSafety
+        : consensusFair && closePrice
+          ? Math.round(((consensusFair - closePrice) / consensusFair) * 100)
+          : null;
 
   let valRatingText = currentStock.valuation?.valuationRatingText;
   let valRatingBadge = currentStock.valuation?.valuationRatingBadge;
@@ -89,8 +89,8 @@ export default function StockCockpitHeader({
       ? currentStock.valuation.models10
       : financials?.valuationMultiples?.models10 &&
         financials.valuationMultiples.models10.length > 0
-      ? financials.valuationMultiples.models10
-      : null;
+        ? financials.valuationMultiples.models10
+        : null;
 
   return (
     <div className="space-y-4">
@@ -196,9 +196,7 @@ export default function StockCockpitHeader({
               <span className="text-xs font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-wider block">
                 🎯 Giá Trị Nội Tại Hội Tụ (Consensus Fair Value)
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 font-semibold">
-                FAM v11.4P
-              </span>
+
             </div>
             <div className="flex flex-wrap items-baseline gap-3 mt-1">
               <span className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400">
@@ -248,9 +246,8 @@ export default function StockCockpitHeader({
                   {formatVND(closePrice)}
                 </span>
                 <span
-                  className={`text-xs font-bold ${
-                    (currentStock.change || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                  }`}
+                  className={`text-xs font-bold ${(currentStock.change || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}
                 >
                   {(currentStock.change || 0) >= 0 ? '+' : ''}
                   {currentStock.change}%
@@ -265,9 +262,8 @@ export default function StockCockpitHeader({
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span
-                  className={`text-2xl font-black ${
-                    (upsideValue || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                  }`}
+                  className={`text-2xl font-black ${(upsideValue || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}
                 >
                   {upsideValue != null ? `${upsideValue >= 0 ? '+' : ''}${upsideValue}%` : '—'}
                 </span>
@@ -284,9 +280,8 @@ export default function StockCockpitHeader({
               </span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span
-                  className={`text-xl font-black ${
-                    (mosValue || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                  }`}
+                  className={`text-xl font-black ${(mosValue || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}
                 >
                   {mosValue != null ? `${mosValue >= 0 ? '+' : ''}${mosValue}%` : '—'}
                 </span>
@@ -312,11 +307,10 @@ export default function StockCockpitHeader({
               return (
                 <div
                   key={m.id || idx}
-                  className={`p-3 rounded-2xl border text-center flex flex-col justify-between transition-all ${
-                    isOutlier
+                  className={`p-3 rounded-2xl border text-center flex flex-col justify-between transition-all ${isOutlier
                       ? 'bg-rose-50/80 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40 opacity-70'
                       : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-white/15 shadow-2xs dark:shadow-none'
-                  }`}
+                    }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1">
@@ -332,13 +326,12 @@ export default function StockCockpitHeader({
                     </div>
 
                     <div
-                      className={`text-sm font-black mt-1 ${
-                        isOutlier
+                      className={`text-sm font-black mt-1 ${isOutlier
                           ? 'line-through text-rose-600 dark:text-rose-300'
                           : hasVal
-                          ? 'text-gray-900 dark:text-white'
-                          : 'text-gray-400 dark:text-indigo-200/60 font-medium text-xs'
-                      }`}
+                            ? 'text-gray-900 dark:text-white'
+                            : 'text-gray-400 dark:text-indigo-200/60 font-medium text-xs'
+                        }`}
                     >
                       {hasVal ? formatVND(targetVal) : m.statusNote || '—'}
                     </div>
@@ -351,14 +344,12 @@ export default function StockCockpitHeader({
                       </span>
                     ) : diff != null ? (
                       <span
-                        className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${
-                          diff >= 0
+                        className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${diff >= 0
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30'
-                        }`}
-                        title={`Chênh lệch so với thị giá (${formatVND(closePrice)}): ${
-                          diff >= 0 ? '+' : ''
-                        }${diff}%`}
+                          }`}
+                        title={`Chênh lệch so với thị giá (${formatVND(closePrice)}): ${diff >= 0 ? '+' : ''
+                          }${diff}%`}
                       >
                         <span>{diff >= 0 ? '▲' : '▼'}</span>
                         <span>
@@ -451,11 +442,10 @@ export default function StockCockpitHeader({
             >
               <span className="text-[10px] text-gray-400 font-bold block">{cycle.label}</span>
               <span
-                className={`text-xs font-black block mt-0.5 ${
-                  (cycle.val || 0) >= 0
+                className={`text-xs font-black block mt-0.5 ${(cycle.val || 0) >= 0
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-rose-600 dark:text-rose-400'
-                }`}
+                  }`}
               >
                 {cycle.val != null ? `${cycle.val >= 0 ? '+' : ''}${cycle.val}%` : '—'}
               </span>

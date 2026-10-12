@@ -180,11 +180,11 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     } catch (err) {
       setSyncMessage({
         type: 'error',
-        text: `Lỗi tải dữ liệu cho ${selectedSymbol}: ${err.message}`
+        text: err.message || `Lỗi tải dữ liệu cho mã ${selectedSymbol}.`
       });
     } finally {
       setSyncingSingle(false);
-      setTimeout(() => setSyncMessage(null), 4000);
+      setTimeout(() => setSyncMessage(null), 8000);
     }
   };
 
@@ -203,7 +203,7 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     setLookingUp(true);
     setSyncMessage({
       type: 'info',
-      text: `Đang tra cứu thời gian thực và trích xuất BCTC cho mã ${sym}...`
+      text: `Đang tra cứu dữ liệu và phân tích BCTC cho mã ${sym}...`
     });
 
     try {
@@ -225,11 +225,11 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     } catch (err) {
       setSyncMessage({
         type: 'error',
-        text: `Lỗi tra cứu mã ${sym}: ${err.message}`
+        text: err.message || `Không thể tra cứu mã ${sym}.`
       });
     } finally {
       setLookingUp(false);
-      setTimeout(() => setSyncMessage(null), 4000);
+      setTimeout(() => setSyncMessage(null), 8000);
     }
   };
 
@@ -454,10 +454,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-dashed border-gray-200 dark:border-gray-700 shadow-xs text-center space-y-3">
               <div className="text-3xl">📊</div>
               <h4 className="text-base font-bold text-gray-900 dark:text-white">
-                Chưa có file BCTC cục bộ cho {selectedSymbol}
+                Dữ liệu BCTC cho {selectedSymbol} chưa có sẵn trong kho lưu trữ
               </h4>
               <p className="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                Dữ liệu BCTC (8 quý & 5 năm) chưa được lưu tại <code className="text-indigo-600 dark:text-indigo-400 font-mono">data/financials/{selectedSymbol}.json</code>.
+                Dữ liệu BCTC chi tiết (8 quý & 5 năm) của mã {selectedSymbol} hiện chưa được cập nhật trong kho lưu trữ của hệ thống. Vui lòng thông báo cho người quản lý để bổ sung mã này vào danh sách theo dõi.
               </p>
               <div className="pt-2">
                 <button

@@ -53,11 +53,11 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      await triggerValuationSync();
+      const res = await triggerValuationSync();
       await loadAllMacroData();
-      if (showToast) showToast('✅ Đồng bộ dữ liệu vĩ mô thành công!', 'success');
+      if (showToast) showToast(res?.message || '✅ Đồng bộ dữ liệu vĩ mô thành công!', 'info');
     } catch (e) {
-      if (showToast) showToast('❌ Lỗi đồng bộ: ' + e.message, 'error');
+      if (showToast) showToast('❌ ' + e.message, 'error');
       else alert('Lỗi đồng bộ: ' + e.message);
     } finally {
       setSyncing(false);
