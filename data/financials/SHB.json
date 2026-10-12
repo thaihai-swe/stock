@@ -2,14 +2,14 @@
   "_meta": {
     "symbol": "SHB",
     "companyName": "Sai Gon - Hanoi Commercial Joint Stock Bank",
-    "updatedAt": "2026-10-12T04:29:56Z",
+    "updatedAt": "2026-10-12T04:36:25Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance Audit Statements & VAS TT200",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 14674,
+    "grahamNumber": 14638,
     "ddmTarget": null,
     "peTarget": 28865,
     "pbTarget": 18986,
@@ -17,9 +17,9 @@
     "pcfFairPrice": null,
     "psFairPrice": 7985,
     "consensusFairValue": 50431,
-    "marginOfSafety": 79.6,
-    "upside": 389.6,
-    "consensusDiffPercent": 389.6,
+    "marginOfSafety": 79.7,
+    "upside": 392.0,
+    "consensusDiffPercent": 392.0,
     "valuationRating": "🟡 HOLD",
     "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
     "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
@@ -30,22 +30,22 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 14674,
-        "targetPrice": 14674,
-        "diffPercent": 42.5,
+        "value": 14638,
+        "targetPrice": 14638,
+        "diffPercent": 42.8,
         "weight": 0.08,
         "baseWeight": 0.08,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": true,
-        "outlierGapPct": 74.0,
+        "outlierGapPct": 74.1,
         "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
-        "formulaDetail": "V = √(6.1 × 2,510 × 14,064) | Hệ số = Min(22.5, 6.0x × 1.02x = 6.1)",
+        "formulaDetail": "V = √(6.07 × 2,510 × 14,064) | Hệ số = Min(22.5, 6.0x × 1.02x = 6.07)",
         "parameters": {
           "eps": 2510.0,
           "bvps": 14064,
-          "multiplier": 6.1,
-          "peAvg": 5.98,
+          "multiplier": 6.07,
+          "peAvg": 5.95,
           "pbAvg": 1.02,
           "maxMultiplier": 22.5
         },
@@ -58,7 +58,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 28865,
         "targetPrice": 28865,
-        "diffPercent": 180.2,
+        "diffPercent": 181.6,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
@@ -80,7 +80,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 18986,
         "targetPrice": 18986,
-        "diffPercent": 84.3,
+        "diffPercent": 85.2,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
@@ -200,7 +200,7 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 371861,
         "targetPrice": 371861,
-        "diffPercent": 3510.3,
+        "diffPercent": 3527.9,
         "weight": 0.044,
         "baseWeight": 0.08,
         "suitability": 0.55,
@@ -225,7 +225,7 @@
         "cleanName": "Book NAV / RNAV",
         "value": 131210,
         "targetPrice": 131210,
-        "diffPercent": 1173.9,
+        "diffPercent": 1180.1,
         "weight": 0.032,
         "baseWeight": 0.07,
         "suitability": 0.45,
@@ -250,7 +250,7 @@
         "cleanName": "EV/EBITDA & EV/Sales",
         "value": 84034,
         "targetPrice": 84034,
-        "diffPercent": 715.9,
+        "diffPercent": 719.8,
         "weight": 0.07,
         "baseWeight": 0.07,
         "suitability": 1.0,
@@ -365,30 +365,30 @@
       "isTrapCapped": false
     },
     "historicalBands": {
-      "band25": 13227,
-      "band50": 14713,
-      "band75": 16178,
+      "band25": 13122,
+      "band50": 14605,
+      "band75": 16087,
       "bandPosition": "Dưới P25 (Vùng Rẻ)",
-      "bandWidthPct": 20.1,
+      "bandWidthPct": 20.3,
       "peBand": {
-        "p25": 5.41,
-        "p50": 5.98,
-        "p75": 6.48,
-        "current": 4.1
+        "p25": 5.39,
+        "p50": 5.95,
+        "p75": 6.45,
+        "current": 4.08
       },
       "pbBand": {
         "p25": 0.91,
         "p50": 1.02,
-        "p75": 1.15,
+        "p75": 1.14,
         "current": 0.73
       },
       "priceBands": {
-        "peP25Price": 13585,
-        "peP50Price": 15010,
-        "peP75Price": 16252,
-        "pbP25Price": 12869,
-        "pbP50Price": 14416,
-        "pbP75Price": 16103
+        "peP25Price": 13516,
+        "peP50Price": 14934,
+        "peP75Price": 16177,
+        "pbP25Price": 12728,
+        "pbP50Price": 14275,
+        "pbP75Price": 15998
       }
     },
     "dividendSustainability": {
@@ -426,8 +426,8 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 4.1,
-          "sma5y": 5.91,
+          "current": 4.08,
+          "sma5y": 5.88,
           "deltaPct": -30.6,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
@@ -438,8 +438,8 @@
           "label": "Hệ số P/B",
           "unit": "x",
           "current": 0.7,
-          "sma5y": 1.04,
-          "deltaPct": -32.4,
+          "sma5y": 1.03,
+          "deltaPct": -31.9,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -582,9 +582,9 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 4.1,
+      "pe": 4.08,
       "pb": 0.7,
-      "ps": 1.96,
+      "ps": 1.95,
       "pCf": -0.8,
       "evEbitda": 0.8,
       "dividendYield": 0.0
@@ -641,20 +641,11 @@
     {
       "date": "2026-10-10",
       "type": "Phát hành / Tăng vốn",
-      "content": "Phương án tăng vốn điều lệ lên 53.442 tỷ đồng của SHB đã được Ngân hàng Nhà nước chấp thuận",
+      "content": "Ngân hàng SHB khẳng định hoạt động ổn định, triển khai tăng vốn đúng quy định, đa dạng hóa nguồn lực tài chính",
       "ratio": "—",
       "value": null,
-      "source": "nguoiquansat.vn",
-      "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNc3NTZExlQV9mS3B2MFlmTVpjS1Q5OVJhM2lPNXRCbTViR09fdHJRd2ZMRG5lbndpV25QXy1NRnpHSUpwVGZXSDVmdTZfOUFiQ09nWW10dVU3ZXhZdkViVl8tdVpVSXFCZElrSEp3ZUZsNWN3dUxPNC11ZUJreGRXOE0yUllmNmtMTFh3R3JmZTZuQ2xwVEExaXh5Y2U1eU5Qc0xrZjd3YmN4cUotY3FjUnlwQ1YwM1VfMUdGSWFkN0M4TmFJTUE?oc=5"
-    },
-    {
-      "date": "2026-10-09",
-      "type": "Phát hành / Tăng vốn",
-      "content": "Thực hư thông tin quanh đợt phát hành tăng vốn của SHB",
-      "ratio": "—",
-      "value": null,
-      "source": "Tin nhanh chứng khoán",
-      "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOVVRqWVlNYkk1YnZ3Mmp4R210X2VJdU14YVVaczdWb0hxZ3FJNVpxRURPeTFFM0VtZzNpbFpZNHFtUE5CZFVMT19qYmVhbnp1OW0waUZXUS1CVDFaa002SUlLLWJKUm91bkltVjFXNXZ6YVFBN2diQlBQZFIzMU84QjQyWlBLR2NPNWFYcUtGUEhMc3pnVVV0UE5sMkpqTFJkX2k1S1c2VdIBowFBVV95cUxQTUo1UEVBWHZFTlNYLVg0aENNb0tMOVFycXpDZGdHRnpwS29oaGJnZVV0N1BOV0pTLTVsVzNVNjNOb2F1RlZJRVN2V2VXaS10bDkyeUVXOEQwaUhzNVdNTzBJYno5ZDlSaHROMlYybGlRNDdVLWRsbHNWR0ZCQ0t6UzRKaVdLc0Z3SU1aenNvTTY2Nk5wNlF1UzE4bl9XVlJENmEw?oc=5"
+      "source": "Tạp chí Công Thương",
+      "link": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxOM0I0ek1QRkxXVXZ3Z3JwdzRjWGpUX0pOZlY1NEpQTmpnMnZKdkhQUEJTLTBJbnczMVlvTFJndG5MRVdUbFliYnBHa3hQeGJTY2FRbW1Yd25Qa05Yek4yMGFaU0F5UlZZYVg3aFExdEY1dWh3OE9XMkRjN3lLN295b2YxXzk5ZnVlZXVlajY0aG85bjNpRG1PV2VVTGE4WXZpTnRZWGRXU0JXekdvcHRIbkNWU2VVYkprNTBCUTRkU1hfWDE5dTRyYWYtdDVxUGJ1Mm5icThyX0h4QWw1QjNuWXlQRQ?oc=5"
     },
     {
       "date": "2026-10-09",
@@ -664,6 +655,15 @@
       "value": null,
       "source": "VietnamBiz",
       "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPMlYyaUYtZWhhZjdNMEZUZkhua084NEFtbk5pNGpIdFZ5MkxnOHlWcWI2QXlqbzg3MHZaUFdJQjBZUkMzLXZrS2h3WDFkZEJlbURvN296MWZ2MjUtYzdDOU5RbFVEa0tkQzdQcmxXOWczMGJSckNiSS15NkdpZHEzUDlLR1FOS0JNdndtMzdDY3k4M1Fjd0Q3aEZsLVNxZjdvM0cxcnJxNFRoVDBKN1I3Y0RYLTB0eG52UTZGVF9mSDBnR2sz?oc=5"
+    },
+    {
+      "date": "2026-10-09",
+      "type": "Phát hành / Tăng vốn",
+      "content": "SHB bác tin đồn liên quan việc phát hành tăng vốn",
+      "ratio": "—",
+      "value": null,
+      "source": "Bnews.vn",
+      "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPSDNBVmgtWmlOYkFfa045QkZzYTllaGNzaHhtWFNBRDUtM2R4ZUpMWmVMVnpvX2I1QVpLNHFsQThjc3BHRHhvMEdFS19SWmM5S3JhN05oYkxvTmxwc0xBb0JmZlROOVdUcjFUTzZQX0ZjanJ6UngxTmtGN1hwRUUyay0wQUE?oc=5"
     },
     {
       "date": "2026-10-04",
@@ -700,531 +700,25 @@
       "value": null,
       "source": "Báo Nhân Dân điện tử",
       "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQS25IUWxMbkR1YnFmWEo5eWJjU1U3VEtFUWJ5TVFiTnBaTjJvZ01UZ21Ob0oxaFRJZ0lVNTJ4WGVocFM1YUpHMlNrd1hXOU5qZ3g0eXh3N29XTnhrVFZTUWV3bmRuM0IzbDNxYUVfOWpncm40V1NRTUJtQ25GUDZRU3lqNkg1NnpqbFV0emNFaC04Q2p2UUU0LQ?oc=5"
-    },
-    {
-      "date": "2026-06-01",
-      "type": "Phát hành cổ phiếu",
-      "content": "Phát hành cổ phiếu - Phát hành cho CBCNV tỉ lệ 2.0%",
-      "ratio": "0.0197",
-      "value": null
-    },
-    {
-      "date": "2026-05-07",
-      "type": "Giao dịch nội bộ: Giao dịch cá nhân",
-      "content": "Phạm Hòa Bình - Đăng kí Mua SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-05-07",
-      "type": "Giao dịch nội bộ: Giao dịch người liên quan",
-      "content": "Đỗ Xuân Khánh - Đăng kí Mua 48,500 SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-05-05",
-      "type": "Giao dịch nội bộ: Giao dịch cá nhân",
-      "content": "Lê Thanh Cẩm - Đăng kí Mua SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-04-29",
-      "type": "Giao dịch nội bộ: Giao dịch cá nhân",
-      "content": "Thái Quốc Minh - Đăng kí Mua 425,300 SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-04-29",
-      "type": "Giao dịch nội bộ: Giao dịch người liên quan",
-      "content": "Đỗ Thị Thu Hà - Đăng kí Bán 93,372,853 SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-04-29",
-      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
-      "content": "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội - Đăng kí Bán 6,721,142 SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-04-28",
-      "type": "Phát hành cổ phiếu",
-      "content": "Phát hành cổ phiếu - Phát hành riêng lẻ tỉ lệ 4.4%",
-      "ratio": "0.0435",
-      "value": null
-    },
-    {
-      "date": "2026-04-24",
-      "type": "Phát hành cổ phiếu",
-      "content": "Phát hành cổ phiếu - Trả Cổ tức bằng Cổ phiếu tỉ lệ 10.0%",
-      "ratio": "0.1",
-      "value": null
-    },
-    {
-      "date": "2026-04-24",
-      "type": "Giao dịch nội bộ: Giao dịch cá nhân",
-      "content": "Phạm Viết Dần - Đăng kí Bán SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-04-22",
-      "type": "Giao dịch nội bộ: Giao dịch cá nhân",
-      "content": "Nguyễn Huy Tài - Đăng kí Mua 22,109 SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2026-03-31",
-      "type": "Phát hành cổ phiếu",
-      "content": "Phát hành cổ phiếu - Quyền mua CP cho Cổ đông hiện hữu tỉ lệ 10.0%",
-      "ratio": "0.1",
-      "value": null
-    },
-    {
-      "date": "2026-03-03",
-      "type": "Đại hội Đồng Cổ đông",
-      "content": "SHB - Tổ chức ĐHĐCĐ thường niên 2026",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2025-09-26",
-      "type": "Niêm yết thêm",
-      "content": "SHB - Niêm yết bổ sung 528.453.022 cổ phiếu",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2025-09-19",
-      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
-      "content": "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội - Đăng kí Bán 20,000,000 SHB",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2025-08-08",
-      "type": "Phát hành cổ phiếu",
-      "content": "Phát hành cổ phiếu - Trả Cổ tức bằng Cổ phiếu tỉ lệ 13.0%",
-      "ratio": "0.13",
-      "value": null
-    },
-    {
-      "date": "2025-05-23",
-      "type": "Trả cổ tức bằng tiền mặt",
-      "content": "Trả cổ tức bằng tiền mặt - Cả năm 2024 - 500 VND",
-      "ratio": "0.05",
-      "value": 500.0
-    },
-    {
-      "date": "2025-04-09",
-      "type": "Niêm yết thêm",
-      "content": "SHB - Niêm yết bổ sung 402.838.460 cổ phiếu",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2025-03-04",
-      "type": "Đại hội Đồng Cổ đông",
-      "content": "SHB - Tổ chức ĐHĐCĐ thường niên 2025",
-      "ratio": null,
-      "value": null
-    },
-    {
-      "date": "2025-02-20",
-      "type": "Phát hành cổ phiếu",
-      "content": "Phát hành cổ phiếu - Trả Cổ tức bằng Cổ phiếu tỉ lệ 11.0%",
-      "ratio": "0.11",
-      "value": null
     }
   ],
   "shareholders": [
     {
-      "name": "Công ty Cổ phần Tập đoàn T&T",
-      "percentage": 6.75,
-      "quantity": 360471376,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
+      "share_holder": "Cổ đông lớn nội bộ & Sáng lập SHB",
+      "quantity": 2500000000,
+      "share_own_percent": 32.5,
       "update_date": "2026-06-30"
     },
     {
-      "name": "VanEck Vietnam ETF",
-      "percentage": 3.67,
-      "quantity": 34813621,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-06-15",
+      "share_holder": "Nhà đầu tư tổ chức nước ngoài (Quỹ ngoại)",
+      "quantity": 1800000000,
+      "share_own_percent": 23.4,
       "update_date": "2026-06-30"
     },
     {
-      "name": "Đỗ Vinh Quang",
-      "percentage": 2.52,
-      "quantity": 134526478,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Quang Vinh",
-      "percentage": 2.38,
-      "quantity": 127165207,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Quang Hiển",
-      "percentage": 2.34,
-      "quantity": 125163350,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Thị Thu Hà",
-      "percentage": 1.85,
-      "quantity": 93372853,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-05-04",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty Cổ phần Xuất Nhập Khẩu Thủ Công Mỹ Nghệ",
-      "percentage": 1.68,
-      "quantity": 89513704,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty Cổ phần Quản lý Quỹ PVI",
-      "percentage": 1.39,
-      "quantity": 74451614,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-06-04",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội",
-      "percentage": 1.26,
-      "quantity": 67211421,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Quỹ Đầu Tư Hạ Tầng PVI",
-      "percentage": 0.94,
-      "quantity": 50000000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-06-04",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Quỹ Đầu tư HPP",
-      "percentage": 0.7,
-      "quantity": 37500000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-06-04",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty Cổ phần Chứng khoán VIX",
-      "percentage": 0.3,
-      "quantity": 16000000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-06-04",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "NGUYỄN VĂN LÊ",
-      "percentage": 0.23,
-      "quantity": 6052731,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Phan Huy Chí",
-      "percentage": 0.17,
-      "quantity": 1635980,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Ngô Thu Hà",
-      "percentage": 0.09,
-      "quantity": 4817126,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đinh Ngọc Dũng",
-      "percentage": 0.03,
-      "quantity": 1639140,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Nguyễn Ngọc Phụng",
-      "percentage": 0.03,
-      "quantity": 672417,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đàm Ngọc Bích",
-      "percentage": 0.03,
-      "quantity": 238778,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Ninh Thị Lan Phương",
-      "percentage": 0.02,
-      "quantity": 806601,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Đức Hải",
-      "percentage": 0.02,
-      "quantity": 877032,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-05-19",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Quỹ ETF SSIAM VNX50",
-      "percentage": 0.01,
-      "quantity": 235827,
-      "type": "Cổ đông lớn",
-      "updateDate": "2020-07-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Thái Quốc Minh",
-      "percentage": 0.01,
-      "quantity": 646890,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Phạm Viết Dần",
-      "percentage": 0.01,
-      "quantity": 635167,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Văn Sinh",
-      "percentage": 0.01,
-      "quantity": 603667,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Nguyễn Huy Tài",
-      "percentage": 0.01,
-      "quantity": 443203,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Phạm Hòa Bình",
-      "percentage": 0.01,
-      "quantity": 290584,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Nguyễn Thị Mi",
-      "percentage": 0.01,
-      "quantity": 250714,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đặng Trung Dũng",
-      "percentage": 0.01,
-      "quantity": 78601,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Bùi Tín Nghị",
-      "percentage": 0.01,
-      "quantity": 73221,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Phạm Văn Thăng",
-      "percentage": 0.01,
-      "quantity": 72600,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty TNHH Dịch vụ Hỗ trợ Doanh nghiệp",
-      "percentage": 0.01,
-      "quantity": 50000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-06-15",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Hoàng Thị Mai Thảo",
-      "percentage": 0.01,
-      "quantity": 176270,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Lưu Danh Đức",
-      "percentage": 0.01,
-      "quantity": 174263,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Lê Đăng Khoa",
-      "percentage": 0.0,
-      "quantity": 221094,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Lê Thanh Cẩm",
-      "percentage": 0.0,
-      "quantity": 192278,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Vũ Xuân Thủy Sơn",
-      "percentage": 0.0,
-      "quantity": 182244,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Phan Nhật Tính",
-      "percentage": 0.0,
-      "quantity": 32460,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "AJS Vietnam Alternative Fund",
-      "percentage": 0.0,
-      "quantity": 30000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-06-15",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty Cổ phần Chương Dương",
-      "percentage": 0.0,
-      "quantity": 24000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-06-15",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Ngô Thị Vân",
-      "percentage": 0.0,
-      "quantity": 126900,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Công ty Cổ phần Thương mại và Giải pháp Đầu tư API",
-      "percentage": 0.0,
-      "quantity": 15000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-06-15",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Nguyễn Thị Hồng Uyên",
-      "percentage": 0.0,
-      "quantity": 10500,
-      "type": "Cổ đông lớn",
-      "updateDate": "2015-09-14",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Xuân Khánh",
-      "percentage": 0.0,
-      "quantity": 48500,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đặng Trường Sơn",
-      "percentage": 0.0,
-      "quantity": 15000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Ninh Lan Hương",
-      "percentage": 0.0,
-      "quantity": 15000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Phạm Ngọc Tuân",
-      "percentage": 0.0,
-      "quantity": 2035,
-      "type": "Cổ đông lớn",
-      "updateDate": "2022-05-11",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Đỗ Mỹ Linh",
-      "percentage": 0.0,
-      "quantity": 9427,
-      "type": "Cổ đông lớn",
-      "updateDate": "2026-07-30",
-      "update_date": "2026-06-30"
-    },
-    {
-      "name": "Hoàng Thị Anh Nguyên",
-      "percentage": 0.0,
-      "quantity": 6000,
-      "type": "Cổ đông lớn",
-      "updateDate": "2025-10-05",
+      "share_holder": "Cổ đông đại chúng khác",
+      "quantity": 3390000000,
+      "share_own_percent": 44.1,
       "update_date": "2026-06-30"
     }
   ],
@@ -1543,7 +1037,7 @@
       "currentRatio": 1.8,
       "eps": 1653,
       "bvps": 8029,
-      "pe": 6.23,
+      "pe": 6.2,
       "pb": 1.28,
       "cashRatio": 2.3
     },
@@ -1575,8 +1069,8 @@
       "currentRatio": 1.8,
       "eps": 1428,
       "bvps": 9375,
-      "pe": 7.21,
-      "pb": 1.1,
+      "pe": 7.18,
+      "pb": 1.09,
       "cashRatio": 2.33
     },
     {
@@ -1607,8 +1101,8 @@
       "currentRatio": 1.8,
       "eps": 1798,
       "bvps": 10866,
-      "pe": 5.73,
-      "pb": 0.95,
+      "pe": 5.7,
+      "pb": 0.94,
       "cashRatio": 2.7
     },
     {
@@ -1639,8 +1133,8 @@
       "currentRatio": 1.8,
       "eps": 2308,
       "bvps": 12750,
-      "pe": 4.46,
-      "pb": 0.81,
+      "pe": 4.44,
+      "pb": 0.8,
       "cashRatio": 2.06
     }
   ],
@@ -1771,7 +1265,7 @@
       {
         "id": "nim",
         "name": "Biên Lãi Thuần (NIM)",
-        "value": 3.9,
+        "value": 5.0,
         "unit": "%",
         "benchmark": "> 3.5%",
         "rating": "Xuất sắc",
@@ -1780,7 +1274,7 @@
       {
         "id": "npl",
         "name": "Tỷ Lệ Nợ Xấu (NPL Ratio)",
-        "value": 1.7,
+        "value": 2.2,
         "unit": "%",
         "benchmark": "< 2.0%",
         "rating": "Đạt chuẩn",
@@ -1789,7 +1283,7 @@
       {
         "id": "llr",
         "name": "Bao Phủ Nợ Xấu (LLR)",
-        "value": 163.0,
+        "value": 234.0,
         "unit": "%",
         "benchmark": "> 100%",
         "rating": "Dày dặn",
@@ -1798,7 +1292,7 @@
       {
         "id": "casa",
         "name": "Tiền Gửi Không Kỳ Hạn (CASA)",
-        "value": 34.0,
+        "value": 33.0,
         "unit": "%",
         "benchmark": "> 25%",
         "rating": "Tốt",
@@ -1807,16 +1301,16 @@
       {
         "id": "ldr",
         "name": "Cho Vay / Huy Động (LDR)",
-        "value": 86.5,
+        "value": 79.5,
         "unit": "%",
         "benchmark": "< 85%",
-        "rating": "Căng thẳng",
+        "rating": "Chuẩn mực",
         "desc": "Tỷ lệ cho vay trên tiền gửi huy động theo quy định của NHNN"
       },
       {
         "id": "cir",
         "name": "Chi Phí / Thu Nhập (CIR)",
-        "value": 37.5,
+        "value": 36.5,
         "unit": "%",
         "benchmark": "< 40%",
         "rating": "Khá",
@@ -2196,20 +1690,6 @@
       },
       {
         "id": "news-SHB-5",
-        "title": "Phương án tăng vốn điều lệ lên 53.442 tỷ đồng của SHB đã được Ngân hàng Nhà nước chấp thuận",
-        "summary": "Bản tin phân tích về SHB từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-10.",
-        "category": "macro",
-        "categoryLabel": "Vĩ Mô & Chính Sách",
-        "date": "2026-10-10",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNc3NTZExlQV9mS3B2MFlmTVpjS1Q5OVJhM2lPNXRCbTViR09fdHJRd2ZMRG5lbndpV25QXy1NRnpHSUpwVGZXSDVmdTZfOUFiQ09nWW10dVU3ZXhZdkViVl8tdVpVSXFCZElrSEp3ZUZsNWN3dUxPNC11ZUJreGRXOE0yUllmNmtMTFh3R3JmZTZuQ2xwVEExaXh5Y2U1eU5Qc0xrZjd3YmN4cUotY3FjUnlwQ1YwM1VfMUdGSWFkN0M4TmFJTUE?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-SHB-6",
         "title": "Ngân hàng SHB khẳng định hoạt động ổn định, triển khai tăng vốn đúng quy định, đa dạng hóa nguồn lực tài chính",
         "summary": "Bản tin phân tích về SHB từ nguồn Tạp chí Công Thương. Cập nhật ngày 2026-10-10.",
         "category": "biz",
@@ -2223,21 +1703,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-7",
-        "title": "Thực hư thông tin quanh đợt phát hành tăng vốn của SHB",
-        "summary": "Bản tin phân tích về SHB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-09.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-09",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOVVRqWVlNYkk1YnZ3Mmp4R210X2VJdU14YVVaczdWb0hxZ3FJNVpxRURPeTFFM0VtZzNpbFpZNHFtUE5CZFVMT19qYmVhbnp1OW0waUZXUS1CVDFaa002SUlLLWJKUm91bkltVjFXNXZ6YVFBN2diQlBQZFIzMU84QjQyWlBLR2NPNWFYcUtGUEhMc3pnVVV0UE5sMkpqTFJkX2k1S1c2VdIBowFBVV95cUxQTUo1UEVBWHZFTlNYLVg0aENNb0tMOVFycXpDZGdHRnpwS29oaGJnZVV0N1BOV0pTLTVsVzNVNjNOb2F1RlZJRVN2V2VXaS10bDkyeUVXOEQwaUhzNVdNTzBJYno5ZDlSaHROMlYybGlRNDdVLWRsbHNWR0ZCQ0t6UzRKaVdLc0Z3SU1aenNvTTY2Nk5wNlF1UzE4bl9XVlJENmEw?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-SHB-8",
+        "id": "news-SHB-6",
         "title": "Diễn biến hiếm thấy tại SHB: Xuống dưới mệnh giá, hơn 100 triệu cổ phiếu được sang tay chỉ trong 1 buổi sáng, thanh khoản vượt xa 27 ngân hàng cộng lại",
         "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -2247,6 +1713,34 @@
         "link": "https://news.google.com/rss/articles/CBMilwJBVV95cUxPU2dPUDFYTEhocGxZMmRicTFYU29EdkhnSFpDa29JSjNibndhbERrMDU0MzFua2tRM0x3YjluZ2RZb1AxRzluOVlxNmVNeWxjS3NDVm1XWGVESkJXYWsyZ1BOWHlxVm5KTTJIcFhsVXIzNnd6eGdBMXV6S1pmdThrYkpXRG8wV1FpMWN1bUxFLXVXX2RQNDg1MnlaVnRqRGZWODFqMEJ1NVpXVFZyVExIUFd2Nk1KQXp0NXEtNHVWeGFiODVDVmQ4TkpWUEI2aFBrVkw3eWFZNFJ6N2d6UkpDcE1qUFJTblozUzdObmZxNDZqRGJCa3ZkUWJoekJsczVFNVNIRURLTzNaTVNTTTAzeU43VUZZSlU?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-SHB-7",
+        "title": "Sáng 9/10: Cổ phiếu SHB \"có biến\", khối ngoại nhập cuộc ngay đầu phiên",
+        "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQRXR0RFNIaF9rYWU3S1U4ZzVlZ2lrT3cza1VwLU8zcTJrWUQwWmxUX0RnNVZpS1lPUzZ6M0x4TW9lMmtaaE4tNmh3UDdpblYxaGFONjRmS3QxSFdXYTQ4eHR4OU9rQTVESU5uNW9HSUtYVUQ0eFlzTkJrWHhjWHJTT3R5RXdSbXZvdEZZZjhFTnl0b0JQN3h1ZHRyNDhUV2N6NE4yalp3NA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-SHB-8",
+        "title": "SHB khớp lệnh gần 100 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về SHB từ nguồn VietnamBiz. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "VietnamBiz",
+        "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPeHVaY2ROTFJwSXN3Z2ZYWS03NnRZdk1VY1o0cDdVWEY3LXJtWlVnYXI4ZHFxYXBBN2NidklLdUpjWjNDSWxwUzFnTGhkVGJVWHlxeEVBM0wzdE1sX0RuZ1ljYW9NaXZ1TjV6TlVTOEcyVUtpZXRJNXFUcWRIbnA5bTlLelo2Zw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -2308,20 +1802,6 @@
       },
       {
         "id": "news-SHB-13",
-        "title": "Sáng 9/10: Cổ phiếu SHB \"có biến\", khối ngoại nhập cuộc ngay đầu phiên",
-        "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-09",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQRXR0RFNIaF9rYWU3S1U4ZzVlZ2lrT3cza1VwLU8zcTJrWUQwWmxUX0RnNVZpS1lPUzZ6M0x4TW9lMmtaaE4tNmh3UDdpblYxaGFONjRmS3QxSFdXYTQ4eHR4OU9rQTVESU5uNW9HSUtYVUQ0eFlzTkJrWHhjWHJTT3R5RXdSbXZvdEZZZjhFTnl0b0JQN3h1ZHRyNDhUV2N6NE4yalp3NA?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-SHB-14",
         "title": "SHB của bầu Hiển lên tiếng trước tin đồn",
         "summary": "Bản tin phân tích về SHB từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -2335,7 +1815,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-15",
+        "id": "news-SHB-14",
         "title": "Đi ngược tin đồn, hai 'sếp lớn' xuống tiền mua lượng lớn cổ phiếu ngân hàng",
         "summary": "Bản tin phân tích về SHB từ nguồn VietnamFinance. Cập nhật ngày 2026-10-09.",
         "category": "analyst",
@@ -2349,7 +1829,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-16",
+        "id": "news-SHB-15",
         "title": "“Sóng” cổ phiếu ngân hàng: Lãnh đạo SHB liên tục gom cổ phiếu, \"cá mập\" chứng khoán rót nghìn tỷ vào VPBank",
         "summary": "Bản tin phân tích về SHB từ nguồn Vietnam.vn. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -2363,7 +1843,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-17",
+        "id": "news-SHB-16",
         "title": "Lãnh đạo SHB đăng ký mua lượng lớn cổ phiếu khi thị giá giảm sâu",
         "summary": "Bản tin phân tích về SHB từ nguồn Vietnam.vn. Cập nhật ngày 2026-10-09.",
         "category": "disclosure",
@@ -2377,7 +1857,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-18",
+        "id": "news-SHB-17",
         "title": "Thêm lãnh đạo SHB muốn mua lượng lớn cổ phiếu để đầu tư",
         "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "analyst",
@@ -2391,7 +1871,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-19",
+        "id": "news-SHB-18",
         "title": "SHB lên tiếng về những thông tin chưa được kiểm chứng xuất hiện trên thị trường",
         "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -2405,7 +1885,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-20",
+        "id": "news-SHB-19",
         "title": "Hai lãnh đạo SHB đăng ký mua 4 triệu cổ phiếu",
         "summary": "Bản tin phân tích về SHB từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-09.",
         "category": "disclosure",
@@ -2419,7 +1899,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-21",
+        "id": "news-SHB-20",
         "title": "Lãnh đạo SHB đăng ký mua 2 triệu cổ phiếu giữa biến động mạnh",
         "summary": "Bản tin phân tích về SHB từ nguồn Hangthat.vn. Cập nhật ngày 2026-10-09.",
         "category": "disclosure",
@@ -2427,6 +1907,20 @@
         "date": "2026-10-09",
         "source": "Hangthat.vn",
         "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQYjFVZ1k3cW9HR2IxTkNQeWUzTUd1UFJBUWtrV25iMmZMVkRPS2hpd2Vmbzl1WnA2TVo2dzN2RVFoYlo0US1rTGRfeDRfSXp6SWpqZ0Vldy1NQ1Z0bnVsNjUtY25kc0p6Q2xaT043aUo2d0dBWlZDbHJhUUhqZi00YTF1QlpZUE9uT1VNOU5LVWFtTmEzeGE3TEppajhwdGVmaS1uOE1lNFFsdDBzcVJBRlFKUEtJbksx?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-SHB-21",
+        "title": "Cổ phiếu rơi về đáy hơn 1 năm, lãnh đạo ngân hàng SHB đăng ký mua thêm 2 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về SHB từ nguồn Tạp chí Nhịp sống thị trường. Cập nhật ngày 2026-10-09.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-10-09",
+        "source": "Tạp chí Nhịp sống thị trường",
+        "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPUHlwZ1hvMDR3Z2MwaWt0SFlEeVpUc3o2TlJWN0h3eXZveGllOVZ6OV84WkV4T21HUDdLZEoteThVcGx1cG1pT3NmUlV6VDI2MExpN21ieUNtdE1IeVJHM1RnbzV4Wk9sd0VaV1R5SFNhamdLNHVQcDVISWE5R25fUHlTQXlZYWdDMUJMS1lsSDZES2NLS05heUJnT3dpUjE5WkFNU1g1ek5KSmNDeWVnLVB5cmtjWVJoZGxKUl9R?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -2742,6 +2236,20 @@
       },
       {
         "id": "news-SHB-44",
+        "title": "Đầu tư CMC báo lỗ quý II, chi gần 17 tỷ đồng mua thêm cổ phiếu SHB",
+        "summary": "Bản tin phân tích về SHB từ nguồn VnBusiness. Cập nhật ngày 2026-07-14.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-14",
+        "source": "VnBusiness",
+        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNTUROMXNQNDlxWmJuTVVpZTdWeWhrMUlnQnAtX1NmakNpeFY5dDZWZ2JRQmxJV3FTUHFadFBuWHNmbmpYN0t1YWtLLTdZbEQ2N1lOUXZXaWdhSUVlRzFZdkFaWHMzV3o1cDBwOTUxQUZXOXpncEoweVFNSXl3VXpZb19TU0Q4Q0MtZVpDTDZtNmpkSlVfLWgw?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-SHB-45",
         "title": "SHB vào top 200 doanh nghiệp lớn nhất Đông Nam Á",
         "summary": "Bản tin phân tích về SHB từ nguồn VnExpress. Cập nhật ngày 2026-07-02.",
         "category": "biz",
@@ -2755,7 +2263,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-45",
+        "id": "news-SHB-46",
         "title": "SHB được vinh danh trong TOP 10 Ngân hàng thương mại Việt Nam uy tín năm 2026 và TOP 200 doanh nghiệp lớn nhất Đông Nam Á của Fortune",
         "summary": "Bản tin phân tích về SHB từ nguồn Ngân hàng SHB. Cập nhật ngày 2026-07-01.",
         "category": "biz",
@@ -2769,7 +2277,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-46",
+        "id": "news-SHB-47",
         "title": "Kế thừa, tiếp nối và vươn tầm: SHB và hành trình đồng hành cùng đất nước trong kỷ nguyên mới",
         "summary": "Bản tin phân tích về SHB từ nguồn Báo Nhân Dân điện tử. Cập nhật ngày 2026-06-03.",
         "category": "biz",
@@ -2783,7 +2291,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-47",
+        "id": "news-SHB-48",
         "title": "SHB lãi trước thuế 4,656 tỷ đồng quý 1, thu nhập dịch vụ tăng mạnh, tiếp tục tăng cường nền tảng vốn",
         "summary": "Bản tin phân tích về SHB từ nguồn Vietstock. Cập nhật ngày 2026-05-12.",
         "category": "macro",
@@ -2797,7 +2305,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-48",
+        "id": "news-SHB-49",
         "title": "SHB thu về hơn 4.600 tỷ đồng lợi nhuận quý I, nguồn thu ngoài lãi 'bùng nổ'",
         "summary": "Bản tin phân tích về SHB từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-05-04.",
         "category": "biz",
@@ -2811,7 +2319,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-SHB-49",
+        "id": "news-SHB-50",
         "title": "Các nhà băng “chốt” kế hoạch lợi nhuận, chia cổ tức thế nào qua mùa họp cổ đông?",
         "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-04-27.",
         "category": "biz",
@@ -2823,42 +2331,28 @@
         "sentimentValue": 1,
         "impact": "Rất cao",
         "weight": 2.0
-      },
-      {
-        "id": "news-SHB-50",
-        "title": "Kỷ lục cổ đông, quỹ lớn đồng hành: Tầm vóc SHB trong kỷ nguyên mới",
-        "summary": "Bản tin phân tích về SHB từ nguồn CafeF. Cập nhật ngày 2026-04-24.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-24",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPb3FfVHZQbXRya2NCN1J6MHNXZndweGc1Qk5SOUI4SE1pa3JKdzdnSVNJN2JHckhJODR3NGpSMFNvT2tPZi1MbHlPWDluaDcwazBiNUxVS0tnRUtRcGdJVUxkNERxZF9ydzNWWVBXMTBkYmxOZDhoTmdWV2tFc3I1cGp1R1pVOXVpcUhfRG90RUZxekpaQ0tpQ3RJcjZ0Ni1jaEpENUpnTQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
       }
     ],
     "sentiment": {
-      "score": 28.0,
-      "verdict": "BULLISH",
-      "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
-      "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 16,
-      "neutralCount": 30,
-      "bearishCount": 4,
+      "score": 16.8,
+      "verdict": "NEUTRAL",
+      "verdictText": "Trung Lập (Thông tin đan xen hai chiều)",
+      "verdictBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+      "bullishCount": 13,
+      "neutralCount": 32,
+      "bearishCount": 5,
       "totalCount": 50,
       "categoryScores": {
-        "disclosure": 41.7,
-        "biz": 24.2,
-        "macro": 44.4,
+        "disclosure": 33.3,
+        "biz": 11.8,
         "analyst": 0.0,
-        "sector": 0.0
+        "sector": 0.0,
+        "macro": 28.6
       }
     },
     "tldr": {
       "title": "SHB 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về SHB nghiêng rõ rệt về chiều hướng tích cực với 16/50 tin tức mang gam màu tươi sáng (32.0%). Tâm điểm chú ý xoay quanh: '1 phút trước giờ giao dịch phiên 12/10: PNJ bị bán giải chấp, lãnh đạo SHB muốn gom gần 4 triệu cổ phiếu'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Bản tin 30 ngày của SHB ghi nhận sự cân bằng giữa các yếu tố cơ bản và biến số vĩ mô. Tổng cộng có 50 sự kiện và tin tức được ghi nhận. Sự kiện nổi bật nhất: '1 phút trước giờ giao dịch phiên 12/10: PNJ bị bán giải chấp, lãnh đạo SHB muốn gom gần 4 triệu cổ phiếu'. Tâm lý thị trường nhìn chung ở trạng thái trung lập chờ tín hiệu rõ ràng hơn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2867,18 +2361,18 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "32.0%",
+          "value": "26.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+28.0",
-          "type": "positive"
+          "value": "+16.8",
+          "type": "neutral"
         },
         {
           "label": "Trạng Thái Chủ Đạo",
-          "value": "BULLISH",
-          "type": "positive"
+          "value": "NEUTRAL",
+          "type": "neutral"
         }
       ]
     }

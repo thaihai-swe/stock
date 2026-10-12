@@ -2,24 +2,24 @@
   "_meta": {
     "symbol": "PNJ",
     "companyName": "Phu Nhuan Jewelry JSC",
-    "updatedAt": "2026-10-11T15:55:07Z",
+    "updatedAt": "2026-10-12T04:36:09Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance Audit Statements & VAS TT200",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 27868,
+    "grahamNumber": 26739,
     "ddmTarget": null,
     "peTarget": 65262,
     "pbTarget": 36657,
     "evEbitdaFairPrice": null,
     "pcfFairPrice": null,
     "psFairPrice": 72949,
-    "consensusFairValue": 30796,
-    "marginOfSafety": 36.7,
-    "upside": 57.9,
-    "consensusDiffPercent": 57.9,
+    "consensusFairValue": 30137,
+    "marginOfSafety": 37.8,
+    "upside": 60.7,
+    "consensusDiffPercent": 60.7,
     "valuationRating": "🟡 HOLD",
     "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
     "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
@@ -30,23 +30,23 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 27868,
-        "targetPrice": 27868,
-        "diffPercent": 42.9,
+        "value": 26739,
+        "targetPrice": 26739,
+        "diffPercent": 42.6,
         "weight": 0.08,
         "baseWeight": 0.08,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 24.0,
+        "outlierGapPct": 27.1,
         "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
-        "formulaDetail": "V = √(5.04 × 5,675 × 27,153) | Hệ số = Min(22.5, 5.2x × 0.96x = 5.04)",
+        "formulaDetail": "V = √(4.64 × 5,675 × 27,153) | Hệ số = Min(22.5, 5.0x × 0.92x = 4.64)",
         "parameters": {
           "eps": 5675.0,
           "bvps": 27153,
-          "multiplier": 5.04,
-          "peAvg": 5.25,
-          "pbAvg": 0.96,
+          "multiplier": 4.64,
+          "peAvg": 5.04,
+          "pbAvg": 0.92,
           "maxMultiplier": 22.5
         },
         "statusNote": "Phù hợp"
@@ -58,7 +58,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 65262,
         "targetPrice": 65262,
-        "diffPercent": 234.7,
+        "diffPercent": 248.1,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
@@ -80,7 +80,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 36657,
         "targetPrice": 36657,
-        "diffPercent": 88.0,
+        "diffPercent": 95.5,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
@@ -225,7 +225,7 @@
         "cleanName": "Book NAV / RNAV",
         "value": 26622,
         "targetPrice": 26622,
-        "diffPercent": 36.5,
+        "diffPercent": 42.0,
         "weight": 0.032,
         "baseWeight": 0.07,
         "suitability": 0.45,
@@ -250,7 +250,7 @@
         "cleanName": "EV/EBITDA & EV/Sales",
         "value": 65154,
         "targetPrice": 65154,
-        "diffPercent": 234.1,
+        "diffPercent": 247.5,
         "weight": 0.07,
         "baseWeight": 0.07,
         "suitability": 1.0,
@@ -271,9 +271,9 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 32748,
-      "cleanMedian": 27868,
-      "dispersionPct": 17.5,
+      "cleanWeightedAvg": 32403,
+      "cleanMedian": 26739,
+      "dispersionPct": 21.2,
       "consensusLevel": "MED",
       "coveragePct": 33.3,
       "confidenceScore": 52.3,
@@ -337,18 +337,18 @@
     "sevenPriceZones": {
       "currentZone": "Deep Value",
       "zoneBadge": "bg-emerald-600 text-white",
-      "safeBuyPrice": 23097,
-      "acceptableBuyPrice": 26177,
-      "bearPrice": 21557,
-      "bullPrice": 38495,
+      "safeBuyPrice": 22603,
+      "acceptableBuyPrice": 25616,
+      "bearPrice": 21096,
+      "bullPrice": 37671,
       "boundaries": {
-        "deepValue": 20787,
-        "safeBuy": 23097,
-        "accumulate": 26177,
-        "fairLow": 27716,
-        "fairHigh": 33876,
-        "aboveFair": 36570,
-        "expensive": 44269
+        "deepValue": 20343,
+        "safeBuy": 22603,
+        "accumulate": 25616,
+        "fairLow": 27123,
+        "fairHigh": 33151,
+        "aboveFair": 35788,
+        "expensive": 43322
       }
     },
     "threeLayerDecision": {
@@ -363,30 +363,30 @@
       "isTrapCapped": false
     },
     "historicalBands": {
-      "band25": 25214,
-      "band50": 27862,
-      "band75": 29721,
+      "band25": 24180,
+      "band50": 26738,
+      "band75": 28582,
       "bandPosition": "Dưới P25 (Vùng Rẻ)",
-      "bandWidthPct": 16.2,
+      "bandWidthPct": 16.5,
       "peBand": {
-        "p25": 4.79,
-        "p50": 5.25,
-        "p75": 5.4,
-        "current": 3.44
+        "p25": 4.61,
+        "p50": 5.04,
+        "p75": 5.19,
+        "current": 3.3
       },
       "pbBand": {
-        "p25": 0.85,
-        "p50": 0.96,
-        "p75": 1.06,
-        "current": 0.72
+        "p25": 0.82,
+        "p50": 0.92,
+        "p75": 1.02,
+        "current": 0.69
       },
       "priceBands": {
-        "peP25Price": 27212,
-        "peP50Price": 29794,
-        "peP75Price": 30659,
-        "pbP25Price": 23216,
-        "pbP50Price": 25931,
-        "pbP75Price": 28782
+        "peP25Price": 26162,
+        "peP50Price": 28630,
+        "peP75Price": 29467,
+        "pbP25Price": 22198,
+        "pbP50Price": 24845,
+        "pbP75Price": 27696
       }
     },
     "dividendSustainability": {
@@ -424,9 +424,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 3.44,
-          "sma5y": 4.95,
-          "deltaPct": -30.5,
+          "current": 3.3,
+          "sma5y": 4.76,
+          "deltaPct": -30.6,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -435,9 +435,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 0.75,
-          "sma5y": 0.96,
-          "deltaPct": -21.9,
+          "current": 0.72,
+          "sma5y": 0.92,
+          "deltaPct": -22.0,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -580,11 +580,11 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 3.44,
-      "pb": 0.75,
-      "ps": 0.28,
-      "pCf": -1.6,
-      "evEbitda": -11.3,
+      "pe": 3.3,
+      "pb": 0.72,
+      "ps": 0.27,
+      "pCf": -1.5,
+      "evEbitda": -10.9,
       "dividendYield": 0.0
     },
     "profitability": {
@@ -637,15 +637,6 @@
   },
   "corporateEvents": [
     {
-      "date": "2026-10-08",
-      "type": "Giao dịch nội bộ",
-      "content": "Khối ngoại và người nhà Chủ tịch PNJ thoái vốn giữa đà giảm giá",
-      "ratio": "—",
-      "value": null,
-      "source": "Laodong.vn",
-      "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQQS0tby1BU3pjN0ZXeWItNEdWR0V0VzR0azNQU1dXTHgwdUFKWUVsbUdzMFluMzhBc1h5c0hxX3lBRDh0TGNzcHRNWXhwUVJNLTVMbG1CTExpRVJtcXJFZnk3d2V2TGo4N1d6Y01Ydko3REdWamZheG5aWFlpVjdsQXVxX0JXdkNud05lQTE2QXpKXzNPWjFZY3RVTEZrVGhjOC1nb3JTbEM?oc=5"
-    },
-    {
       "date": "2026-10-07",
       "type": "Đại hội cổ đông",
       "content": "Gã khổng lồ quản lý 12.000 tỷ USD rời ghế cổ đông lớn tại PNJ ngay trước đại hội bất thường",
@@ -671,15 +662,6 @@
       "value": null,
       "source": "baodautu",
       "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPSTJhS1NXLTQ2TmlKODZfWXozbzhJN0tYcXh1VnY4cjFvTTk4X1Q1RUIxaXJleTF3WGpXbW5FbExRU0NvajhacFhBcDZKdUdwdWZNTzV0RS1JblVmYTgtQVVHa0lnMVBSUWlTUk04b2NiSG5hay1RSTdUc01NdnZXYXY2MXl2SWtqQ3dqYnhpdjBORnRRelZHc1RBY0dob3dBWlR5OUZ4S010VEVpa0RQag?oc=5"
-    },
-    {
-      "date": "2026-09-29",
-      "type": "Phát hành / Tăng vốn",
-      "content": "PNJ lên kế hoạch phát hành tối đa 550 triệu cổ phiếu riêng lẻ",
-      "ratio": "—",
-      "value": null,
-      "source": "Tin nhanh chứng khoán",
-      "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNaHoxMDNLMDM4VGFocHFUME1TU3NReEU1Mk1kOXhoaGVhSTVjdXBZaG9vRmZReVVvSHp0OVdBR0pWU25EWnFQOTJlSE9KYWdXNlF2U1lHYTktbVlZd2s2MHRMV2pNVmlHLWg1SENDOVZhS2dzLVExYkd3RWw0SmpSSU1YNFFwdXgydHRJMEZranF1UU1BUHQ3dTNiamxUOEltZUtBUDhwWVFocVZZUEd2RtIBrAFBVV95cUxQdXEyYWNhUVV6akRtY2w3ZkxmUkVOdmhKQVdKS3RhVjhLZUV4ZHNVNUQyajRXWS04YlZxdjNRemRwczNfYjMtNlc5Qi05MW1ySldnNmFnWnJPYmpURFg3THNGTzBvSWVJZktySG1EYklabFR4Y2JWTDNiX0FyMWtnTWtuemIxM3gzTFQ1SFgycmZ4R0tXTDhSNUFEYVM5MC1WM2t4OGlUTzJFMkdu?oc=5"
     }
   ],
   "shareholders": [
@@ -1017,8 +999,8 @@
       "currentRatio": 4.46,
       "eps": 3567,
       "bvps": 16501,
-      "pe": 5.47,
-      "pb": 1.18,
+      "pe": 5.26,
+      "pb": 1.14,
       "cashRatio": 0.92
     },
     {
@@ -1049,8 +1031,8 @@
       "currentRatio": 5.44,
       "eps": 3624,
       "bvps": 19163,
-      "pe": 5.38,
-      "pb": 1.02,
+      "pe": 5.17,
+      "pb": 0.98,
       "cashRatio": 1.12
     },
     {
@@ -1081,8 +1063,8 @@
       "currentRatio": 4.7,
       "eps": 3809,
       "bvps": 21994,
-      "pe": 5.12,
-      "pb": 0.89,
+      "pe": 4.92,
+      "pb": 0.85,
       "cashRatio": 0.95
     },
     {
@@ -1113,8 +1095,8 @@
       "currentRatio": 4.41,
       "eps": 5101,
       "bvps": 25942,
-      "pe": 3.82,
-      "pb": 0.75,
+      "pe": 3.68,
+      "pb": 0.72,
       "cashRatio": 0.88
     }
   ],
@@ -1541,13 +1523,13 @@
     "items": [
       {
         "id": "news-PNJ-1",
-        "title": "Con gái Chủ tịch PNJ bị bán giải chấp gần 3 triệu cổ phiếu",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Dân Việt. Cập nhật ngày 2026-10-11.",
+        "title": "1 phút trước giờ giao dịch phiên 12/10: PNJ bị bán giải chấp, lãnh đạo SHB muốn gom gần 4 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-12.",
         "category": "disclosure",
         "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-11",
-        "source": "Báo Dân Việt",
-        "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxORlZpNmZQbjROTHRlR2NHR3FpSmxtTkt0S1VEaURxbTNvYTFoTHVIeWpLOHJ5NGRDaVBqZEVJWjhTdlpLNm1BQjZ2QkUtWWxlLVkxdHZoZnlPWnBNek9LQzVyTnRFNzJsMU9aU2FvRFJ0d0JIaDhrV0RJeGhVWnpPREs5VXpNczhwUGtfQUZYcjV6b0NlRWNic1FyUm92Zw?oc=5",
+        "date": "2026-10-12",
+        "source": "nguoiquansat.vn",
+        "link": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxOQWNnUWVPM1lFS21xeklkNkF1STktalprX0N2U3NoczQ0ZkgwZGpYa0UwdFFwNkRwUGFlQjdJdHlZdF9FYnFCOFRBR3hxNXU2S1E5Tm83blNGRzJVTVh2WExGSUNSeV9YdG5GN1hfbEh2OHFLSUpoRVJVRmtqc3U4OFZMaGk3OGIxekRwUkZfdVlZUkFfYTVQaFF3dXVuQm9BNXRoZXRfWnRodWl4RUdSaTI3VmFjTGRBS1NWQ2NCbndsejBzTUdmLXFrLWhWLVJoclhtNw?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -1555,27 +1537,27 @@
       },
       {
         "id": "news-PNJ-2",
-        "title": "Con gái Chủ tịch PNJ bị VNDirect bán giải chấp, thị giá rơi về mức thấp nhất 9 năm",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Fili.vn. Cập nhật ngày 2026-10-11.",
+        "title": "Đọc gì trước phiên giao dịch 12/10?",
+        "summary": "Bản tin phân tích về PNJ từ nguồn MoneyF. Cập nhật ngày 2026-10-12.",
         "category": "disclosure",
         "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-11",
-        "source": "Fili.vn",
-        "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQTllGM0cyMVNlQVFjdEsySThaOTBDSGljTDcyR25yRmdjWGtLT3dySEtqWHhtQldUdkFvTEVaQmJiLUhHT0FVeXJlMU1oSGV5Skd3ODU5ekd5VHVxcktHU2ZnazRkSFdXZ0M1c0JxeVgwSzZBMWdGcEloNHQ3Unk3b3ZOZGJuR0lkc2R4dU1SY0NCazJ4ZTJnZHREcFVSWWF0S2Y5UGt5aHpkdkF0NEJaeHJtT205NmtrR2hpaGRB?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
+        "date": "2026-10-12",
+        "source": "MoneyF",
+        "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBsYVBEcmpNM3FxbmpYZWZ1ME0zUDhTYlRoSUpUNmxzTHdXUzVFdkc2X3JKNEMyNE44WmM3blV0ZmNraldCTXc0ODBGLWpYSlpsZEVaekpYRkRDbFZtbGZUNk1fNm5RZFhpdTluNA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
         "id": "news-PNJ-3",
-        "title": "PNJ (PNJ): Công ty chứng khoán bán giải chấp cổ phiếu của con gái Chủ tịch để thu hồi nợ",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-10-11.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "title": "Câu chuyện PNJ: Từ “viên kim cương” đến “hòn than nóng”",
+        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-11.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
         "date": "2026-10-11",
-        "source": "Báo Pháp Luật Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQWFBmcUd4aVZXZTdlejhpbFZZWExKYnZJVVpCS3FudUNWaWNsMTR6UUsyX3g1dGdhRlJlSjBDdnRQMWJUaXktN3VVd2hZY3dhdl84akZrTlVlT1lIdEZVa25QQVZuVGsyR2hvTjNOWHpTNEZBa09lTllDblVCcGQ5ZFpXSi1EMjZrZ1FZUnRzSGd6WGt3dDRkeER5SkhidmM3WHZmUkJUVVozZEF6bUxzeWhRQW5FTUwzaWN4R2lDTU4?oc=5",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOaVNiYlJxODItdjhJQUlxS0dxLWlIOUFwRkZyWWViZDVTQVFlUTFySXJzLWFSSldXLWlVMGdhN1RYbmhKeTRvYkMzY1lfNllBMi1UYjBjWm81WHNsS1pFYzgxUUlwYVlPcld5QVdERUhtbU01emg2aml2NXFRRF82WWxtMXlVTlgyclBTZEoxbm1jMWc?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -1583,13 +1565,13 @@
       },
       {
         "id": "news-PNJ-4",
-        "title": "Câu chuyện PNJ: Từ “viên kim cương” đến “hòn than nóng”",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Nhịp sống thị trường. Cập nhật ngày 2026-10-11.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
+        "title": "Con gái Chủ tịch PNJ bị bán giải chấp gần 3 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Dân Việt. Cập nhật ngày 2026-10-11.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
         "date": "2026-10-11",
-        "source": "Tạp chí Nhịp sống thị trường",
-        "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOOXExaXpqU0tlMlhHZUJrNmFmV08ta05CVU8wMTZhQnNYd3JDZUJRSEd5aWI3dlhwVzA3RHFkcGpTLXVBSjFiVWhHV1h6alhPNjJ6VWZaei0zUG1OZEFDaW8zbTItTi1lMHF2M2U0U243Z3BVWlFJTHlxd0F6NE9PQVNGQVZ6ZjFzSjRJcjVB?oc=5",
+        "source": "Báo Dân Việt",
+        "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxORlZpNmZQbjROTHRlR2NHR3FpSmxtTkt0S1VEaURxbTNvYTFoTHVIeWpLOHJ5NGRDaVBqZEVJWjhTdlpLNm1BQjZ2QkUtWWxlLVkxdHZoZnlPWnBNek9LQzVyTnRFNzJsMU9aU2FvRFJ0d0JIaDhrV0RJeGhVWnpPREs5VXpNczhwUGtfQUZYcjV6b0NlRWNic1FyUm92Zw?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -1612,12 +1594,12 @@
       {
         "id": "news-PNJ-6",
         "title": "Con gái bà Cao Thị Ngọc Dung bị bán giải chấp gần 3 triệu cổ phiếu PNJ",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-10.",
+        "summary": "Bản tin phân tích về PNJ từ nguồn VnExpress. Cập nhật ngày 2026-10-10.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-10-10",
-        "source": "Báo Tuổi Trẻ",
-        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPZ19PM1cyV0lEbjBCSjVIaWNuenFKXzR5Sk1BOWxleEUwVDJ5Y0tWTnB1NzI1VzJvdW5DeDAwcm10bVVyZkZ3bTE3TEswY0FsbXpKeElha1NjdjRCN2dLZEljTWxsanJCQnYyeFJWeTdubE15QXgxUFRUUWowOEQ1MXdsUkhhNnY5bnVSb1k1bUI2UURKa05QN3JHbndiMGJVZEFjb3hETjIyTTBxYXk0d3RR?oc=5",
+        "source": "VnExpress",
+        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOYVpoRUJTeXlnQkw4Y2lzaFYxeGpaLXJvRlVuMjFsVG1TSUVGUWdjSi1GQ3I3MDR6Y05RQmdBbHZZbDVoM1poUHVaRm5oQldNSHpGYXJLOWxvYWhzUzBha0hMR3lkenY3WW13d1FVVnNJYXhqVEFCcjROajlBZVBVVjAzOTA5OG1rZUI1VHE1WVBHUDAxX2RCRm85VmZvbDU5V2ppUUM0d2g?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -1681,48 +1663,6 @@
       },
       {
         "id": "news-PNJ-11",
-        "title": "Cổ phiếu PNJ tăng kịch trần, Novaland ngược dòng",
-        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-09",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPYmNoZ0RXZkhVQVhrY1NRNnNZYU5wamdCMjgwNFIyRnlLX1FkWktOeWFKZFRndGMzUTZ5ejc1a1FZSHk3bEN5Rk9YdVNMQy1rTXd2bXBhWHhabnd5dEN1T3ZGVjVyaXZFM3VTQU9teVZacTNaTGtIcHJBLVlRck11UTYwb3FtdDhpaFFXSkRnZjI?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-12",
-        "title": "Giao dịch chứng khoán sáng 9/10: Thị trường vẫn giảm, cổ phiếu PNJ được giải cứu",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-09.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-09",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOQkw0RG9NYWR6eFN6OVQyb2w1VkNVazQ1QmRsZUpEeUVYTGZOTWdkM0ZSdElKNFluRHRSblpRQ0l0anJfbjRJX0tRU2I0UWpFT3NRU3AydDdFcVFFOGc5N2pXRHJyM3FjeDd2WDdna0JrOHRsRXVFdk5GbXM2SmlPSmxTWHdZbTc5ZUNHcjFwNmxpYTh1MHZnX0lrRWwtRW1OYWExUE5SWVhGd2FlOFFZNmx0bmFkWEhoUVlpTThLS1AxcUZ3ekHSAcIBQVVfeXFMTWRWaFRUYTB5Zmk4MWVyejdQQmpKTC1KTm9Ga1BVSm42STRyN0J2Y25VNVZLaUJqU1g0NkhkWEFqS3dkQ0NPM3FsTlR1M19HZHkzOGowck92U0RoOVY2SFl4TExuWURUZ0dkS2JKY2dRak9FUVY4Wk02dTd4MjUwcC1BZlFvWG15WlRGMXZkb2w0a2pOZTUyT0RMTTNFQk5NUTlCRGZ1dzFNLVNnSm51czVBWmR1WENxaTRSdXUwdFRLUGc?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-13",
-        "title": "Cổ phiếu PNJ bất ngờ có sắc tím sau chuỗi ngày \"dò đáy\"",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-09",
-        "source": "Laodong.vn",
-        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOeEQ4MV83THgzcmRsaW1BalJOVHpZUW8tbWctQ1NiX0JWX3l4Zi1OY2V3UVFoRVJoeUd4OGxjX01DX0ViLTk4NmZZWE5SQmEtOGpKX2wtWUZkdmkyelBrQzh1bl9SMVl2cGxPLVppdFBPSjAyOUxlMkdOWnBWVzlleVM0MS1pR0tNc3plczYtTjRGaEJvWXhpWkVLVQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-14",
         "title": "Cổ phiếu PNJ bật \"tím\": Tín hiệu phục hồi hay hiệu ứng nhất thời từ kết quả kiểm định?",
         "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1736,16 +1676,58 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-15",
-        "title": "Sau 13 phiên giảm, giá cổ phiếu PNJ tăng trần phiên sáng 09/10",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Vietstock. Cập nhật ngày 2026-10-09.",
+        "id": "news-PNJ-12",
+        "title": "Tăng Trần Sau Thời Gian Giảm Sâu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn VnBusiness. Cập nhật ngày 2026-10-09.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-10-09",
-        "source": "Vietstock",
-        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQa29aT29KTUpPVGlfM21iVms4UE1TbGNtaENBMlhFZUZHbWRUQVpWdWx5S2FSeE9LQkJ3SU1xNXlDT0FGWHczaWJuNk1fSTk4SHlHTU1LZkd2STJNWFZrOUV2UWJqZEs5a0d1SlBDcmx3d2pIN3RNMko3VkhoeThrMTFpV0RrakhTMURPQ3hCcGtQVUxfWTF5ODVtMm5fLUcxa0VMR3pRYng?oc=5",
+        "source": "VnBusiness",
+        "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNazNMUXJtcHAtTXdmTm4yci1sbVJlR0kwZHF3RkcydmNHTWEyZWdNcFNyNXA2Q3hPVkpkYW5MNkdyb25vYUhISm4yNVM1ZGRwWDlDZzc0MXQ2RHotMHZ1Zmt6VUVVZ01uaEZhdk9JQ2NnSno0X3piVFZTLV90QzRxckR2bkNzazV4Nm1Fc3piYlJNWEwxQlVSaQ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-13",
+        "title": "Cổ phiếu PNJ bất ngờ khoe sắc tím sáng 9/10",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Nghệ An. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "Báo Nghệ An",
+        "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPb09WenF3cFlpei1WS2JfSlZ3RmIwT0hoWW5ZRWF0bzBuQVdlTG5hT2NGTkZITTRUMnVXX0R0a1JmY3hHT1NUcGs5TkVtTHIwQnVSbTdLQnNPNXJXMkxGUXpLRkctZVJPNHdKYl9ESEswQ1RfeHpwcVBNNmxKMk4zM3kzXzg?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-14",
+        "title": "Cổ phiếu PNJ bất ngờ có sắc tím sau chuỗi ngày \"dò đáy\"",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "Laodong.vn",
+        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOeEQ4MV83THgzcmRsaW1BalJOVHpZUW8tbWctQ1NiX0JWX3l4Zi1OY2V3UVFoRVJoeUd4OGxjX01DX0ViLTk4NmZZWE5SQmEtOGpKX2wtWUZkdmkyelBrQzh1bl9SMVl2cGxPLVppdFBPSjAyOUxlMkdOWnBWVzlleVM0MS1pR0tNc3plczYtTjRGaEJvWXhpWkVLVQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-15",
+        "title": "Novaland, PNJ đồng loạt tăng trần, Quốc Cường Gia Lai bật mạnh sau thông tin liên quan bà Nguyễn Thị Như Loan",
+        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxNRmwyVm5pYV9EcTNSTVQyLXdBQ2dPRk9lNk5QcXM1M0RfeW9CUXZBRTRxUFF2a1gtZGNtUUZlak13SEE4N3VfYTBnZEVBa2U4aVc5OUlUMUxVTzhsSjZLRklPaGFva29IbjhRa1FnY3daVWgyaV93S2N6NnZ1d1RLWWJweUlXUTJva1NnUjk1aUZEQ0pzWnZtWDNuYzZYS0owQXpuYU5kUFFNek81dWhIeHN0RlMyUmhpNHBwOUdwSmlLQWlPMEtCdkFsWlE2ZDEzNmswaHdfYW9rRUt4Q0p2dA?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -1793,20 +1775,6 @@
       },
       {
         "id": "news-PNJ-19",
-        "title": "Novaland, PNJ đồng loạt tăng trần, Quốc Cường Gia Lai bật mạnh sau thông tin liên quan bà Nguyễn Thị Như Loan",
-        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-09",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxNRmwyVm5pYV9EcTNSTVQyLXdBQ2dPRk9lNk5QcXM1M0RfeW9CUXZBRTRxUFF2a1gtZGNtUUZlak13SEE4N3VfYTBnZEVBa2U4aVc5OUlUMUxVTzhsSjZLRklPaGFva29IbjhRa1FnY3daVWgyaV93S2N6NnZ1d1RLWWJweUlXUTJva1NnUjk1aUZEQ0pzWnZtWDNuYzZYS0owQXpuYU5kUFFNek81dWhIeHN0RlMyUmhpNHBwOUdwSmlLQWlPMEtCdkFsWlE2ZDEzNmswaHdfYW9rRUt4Q0p2dA?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-20",
         "title": "PNJ bất ngờ \"cháy hàng\"",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1820,7 +1788,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-21",
+        "id": "news-PNJ-20",
         "title": "Từng thắng lớn với dầu gội X-Men, ông Phan Quốc Công đang tạm lỗ 16 tỷ đồng tại PNJ",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1834,49 +1802,21 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-22",
-        "title": "Em trai Chủ tịch PNJ đã bán 9 triệu cổ phiếu bất chấp giá giảm sâu",
-        "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-08.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-08",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOLXRFZnVfaXpEbHBNcXc4SlpIWGFLT2FhSEVHWG45VF9MOW9WRjJzTl91blZsckFUR2w3LXdST1REamhDMXVtLVRuV3pkOVFRaHJMUkFjUkRaSU8wRnp6ZlhmdUhKZV9jU1hwYUZuVE5XNk91X28tUDVIdGhMamFRVFRiMExHenZsRnVxdVdhd0MwNXBVTzg1bEFHTUI3Ym5TenJMYQ?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-23",
-        "title": "Con gái và em trai Chủ tịch Cao Thị Ngọc Dung đã bán tổng cộng 34 triệu cổ phiếu PNJ",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-08.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-08",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNZDJ3SnJJX0RwU2JwMk9DbVVyWmhDZjlqeEVxU2oxWGFWaTQwc21jdXp6Q1Z1VHFFUDdjTXBVdjlWaHhJRDNxV2hyd2QzNkRQTi1VM2pOY240c0hvUlA0YWR6X3lfREdwM3FEakc5bVhldzZVTG5RSnVHNUlTaDFXbEZKQWdPSHUtR2RtdFRYWHZuUC0yMVdQaVNvd0U4anNDQzJmcmNWWFVZZ0VkUGlsTUxETDcxMXZFQWNCenM3cXNPVGFqNERSLXFEeVZWSGvSAcsBQVVfeXFMTUJNeFRtNXNDcGd5VjRDMmFTelRrWl9ubWNuREQtUlY0cFpwa2NMeW5fSzNQWlc1RVA1RWxCNG45bjdudzVoY1JLTS0tczZyQy1jemtvOXpsMkJNeVJ6UlpwTHluQzFocmR3d2NFbG42Q0I0ZlJvbVZyNTdMMmFPSU1xNkZPZWZWaGlmZ1BtY1Z2SXE4YlF4czVidlg3WXlrUm9YOTM0Y0NBUUg5bXVUVDl0a2NCc1hIajN3cWtRaXZuZW82QjI3c3pJTlU?oc=5",
+        "id": "news-PNJ-21",
+        "title": "Sau 13 phiên giảm, giá cổ phiếu PNJ tăng trần phiên sáng 09/10",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Fili.vn. Cập nhật ngày 2026-10-09.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-09",
+        "source": "Fili.vn",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQYkdqMWRxZ1RTTDRjcjV6SEJ4YllFYnhBUFlVV0xmRkljbXEzWHVWX19MYlI4a3U2dXA4NnVfaDMtT08yOHA3SVdDbkZEZG9uRzVKNWYtcmtYSG5mSksxUVcyYVpRRzJINzVqYnVPRVl1OXByMUs4OTJxR0RGVlZyQVBEdFhyUVVNM1ZNbmZmMkczeTFiU1JWYXVCclpfaHYxYUE?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-24",
-        "title": "Cổ phiếu PNJ hết bị bán tháo trong ngày VN-Index mất hơn 14 điểm",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Dân trí. Cập nhật ngày 2026-10-08.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-08",
-        "source": "Báo Dân trí",
-        "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQbC1CQnNRMVBOeFIzVkJqeXcwXzZvekItMlFDR19STldOaGRnRjZjeGk2dkxNay0wdUIzblRYZEZzaDhBRHNQdnUtdzhlc3B0d0lwVjl6LVU1WEZjd2FWaFoxN215TTBMT1ZIeF80a0NOWE9NbWM4dGVDcnJ3NnRfSmNiendRbUR6RUNadHMtdTBtVWNTMklodktWZTNSQkFDRzdTMlVOZF9aWTBoM1ZFcXEtQ1A4bTVOQzY4?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-25",
+        "id": "news-PNJ-22",
         "title": "Động thái mới của \"cá mập\" nước ngoài khi cổ phiếu PNJ thấp nhất 10 năm",
         "summary": "Bản tin phân tích về PNJ từ nguồn Báo Dân trí. Cập nhật ngày 2026-10-08.",
         "category": "biz",
@@ -1890,21 +1830,49 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-26",
-        "title": "Khối ngoại và người nhà Chủ tịch PNJ thoái vốn giữa đà giảm giá",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-08.",
+        "id": "news-PNJ-23",
+        "title": "9 triệu cổ phiếu PNJ được em trai Chủ tịch bán sạch trong 2 ngày",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-10-08.",
         "category": "disclosure",
         "categoryLabel": "Công Bố TT & Cổ Tức",
         "date": "2026-10-08",
-        "source": "Laodong.vn",
-        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQQS0tby1BU3pjN0ZXeWItNEdWR0V0VzR0azNQU1dXTHgwdUFKWUVsbUdzMFluMzhBc1h5c0hxX3lBRDh0TGNzcHRNWXhwUVJNLTVMbG1CTExpRVJtcXJFZnk3d2V2TGo4N1d6Y01Ydko3REdWamZheG5aWFlpVjdsQXVxX0JXdkNud05lQTE2QXpKXzNPWjFZY3RVTEZrVGhjOC1nb3JTbEM?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
+        "source": "Tạp chí Doanh nghiệp và Hội nhập",
+        "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPTzVjRVhJM045bUlhdVJZckg3SVlaUWdxTmlMT3JIOGthSTQ0QmsyNGdWU3pvczZycmI3LXhlWldlb0EyUHprMm5pRktoZ0tWMTE4bGY4VGJzd3hyaFNHMkhRcUhSbDBUUGsybi1mekdka0hPTFllQTZrWFpzYlJDZ0FrX0l4RnVEOXBQM253WF9JS3RMOGl6cU43WmFmVnZTVUZmRm02TGN5UQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-27",
+        "id": "news-PNJ-24",
+        "title": "Em trai Chủ tịch PNJ bán xong 9 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-08.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-10-08",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQWW5MYmRGMERDbHlZTHl3UEhrZDhzckFkSEtFUkNhUlVEaHBEN2liemJfMW5hV3RwdEYyUFlpZ01PTm4tcnlpVXJ3Uk9faUtxX0NKcUpQMkVNSmlleUJyVzZxbDdZbFUyNEk2Y0ZCdXNoc2d4MnNyMnRoMDJuUW0wc1FhaV9VTWk5eTZKRWt6NA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-25",
+        "title": "AIGS: 100% mẫu kim cương PNJ là kim cương thiên nhiên",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Znews. Cập nhật ngày 2026-10-08.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-08",
+        "source": "Znews",
+        "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQOUhST2xMc0xSU2p3VEhDUFFBaUlRbjRWQjRhREltVkthbndBUmVoWkw0eHVMT3ZIbTd6c3RXWVlLbmRKTFFHZUhWbG40VDlqWHJJVjlEUnJiNDFPN3NUNkY4LW9nX1RxRXdoWmFNcE1rTmR3Z2FET09YRDd5TjZxNGc1OXdIVUtMb3RNMm1B?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-26",
         "title": "AIGS công bố kết quả kiểm định: 100% mẫu kim cương PNJ là kim cương thiên nhiên",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-08.",
         "category": "biz",
@@ -1918,7 +1886,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-28",
+        "id": "news-PNJ-27",
         "title": "Cổ phiếu PNJ chạm đáy lịch sử, nhà đầu tư bắt đáy lỗ nặng",
         "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1932,7 +1900,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-29",
+        "id": "news-PNJ-28",
         "title": "Cổ phiếu PNJ ở mức thấp nhất 10 năm, lộ diện quỹ ngoại bán ròng 5 triệu cổ phiếu",
         "summary": "Bản tin phân tích về PNJ từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1946,7 +1914,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-30",
+        "id": "news-PNJ-29",
         "title": "Vốn hóa cổ phiếu PNJ bốc hơi 30.000 tỉ đồng, chạm đáy gần một thập kỷ",
         "summary": "Bản tin phân tích về PNJ từ nguồn Laodong.vn. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1960,7 +1928,35 @@
         "weight": 1.0
       },
       {
+        "id": "news-PNJ-30",
+        "title": "Lộ diện tổ chức nước ngoài bán cổ phiếu PNJ trong phiên khớp lệnh kỷ lục",
+        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-07",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOdC1pSTZRb09CVTEwclZocWVKczBTcWZaNzBMOEhDTHNfVUhYSjhrZ0FNcXQ1V3M1N2l5LVJ0VUJ3UHQ3aWdxdVZINUhDWEg3SjRLNFd3TjlTNDJrLXVSZV9VRXFvM3Z2enpYVXgzaUR4bDJpNHc4YTN4c1AySFZpc0ZoendkRGVSaHZBNHFPbnI0RmwwYkM4RmE1ZE9iLUgtaENpZXhGUG5PUXl3MTRtTW53?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
         "id": "news-PNJ-31",
+        "title": "Cổ phiếu PNJ lặp lại lịch sử sau gần 1 thập kỷ",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-10-07.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-07",
+        "source": "Tạp chí Doanh nghiệp và Hội nhập",
+        "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNdzU3X1hCRnotU0FrTm0zdmZGTmh1RzI0S0NnMzdyRVFZdDM0VW82X3RTdUduVkF5WGVBU2xVbE5HbzIzbm1TZDVZYzh6d1ZsbHFhdDBrYXVKNEdZNEVTVktJbE45Z0FzQTRSSmVKSDE4cmlSdHo1T0JodUR1ZnZCamtjNThhUEJKdklHNUxyYVlSUQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-32",
         "title": "Buồn của cổ đông PNJ: Bắt đáy lãi ngay 10%, nhưng hàng về tài khoản thì lỗ",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -1974,7 +1970,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-32",
+        "id": "news-PNJ-33",
         "title": "Gã khổng lồ quản lý 12.000 tỷ USD rời ghế cổ đông lớn tại PNJ ngay trước đại hội bất thường",
         "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-07.",
         "category": "disclosure",
@@ -1988,7 +1984,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-33",
+        "id": "news-PNJ-34",
         "title": "Hai nhóm cổ đông ngoại bán hơn 12 triệu cổ phiếu PNJ, cùng rời danh sách cổ đông lớn",
         "summary": "Bản tin phân tích về PNJ từ nguồn Người Đưa Tin. Cập nhật ngày 2026-10-07.",
         "category": "disclosure",
@@ -2002,7 +1998,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-34",
+        "id": "news-PNJ-35",
         "title": "Cổ phiếu PNJ tiếp tục bị bán mạnh",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -2016,7 +2012,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-35",
+        "id": "news-PNJ-36",
         "title": "PNJ được dự báo lỗ nặng quý III/2026 dù doanh thu gần 11.800 tỷ đồng: Điều gì đang 'rút cạn' lợi nhuận?",
         "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-07.",
         "category": "biz",
@@ -2030,21 +2026,63 @@
         "weight": 2.0
       },
       {
-        "id": "news-PNJ-36",
-        "title": "Công ty vàng bạc đá quý PNJ có 'động thái lạ'",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tin tức 24h. Cập nhật ngày 2026-10-06.",
+        "id": "news-PNJ-37",
+        "title": "Cổ phiếu PNJ lại bị bán mạnh, thị giá chia hơn 4 lần từ đỉnh",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-06.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-10-06",
-        "source": "Tin tức 24h",
-        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPZm1nTWRJMzZrUHMzZURMRkJGOXoxbXdxQVB6Ylczand4S1BaMmpUZTNqQll2RUhBZnpCR0NIT0JhWElhYnBRRFBXS2FVSXRfR1N5SWVTU29CdFlHM0ZqSmI2azM4TDhFcnVDUVBTNU1vRndBSnVmNDlOTzJVa0h0blBnNk1UZkJFUTVXWTNlWFdZSlE2Yk83RnVKdw?oc=5",
+        "source": "Báo Tuổi Trẻ",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOS296QnR5T1h3c3pQODlySHQ3Q0VYYTBHQmVSU3NsLTBnemYyc092eEZrSE1Da19BdDBiWE5HUTMzelFXU01aZjVWaXU4dVc4bkpXMnBtU1VrSlNuRllVMDZ0X0t1X3NtWFp0c1pSZ2xWVndCdE5mQmpPaFJtdUR5TFUtajUyRHRoNElhN0FHUnA2aUtRbFhMTWlhbHhWczlqaU9v?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-37",
+        "id": "news-PNJ-38",
+        "title": "Cổ phiếu PNJ chạm đáy 10 năm",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Znews. Cập nhật ngày 2026-10-06.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-06",
+        "source": "Znews",
+        "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBRRURZNzFzb29iaTI2VkxMc041Uk8xdUJqRHJUb0NFMU10TnFfamdXQkdISmJJNGlVdURaY2lzb2xwSC1QUFVLcVBjQ0FUS3JHUmc2c0ZPUWgxY2pzdWhnSjdXTUkxZTRYaUxfY3ZyRQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-39",
+        "title": "Vụ án kim cương được làm rõ, cổ phiếu PNJ vẫn 'thảm' nhất gần 1 thập kỷ",
+        "summary": "Bản tin phân tích về PNJ từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-06.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-06",
+        "source": "nguoiquansat.vn",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPeExlOVdRbWh3Vk83YmhRdHdCYUFNcjFkd0kyWFhrZ3hRSnEybTdZWHpvUzVySHNmVC12NGYtRkpWeTI2eDFfYmVST3pscTItbTFBYW9DdDBweWZIejUyenN3TTJlcWg5OFdsYVJxTWNISFlZSzlfQ1NQWHljQjlxM0RTNUFKUjZGSnBBTnUwdW1WZTZrWDhsbmVNUlE1RjN2bDJXLXpkSQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-40",
+        "title": "Công ty vàng bạc đá quý PNJ có 'động thái lạ'",
+        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-06.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-06",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOUkJwZFgtTHMtZ3lVd2w1TkNjYzhVQnhMMFAxVWhVMHNaTUhqLXMxcDNoWkNEV253NVJWbkpodmZZdUhKLUFuMjR2ZjBvS04ySWc3bk5IUkNrQnNEai1zMlVzN3JlUlllaC1PVWlKNWFxYkdHeGwzVU1jaVloWktQZUhacW9MaFowd2c4?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-PNJ-41",
         "title": "Buồn của nhà đầu tư “bắt đáy” PNJ",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-06.",
         "category": "biz",
@@ -2058,21 +2096,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-38",
-        "title": "PNJ liệu có hoàn nhập được khoản dự phòng 7.071 tỷ đồng?",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-05.",
+        "id": "news-PNJ-42",
+        "title": "Cổ phiếu PNJ giảm sàn 5 phiên, công ty giải trình nguyên nhân",
+        "summary": "Bản tin phân tích về PNJ từ nguồn VnEconomy. Cập nhật ngày 2026-10-05.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-10-05",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPZXppV044aXNDSk8tRjgwMU01U0Vkdm4wcVN0VGxleGFsVnlPZTVoLU1pNVcyS1dCTDRiVEdjYjg5bWJhUFFiajRrZmc1NjZjWkQ2eFZ1bFVLdzZYc1VIVHhGeHMzZm53T29XZnRERUp0QnhZNGYzRDM3cU1CMTNlZGxXQU03Z1BHdXpQUVZNQ20xX0NVZWQzbDhldG5kaHAyT3ZpbDBJMNIBowFBVV95cUxPVTh6U2J2aHZXVkE1VHkxWUNOeVJpZ3UxeUF0ME93elNaWl9fMGlGRk1EN09UYnhPcnFxbmpxVjlydnpPVktVdkZSck5lR0pmeFJrSktTcmNNQTN0Nkpjbmh3eXVvUHc0LVQ3NThPNzN5dGpwOTJvLVVwa3ZLdFRyX2Q5REVRQUhCcUhkNUtrSzA4anhldzBsZjh1cGhZSVlMR1pN?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
+        "source": "VnEconomy",
+        "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQa1BPZURCVkVaUEpUUGhlS2IzdGpZZi0zbzYwMmNsdUgxajJhQkFBTE1LR3pPU2dZQ0RSaElBWFU3RldPOXR2S0s3NTkwX3dtSDBPaldmNzUzWm9GUHRtbGJLc0VyeFRFVGxMRTA2c0ZBUW9oemdCYjV6STdleEt3YkpsejA3enNlc3JVMFdB?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-39",
+        "id": "news-PNJ-43",
         "title": "PNJ nêu lý do khiến cổ phiếu giảm sàn 5 phiên liên tiếp",
         "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-10-03.",
         "category": "biz",
@@ -2086,7 +2124,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-40",
+        "id": "news-PNJ-44",
         "title": "Phép thử với cổ đông tại PNJ",
         "summary": "Bản tin phân tích về PNJ từ nguồn Fili.vn. Cập nhật ngày 2026-10-01.",
         "category": "biz",
@@ -2100,7 +2138,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-41",
+        "id": "news-PNJ-45",
         "title": "PNJ phát hành riêng lẻ tối đa 550 triệu cổ phiếu, điều chỉnh chính sách thu mua",
         "summary": "Bản tin phân tích về PNJ từ nguồn baodautu. Cập nhật ngày 2026-09-30.",
         "category": "macro",
@@ -2114,7 +2152,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-42",
+        "id": "news-PNJ-46",
         "title": "PNJ lên kế hoạch phát hành cổ phiếu riêng lẻ, cổ đông đối diện nguy cơ \"pha loãng\" tỉ lệ sở hữu",
         "summary": "Bản tin phân tích về PNJ từ nguồn Bloomberg Businessweek Vietnam. Cập nhật ngày 2026-09-30.",
         "category": "disclosure",
@@ -2128,63 +2166,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-PNJ-43",
-        "title": "PNJ muốn chào bán riêng lẻ tối đa 550 triệu cổ phiếu",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Mekong ASEAN. Cập nhật ngày 2026-09-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-30",
-        "source": "Mekong ASEAN",
-        "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQMjBNSDM3RnZQTWVCRzRab3piLVRHR0Y2a0VBYkpsU2pfSXRhRjFfc19DTU9odE9YbXd3clRiWDFzRVZnT2tLUEVvOTBXakFWbFBQT2tqUG9yVXh2QV9NMHlaM1RSYVpjV0E5LVBqa0hpdEhoTWtHemxiV2FmZ1puVkZSbXhCdUhBZzJaWjRLVQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-44",
-        "title": "Giảm sàn phiên thứ 3 liên tiếp, PNJ muốn phát hành riêng lẻ tối đa 550 triệu cổ phiếu",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Baodautu.vn. Cập nhật ngày 2026-09-30.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-09-30",
-        "source": "Baodautu.vn",
-        "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPQ19HQWc1VUhzcnJNRWY4eHZ2YlVsaTR0ZFpqbGtPcFBpREx1dlBUTE9sOVRnSjZxeG5FbFNFajduazgtT3BiMHg1czhPMDlScHJDOGxkUU5vS1d4N3JYam12S0ZZalJldU4xZlpiaVZDOHVDVzZiSHlxTEFDVTBWMFQtdk15TklCSDBVd0tITHo5Vk1BYVhSMGwxaXNCYjBqN041WVdVT0lvcVV3aUJnYXAtQ2dBc3gy?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-45",
-        "title": "PNJ muốn phát hành thêm 550 triệu cổ phiếu, cao hơn cả số lượng đang lưu hành",
-        "summary": "Bản tin phân tích về PNJ từ nguồn VnEconomy. Cập nhật ngày 2026-09-30.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-09-30",
-        "source": "VnEconomy",
-        "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBQekt6OUlKYkVlWlRZYnctd2lKQUpGZk9tQUtweEZoOTBiLUFxVmhZcF9COE1PQ3B3SmZVZmhlWlhvdmgzUFNVc185R0I1R1RvM01yelBaVTlfQ1hIdG5CTjlTUWk1bGNGV0lDb19nZ2trY0RZdGc?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-PNJ-46",
-        "title": "PNJ dồn dập tin cải tổ, cổ phiếu vẫn liên tục giảm, 30.000 tỷ vốn hóa đã mất",
-        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-09-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-30",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPUmlidnpDSUZDMWZIWm5FcHdLT3MxMjNpajRmOGNPeHZzYmstajRVTVExaUJNWVlydnBMUWFKdGx6RW45aUZfY25JTlFEQnRxUGk3S29wa2pZdGdJWW80dF9XdFJDa0dIUTdNUDRpWmRsN2V1d1FZeTVQbjRMaDJMMlBfRDBIdExvQTFTbS1XOXBFa0NtcENhVmdWYTd1TDRpZDZJLWlSemEzLUZyQzNOcDJ5dw?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
         "id": "news-PNJ-47",
+        "title": "PNJ lên kế hoạch phát hành riêng lẻ 550 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-09-30.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-09-30",
+        "source": "Thời báo Tài chính Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNRVlyZm9ZbHNreVdOUllmN21DWEw2UVg2YU81WmttZXQtZlI0MWwzZWM5U1Mzdk9MRVJUaWZfbmtHRTNzRk56MzFLS3h2U0NqTmpPQjNzam9xZkNoaVJxbG10RFZiUENJTVoxYnluX0RlUDZvUm94WHZJcmpEbmFzYnBnV0ZHa3dnVG91eU1zbzA3YnlROFJxNnhxQ0hKYlh6V2c?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-PNJ-48",
         "title": "PNJ trình phương án phát hành riêng lẻ tối đa 550 triệu cổ phiếu",
         "summary": "Bản tin phân tích về PNJ từ nguồn VietnamFinance. Cập nhật ngày 2026-09-30.",
         "category": "disclosure",
@@ -2198,67 +2194,53 @@
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-48",
-        "title": "Động thái mới nhất của PNJ khi cổ phiếu liên tục bị bán tháo",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Báo Dân trí. Cập nhật ngày 2026-09-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
+        "id": "news-PNJ-49",
+        "title": "Giảm sàn phiên thứ 3 liên tiếp, PNJ muốn phát hành riêng lẻ tối đa 550 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về PNJ từ nguồn Baodautu.vn. Cập nhật ngày 2026-09-30.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
         "date": "2026-09-30",
-        "source": "Báo Dân trí",
-        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxONzFtQ19kSjNFT2JpcVRqVWQxUWVCZjh5WVRmU1pUV3ZDTHhZYjhyQkxuQnU4SGZOWVZXb1QtSkVLRzY3WkkxODIzUWFhTVpOaFhabHozZlYtX3kxUWQyWldwYXp1VXlsbkpTN184ZEtmai0tdjQ5VlFEN0hTVnBrNTMwbzlmT01paU55aS1VNGZ5M194dHJCR1BvQUhxOUlMckpsNzM2NlJMM1NSdzdVTUx2cXAxZw?oc=5",
+        "source": "Baodautu.vn",
+        "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPQ19HQWc1VUhzcnJNRWY4eHZ2YlVsaTR0ZFpqbGtPcFBpREx1dlBUTE9sOVRnSjZxeG5FbFNFajduazgtT3BiMHg1czhPMDlScHJDOGxkUU5vS1d4N3JYam12S0ZZalJldU4xZlpiaVZDOHVDVzZiSHlxTEFDVTBWMFQtdk15TklCSDBVd0tITHo5Vk1BYVhSMGwxaXNCYjBqN041WVdVT0lvcVV3aUJnYXAtQ2dBc3gy?oc=5",
         "sentiment": "bearish",
         "sentimentValue": -1,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-PNJ-49",
-        "title": "PNJ lên kế hoạch phát hành tối đa 550 triệu cổ phiếu riêng lẻ",
-        "summary": "Bản tin phân tích về PNJ từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-09-29.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-09-29",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNaHoxMDNLMDM4VGFocHFUME1TU3NReEU1Mk1kOXhoaGVhSTVjdXBZaG9vRmZReVVvSHp0OVdBR0pWU25EWnFQOTJlSE9KYWdXNlF2U1lHYTktbVlZd2s2MHRMV2pNVmlHLWg1SENDOVZhS2dzLVExYkd3RWw0SmpSSU1YNFFwdXgydHRJMEZranF1UU1BUHQ3dTNiamxUOEltZUtBUDhwWVFocVZZUEd2RtIBrAFBVV95cUxQdXEyYWNhUVV6akRtY2w3ZkxmUkVOdmhKQVdKS3RhVjhLZUV4ZHNVNUQyajRXWS04YlZxdjNRemRwczNfYjMtNlc5Qi05MW1ySldnNmFnWnJPYmpURFg3THNGTzBvSWVJZktySG1EYklabFR4Y2JWTDNiX0FyMWtnTWtuemIxM3gzTFQ1SFgycmZ4R0tXTDhSNUFEYVM5MC1WM2t4OGlUTzJFMkdu?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
         "id": "news-PNJ-50",
-        "title": "PNJ báo lỗ 2 tháng đầu quý III, dự kiến đóng 25-30 cửa hàng",
-        "summary": "Bản tin phân tích về PNJ từ nguồn baodautu. Cập nhật ngày 2026-09-29.",
+        "title": "PNJ dồn dập tin cải tổ, cổ phiếu vẫn liên tục giảm, 30.000 tỷ vốn hóa đã mất",
+        "summary": "Bản tin phân tích về PNJ từ nguồn CafeF. Cập nhật ngày 2026-09-30.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-29",
-        "source": "baodautu",
-        "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQMG01YlVBbzdTSFlJMHZMdXd3SVNRVVFUMlgzSkwxMldQR2tUNW93OWpaZ3ZsckxVcHZCWUZGZWgwNTdTR0ZkRzVpWFVEdnVqd3NfbjQ4YTQ3NzRIbFpBd3VDalREVGtKcTB4dG9hTDQySjM2TXUwZ0I4aFNTVGx0MEhFRXoxRHlqQXZ4dG50VUtyY3hnT0E?oc=5",
+        "date": "2026-09-30",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPUmlidnpDSUZDMWZIWm5FcHdLT3MxMjNpajRmOGNPeHZzYmstajRVTVExaUJNWVlydnBMUWFKdGx6RW45aUZfY25JTlFEQnRxUGk3S29wa2pZdGdJWW80dF9XdFJDa0dIUTdNUDRpWmRsN2V1d1FZeTVQbjRMaDJMMlBfRDBIdExvQTFTbS1XOXBFa0NtcENhVmdWYTd1TDRpZDZJLWlSemEzLUZyQzNOcDJ5dw?oc=5",
         "sentiment": "bearish",
         "sentimentValue": -1,
-        "impact": "Rất cao",
-        "weight": 2.0
+        "impact": "Trung bình",
+        "weight": 1.0
       }
     ],
     "sentiment": {
-      "score": -30.4,
-      "verdict": "BEARISH",
-      "verdictText": "Tiêu Cực (Áp lực tin tức kém khả quan)",
-      "verdictBadge": "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
+      "score": -16.1,
+      "verdict": "NEUTRAL",
+      "verdictText": "Trung Lập (Thông tin đan xen hai chiều)",
+      "verdictBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
       "bullishCount": 6,
-      "neutralCount": 26,
-      "bearishCount": 18,
+      "neutralCount": 32,
+      "bearishCount": 12,
       "totalCount": 50,
       "categoryScores": {
-        "disclosure": -33.3,
-        "biz": -28.9,
+        "disclosure": -8.3,
+        "biz": -17.1,
         "analyst": -50.0,
         "macro": 0.0
       }
     },
     "tldr": {
       "title": "PNJ 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Dòng tin tức 30 ngày gần nhất của PNJ chịu áp lực điều chỉnh với 18/50 tin tức tiêu cực. Vấn đề gây quan ngại chính là: 'Con gái Chủ tịch PNJ bị bán giải chấp gần 3 triệu cổ phiếu'. Nhà đầu tư nên thận trọng quan sát các chuyển biến về biên lợi nhuận và thị trường chung.",
+      "summary": "Bản tin 30 ngày của PNJ ghi nhận sự cân bằng giữa các yếu tố cơ bản và biến số vĩ mô. Tổng cộng có 50 sự kiện và tin tức được ghi nhận. Sự kiện nổi bật nhất: '1 phút trước giờ giao dịch phiên 12/10: PNJ bị bán giải chấp, lãnh đạo SHB muốn gom gần 4 triệu cổ phiếu'. Tâm lý thị trường nhìn chung ở trạng thái trung lập chờ tín hiệu rõ ràng hơn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2272,13 +2254,13 @@
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "-30.4",
-          "type": "negative"
+          "value": "-16.1",
+          "type": "neutral"
         },
         {
           "label": "Trạng Thái Chủ Đạo",
-          "value": "BEARISH",
-          "type": "negative"
+          "value": "NEUTRAL",
+          "type": "neutral"
         }
       ]
     }
