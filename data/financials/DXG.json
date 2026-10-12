@@ -309,9 +309,9 @@
       ]
     },
     "valuationTraps": {
-      "trapScore": 2.5,
-      "trapLabel": "TB",
-      "trapReason": "Book Trap (ROE thấp hơn Chi phí vốn CoE)",
+      "trapScore": 0.0,
+      "trapLabel": "THẤP",
+      "trapReason": "Không phát hiện bẫy định giá",
       "isCapPenalized": false,
       "trapsList": [
         {
@@ -323,7 +323,7 @@
         {
           "id": "book_trap",
           "name": "Book Trap",
-          "active": true,
+          "active": false,
           "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
         },
         {
@@ -2427,7 +2427,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-23",
+        "id": "news-DXG-21",
         "title": "Nhóm Dragon Capital bán ra 2,6 triệu cổ phiếu Bluemarq Group (DXG)",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-06-17.",
         "category": "disclosure",
@@ -2441,7 +2441,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-24",
+        "id": "news-DXG-22",
         "title": "DXG tăng vốn lên gần 12.700 tỷ đồng: Vì sao cổ phiếu vẫn chưa thuyết phục dòng tiền?",
         "summary": "Bản tin phân tích về DXG từ nguồn diendandoanhnghiep.vn. Cập nhật ngày 2026-06-05.",
         "category": "biz",
@@ -2455,7 +2455,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-25",
+        "id": "news-DXG-23",
         "title": "Cổ phiếu DXG mất gần 20% trong nửa tháng, vì sao vẫn được khuyến nghị MUA với kỳ vọng tăng hơn 32%?",
         "summary": "Bản tin phân tích về DXG từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-06-04.",
         "category": "analyst",
@@ -2469,7 +2469,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-26",
+        "id": "news-DXG-24",
         "title": "DXG tăng vốn lên gần 12.700 tỷ đồng sau đợt chia cổ phiếu thưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-06-04.",
         "category": "disclosure",
@@ -2483,7 +2483,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-27",
+        "id": "news-DXG-25",
         "title": "Cổ phiếu DXG bất ngờ giảm sàn",
         "summary": "Bản tin phân tích về DXG từ nguồn Laodong.vn. Cập nhật ngày 2026-05-20.",
         "category": "biz",
@@ -2497,7 +2497,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-28",
+        "id": "news-DXG-26",
         "title": "Cổ phiếu DXG “lau sàn” dư bán gần 5 triệu cp",
         "summary": "Bản tin phân tích về DXG từ nguồn Fili.vn. Cập nhật ngày 2026-05-20.",
         "category": "biz",
@@ -2511,7 +2511,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-29",
+        "id": "news-DXG-27",
         "title": "DXG chốt quyền nhận cổ phiếu thưởng 14%, tăng vốn lên gần 12.700 tỷ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Tạp chí điện tử Thương Trường. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2525,7 +2525,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-30",
+        "id": "news-DXG-28",
         "title": "DXG chốt quyền phân bổ 155,7 triệu cổ phiếu thưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2539,7 +2539,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-31",
+        "id": "news-DXG-29",
         "title": "DXG chốt phát hành gần 156 triệu cổ phiếu thưởng ngay sau màn “thay tên đổi họ”",
         "summary": "Bản tin phân tích về DXG từ nguồn 24HMoney. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2553,7 +2553,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-32",
+        "id": "news-DXG-30",
         "title": "Vừa đổi tên, Bluemarq (DXG) đã dành hơn 1.500 tỷ đồng phát hành cổ phiếu trả cổ tức tỷ lệ 14%",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2624,6 +2624,20 @@
       },
       {
         "id": "news-DXG-37",
+        "title": "Đất Xanh (DXG) báo lãi quý I/2026 tăng 173% lên 214 tỷ đồng, lộ diện 'gà đẻ trứng vàng' mới",
+        "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-05-04.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-05-04",
+        "source": "nguoiquansat.vn",
+        "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPX2FZZWtSUGxMNjN5SnpsRnlNRnZfTWx5MzU5cVRjX3dSdnJZcE82YnNVY1ZySEZVWXRRSzZ5VUU2VERXT3k2eXpUYlFpZG9zZ3VhWXZ6WDJrUklRVWxEQ2Qwa25vQWpIWk5ZQkZDUVJtVUs5OGdjN3Z3T01ITUJDbXFEUjJvZGROTjB1VUJGbFdoQmZ0bGExM0lSY3ROWjBHZHJaZmpXTXdJYUdiVDJldUFFYkJlU3hVOGNOUlFR?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-38",
         "title": "Nhờ đâu lợi nhuận quý 1/2026 của Đất Xanh gấp gần 3 lần cùng kỳ",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-05-03.",
         "category": "biz",
@@ -2637,7 +2651,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-38",
+        "id": "news-DXG-39",
         "title": "Đất Xanh đạt 80% kế hoạch lợi nhuận năm sau quý 1, cho vay bí ẩn hơn 3.3 ngàn tỷ",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-05-01.",
         "category": "biz",
@@ -2651,7 +2665,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-39",
+        "id": "news-DXG-40",
         "title": "Tập đoàn Đất Xanh (DXG): Hoàn thành 80% kế hoạch lợi nhuận quý I/2026, xuất hiện khoản cho vay hơn 3.300 tỷ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-05-01.",
         "category": "biz",
@@ -2665,7 +2679,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-40",
+        "id": "news-DXG-41",
         "title": "Tổng Giám đốc Đất Xanh bán toàn bộ cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-04-30.",
         "category": "disclosure",
@@ -2679,7 +2693,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-41",
+        "id": "news-DXG-42",
         "title": "ĐHĐCĐ Đất Xanh (DXG) 2026: Đặt mục tiêu doanh thu 5.000 tỷ, tái cấu trúc cho chiến lược tăng trưởng bền vững",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-04-17.",
         "category": "biz",

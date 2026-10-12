@@ -683,11 +683,11 @@
       "recommendText": "Bán",
       "recommendColor": "text-rose-400 font-medium",
       "beta": 0.71,
-      "techScore": -1,
-      "techScoreVerdict": "Kém (Moderate Bearish)",
-      "techScoreColor": "text-rose-400 font-semibold",
+      "techScore": 0,
+      "techScoreVerdict": "Trung lập (Neutral)",
+      "techScoreColor": "text-gray-400",
       "factors": [
-        "Đồng thuận kỹ thuật TradingView: Tiêu cực",
+        "Đồng thuận kỹ thuật TradingView: Yếu",
         "Thị giá ở vùng đáy 52 tuần (Vùng giá chiết khấu)"
       ]
     },
@@ -1018,9 +1018,9 @@
         ]
       },
       "valuationTraps": {
-        "trapScore": 2.5,
-        "trapLabel": "TB",
-        "trapReason": "Book Trap (ROE thấp hơn Chi phí vốn CoE)",
+        "trapScore": 0.0,
+        "trapLabel": "THẤP",
+        "trapReason": "Không phát hiện bẫy định giá",
         "isCapPenalized": false,
         "trapsList": [
           {
@@ -1032,7 +1032,7 @@
           {
             "id": "book_trap",
             "name": "Book Trap",
-            "active": true,
+            "active": false,
             "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
           },
           {
