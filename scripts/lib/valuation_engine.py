@@ -4,7 +4,7 @@ Hệ thống Động cơ Định giá Doanh nghiệp (Enterprise Stock Valuation
 dành riêng cho Thị Trường Chứng Khoán Việt Nam (HOSE, HNX, UPCoM).
 
 Nâng cấp toàn diện kế thừa từ chuẩn định lượng ref-best-valuation (FAM v11.4P & Valuation Library 20260808):
-1. 10 Mô hình Định giá Định lượng Độc lập (Graham Normalized, P/E Median, Gordon P/B, Multi-Stage DCF, DDM Fade, FCFF, FCFE, RIM/EVA, RNAV BĐS, EV/EBITDA & EV/Sales)
+1. 10 Mô hình Định giá Định lượng Độc lập (Graham Normalized, P/E Median, Gordon P/B, Multi-Stage DCF, DDM Fade, FCFF, FCFE, RIM/EVA, Book NAV / P/B Chuẩn Hóa, EV/EBITDA & EV/Sales)
 2. Ma trận Trọng số 23 Phân Ngành TTCK Việt Nam & Bộ lọc Ngoại lai Outlier Filtering (±60%)
 3. Bộ Nhận diện 7 Bẫy Định giá (Valuation Traps Scanner) với cơ chế Phạt Trần Điểm khi Bẫy CAO
 4. Hệ thống 7 Vùng Định giá (7 Price Zones) & Khung Quyết định 3 Tầng Gated (V40 / Q35 / T25)
@@ -16,8 +16,12 @@ Nâng cấp toàn diện kế thừa từ chuẩn định lượng ref-best-valu
 from __future__ import annotations
 
 import math
+import json
+from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 
+CURRENT_DIR = Path(__file__).resolve().parent
+DATA_DIR = CURRENT_DIR.parent.parent / "data"
 
 try:
     from .config_loader import get_valuation_config
@@ -41,6 +45,24 @@ DEFAULT_PCF_MULTIPLE = float(_val_cfg.get("pcfMultiple", 8.0))            # P/CF
 DEFAULT_PS_MULTIPLE = float(_val_cfg.get("psMultiple", 1.1))              # P/S trung vị doanh thu
 DEFAULT_RISK_FREE_RATE = float(_val_cfg.get("riskFreeRate", 0.045))       # Lãi suất TPCP VN 10Y/20Y cơ sở
 OUTLIER_GAP_THRESHOLD = float(_val_cfg.get("outlierFilter", {}).get("outlierGapThreshold", 0.60))
+
+# Tham số mô hình Benjamin Graham Revised từ cấu hình trung tâm (data/default-constant-value.json)
+_graham_cfg = _val_cfg.get("graham", {})
+GRAHAM_BASE_PE_MAX = float(_graham_cfg.get("basePeMax", 7.0))
+GRAHAM_BASE_PE_MIN = float(_graham_cfg.get("basePeMin", 3.0))
+GRAHAM_DEFAULT_BASE_PE = float(_graham_cfg.get("defaultBasePe", 7.0))
+GRAHAM_HIGH_QUALITY_HS = float(_graham_cfg.get("highQualityHs", 1.0))
+GRAHAM_STANDARD_HS = float(_graham_cfg.get("standardHs", 0.8))
+GRAHAM_ROE_THRESHOLD = float(_graham_cfg.get("roeQualityThreshold", 15.0))
+GRAHAM_CYCLICAL_G = float(_graham_cfg.get("cyclicalGrowthRate", 5.0))
+GRAHAM_MAX_NON_CYCLICAL_G = float(_graham_cfg.get("maxNonCyclicalGrowthRate", 12.0))
+GRAHAM_MIN_G = float(_graham_cfg.get("minGrowthRate", 3.0))
+GRAHAM_DEFAULT_G = float(_graham_cfg.get("defaultGrowthRate", 5.0))
+GRAHAM_MIN_CONSTANT = float(_graham_cfg.get("minBenchmarkConstant", 4.4))
+GRAHAM_MIN_Y = float(_graham_cfg.get("minDiscountYield", 5.0))
+GRAHAM_CYCLICAL_SECTORS = _graham_cfg.get("cyclicalSectors", [
+    "Thép", "Hóa Chất", "Dầu Khí", "Thủy Sản", "Khai Khoáng", "Phân Bón", "Cao Su"
+])
 
 
 def _safe_float(val: Any, default: float = 0.0) -> float:
@@ -69,47 +91,96 @@ def _safe_div(num: Optional[float], den: Optional[float], default: Optional[floa
 
 def calc_graham(
     eps: Optional[float],
-    bvps: Optional[float],
+    bvps_or_pe: Optional[float] = None,
     multiplier: Optional[float] = None,
     pe_avg: Optional[float] = None,
     pb_avg: Optional[float] = None,
     rf: Optional[float] = None,
     g: Optional[float] = None,
-    max_multiplier: float = 22.5,
-    min_multiplier: float = 4.0
+    pe_base: Optional[float] = None,
+    hs: Optional[float] = None,
+    constant: Optional[float] = None,
+    y: Optional[float] = None,
+    vn10y: Optional[float] = None,
+    pe_median: Optional[float] = None,
+    cagr_ni: Optional[float] = None,
+    roe: Optional[float] = None,
+    has_dividend: bool = True,
+    **kwargs
 ) -> Optional[int]:
     """
-    Công thức Benjamin Graham thích ứng động (Dynamic Conservative Multiplier):
-    1. Nếu có pe_avg và pb_avg:
-       effective_multiplier = min(max_multiplier, max(min_multiplier, pe_avg * pb_avg))
-       Tránh dùng cứng 22.5 (15.0 x 1.5) gây định giá quá hào phóng cho các ngành chu kỳ/thâm dụng vốn.
-    2. Giá trị nội tại = sqrt(effective_multiplier * EPS * BVPS)
-    3. Growth Formula (ref-best-valuation): Nếu có rf và g:
-       V = (EPS * (7.0 + 1.0 * g_pct) * 4.4) / (rf_pct)
-    Điều kiện: EPS > 0 và BVPS > 0.
+    Công thức Benjamin Graham Thích Ứng Động 100% Dữ Liệu Thật (Bảng tính BENJAMIN 1):
+    V = EPS * (PE_base + hs * g) * (Hằng số_VN / y)
+
+    1. EPS: EPS TTM thực tế hoặc Normalized EPS (EPS > 0).
+    2. PE_base: Lấy từ PE Avg / PE Median 5 năm chu kỳ (pe_median/pe_avg), có chặn trần/sàn an toàn:
+       min(12.0, max(4.0, pe_avg)), mặc định 7.0 nếu không có dữ liệu chu kỳ.
+    3. hs: Hệ số nhạy cảm chất lượng doanh nghiệp:
+       hs = 1.0 nếu ROE >= 15% và chia cổ tức đều đặn, ngược lại 0.8.
+    4. g: Tốc độ tăng trưởng kép dài hạn từ CAGR 3Y/5Y thực tế của doanh nghiệp:
+       g = min(20.0, max(3.0, cagr_ni)), mặc định 5.0%.
+    5. Hằng số_VN: max(4.4, vn10y) thay vì fix cứng 4.4 của Mỹ 1962.
+    6. y: Lãi suất thị trường dài hạn thực tế max(5.0, vn10y).
+    * Hỗ trợ tương thích ngược (Backward-compatibility) cho các cuộc gọi cũ.
     """
-    if eps and bvps and eps > 0 and bvps > 0:
-        try:
-            # 1. Revised Growth Formula (nếu có rf và g từ ref-best-valuation)
-            if rf is not None and rf > 0 and g is not None:
-                g_pct = g * 100.0 if g < 1.0 else g
-                rf_pct = rf * 100.0 if rf < 1.0 else rf
-                val = (eps * (7.0 + min(20.0, max(0.0, g_pct))) * 4.4) / rf_pct
-                return round(val) if val > 0 else None
+    if eps is None or eps <= 0:
+        return None
 
-            # 2. Xác định effective multiplier (thích ứng theo PE_avg và PB_avg)
-            if multiplier is not None and multiplier > 0:
-                eff_mult = multiplier
-            elif pe_avg is not None and pb_avg is not None and pe_avg > 0 and pb_avg > 0:
-                raw_mult = pe_avg * pb_avg
-                eff_mult = min(max_multiplier, max(min_multiplier, raw_mult))
-            else:
-                eff_mult = max_multiplier
+    try:
+        # Nhận diện nếu truyền bvps lớn theo hàm cũ và không có tham số tăng trưởng nào:
+        if (
+            bvps_or_pe is not None and bvps_or_pe > 100
+            and g is None and pe_base is None and hs is None
+            and constant is None and y is None and vn10y is None and cagr_ni is None
+        ):
+            # Legacy Graham Number fallback: sqrt(multiplier * eps * bvps)
+            eff_mult = multiplier if (multiplier and multiplier > 0) else 22.5
+            if pe_avg and pb_avg and pe_avg > 0 and pb_avg > 0:
+                eff_mult = min(22.5, max(4.0, pe_avg * pb_avg))
+            return round(math.sqrt(eff_mult * eps * bvps_or_pe))
 
-            return round(math.sqrt(eff_mult * eps * bvps))
-        except Exception:
-            return None
-    return None
+        # 1. Macro Rates thực tế (Hằng số VN & Lãi suất thị trường y)
+        rate_10y = vn10y if (vn10y and vn10y > 0) else (rf * 100.0 if (rf and 0 < rf < 1.0) else (rf if rf else 4.47))
+        eff_constant = constant if constant else max(GRAHAM_MIN_CONSTANT, rate_10y)
+        eff_y = y if y else max(GRAHAM_MIN_Y, rate_10y)
+
+        # 2. PE Cơ sở động từ PE Avg / PE Median 5 năm (Trần tối đa GRAHAM_BASE_PE_MAX theo chuẩn an toàn VN & bảng tính BENJAMIN 1)
+        if pe_base is not None and pe_base > 0:
+            eff_pe = min(GRAHAM_BASE_PE_MAX, float(pe_base))
+        elif bvps_or_pe is not None and 0 < bvps_or_pe <= 100:
+            eff_pe = min(GRAHAM_BASE_PE_MAX, float(bvps_or_pe))
+        elif pe_median is not None and pe_median > 0:
+            eff_pe = min(GRAHAM_BASE_PE_MAX, max(GRAHAM_BASE_PE_MIN, float(pe_median)))
+        elif pe_avg is not None and pe_avg > 0:
+            eff_pe = min(GRAHAM_BASE_PE_MAX, max(GRAHAM_BASE_PE_MIN, float(pe_avg)))
+        else:
+            eff_pe = GRAHAM_DEFAULT_BASE_PE
+
+        # 3. Tăng trưởng thực tế từ CAGR BCTC (sàn GRAHAM_MIN_G, trần an toàn)
+        if g is not None:
+            g_pct = g * 100.0 if (0 < g < 1.0) else g
+            eff_g = min(20.0, max(0.0, g_pct))
+        elif cagr_ni is not None:
+            cagr_pct = cagr_ni * 100.0 if (-1.0 < cagr_ni < 1.0) else cagr_ni
+            eff_g = min(GRAHAM_MAX_NON_CYCLICAL_G, max(GRAHAM_MIN_G, cagr_pct))
+        else:
+            eff_g = GRAHAM_DEFAULT_G
+
+        # 4. Hệ số nhạy cảm hs dựa trên chất lượng DN
+        if hs is not None and hs > 0:
+            eff_hs = hs
+        else:
+            is_high_quality = (roe is not None and roe >= GRAHAM_ROE_THRESHOLD) and has_dividend
+            eff_hs = GRAHAM_HIGH_QUALITY_HS if is_high_quality else GRAHAM_STANDARD_HS
+
+        # 5. Định giá Graham Revised
+        growth_multiplier = eff_pe + eff_hs * eff_g
+        rate_ratio = eff_constant / eff_y
+        val = eps * growth_multiplier * rate_ratio
+
+        return round(val) if val > 0 else None
+    except Exception:
+        return None
 
 
 def calc_ddm(
@@ -370,42 +441,27 @@ def calc_rim_eva(
         return None
 
 
-def calc_rnav_real_estate(
-    total_assets: Optional[float],
-    total_debt: Optional[float],
-    inventory: Optional[float],
-    shares: Optional[float],
-    current_liabilities: Optional[float] = None,
-    discount_pct: float = 0.20,
-    is_real_estate: bool = False
+def calc_book_nav_target(
+    bvps: Optional[float],
+    pb_normalized: Optional[float] = None,
+    shares: Optional[float] = None,
+    equity: Optional[float] = None
 ) -> Optional[int]:
     """
-    Book NAV / RNAV (Revalued Net Asset Value từ ref-best-valuation):
-    Base NAV = Total Assets - Total Debt.
-    Đối với Bất Động Sản (RNAV):
-    - Tồn kho dự án > 50% tổng tài sản: thưởng +10% tiềm năng quỹ đất.
-    - Nợ ngắn hạn / Nợ vay > 60%: phạt -15% áp lực thanh khoản.
-    - Áp dụng chiết khấu thận trọng NAV Discount (mặc định 20%).
+    Định giá Book NAV / P/B Chuẩn Hóa (Asset-Based & Relative Valuation):
+    V = BVPS * PB_normalized
+    - BVPS: Giá trị sổ sách trên mỗi cổ phiếu thực tế từ BCTC (Equity / Shares).
+    - PB_normalized: Hệ số P/B trung vị chu kỳ 5 năm (P50) hoặc P/B mục tiêu.
+      Nếu không có P/B lịch sử hoặc PB <= 0, lấy Book NAV thuần túy (P/B = 1.0x).
     """
-    if not total_assets or total_assets <= 0 or not shares or shares <= 0:
-        return None
+    if bvps is None or bvps <= 0:
+        if equity and shares and equity > 0 and shares > 0:
+            bvps = round(equity / shares)
+        else:
+            return None
+    pb_eff = pb_normalized if (pb_normalized and pb_normalized > 0) else 1.0
     try:
-        debt = total_debt if total_debt is not None else 0.0
-        base_nav = total_assets - debt
-        if base_nav <= 0:
-            return None
-
-        adj_factor = 1.0
-        if is_real_estate and inventory is not None:
-            inv_ratio = inventory / total_assets
-            ref_ratio = (current_liabilities / debt) if (current_liabilities and debt > 0) else 0.5
-            adj_factor = 1.0 + (0.10 if inv_ratio > 0.5 else 0.0) - (0.15 if ref_ratio > 0.6 else 0.0)
-            adj_factor = max(0.70, min(1.30, adj_factor))
-
-        fair_equity = base_nav * (1.0 - discount_pct) * adj_factor
-        if fair_equity <= 0:
-            return None
-        return round(fair_equity / shares)
+        return round(bvps * pb_eff)
     except Exception:
         return None
 
@@ -477,8 +533,10 @@ def calc_implied_fcf_yield(
 # CÁC MÔ HÌNH ĐỊNH GIÁ CHIẾT KHẤU DÒNG TIỀN DCF & REVERSE DCF
 # ---------------------------------------------------------------------------
 
-SECTOR_WACC_BENCHMARKS = {
+SECTOR_WACC_BENCHMARKS = _val_cfg.get("sectorWaccBenchmarks", {
     "BANKING": 0.100,
+    "FINANCIAL_SERVICES": 0.105,
+    "INSURANCE": 0.100,
     "MANUFACTURING": 0.105,
     "STEEL": 0.105,
     "HEAVY_INDUSTRY": 0.105,
@@ -489,18 +547,56 @@ SECTOR_WACC_BENCHMARKS = {
     "ENERGY": 0.100,
     "OIL_GAS": 0.100,
     "GENERAL": 0.105
-}
+})
+
+
+def map_sector_to_industry_category(sector_name: str) -> str:
+    """Ánh xạ tên ngành 23 phân nhóm sang mã ngành WACC Benchmark chuẩn."""
+    sec = normalize_sector_name(sector_name)
+    mapping = {
+        "Ngân Hàng": "BANKING",
+        "Chứng Khoán": "FINANCIAL_SERVICES",
+        "Bảo Hiểm": "INSURANCE",
+        "Bất Động Sản": "REAL_ESTATE",
+        "Thép": "HEAVY_INDUSTRY",
+        "Công Nghệ & Viễn Thông": "TECHNOLOGY",
+        "Bán Lẻ": "RETAIL",
+        "Dầu Khí": "OIL_GAS",
+        "Điện & Tiện Ích": "ENERGY",
+        "Dược Phẩm & Y Tế": "CONSUMER",
+        "Thực Phẩm & Đồ Uống": "CONSUMER",
+        "Thủy Sản": "CONSUMER",
+        "Dệt May": "MANUFACTURING",
+        "Hóa Chất": "HEAVY_INDUSTRY",
+        "Phân Bón": "HEAVY_INDUSTRY",
+        "Khai Khoáng": "HEAVY_INDUSTRY",
+        "Xây Dựng": "HEAVY_INDUSTRY",
+        "Vật Liệu Xây Dựng": "HEAVY_INDUSTRY",
+        "Logistics & Vận Tải": "GENERAL",
+        "Hàng Không": "GENERAL",
+        "Nông Nghiệp": "GENERAL",
+        "Cao Su": "GENERAL",
+        "Giáo Dục": "GENERAL",
+    }
+    return mapping.get(sec, "GENERAL")
+
 
 def get_sector_wacc(industry_category: str = "GENERAL", beta: Optional[float] = 1.0) -> float:
     """
-    Xác định WACC tham chiếu theo ngành TTCK VN và hiệu chỉnh theo Beta:
-    WACC = Base_Sector_WACC + (beta - 1.0) * 1.5%
+    Xác định WACC tham chiếu theo ngành TTCK VN và hiệu chỉnh theo Beta từ cấu hình trung tâm:
+    WACC = Base_Sector_WACC + (beta - 1.0) * beta_sensitivity
     """
+    adj_cfg = _val_cfg.get("waccAdjustment", {})
+    beta_sens = float(adj_cfg.get("betaSensitivity", 0.015))
+    min_w = float(adj_cfg.get("minWacc", 0.075))
+    max_w = float(adj_cfg.get("maxWacc", 0.160))
+
     cat = (industry_category or "GENERAL").upper()
-    base_wacc = SECTOR_WACC_BENCHMARKS.get(cat, SECTOR_WACC_BENCHMARKS["GENERAL"])
+    benchmarks = _val_cfg.get("sectorWaccBenchmarks", SECTOR_WACC_BENCHMARKS)
+    base_wacc = benchmarks.get(cat, benchmarks.get("GENERAL", 0.105))
     b = float(beta) if beta is not None and beta > 0 else 1.0
-    adjusted = base_wacc + (b - 1.0) * 0.015
-    return round(max(0.075, min(0.160, adjusted)), 4)
+    adjusted = base_wacc + (b - 1.0) * beta_sens
+    return round(max(min_w, min(max_w, adjusted)), 4)
 
 
 def calc_dcf_fcff(
@@ -808,6 +904,7 @@ SECTOR_WEIGHTS_23: Dict[str, Dict[str, float]] = _val_cfg.get("sectorWeights") o
 
 def normalize_sector_name(sector_str: str) -> str:
     s = (sector_str or "").strip().lower()
+    s_clean = s.replace("non-energy", "non_energy")
     if any(k in s for k in ["ngân hàng", "bank"]):
         return "Ngân Hàng"
     if any(k in s for k in ["chứng khoán", "securities"]):
@@ -824,7 +921,9 @@ def normalize_sector_name(sector_str: str) -> str:
         return "Bán Lẻ"
     if any(k in s for k in ["dầu khí", "oil", "gas"]):
         return "Dầu Khí"
-    if any(k in s for k in ["điện", "tiện ích", "utilities", "energy"]):
+    if any(k in s for k in ["khai khoáng", "minerals", "mining"]):
+        return "Khai Khoáng"
+    if any(k in s_clean for k in ["điện", "tiện ích", "utilities", "energy"]):
         return "Điện & Tiện Ích"
     if any(k in s for k in ["dược", "y tế", "pharmaceutical"]):
         return "Dược Phẩm & Y Tế"
@@ -848,27 +947,34 @@ def normalize_sector_name(sector_str: str) -> str:
 def get_method_suitability(method_name: str, sector: str, dps: Optional[float] = 0.0) -> Tuple[float, str]:
     """
     Tính hệ số phù hợp (Suitability Multiplier) theo chuẩn ref-best-valuation:
-    - Tài chính: Tắt DCF, FCFF, FCFE, EV/EBITDA; giảm Graham còn 0.35.
+    - Đọc từ cấu hình trung tâm (data/default-constant-value.json)
+    - Tài chính: Tắt DCF, FCFF, FCFE, EV/EBITDA; giảm Graham còn fin_graham (0.35).
     - DDM: = 0 nếu không có DPS; = 0.25 với BĐS.
-    - NAV: = 0.45 với phi tài chính phi BĐS.
-    - RIM: = 0.55 với phi tài chính.
+    - NAV: = nonfin_nav (0.85) với phi tài chính.
+    - RIM: = nonfin_rim (0.55) với phi tài chính.
     """
+    suit_cfg = _val_cfg.get("methodSuitability", {})
+    fin_graham = float(suit_cfg.get("finGrahamSuitability", 0.35))
+    nonfin_rim = float(suit_cfg.get("nonFinRimSuitability", 0.55))
+    nonfin_nav = float(suit_cfg.get("nonFinNavSuitability", 0.85))
+
     sec = normalize_sector_name(sector)
     is_fin = sec in ["Ngân Hàng", "Chứng Khoán", "Bảo Hiểm"]
     is_re = sec == "Bất Động Sản"
+    method_key = (method_name or "").upper().replace("/", "").replace("_", "").strip()
 
-    if is_fin and method_name in ["DCF", "FCFF", "FCFE", "EV/EBITDA"]:
+    if is_fin and method_key in ["DCF", "FCFF", "FCFE", "EVEBITDA"]:
         return 0.0, "N/A ngành TC"
-    if is_fin and method_name == "Graham":
-        return 0.35, "Ít phù hợp NH/CK"
-    if method_name == "DDM" and (dps is None or dps <= 0):
+    if is_fin and method_key == "GRAHAM":
+        return fin_graham, "Ít phù hợp NH/CK"
+    if method_key == "DDM" and (dps is None or dps <= 0):
         return 0.0, "Không có DPS"
-    if method_name == "DDM" and is_re:
-        return 0.25, "CT BĐS kém"
-    if method_name == "NAV" and not is_fin and not is_re:
-        return 0.45, "Thứ cấp phi TC/BĐS"
-    if method_name == "RIM" and not is_fin:
-        return 0.55, "Thứ cấp phi TC"
+    if method_key == "NAV":
+        if is_fin or is_re:
+            return 1.0, "Trọng yếu ngành Tài sản/TC"
+        return nonfin_nav, "Phù hợp tài sản ròng"
+    if method_key == "RIM" and not is_fin:
+        return nonfin_rim, "Thứ cấp phi TC"
     return 1.0, "Phù hợp"
 
 
@@ -1027,14 +1133,24 @@ def detect_valuation_traps(
     trap_wc = (wc_growth is not None and rev_growth is not None and
                wc_growth > 20.0 and wc_growth > (rev_growth * 2.0))
 
+    trap_cfg = _val_cfg.get("valuationTraps", {})
+    tw = trap_cfg.get("weights", {})
+    w_val = float(tw.get("valueTrap", 2.5))
+    w_book = float(tw.get("bookTrap", 2.5))
+    w_cyc = float(tw.get("cyclicalPeak", 2.0))
+    w_div = float(tw.get("dividendTrap", 1.5))
+    w_debt = float(tw.get("debtStress", 2.0))
+    w_dil = float(tw.get("shareDilution", 1.5))
+    w_wc = float(tw.get("wcStress", 1.5))
+
     trap_score = (
-        (2.5 if trap_value else 0.0) +
-        (2.5 if trap_book else 0.0) +
-        (2.0 if trap_cyc else 0.0) +
-        (1.5 if trap_div else 0.0) +
-        (2.0 if trap_debt else 0.0) +
-        (1.5 if trap_dilution else 0.0) +
-        (1.5 if trap_wc else 0.0)
+        (w_val if trap_value else 0.0) +
+        (w_book if trap_book else 0.0) +
+        (w_cyc if trap_cyc else 0.0) +
+        (w_div if trap_div else 0.0) +
+        (w_debt if trap_debt else 0.0) +
+        (w_dil if trap_dilution else 0.0) +
+        (w_wc if trap_wc else 0.0)
     )
 
     traps_detected = []
@@ -1053,7 +1169,9 @@ def detect_valuation_traps(
     if trap_wc:
         traps_detected.append("WC Stress (Vốn lưu động ứ đọng công nợ/tồn kho)")
 
-    trap_label = "CAO" if trap_score >= 4.0 else ("TB" if trap_score >= 2.0 else "THẤP")
+    high_th = float(trap_cfg.get("highRiskThreshold", 4.0))
+    med_th = float(trap_cfg.get("mediumRiskThreshold", 2.0))
+    trap_label = "CAO" if trap_score >= high_th else ("TB" if trap_score >= med_th else "THẤP")
     trap_reason = "; ".join(traps_detected) if traps_detected else "Không phát hiện bẫy định giá"
 
     return {
@@ -1104,15 +1222,21 @@ def calc_7_price_zones(
             "boundaries": {}
         }
 
-    s_buy = safe_buy if safe_buy and safe_buy > 0 else consensus_fv * 0.75
-    b_accum = buy_price_base if buy_price_base and buy_price_base > 0 else consensus_fv * 0.85
+    zone_cfg = _val_cfg.get("sevenPriceZones", {})
+    deep_r = float(zone_cfg.get("deepValueRatio", 0.75))
+    buy_r = float(zone_cfg.get("buyRatio", 0.85))
+    fair_low_r = float(zone_cfg.get("fairLowRatio", 0.95))
+    fair_high_r = float(zone_cfg.get("fairHighRatio", 1.10))
+
+    s_buy = safe_buy if safe_buy and safe_buy > 0 else consensus_fv * deep_r
+    b_accum = buy_price_base if buy_price_base and buy_price_base > 0 else consensus_fv * buy_r
     b_bull = bull_v if bull_v and bull_v > 0 else consensus_fv * 1.25
 
     v_deep = s_buy * 0.90
     v_buy = s_buy
-    v_accum = max(v_buy, min(consensus_fv * 0.90, b_accum))
-    v_fair_low = consensus_fv * 0.90
-    v_fair_high = consensus_fv * 1.10
+    v_accum = max(v_buy, min(consensus_fv * fair_low_r, b_accum))
+    v_fair_low = consensus_fv * fair_low_r
+    v_fair_high = consensus_fv * fair_high_r
     v_above = max(v_fair_high, b_bull * 0.95)
     v_exp = max(v_above, b_bull * 1.15)
 
@@ -1279,10 +1403,15 @@ def calc_historical_valuation_bands(
     bvps: Optional[float],
     pe_history: Optional[List[float]] = None,
     pb_history: Optional[List[float]] = None,
-    yearly_history: Optional[List[Dict[str, Any]]] = None
+    yearly_history: Optional[List[Dict[str, Any]]] = None,
+    default_pe: float = DEFAULT_PE_MULTIPLE,
+    default_pb: float = DEFAULT_PB_MULTIPLE
 ) -> Dict[str, Any]:
     """
-    Tính dải băng P25 - P50 - P75 theo phân vị định giá lịch sử từ BCTC thực tế 5 năm.
+    Tính dải băng P25 - P50 - P75 theo phân vị định giá lịch sử từ BCTC thực tế.
+    Nếu không đủ 5 năm, hệ thống tự động tính trung vị của số năm hiện tại đang có (N-Year Rolling Median).
+    Nếu hoàn toàn không có năm nào, mới dự phòng theo bội số ngành/mặc định (default_pe, default_pb).
+    Tuyệt đối không sử dụng mảng gán cứng [8.0, 10.5, ...].
     """
     if not close or not eps or eps <= 0 or not bvps or bvps <= 0:
         return {
@@ -1290,16 +1419,37 @@ def calc_historical_valuation_bands(
             "band50": None,
             "band75": None,
             "bandPosition": "N/A",
-            "bandWidthPct": None
+            "bandWidthPct": None,
+            "peYearsUsed": 0,
+            "pbYearsUsed": 0,
+            "peMean": None,
+            "pbMean": None,
+            "isFallbackToSector": True
         }
 
-    if yearly_history and not pe_history:
-        pe_history = [float(y["pe"]) for y in yearly_history if isinstance(y, dict) and y.get("pe") and float(y["pe"]) > 0]
-    if yearly_history and not pb_history:
-        pb_history = [float(y["pb"]) for y in yearly_history if isinstance(y, dict) and y.get("pb") and float(y["pb"]) > 0]
+    valid_pe = []
+    if pe_history and isinstance(pe_history, list):
+        valid_pe = [float(p) for p in pe_history if p is not None and float(p) > 0]
+    elif yearly_history and isinstance(yearly_history, list):
+        for y in yearly_history:
+            if isinstance(y, dict) and y.get("pe") and float(y["pe"]) > 0:
+                valid_pe.append(float(y["pe"]))
 
-    pe_list = sorted([p for p in (pe_history or [8.0, 10.5, 12.0, 14.5, 17.0]) if p and p > 0])
-    pb_list = sorted([p for p in (pb_history or [1.0, 1.25, 1.45, 1.8, 2.2]) if p and p > 0])
+    valid_pb = []
+    if pb_history and isinstance(pb_history, list):
+        valid_pb = [float(p) for p in pb_history if p is not None and float(p) > 0]
+    elif yearly_history and isinstance(yearly_history, list):
+        for y in yearly_history:
+            if isinstance(y, dict) and y.get("pb") and float(y["pb"]) > 0:
+                valid_pb.append(float(y["pb"]))
+
+    pe_list = sorted(valid_pe)
+    pb_list = sorted(valid_pb)
+
+    n_pe = len(pe_list)
+    n_pb = len(pb_list)
+    pe_mean = round(sum(pe_list) / n_pe, 2) if n_pe > 0 else None
+    pb_mean = round(sum(pb_list) / n_pb, 2) if n_pb > 0 else None
 
     def _pctl(arr: List[float], pct: float) -> float:
         if not arr:
@@ -1311,13 +1461,41 @@ def calc_historical_valuation_bands(
             return arr[int(k)]
         return arr[f] * (c - k) + arr[c] * (k - f)
 
-    pe_p25 = _pctl(pe_list, 25)
-    pe_p50 = _pctl(pe_list, 50)
-    pe_p75 = _pctl(pe_list, 75)
+    # 1. Tính P/E: 5 năm, N năm hiện có, hoặc fallback
+    if n_pe >= 3:
+        pe_p25 = _pctl(pe_list, 25)
+        pe_p50 = _pctl(pe_list, 50)
+        pe_p75 = _pctl(pe_list, 75)
+    elif n_pe == 2:
+        pe_p50 = (pe_list[0] + pe_list[1]) / 2.0
+        pe_p25 = pe_list[0]
+        pe_p75 = pe_list[1]
+    elif n_pe == 1:
+        pe_p50 = pe_list[0]
+        pe_p25 = round(pe_p50 * 0.85, 2)
+        pe_p75 = round(pe_p50 * 1.15, 2)
+    else:
+        pe_p50 = float(default_pe) if default_pe > 0 else DEFAULT_PE_MULTIPLE
+        pe_p25 = round(pe_p50 * 0.80, 2)
+        pe_p75 = round(pe_p50 * 1.20, 2)
 
-    pb_p25 = _pctl(pb_list, 25)
-    pb_p50 = _pctl(pb_list, 50)
-    pb_p75 = _pctl(pb_list, 75)
+    # 2. Tính P/B: 5 năm, N năm hiện có, hoặc fallback
+    if n_pb >= 3:
+        pb_p25 = _pctl(pb_list, 25)
+        pb_p50 = _pctl(pb_list, 50)
+        pb_p75 = _pctl(pb_list, 75)
+    elif n_pb == 2:
+        pb_p50 = (pb_list[0] + pb_list[1]) / 2.0
+        pb_p25 = pb_list[0]
+        pb_p75 = pb_list[1]
+    elif n_pb == 1:
+        pb_p50 = pb_list[0]
+        pb_p25 = round(pb_p50 * 0.85, 2)
+        pb_p75 = round(pb_p50 * 1.15, 2)
+    else:
+        pb_p50 = float(default_pb) if default_pb > 0 else DEFAULT_PB_MULTIPLE
+        pb_p25 = round(pb_p50 * 0.80, 2)
+        pb_p75 = round(pb_p50 * 1.20, 2)
 
     pe_band_25 = eps * pe_p25
     pe_band_50 = eps * pe_p50
@@ -1351,17 +1529,26 @@ def calc_historical_valuation_bands(
         "band75": band75,
         "bandPosition": pos,
         "bandWidthPct": width,
+        "peYearsUsed": n_pe,
+        "pbYearsUsed": n_pb,
+        "peMean": pe_mean,
+        "pbMean": pb_mean,
+        "isFallbackToSector": (n_pe == 0 and n_pb == 0),
         "peBand": {
             "p25": round(pe_p25, 2),
             "p50": round(pe_p50, 2),
             "p75": round(pe_p75, 2),
-            "current": cur_pe
+            "mean": pe_mean,
+            "current": cur_pe,
+            "yearsUsed": n_pe
         },
         "pbBand": {
             "p25": round(pb_p25, 2),
             "p50": round(pb_p50, 2),
             "p75": round(pb_p75, 2),
-            "current": cur_pb
+            "mean": pb_mean,
+            "current": cur_pb,
+            "yearsUsed": n_pb
         },
         "priceBands": {
             "peP25Price": round(pe_band_25) if pe_band_25 else None,
@@ -1452,8 +1639,8 @@ def _extract_finval_metric(d: Dict[str, Any], key: str, shares: Optional[float] 
     eq = d.get("equity")
     assets = d.get("totalAssets")
     debt = d.get("totalDebt")
-    interest = d.get("interestExpense") or 0.0
-    deprec = d.get("depreciation") or 0.0
+    interest = d.get("interestExpense")
+    deprec = d.get("depreciation")
     gp = d.get("grossProfit")
     cogs = d.get("costOfGoodsSold")
     cfo = d.get("cfo")
@@ -1493,7 +1680,7 @@ def _extract_finval_metric(d: Dict[str, Any], key: str, shares: Optional[float] 
         if ni is not None and (eq or debt):
             cap = float(eq or 0) + float(debt or 0)
             if cap > 0:
-                ebit_proxy = float(ni) + float(interest) * 0.8
+                ebit_proxy = float(ni) + (float(interest) if interest is not None else 0.0) * 0.8
                 return round((ebit_proxy / cap) * 100.0, 2)
     elif key == "grossMargin":
         if gp is not None and rev and float(rev) > 0:
@@ -1506,8 +1693,10 @@ def _extract_finval_metric(d: Dict[str, Any], key: str, shares: Optional[float] 
     elif key == "ebitda":
         if ni is not None and interest is not None and deprec is not None:
             return round(float(ni) + float(interest) + float(deprec))
-        if ni is not None and deprec is not None:
-            return round(float(ni) * 1.25 + float(deprec))
+        ebit = d.get("ebit") or d.get("operatingProfit")
+        if ebit is not None and deprec is not None:
+            return round(float(ebit) + float(deprec))
+        return None
     elif key == "freeCashFlow":
         if cfo is not None:
             return round(float(cfo) - abs(float(capex)))
@@ -1515,26 +1704,17 @@ def _extract_finval_metric(d: Dict[str, Any], key: str, shares: Optional[float] 
         if debt is not None and eq and float(eq) > 0:
             return round(float(debt) / float(eq), 2)
     elif key == "currentRatio":
-        st_assets = d.get("shortTermAssets")
-        st_debt = d.get("shortTermDebt")
-        if st_assets is not None and st_debt and float(st_debt) > 0:
-            return round(float(st_assets) / float(st_debt), 2)
-        if assets is not None and debt and float(debt) > 0:
-            st_d = float(debt) * 0.65
-            inv = float(d.get("inventory") or 0)
-            rec = float(d.get("accountsReceivable") or 0)
-            st_a = inv + rec + (float(assets) * 0.12)
-            if st_d > 0:
-                return round(st_a / st_d, 2)
+        st_assets = d.get("shortTermAssets") or d.get("currentAssets")
+        st_liab = d.get("shortTermDebt") or d.get("currentLiabilities") or d.get("shortTermLiabilities")
+        if st_assets is not None and st_liab and float(st_liab) > 0:
+            return round(float(st_assets) / float(st_liab), 2)
+        return None
     elif key == "cashRatio":
-        cash = d.get("cashAndEquivalents")
-        st_debt = d.get("shortTermDebt")
-        if cash is not None and st_debt and float(st_debt) > 0:
-            return round(float(cash) / float(st_debt), 2)
-        if assets is not None and debt and float(debt) > 0:
-            st_d = float(debt) * 0.65
-            if st_d > 0:
-                return round((float(assets) * 0.12) / st_d, 2)
+        cash = d.get("cashAndEquivalents") or d.get("cash")
+        st_liab = d.get("shortTermDebt") or d.get("currentLiabilities") or d.get("shortTermLiabilities")
+        if cash is not None and st_liab and float(st_liab) > 0:
+            return round(float(cash) / float(st_liab), 2)
+        return None
 
     return None
 
@@ -1801,6 +1981,8 @@ class StockValuationEngine:
         self.pcf_multiple = pcf_multiple
         self.ps_multiple = ps_multiple
         self.rf = rf
+        self.val_cfg = get_valuation_config()
+        self.graham_cfg = self.val_cfg.get("graham", _graham_cfg)
 
     def evaluate(self, stock_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -1834,23 +2016,29 @@ class StockValuationEngine:
         if total_assets and total_debt and not equity:
             equity = total_assets - total_debt
 
+        shares = stock_data.get("sharesOutstanding") or stock_data.get("shares")
+        if shares is None and "scale" in stock_data:
+            shares = stock_data["scale"].get("sharesOutstanding")
+        if shares is not None:
+            shares = float(shares)
+
         if bvps is None:
-            if close and pb and pb > 0:
+            if equity and equity > 0 and shares and shares > 0:
+                # Chuẩn mực kế toán BCTC: BVPS = Vốn chủ sở hữu / Số cổ phiếu lưu hành
+                # Nếu equity tính bằng Tỷ đồng (< 100,000,000) thì nhân 1e9
+                eq_vnd = equity * 1_000_000_000 if equity < 100_000_000 else equity
+                bvps = round(eq_vnd / shares)
+            elif close and pb and pb > 0:
+                # Thị trường tức thời: BVPS = Thị giá / (P/B)
                 bvps = round(close / pb)
-            elif equity and equity > 0 and total_assets and close:
-                bvps = round(equity / (total_assets / (close or 10000)))
+            else:
+                bvps = None
 
         dps = stock_data.get("dps")
         if dps is None and "dividends" in stock_data:
             dps = stock_data["dividends"].get("dps")
         if dps is not None:
             dps = float(dps)
-
-        shares = stock_data.get("sharesOutstanding") or stock_data.get("shares")
-        if shares is None and "scale" in stock_data:
-            shares = stock_data["scale"].get("sharesOutstanding")
-        if shares is not None:
-            shares = float(shares)
 
         ebitda = stock_data.get("ebitda")
         if ebitda is None and "health" in stock_data:
@@ -1885,8 +2073,12 @@ class StockValuationEngine:
             net_margin_val = stock_data["profitability"].get("netMargin")
 
         beta_val = stock_data.get("beta") or stock_data.get("technicals", {}).get("beta", 1.0)
-        sector_raw = stock_data.get("sector") or stock_data.get("industry") or "Khác"
-        sec_name = normalize_sector_name(sector_raw)
+        sector_raw = str(stock_data.get("sector") or "")
+        industry_raw = str(stock_data.get("industry") or "")
+        sec_combined = f"{sector_raw} {industry_raw}".strip() or "Khác"
+        sec_name = normalize_sector_name(sec_combined)
+        ind_cat = map_sector_to_industry_category(sec_name)
+        stock_wacc = get_sector_wacc(ind_cat, beta_val)
 
         # 1. Dải băng lịch sử P25-P75 để lấy P/E & P/B trung vị (pe_p50, pb_p50)
         bands_eval = calc_historical_valuation_bands(
@@ -1900,25 +2092,120 @@ class StockValuationEngine:
 
         pe_band = bands_eval.get("peBand", {})
         pb_band = bands_eval.get("pbBand", {})
+        pe_years_used = bands_eval.get("peYearsUsed", 0)
+        pb_years_used = bands_eval.get("pbYearsUsed", 0)
+        pe_mean = bands_eval.get("peMean") or pe_band.get("mean")
+        pb_mean = bands_eval.get("pbMean") or pb_band.get("mean")
+        is_pe_fallback = pe_years_used == 0
+        is_pb_fallback = pb_years_used == 0
         pe_p50 = float(pe_band.get("p50") or self.pe_multiple)
         pb_p50 = float(pb_band.get("p50") or self.pb_multiple)
         pe_pb_prod = round(pe_p50 * pb_p50, 2)
         graham_multiplier = round(min(22.5, max(4.0, pe_pb_prod)), 2)
 
-        # 2. Tính toán các mô hình độc lập (10 Mô hình)
+        # 1. Macro Rates thực tế (Hằng số VN & Lãi suất thị trường y)
+        vn10y_yield = 4.47
+        macro_cache_file = DATA_DIR / "macro_valuation.json"
+        if macro_cache_file.exists():
+            try:
+                with open(macro_cache_file, "r", encoding="utf-8") as f:
+                    m_data = json.load(f)
+                    vn10y_yield = float(
+                        m_data.get("macro", {}).get("vn10yYield") or
+                        m_data.get("yieldCurveAnalysis", {}).get("vn10y") or
+                        4.47
+                    )
+            except Exception:
+                pass
+        elif self.rf:
+            vn10y_yield = self.rf * 100.0 if self.rf < 1.0 else self.rf
+
+        # 2. Trích xuất dữ liệu chuỗi lịch sử cho mô hình Graham Dynamic
+        yearly_history = stock_data.get("yearlyHistory") or stock_data.get("yearly")
+        eps_avg = None
+        cagr_ni = None
+        if yearly_history and isinstance(yearly_history, list) and len(yearly_history) >= 2:
+            eps_hist = []
+            for item in yearly_history:
+                if isinstance(item, dict):
+                    y_eps = item.get("eps")
+                    if y_eps is None and shares and item.get("netIncome"):
+                        raw_ni = item["netIncome"]
+                        y_eps = (raw_ni * 1e9) / shares if raw_ni < 1000000 else raw_ni / shares
+                    if y_eps is not None and float(y_eps) > 0:
+                        eps_hist.append(float(y_eps))
+            if eps_hist:
+                eps_avg = round(sum(eps_hist) / len(eps_hist))
+
+            # CAGR lợi nhuận sau thuế thực tế
+            ni_first = yearly_history[0].get("netIncome")
+            ni_last = yearly_history[-1].get("netIncome")
+            n_years = len(yearly_history) - 1
+            if ni_first and ni_last and ni_first > 0 and ni_last > 0 and n_years >= 1:
+                try:
+                    cagr_ni = round(((float(ni_last) / float(ni_first)) ** (1.0 / n_years) - 1.0) * 100.0, 2)
+                except Exception:
+                    pass
+
+        # 3. Tham số Graham Dynamic từ cấu hình trung tâm (data/default-constant-value.json)
+        g_cfg = getattr(self, "graham_cfg", None) or _graham_cfg
+        base_pe_max = float(g_cfg.get("basePeMax", GRAHAM_BASE_PE_MAX))
+        base_pe_min = float(g_cfg.get("basePeMin", GRAHAM_BASE_PE_MIN))
+        hs_high = float(g_cfg.get("highQualityHs", GRAHAM_HIGH_QUALITY_HS))
+        hs_std = float(g_cfg.get("standardHs", GRAHAM_STANDARD_HS))
+        roe_thresh = float(g_cfg.get("roeQualityThreshold", GRAHAM_ROE_THRESHOLD))
+        cyclical_g = float(g_cfg.get("cyclicalGrowthRate", GRAHAM_CYCLICAL_G))
+        max_non_cyc_g = float(g_cfg.get("maxNonCyclicalGrowthRate", GRAHAM_MAX_NON_CYCLICAL_G))
+        min_g = float(g_cfg.get("minGrowthRate", GRAHAM_MIN_G))
+        default_g = float(g_cfg.get("defaultGrowthRate", GRAHAM_DEFAULT_G))
+        min_const = float(g_cfg.get("minBenchmarkConstant", GRAHAM_MIN_CONSTANT))
+        min_y = float(g_cfg.get("minDiscountYield", GRAHAM_MIN_Y))
+        cyc_sectors = g_cfg.get("cyclicalSectors", GRAHAM_CYCLICAL_SECTORS)
+
+        # PE Cơ sở: Lấy min giữa PE Trung vị 5 năm với base_pe_max (chuẩn an toàn Graham VN cho tăng trưởng 0%)
+        pe_base_dyn = round(min(base_pe_max, max(base_pe_min, pe_p50)), 2)
+        has_div = bool(dps and dps > 0)
+        hs_dyn = hs_high if (roe_val and roe_val >= roe_thresh and has_div) else hs_std
+
+        # Kiểm tra nhóm ngành chu kỳ giá hàng hóa (Thép, Hóa chất, Dầu khí...)
+        sec_norm_graham = normalize_sector_name(sec_name)
+        is_cyclical_sector = sec_norm_graham in cyc_sectors
+
+        if is_cyclical_sector:
+            # Nhóm chu kỳ: Tránh bẫy tăng trưởng ảo khi tính CAGR từ đáy chu kỳ, chuẩn hóa cyclical_g theo bảng tính Graham
+            g_dyn = cyclical_g
+        elif cagr_ni is not None:
+            # Nhóm phi chu kỳ: Phản ánh CAGR thực tế nhưng có chặn trần an toàn max_non_cyc_g
+            g_dyn = round(min(max_non_cyc_g, max(min_g, cagr_ni)), 1)
+        else:
+            g_dyn = round(self.growth_rate * 100.0 if self.growth_rate < 1.0 else default_g, 1)
+
+        constant_vn = round(max(min_const, vn10y_yield), 2)
+        y_vn = round(max(min_y, vn10y_yield), 2)
+
+        # 4. Tính toán các mô hình độc lập (10 Mô hình)
         graham_val = calc_graham(
             eps=eps,
-            bvps=bvps,
-            multiplier=graham_multiplier,
+            pe_base=pe_base_dyn,
+            hs=hs_dyn,
+            g=g_dyn,
+            constant=constant_vn,
+            y=y_vn,
+            vn10y=vn10y_yield,
             pe_avg=pe_p50,
-            pb_avg=pb_p50
+            cagr_ni=cagr_ni,
+            roe=roe_val,
+            has_dividend=has_div
         )
-        ddm_val = calc_ddm(dps, r=self.wacc, g=self.growth_rate)
-        pe_target_val = calc_pe_target(eps, multiple=self.pe_multiple)
-        pb_target_val = calc_pb_target(bvps, multiple=self.pb_multiple, roe=roe_val)
+        ddm_val = calc_ddm(dps, r=stock_wacc, g=self.growth_rate)
+        effective_pe = pe_p50 if (pe_p50 and pe_p50 > 0) else self.pe_multiple
+        effective_pb = pb_p50 if (pb_p50 and pb_p50 > 0) else self.pb_multiple
+
+        pe_target_val = calc_pe_target(eps, multiple=effective_pe)
+        pb_target_val = calc_pb_target(bvps, multiple=effective_pb, roe=roe_val)
 
         # Gordon P/B chuyên biệt cho tài chính
-        gordon_pb_val = calc_gordon_pb(bvps, roe_val, coe=self.wacc, terminal_g=self.growth_rate)
+        gordon_pb_val = calc_gordon_pb(bvps, roe_val, coe=stock_wacc, terminal_g=self.growth_rate)
         effective_pb_val = gordon_pb_val if (sec_name in ["Ngân Hàng", "Chứng Khoán", "Bảo Hiểm"] and gordon_pb_val) else pb_target_val
 
         net_debt = total_debt if total_debt is not None else 0
@@ -1927,18 +2214,30 @@ class StockValuationEngine:
         ps_val = calc_ps_target(revenue, shares, multiple=self.ps_multiple)
 
         # Multi-stage DCF
-        dcf_val = calc_multi_stage_dcf(cfo, shares, coe=self.wacc, g1=self.growth_rate * 2.0, terminal_g=self.growth_rate)
+        dcf_val = calc_multi_stage_dcf(cfo, shares, coe=stock_wacc, g1=self.growth_rate * 2.0, terminal_g=self.growth_rate)
 
-        # FCFF & FCFE
+        # FCFF (DCF 3 Kịch bản Doanh nghiệp)
         capex_val = stock_data.get("capex", 0.0)
-        fcfe_val = calc_fcfe(cfo, capex_val, None, shares, coe=self.wacc, g=self.growth_rate)
+        base_fcff_val = (cfo - capex_val) if (cfo is not None and capex_val is not None) else cfo
+        fcff_res = calc_dcf_fcff(
+            base_fcff=base_fcff_val,
+            wacc=stock_wacc,
+            terminal_g=self.growth_rate,
+            net_debt=net_debt,
+            shares=shares,
+            historical_cagr=(cagr_ni / 100.0) if cagr_ni is not None else None
+        )
+        fcff_val = fcff_res.get("fairPrice") if isinstance(fcff_res, dict) else None
+
+        # FCFE
+        fcfe_val = calc_fcfe(cfo, capex_val, None, shares, coe=stock_wacc, g=self.growth_rate)
 
         # RIM / EVA
-        rim_val = calc_rim_eva(equity, roe_val, shares, coe=self.wacc, terminal_g=self.growth_rate)
+        rim_val = calc_rim_eva(equity, roe_val, shares, coe=stock_wacc, terminal_g=self.growth_rate)
 
-        # RNAV BĐS
-        inv_val = stock_data.get("inventory")
-        rnav_val = calc_rnav_real_estate(total_assets, total_debt, inv_val, shares, is_real_estate=(sec_name == "Bất Động Sản"))
+        # Book NAV / P/B Chuẩn Hóa
+        pb_norm_val = pb_p50 if (pb_p50 and pb_p50 > 0) else self.pb_multiple
+        book_nav_val = calc_book_nav_target(bvps, pb_norm_val, shares, equity)
 
         # Advanced Multiples (EV/EBITDA + EV/Sales)
         adv_multiples_val = calc_advanced_multiples(ebitda, revenue, net_debt, shares, target_ev_ebitda=self.ev_multiple, target_ev_sales=self.ps_multiple)
@@ -1946,7 +2245,7 @@ class StockValuationEngine:
         # Implied FCF Yield Diagnostic
         fcf_yield_val = calc_implied_fcf_yield(cfo, shares, rf=self.rf)
 
-        # 3. Xây dựng danh sách 10 mô hình lượng hóa có trọng số ngành và hệ số phù hợp
+        # 5. Xây dựng danh sách 10 mô hình lượng hóa có trọng số ngành và hệ số phù hợp
         sec_weights = SECTOR_WEIGHTS_23.get(sec_name, SECTOR_WEIGHTS_23["Khác"])
 
         def _make_model(m_id, m_name, raw_v, base_w, formula="", formula_detail="", params=None, status_note=""):
@@ -1978,76 +2277,105 @@ class StockValuationEngine:
         models10 = [
             _make_model(
                 "graham", "1. Benjamin Graham", graham_val, sec_weights.get("graham", 0.05),
-                formula="√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+                formula="EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
                 formula_detail=(
-                    f"V = √({graham_multiplier} × {eps:,.0f} × {bvps:,.0f}) | "
-                    f"Hệ số = Min(22.5, {pe_p50:.1f}x × {pb_p50:.2f}x = {pe_pb_prod})"
-                ) if (eps and bvps) else "V = √(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
+                    f"V = {eps:,.0f} × ({pe_base_dyn:.1f}x + {hs_dyn} × {g_dyn:.1f}%) × ({constant_vn}% / {y_vn}%) | "
+                    f"Bội số={pe_base_dyn + hs_dyn * g_dyn:.2f}x, Tỷ số LS={constant_vn / y_vn:.3f}"
+                ) if eps else "V = EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
                 params={
                     "eps": eps,
-                    "bvps": bvps,
-                    "multiplier": graham_multiplier,
-                    "peAvg": round(pe_p50, 2),
-                    "pbAvg": round(pb_p50, 2),
-                    "maxMultiplier": 22.5
+                    "epsAvg": eps_avg,
+                    "peBase": pe_base_dyn,
+                    "peMedian": round(pe_p50, 2),
+                    "hs": hs_dyn,
+                    "gCagr": g_dyn,
+                    "constantVn": constant_vn,
+                    "yVn": y_vn,
+                    "vn10yYield": vn10y_yield
                 },
-                status_note="EPS hoặc BVPS âm"
+                status_note="EPS âm"
             ),
             _make_model(
                 "pe", "2. P/E Chuẩn Hóa", pe_target_val, sec_weights.get("pe", 0.15),
-                formula="EPS × P/E Mục Tiêu (11.5x)",
-                formula_detail=f"V = {eps or 0:,.0f} × 11.5x (Median chu kỳ 5Y)" if eps else "V = EPS × 11.5x",
-                params={"eps": eps, "targetPe": 11.5},
+                formula="EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)",
+                formula_detail=(
+                    f"V = {eps:,.0f} × {effective_pe:.1f}x (" +
+                    (f"Trung vị {pe_years_used} năm | PE Trung bình: {pe_mean:.1f}x" if not is_pe_fallback and pe_mean else (f"Median chu kỳ {pe_years_used}Y" if not is_pe_fallback else "Median ngành")) +
+                    ")"
+                ) if eps else f"V = EPS × {effective_pe:.1f}x",
+                params={
+                    "eps": eps,
+                    "targetPe": round(effective_pe, 2),
+                    "peMedian": round(pe_p50, 2),
+                    "peAvg": pe_mean,
+                    "yearsUsed": pe_years_used,
+                    "isFallback": is_pe_fallback
+                },
                 status_note="EPS âm"
             ),
             _make_model(
                 "pb", "3. P/B Ngành & Gordon", effective_pb_val, sec_weights.get("pb", 0.15),
-                formula="BVPS × [(ROE - g)/(r - g)]",
-                formula_detail=f"V = {bvps or 0:,.0f} × Gordon Multiple" if bvps else "BVPS × Gordon / Target P/B",
-                params={"bvps": bvps, "roe": roe_val, "coe": round(self.wacc, 4), "terminalG": self.growth_rate},
+                formula="BVPS × [(ROE - g)/(r - g)]" if (sec_name in ["Ngân Hàng", "Chứng Khoán", "Bảo Hiểm"] and gordon_pb_val) else "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
+                formula_detail=(
+                    f"V = {bvps:,.0f} × Gordon Multiple" if (sec_name in ["Ngân Hàng", "Chứng Khoán", "Bảo Hiểm"] and gordon_pb_val) else
+                    (f"V = {bvps:,.0f} × {effective_pb:.2f}x (" +
+                     (f"Trung vị {pb_years_used} năm | PB Trung bình: {pb_mean:.2f}x" if not is_pb_fallback and pb_mean else (f"Median chu kỳ {pb_years_used}Y" if not is_pb_fallback else "Median ngành")) +
+                     ")")
+                ) if bvps else "BVPS × Gordon / Target P/B",
+                params={
+                    "bvps": bvps,
+                    "roe": roe_val,
+                    "coe": round(stock_wacc, 4),
+                    "terminalG": self.growth_rate,
+                    "targetPb": round(effective_pb, 2),
+                    "pbMedian": round(pb_p50, 2),
+                    "pbAvg": pb_mean,
+                    "yearsUsed": pb_years_used,
+                    "isFallback": is_pb_fallback
+                },
                 status_note="BVPS âm hoặc ROE không xác định"
             ),
             _make_model(
                 "dcf", "4. DCF Đa Giai Đoạn", dcf_val, sec_weights.get("dcf", 0.15),
                 formula="DCF 3 Pha (Growth → Fade → Terminal)",
-                formula_detail=f"FCF Base, WACC={self.wacc*100:.1f}%, g1={self.growth_rate*200:.1f}%, g_term={self.growth_rate*100:.1f}%",
-                params={"baseFcf": cfo, "shares": shares, "wacc": round(self.wacc, 4), "g1": self.growth_rate * 2.0, "terminalG": self.growth_rate},
+                formula_detail=f"FCF Base, WACC={stock_wacc*100:.1f}%, g1={self.growth_rate*200:.1f}%, g_term={self.growth_rate*100:.1f}%",
+                params={"baseFcf": cfo, "shares": shares, "wacc": round(stock_wacc, 4), "g1": self.growth_rate * 2.0, "terminalG": self.growth_rate},
                 status_note="FCF âm hoặc đang chu kỳ đầu tư lớn"
             ),
             _make_model(
                 "ddm", "5. Chiết Khấu DDM", ddm_val, sec_weights.get("ddm", 0.05),
                 formula="[DPS × (1 + g)] / (r - g) × Fade",
-                formula_detail=f"DPS={dps or 0:,.0f} đ, r={self.wacc*100:.1f}%, g={self.growth_rate*100:.1f}%" if dps else "Chiết khấu dòng cổ tức tiền mặt",
-                params={"dps": dps, "coe": round(self.wacc, 4), "g": self.growth_rate},
+                formula_detail=f"DPS={dps or 0:,.0f} đ, r={stock_wacc*100:.1f}%, g={self.growth_rate*100:.1f}%" if dps else "Chiết khấu dòng cổ tức tiền mặt",
+                params={"dps": dps, "coe": round(stock_wacc, 4), "g": self.growth_rate},
                 status_note="Không có cổ tức tiền mặt"
             ),
             _make_model(
-                "fcff", "6. FCFF Doanh Nghiệp", dcf_val, sec_weights.get("fcff", 0.12),
+                "fcff", "6. FCFF Doanh Nghiệp", fcff_val, sec_weights.get("fcff", 0.12),
                 formula="(PV(FCFF) + TV - Nợ ròng) / Shares",
-                formula_detail=f"FCFF chiết khấu WACC={self.wacc*100:.1f}%",
-                params={"fcff": cfo, "netDebt": net_debt, "wacc": round(self.wacc, 4), "shares": shares},
-                status_note="Dòng tiền FCFF âm"
+                formula_detail=f"FCFF chiết khấu WACC={stock_wacc*100:.1f}%, Terminal g={self.growth_rate*100:.1f}%",
+                params={"fcff": base_fcff_val, "netDebt": net_debt, "wacc": round(stock_wacc, 4), "shares": shares, "scenarios": fcff_res},
+                status_note="Dòng tiền FCFF âm hoặc đòn bẩy nợ quá lớn"
             ),
             _make_model(
                 "fcfe", "7. FCFE Cổ Đông", fcfe_val, sec_weights.get("fcfe", 0.08),
                 formula="PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
-                formula_detail=f"FCFE chiết khấu CoE={self.wacc*100:.1f}%",
-                params={"cfo": cfo, "capex": capex_val, "coe": round(self.wacc, 4), "shares": shares},
+                formula_detail=f"FCFE chiết khấu CoE={stock_wacc*100:.1f}%",
+                params={"cfo": cfo, "capex": capex_val, "coe": round(stock_wacc, 4), "shares": shares},
                 status_note="Dòng tiền FCFE âm"
             ),
             _make_model(
                 "rim", "8. Residual Income RIM/EVA", rim_val, sec_weights.get("rim", 0.08),
                 formula="BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
-                formula_detail=f"BVPS={bvps or 0:,.0f} đ, ROE={roe_val or 0:.1f}%, CoE={self.wacc*100:.1f}%" if bvps else "Mô hình thu nhập thặng dư vốn chủ",
-                params={"equity": equity, "bvps": bvps, "roe": roe_val, "coe": round(self.wacc, 4), "shares": shares},
+                formula_detail=f"BVPS={bvps or 0:,.0f} đ, ROE={roe_val or 0:.1f}%, CoE={stock_wacc*100:.1f}%" if bvps else "Mô hình thu nhập thặng dư vốn chủ",
+                params={"equity": equity, "bvps": bvps, "roe": roe_val, "coe": round(stock_wacc, 4), "shares": shares},
                 status_note="Vốn chủ âm hoặc ROE < CoE"
             ),
             _make_model(
-                "nav", "9. Book NAV / RNAV", rnav_val, sec_weights.get("nav", 0.07),
-                formula="RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
-                formula_detail=f"Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
-                params={"equity": equity, "totalAssets": total_assets, "totalDebt": total_debt, "inventory": inv_val, "shares": shares},
-                status_note="Không đủ dữ liệu Bảng CĐKT"
+                "nav", "9. Book NAV / P/B Chuẩn Hóa", book_nav_val, sec_weights.get("nav", 0.07),
+                formula="BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
+                formula_detail=f"V = {bvps:,.0f} đ × {pb_norm_val:.2f}x (Median P/B chu kỳ)" if (bvps and pb_norm_val != 1.0) else (f"V = {bvps:,.0f} đ (Book NAV thuần túy)" if bvps else "Tài sản ròng sổ sách BVPS"),
+                params={"bvps": bvps, "targetPb": pb_norm_val, "equity": equity, "shares": shares},
+                status_note="Vốn chủ âm hoặc BVPS <= 0"
             ),
             _make_model(
                 "evebitda", "10. EV/EBITDA & EV/Sales", adv_multiples_val, sec_weights.get("evebitda", 0.07),
@@ -2058,15 +2386,9 @@ class StockValuationEngine:
             )
         ]
 
-        # 3. Lọc ngoại lai ±60% & Consensus Blending
+        # 3. Lọc ngoại lai ±60% & Consensus Blending (Chỉ sử dụng duy nhất 10 mô hình định lượng mới)
         consensus_analysis = filter_outliers_and_consensus(models10, close)
         fair_val = consensus_analysis["fairValue"]
-
-        # Fallback an toàn nếu chưa đủ dữ liệu cho 10 mô hình: dùng 6 mô hình cũ
-        candidates_legacy = [v for v in [graham_val, ddm_val, pe_target_val, pb_target_val, ev_ebitda_val, pcf_val] if v and v > 0]
-        consensus_legacy = calc_consensus_fair_value(candidates_legacy, close)
-        if fair_val is None:
-            fair_val = consensus_legacy["fairValue"]
 
         mos_fair = round(((fair_val - close) / fair_val) * 100.0, 1) if (fair_val and close and close > 0) else None
         mos_graham = round(((graham_val - close) / graham_val) * 100.0, 1) if (graham_val and close and close > 0) else None
@@ -2076,7 +2398,7 @@ class StockValuationEngine:
             pe=stock_data.get("pe") or (close / eps if (close and eps and eps > 0) else None),
             pb=stock_data.get("pb") or (close / bvps if (close and bvps and bvps > 0) else None),
             roe=roe_val,
-            coe_pct=self.wacc * 100.0,
+            coe_pct=stock_wacc * 100.0,
             fcf=cfo,
             de=stock_data.get("debtToEquity") or (total_debt / equity if (total_debt and equity and equity > 0) else None),
             rev_cagr=stock_data.get("revCagr"),
@@ -2109,7 +2431,7 @@ class StockValuationEngine:
             dispersion_pct=consensus_analysis["dispersionPct"],
             trap_label=traps_eval["trapLabel"],
             roe=roe_val,
-            coe_pct=self.wacc * 100.0,
+            coe_pct=stock_wacc * 100.0,
             cfo=cfo,
             net_income=net_income,
             altman_z=stock_data.get("altmanZ"),
@@ -2256,5 +2578,9 @@ class StockValuationEngine:
             "historicalBands": bands_eval,
             "dividendSustainability": div_sustain,
             "finvalLab": lab_snapshot,
-            "impliedFcfYieldPrice": fcf_yield_val
+            "impliedFcfYieldPrice": fcf_yield_val,
+            "dcfScenarios": fcff_res,
+            "sectorWacc": round(stock_wacc * 100, 2),
+            "industryCategory": ind_cat,
+            "effectiveBeta": beta_val
         }

@@ -11,6 +11,7 @@ Module phân tích Báo Cáo Tài Chính theo đặc thù từng ngành nghề (
 
 from __future__ import annotations
 
+import math
 from typing import Any, Dict, List, Optional
 
 
@@ -68,33 +69,61 @@ def compute_industry_metrics(
     company_name: str = "",
     icb_name: str = ""
 ) -> Dict[str, Any]:
-    """Tính toán và đóng gói các chỉ số đặc thù của từng nhóm ngành."""
+    """Tính toán và đóng gói các chỉ số đặc thù của từng nhóm ngành từ 100% dữ liệu BCTC/Ratios thật."""
     category = detect_industry_category(symbol, company_name, icb_name)
     sym = symbol.strip().upper()
 
-    rev = float(latest_quarter.get("revenue") or 30000)
-    assets = float(latest_quarter.get("totalAssets") or 100000)
-    equity = float(latest_quarter.get("equity") or 50000)
-    inv = float(latest_quarter.get("inventory") or 25000)
-    receivables = float(latest_quarter.get("accountsReceivable") or 15000)
-    cash = float(latest_quarter.get("cashAndEquivalents") or 15000)
-    st_debt = float(latest_quarter.get("shortTermDebt") or 20000)
-    lt_debt = float(latest_quarter.get("longTermDebt") or 10000)
-    total_debt = float(latest_quarter.get("totalDebt") or (st_debt + lt_debt))
-    cogs = float(latest_quarter.get("costOfGoodsSold") or (rev * 0.8))
-    capex = abs(float(latest_quarter.get("capex") or 3000))
-    depreciation = float(latest_quarter.get("depreciation") or 2500)
-    op_profit = float(latest_quarter.get("operatingProfit") or 4000)
-    net_inc = float(latest_quarter.get("netIncomeParent") or latest_quarter.get("netIncome") or 3200)
+    def _val(k):
+        v = latest_quarter.get(k)
+        if v is not None:
+            try:
+                f = float(v)
+                return f if math.isfinite(f) else None
+            except (ValueError, TypeError):
+                return None
+        return None
+
+    rev = _val("revenue")
+    assets = _val("totalAssets")
+    equity = _val("equity")
+    inv = _val("inventory")
+    receivables = _val("accountsReceivable")
+    cash = _val("cashAndEquivalents")
+    st_debt = _val("shortTermDebt")
+    lt_debt = _val("longTermDebt")
+    total_debt = _val("totalDebt")
+    if total_debt is None and (st_debt is not None or lt_debt is not None):
+        total_debt = (st_debt or 0.0) + (lt_debt or 0.0)
+    cogs = _val("costOfGoodsSold")
+    capex = abs(_val("capex")) if _val("capex") is not None else None
+    depreciation = _val("depreciation")
+    op_profit = _val("operatingProfit")
+    net_inc = _val("netIncomeParent") if _val("netIncomeParent") is not None else _val("netIncome")
 
     # 1. NGÀNH NGÂN HÀNG (BANKING)
     if category == "BANKING":
-        nim = round(min(6.5, max(1.8, 3.6 + (hash(sym) % 15) * 0.1)), 2)
-        npl = round(min(3.8, max(0.9, 1.4 + (hash(sym) % 12) * 0.1)), 2)
-        llr = round(min(300.0, max(80.0, 160.0 + (hash(sym) % 90))), 1)
-        ldr = round(min(88.0, max(72.0, 79.5 + (hash(sym) % 8))), 1)
-        cir = round(min(45.0, max(28.0, 34.5 + (hash(sym) % 9))), 1)
-        casa = round(min(48.0, max(16.0, 31.0 + (hash(sym) % 18))), 1)
+        # Trích xuất dữ liệu thực tế từ BCTC hoặc Ratios (nếu có thuyết minh ngân hàng)
+        cir = None
+        op_exp = _val("operatingExpense") or _val("sellingGeneralAdministrative")
+        op_inc = _val("operatingIncome") or _val("netInterestIncome")
+        if op_exp is not None and op_inc and op_inc > 0:
+            cir = round((op_exp / op_inc) * 100.0, 1)
+        elif ratios.get("efficiency", {}).get("cir") is not None:
+            cir = float(ratios["efficiency"]["cir"])
+
+        nim = None
+        if ratios.get("profitability", {}).get("nim") is not None:
+            nim = float(ratios["profitability"]["nim"])
+        elif _val("netInterestIncome"):
+            e_assets = _val("earningAssets") or assets
+            if e_assets and e_assets > 0:
+                # NIM = (Thu nhập lãi thuần 4 quý / Tài sản sinh lãi)
+                nim = round((_val("netInterestIncome") * 4.0 / e_assets) * 100.0, 2)
+
+        npl = float(ratios.get("credit", {}).get("npl")) if ratios.get("credit", {}).get("npl") is not None else None
+        llr = float(ratios.get("credit", {}).get("llr")) if ratios.get("credit", {}).get("llr") is not None else None
+        casa = float(ratios.get("funding", {}).get("casa")) if ratios.get("funding", {}).get("casa") is not None else None
+        ldr = float(ratios.get("liquidity", {}).get("ldr")) if ratios.get("liquidity", {}).get("ldr") is not None else None
 
         return {
             "category": "BANKING",
@@ -108,7 +137,7 @@ def compute_industry_metrics(
                     "value": nim,
                     "unit": "%",
                     "benchmark": "> 3.5%",
-                    "rating": "Xuất sắc" if nim >= 3.8 else "Tốt" if nim >= 3.0 else "Trung bình",
+                    "rating": ("Xuất sắc" if nim >= 3.8 else "Tốt" if nim >= 3.0 else "Trung bình") if nim is not None else "Cần bổ sung BCTC",
                     "desc": "Chênh lệch giữa thu nhập lãi cho vay và chi phí huy động vốn"
                 },
                 {
@@ -117,7 +146,7 @@ def compute_industry_metrics(
                     "value": npl,
                     "unit": "%",
                     "benchmark": "< 2.0%",
-                    "rating": "An toàn" if npl <= 1.6 else "Đạt chuẩn" if npl <= 2.5 else "Rủi ro",
+                    "rating": ("An toàn" if npl <= 1.6 else "Đạt chuẩn" if npl <= 2.5 else "Rủi ro") if npl is not None else "Cần bổ sung thuyết minh",
                     "desc": "Tỷ lệ nợ nhóm 3-5 trên tổng dư nợ cho vay khách hàng"
                 },
                 {
@@ -126,7 +155,7 @@ def compute_industry_metrics(
                     "value": llr,
                     "unit": "%",
                     "benchmark": "> 100%",
-                    "rating": "Dày dặn" if llr >= 150 else "Đủ chuẩn" if llr >= 100 else "Mỏng",
+                    "rating": ("Dày dặn" if llr >= 150 else "Đủ chuẩn" if llr >= 100 else "Mỏng") if llr is not None else "Cần bổ sung thuyết minh",
                     "desc": "Quỹ dự phòng rủi ro tín dụng trên nợ xấu, bộ đệm phòng thủ tài chính"
                 },
                 {
@@ -135,7 +164,7 @@ def compute_industry_metrics(
                     "value": casa,
                     "unit": "%",
                     "benchmark": "> 25%",
-                    "rating": "Vượt trội" if casa >= 35 else "Tốt" if casa >= 25 else "Bình thường",
+                    "rating": ("Vượt trội" if casa >= 35 else "Tốt" if casa >= 25 else "Bình thường") if casa is not None else "Cần bổ sung thuyết minh",
                     "desc": "Nguồn vốn giá rẻ tối ưu hóa chi phí đầu vào của ngân hàng"
                 },
                 {
@@ -144,7 +173,7 @@ def compute_industry_metrics(
                     "value": ldr,
                     "unit": "%",
                     "benchmark": "< 85%",
-                    "rating": "Chuẩn mực" if ldr <= 85 else "Căng thẳng",
+                    "rating": ("Chuẩn mực" if ldr <= 85 else "Căng thẳng") if ldr is not None else "Cần bổ sung thuyết minh",
                     "desc": "Tỷ lệ cho vay trên tiền gửi huy động theo quy định của NHNN"
                 },
                 {
@@ -153,7 +182,7 @@ def compute_industry_metrics(
                     "value": cir,
                     "unit": "%",
                     "benchmark": "< 40%",
-                    "rating": "Tinh gọn" if cir <= 35 else "Khá" if cir <= 40 else "Cao",
+                    "rating": ("Tinh gọn" if cir <= 35 else "Khá" if cir <= 40 else "Cao") if cir is not None else "Cần bổ sung BCTC",
                     "desc": "Tỷ lệ chi phí hoạt động trên tổng thu nhập hoạt động"
                 }
             ]
@@ -161,11 +190,15 @@ def compute_industry_metrics(
 
     # 2. NGÀNH BẤT ĐỘNG SẢN (REAL ESTATE)
     if category == "REAL_ESTATE":
-        inv_to_assets = round((inv / assets) * 100.0, 1) if assets else 45.0
-        net_debt = max(0.0, total_debt - cash)
-        net_debt_equity = round(net_debt / equity, 2) if equity else 0.85
-        cash_st_debt = round(cash / st_debt, 2) if st_debt else 0.75
-        unearned_rev_ratio = round(min(55.0, max(12.0, 24.5 + (hash(sym) % 20))), 1)
+        inv_to_assets = round((inv / assets) * 100.0, 1) if (inv is not None and assets and assets > 0) else None
+        net_debt = (total_debt - cash) if (total_debt is not None and cash is not None) else total_debt
+        net_debt_equity = round(net_debt / equity, 2) if (net_debt is not None and equity and equity > 0) else None
+        cash_st_debt = round(cash / st_debt, 2) if (cash is not None and st_debt and st_debt > 0) else None
+
+        unearned_rev_val = _val("unearnedRevenue") or _val("customerDeposits")
+        unearned_rev_ratio = None
+        if unearned_rev_val is not None and assets and assets > 0:
+            unearned_rev_ratio = round((unearned_rev_val / assets) * 100.0, 1)
 
         return {
             "category": "REAL_ESTATE",
@@ -179,17 +212,17 @@ def compute_industry_metrics(
                     "value": inv_to_assets,
                     "unit": "%",
                     "benchmark": "40 - 65%",
-                    "rating": "Dồi dào" if inv_to_assets >= 40 else "Thấp",
+                    "rating": ("Dồi dào" if inv_to_assets >= 40 else "Thấp") if inv_to_assets is not None else "Chưa đủ số liệu",
                     "desc": "Tỷ lệ dự án đang triển khai và quỹ đất dở dang của doanh nghiệp"
                 },
                 {
                     "id": "unearned_revenue",
-                    "name": "Người Mua Trả Tiền Trước",
+                    "name": "Người Mua Trả Tiền Trước / Tổng TS",
                     "value": unearned_rev_ratio,
-                    "unit": "% vốn hóa",
-                    "benchmark": "> 20%",
-                    "rating": "Của để dành lớn" if unearned_rev_ratio >= 25 else "Bình thường",
-                    "desc": "Khoản tiền đặt cọc từ khách hàng sẽ ghi nhận thành doanh thu khi bàn giao"
+                    "unit": "%",
+                    "benchmark": "> 15%",
+                    "rating": ("Của để dành lớn" if unearned_rev_ratio >= 15 else "Bình thường") if unearned_rev_ratio is not None else "Cần bổ sung CĐKT",
+                    "desc": "Khoản tiền đặt cọc từ khách hàng mua nhà/đất ghi nhận doanh thu khi bàn giao"
                 },
                 {
                     "id": "net_debt_equity",
@@ -197,7 +230,7 @@ def compute_industry_metrics(
                     "value": net_debt_equity,
                     "unit": "lần",
                     "benchmark": "< 1.2x",
-                    "rating": "An toàn" if net_debt_equity <= 0.8 else "Chấp nhận được" if net_debt_equity <= 1.5 else "Đòn bẩy cao",
+                    "rating": ("An toàn" if net_debt_equity <= 0.8 else "Chấp nhận được" if net_debt_equity <= 1.5 else "Đòn bẩy cao") if net_debt_equity is not None else "Chưa đủ số liệu",
                     "desc": "Áp lực vay nợ sau khi đã bù trừ toàn bộ tiền mặt và tiền gửi"
                 },
                 {
@@ -206,7 +239,7 @@ def compute_industry_metrics(
                     "value": cash_st_debt,
                     "unit": "lần",
                     "benchmark": "> 0.5x",
-                    "rating": "Dồi dào" if cash_st_debt >= 0.8 else "Ổn định" if cash_st_debt >= 0.5 else "Cần theo dõi",
+                    "rating": ("Dồi dào" if cash_st_debt >= 0.8 else "Ổn định" if cash_st_debt >= 0.5 else "Cần theo dõi") if cash_st_debt is not None else "Chưa đủ số liệu",
                     "desc": "Khả năng thanh toán tức thời các khoản nợ vay đến hạn trả"
                 }
             ]
@@ -214,14 +247,18 @@ def compute_industry_metrics(
 
     # 3. NGÀNH SẢN XUẤT & VẬT LIỆU (MANUFACTURING)
     if category == "MANUFACTURING":
-        dso = ratios.get("efficiency", {}).get("dso", 52)
-        dio = ratios.get("efficiency", {}).get("dio", 108)
-        dpo = ratios.get("efficiency", {}).get("dpo", 42)
-        ccc = dso + dio - dpo
+        dso = ratios.get("efficiency", {}).get("dso")
+        dio = ratios.get("efficiency", {}).get("dio")
+        dpo = ratios.get("efficiency", {}).get("dpo")
+        ccc = round(dso + dio - dpo) if (dso is not None and dio is not None and dpo is not None) else None
 
-        capex_da = round(capex / depreciation, 2) if depreciation else 1.25
-        gross_margin = ratios.get("profitability", {}).get("grossMargin", 16.5)
-        fixed_asset_turn = round((rev * 4.0) / max(1000.0, float(latest_quarter.get("fixedAssets") or 40000)), 2)
+        capex_da = round(capex / depreciation, 2) if (capex is not None and depreciation and depreciation > 0) else None
+        gross_margin = ratios.get("profitability", {}).get("grossMargin")
+        if gross_margin is None and rev and rev > 0 and cogs is not None:
+            gross_margin = round(((rev - cogs) / rev) * 100.0, 2)
+
+        fixed_assets = _val("fixedAssets")
+        fixed_asset_turn = round((rev * 4.0) / fixed_assets, 2) if (rev is not None and fixed_assets and fixed_assets > 0) else None
 
         return {
             "category": "MANUFACTURING",
@@ -235,7 +272,7 @@ def compute_industry_metrics(
                     "value": ccc,
                     "unit": "ngày",
                     "benchmark": "< 90 ngày",
-                    "rating": "Rất nhanh" if ccc < 60 else "Chuẩn mực" if ccc < 110 else "Dài ngày",
+                    "rating": ("Rất nhanh" if ccc < 60 else "Chuẩn mực" if ccc < 110 else "Dài ngày") if ccc is not None else "Chưa đủ số liệu",
                     "desc": "Thời gian từ lúc chi tiền mua NVL đến khi thu tiền bán hàng (DSO + DIO - DPO)"
                 },
                 {
@@ -244,7 +281,7 @@ def compute_industry_metrics(
                     "value": capex_da,
                     "unit": "lần",
                     "benchmark": "> 1.0x",
-                    "rating": "Mở rộng công suất" if capex_da > 1.2 else "Duy trì hoạt động" if capex_da >= 0.8 else "Thu hẹp",
+                    "rating": ("Mở rộng công suất" if capex_da > 1.2 else "Duy trì hoạt động" if capex_da >= 0.8 else "Thu hẹp") if capex_da is not None else "Chưa đủ số liệu",
                     "desc": "Tỷ lệ đầu tư tài sản cố định mới so với mức hao mòn khấu hao"
                 },
                 {
@@ -253,7 +290,7 @@ def compute_industry_metrics(
                     "value": gross_margin,
                     "unit": "%",
                     "benchmark": "> 15%",
-                    "rating": "Cao" if gross_margin >= 18 else "Khá" if gross_margin >= 12 else "Mỏng",
+                    "rating": ("Cao" if gross_margin >= 18 else "Khá" if gross_margin >= 12 else "Mỏng") if gross_margin is not None else "Chưa đủ số liệu",
                     "desc": "Sức mạnh chuyển chi phí nguyên liệu đầu vào sang giá bán thành phẩm"
                 },
                 {
@@ -262,7 +299,7 @@ def compute_industry_metrics(
                     "value": fixed_asset_turn,
                     "unit": "vòng",
                     "benchmark": "> 1.5x",
-                    "rating": "Tối ưu" if fixed_asset_turn >= 2.0 else "Khá" if fixed_asset_turn >= 1.2 else "Chưa đầy tải",
+                    "rating": ("Tối ưu" if fixed_asset_turn >= 2.0 else "Khá" if fixed_asset_turn >= 1.2 else "Chưa đầy tải") if fixed_asset_turn is not None else "Chưa đủ số liệu",
                     "desc": "Hiệu suất tạo doanh thu trên quy mô nhà xưởng và máy móc thiết bị"
                 }
             ]
@@ -270,10 +307,10 @@ def compute_industry_metrics(
 
     # 4. NGÀNH BÁN LẺ (RETAIL)
     if category == "RETAIL":
-        inv_turn = ratios.get("efficiency", {}).get("inventoryTurnover", 5.5)
-        dio = ratios.get("efficiency", {}).get("dio", 66)
-        gross_margin = ratios.get("profitability", {}).get("grossMargin", 22.0)
-        net_margin = ratios.get("profitability", {}).get("netMargin", 4.2)
+        inv_turn = ratios.get("efficiency", {}).get("inventoryTurnover")
+        dio = ratios.get("efficiency", {}).get("dio")
+        gross_margin = ratios.get("profitability", {}).get("grossMargin")
+        net_margin = ratios.get("profitability", {}).get("netMargin")
 
         return {
             "category": "RETAIL",
@@ -287,7 +324,7 @@ def compute_industry_metrics(
                     "value": inv_turn,
                     "unit": "vòng",
                     "benchmark": "> 6.0x",
-                    "rating": "Xuất sắc" if inv_turn >= 6.5 else "Tốt" if inv_turn >= 4.5 else "Chậm",
+                    "rating": ("Xuất sắc" if inv_turn >= 6.5 else "Tốt" if inv_turn >= 4.5 else "Chậm") if inv_turn is not None else "Chưa đủ số liệu",
                     "desc": "Số lần luân chuyển xả kho trong chu kỳ kinh doanh"
                 },
                 {
@@ -296,7 +333,7 @@ def compute_industry_metrics(
                     "value": dio,
                     "unit": "ngày",
                     "benchmark": "< 60 ngày",
-                    "rating": "Nhanh" if dio <= 55 else "Bình thường" if dio <= 75 else "Ứ đọng",
+                    "rating": ("Nhanh" if dio <= 55 else "Bình thường" if dio <= 75 else "Ứ đọng") if dio is not None else "Chưa đủ số liệu",
                     "desc": "Số ngày trung bình để bán hết một vòng kho hàng"
                 },
                 {
@@ -305,7 +342,7 @@ def compute_industry_metrics(
                     "value": gross_margin,
                     "unit": "%",
                     "benchmark": "> 20%",
-                    "rating": "Dày" if gross_margin >= 22 else "Khá",
+                    "rating": ("Dày" if gross_margin >= 22 else "Khá") if gross_margin is not None else "Chưa đủ số liệu",
                     "desc": "Tỷ suất lợi nhuận sau khi trừ giá vốn hàng nhập"
                 },
                 {
@@ -314,7 +351,7 @@ def compute_industry_metrics(
                     "value": net_margin,
                     "unit": "%",
                     "benchmark": "> 3.5%",
-                    "rating": "Khỏe" if net_margin >= 4.5 else "Trung bình",
+                    "rating": ("Khỏe" if net_margin >= 4.5 else "Trung bình") if net_margin is not None else "Chưa đủ số liệu",
                     "desc": "Lợi nhuận ròng cuối cùng sau toàn bộ chi phí cửa hàng và nhân sự"
                 }
             ]
@@ -322,10 +359,10 @@ def compute_industry_metrics(
 
     # 5. NGÀNH CÔNG NGHỆ (TECHNOLOGY)
     if category == "TECHNOLOGY":
-        ebit_margin = round((op_profit / rev) * 100.0, 2) if rev else 18.5
-        net_cash = max(0.0, cash - total_debt)
-        net_cash_ratio = round((net_cash / assets) * 100.0, 1) if assets else 22.0
-        growth = ratios.get("profitability", {}).get("netMargin", 15.0)
+        ebit_margin = round((op_profit / rev) * 100.0, 2) if (op_profit is not None and rev and rev > 0) else None
+        net_cash = (cash - (total_debt or 0.0)) if cash is not None else None
+        net_cash_ratio = round((net_cash / assets) * 100.0, 1) if (net_cash is not None and assets and assets > 0) else None
+        roe = ratios.get("profitability", {}).get("roe")
 
         return {
             "category": "TECHNOLOGY",
@@ -339,7 +376,7 @@ def compute_industry_metrics(
                     "value": ebit_margin,
                     "unit": "%",
                     "benchmark": "> 15%",
-                    "rating": "Xuất sắc" if ebit_margin >= 18 else "Khá",
+                    "rating": ("Xuất sắc" if ebit_margin >= 18 else "Khá") if ebit_margin is not None else "Chưa đủ số liệu",
                     "desc": "Biên lợi nhuận hoạt động cốt lõi từ dịch vụ phần mềm và IT"
                 },
                 {
@@ -348,22 +385,26 @@ def compute_industry_metrics(
                     "value": net_cash_ratio,
                     "unit": "%",
                     "benchmark": "> 15%",
-                    "rating": "Dồi dào" if net_cash_ratio >= 18 else "An toàn",
+                    "rating": ("Dồi dào" if net_cash_ratio >= 18 else "An toàn") if net_cash_ratio is not None else "Chưa đủ số liệu",
                     "desc": "Vùng đệm tiền mặt ròng dồi dào, hầu như không chịu rủi ro lãi vay"
                 },
                 {
                     "id": "roe",
                     "name": "Tỷ Suất Sinh Lời ROE",
-                    "value": ratios.get("profitability", {}).get("roe", 22.5),
+                    "value": roe,
                     "unit": "%",
                     "benchmark": "> 20%",
-                    "rating": "Xuất sắc" if ratios.get("profitability", {}).get("roe", 20) >= 20 else "Khá",
+                    "rating": ("Xuất sắc" if roe >= 20 else "Khá") if roe is not None else "Chưa đủ số liệu",
                     "desc": "Khả năng sinh lời vượt trội trên vốn đầu tư"
                 }
             ]
         }
 
     # 6. MẶC ĐỊNH CHO DOANH NGHIỆP CHUNG (GENERAL)
+    roe_gen = ratios.get("profitability", {}).get("roe")
+    net_margin_gen = ratios.get("profitability", {}).get("netMargin")
+    debt_equity_gen = ratios.get("leverage", {}).get("debtToEquity")
+
     return {
         "category": "GENERAL",
         "categoryName": "Doanh Nghiệp Thương Mại & Tổng Hợp",
@@ -373,28 +414,28 @@ def compute_industry_metrics(
             {
                 "id": "roe",
                 "name": "Tỷ Suất Sinh Lời ROE",
-                "value": ratios.get("profitability", {}).get("roe", 14.5),
+                "value": roe_gen,
                 "unit": "%",
                 "benchmark": "> 15%",
-                "rating": "Tốt",
+                "rating": ("Xuất sắc" if roe_gen >= 20 else "Tốt" if roe_gen >= 15 else "Trung bình") if roe_gen is not None else "Chưa đủ số liệu",
                 "desc": "Hiệu quả sử dụng vốn chủ sở hữu"
             },
             {
                 "id": "net_margin",
                 "name": "Biên Lợi Nhuận Ròng",
-                "value": ratios.get("profitability", {}).get("netMargin", 8.5),
+                "value": net_margin_gen,
                 "unit": "%",
                 "benchmark": "> 8%",
-                "rating": "Khá",
+                "rating": ("Cao" if net_margin_gen >= 12 else "Khá" if net_margin_gen >= 8 else "Mỏng") if net_margin_gen is not None else "Chưa đủ số liệu",
                 "desc": "Tỷ lệ lợi nhuận sau thuế trên doanh thu"
             },
             {
                 "id": "debt_to_equity",
                 "name": "Nợ Vay / Vốn Chủ",
-                "value": ratios.get("leverage", {}).get("debtToEquity", 0.75),
+                "value": debt_equity_gen,
                 "unit": "lần",
                 "benchmark": "< 1.5x",
-                "rating": "An toàn",
+                "rating": ("An toàn" if debt_equity_gen <= 1.0 else "Chấp nhận được" if debt_equity_gen <= 1.5 else "Đòn bẩy cao") if debt_equity_gen is not None else "Chưa đủ số liệu",
                 "desc": "Mức độ sử dụng nợ tài trợ cho hoạt động kinh doanh"
             }
         ]

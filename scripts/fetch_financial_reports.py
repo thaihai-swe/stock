@@ -36,7 +36,6 @@ from lib.valuation_engine import (
     calc_ev_ebitda,
     calc_pcf,
     calc_ps_target,
-    calc_consensus_fair_value,
     get_sector_wacc,
     calc_dcf_fcff,
     calc_reverse_dcf,
@@ -95,6 +94,23 @@ DATA_DIR = ROOT_DIR / "data"
 FINANCIALS_DIR = DATA_DIR / "financials"
 CACHE_FILE = DATA_DIR / "fundamentals_cache.json"
 SUPPORTED_FILE = DATA_DIR / "supported_stocks.json"
+
+def get_current_vn10y_yield() -> float:
+    macro_cache_file = DATA_DIR / "macro_valuation.json"
+    if macro_cache_file.exists():
+        try:
+            with open(macro_cache_file, "r", encoding="utf-8") as f:
+                m_data = json.load(f)
+                val = float(
+                    m_data.get("macro", {}).get("vn10yYield") or
+                    m_data.get("yieldCurveAnalysis", {}).get("vn10y") or
+                    4.47
+                )
+                if val > 0:
+                    return val
+        except Exception:
+            pass
+    return 4.47
 
 limiter = MultiSourceRateLimiter()
 
@@ -207,19 +223,52 @@ def merge_financial_series(existing_doc: Dict[str, Any], new_statements: Optiona
             "status": existing_doc.get("_meta", {}).get("status", "AUDITED_REAL_DATA")
         }
 
+    def _merge_single_record(base: Dict[str, Any], incoming: Dict[str, Any]) -> Dict[str, Any]:
+        """Hợp nhất từng trường: Nguồn mới bổ sung/cập nhật nhưng KHÔNG đè 0/null lên số thực khác 0."""
+        res = dict(base)
+        for k, v in incoming.items():
+            if k not in res or res[k] is None:
+                res[k] = v
+            elif v is not None:
+                if isinstance(v, (int, float)):
+                    if v != 0:
+                        res[k] = v
+                    # Nếu v == 0 nhưng res[k] đã có giá trị thực != 0, BẢO LƯU res[k]!
+                elif isinstance(v, str) and v.strip() != "":
+                    res[k] = v
+
+        # Tái đối soát và chuẩn hóa các trường dẫn xuất
+        cfo_val = res.get("cfo")
+        capex_val = res.get("capex")
+        if cfo_val is not None and capex_val is not None:
+            if capex_val > 0:
+                capex_val = -capex_val
+                res["capex"] = capex_val
+            if cfo_val != 0 or capex_val != 0:
+                res["freeCashFlow"] = round(cfo_val + capex_val)
+
+        ni_val = res.get("netIncome", 0) or 0
+        int_val = res.get("interestExpense", 0) or 0
+        depr_val = res.get("depreciation", 0) or 0
+        if depr_val != 0 and (res.get("ebitda") is None or res.get("ebitda") == 0):
+            res["ebitda"] = round(ni_val + int_val + depr_val)
+
+        return res
+
     # 1. HỢP NHẤT CHUỖI QUÝ (QUARTERLY TIME SERIES MERGE)
     merged_q = {}
-    # Nạp các quý cũ đã lưu trong kho
     for q in existing_doc.get("quarterly", []):
         p = q.get("period")
         if p and isinstance(p, str):
             merged_q[p] = dict(q)
 
-    # Nạp/ghi đè các quý mới nhất từ Yahoo Finance (số liệu kiểm toán cập nhật mới nhất)
     for q in new_statements.get("quarterly", []):
         p = q.get("period")
         if p and isinstance(p, str):
-            merged_q[p] = dict(q)
+            if p in merged_q:
+                merged_q[p] = _merge_single_record(merged_q[p], q)
+            else:
+                merged_q[p] = dict(q)
 
     def parse_q_key(p_str):
         try:
@@ -240,7 +289,10 @@ def merge_financial_series(existing_doc: Dict[str, Any], new_statements: Optiona
     for y in new_statements.get("annual", []):
         yr = str(y.get("year", ""))
         if yr:
-            merged_y[yr] = dict(y)
+            if yr in merged_y:
+                merged_y[yr] = _merge_single_record(merged_y[yr], y)
+            else:
+                merged_y[yr] = dict(y)
 
     def parse_y_key(y_str):
         try:
@@ -251,7 +303,7 @@ def merge_financial_series(existing_doc: Dict[str, Any], new_statements: Optiona
     sorted_y = sorted(merged_y.values(), key=lambda x: parse_y_key(x.get("year", "0")))
 
     return {
-        "source": new_statements.get("source", "Yahoo Finance Audit Statements & VAS TT200"),
+        "source": new_statements.get("source", "Yahoo Finance & vnstock / CafeF"),
         "status": "AUDITED_REAL_DATA" if (sorted_q or sorted_y) else "NO_AUDITED_DATA",
         "quarterly": sorted_q,
         "annual": sorted_y
@@ -310,31 +362,31 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
         base_stock_data = {}
 
     is_etf = symbol.startswith("E1") or symbol.startswith("FU") or "ETF" in symbol
-    close = base_stock_data.get("close", 20000)
-    eps = base_stock_data.get("profitability", {}).get("eps", 2000)
-    rev = base_stock_data.get("scale", {}).get("revenue", 10000000000000)
-    ni = base_stock_data.get("scale", {}).get("netIncome", 1000000000000)
-    assets = base_stock_data.get("health", {}).get("totalAssets", 20000000000000)
-    debt = base_stock_data.get("health", {}).get("totalDebt", 5000000000000)
-    shares = base_stock_data.get("scale", {}).get("sharesOutstanding") or 500_000_000
-    pb = base_stock_data.get("valuation", {}).get("pb", 1.2)
-    pe = base_stock_data.get("valuation", {}).get("pe", 9.5)
-    dps = base_stock_data.get("dividends", {}).get("dps", 1000)
+    close = base_stock_data.get("close")
+    eps = base_stock_data.get("profitability", {}).get("eps")
+    rev = base_stock_data.get("scale", {}).get("revenue")
+    ni = base_stock_data.get("scale", {}).get("netIncome")
+    assets = base_stock_data.get("health", {}).get("totalAssets")
+    debt = base_stock_data.get("health", {}).get("totalDebt")
+    shares = base_stock_data.get("scale", {}).get("sharesOutstanding")
+    pb = base_stock_data.get("valuation", {}).get("pb")
+    pe = base_stock_data.get("valuation", {}).get("pe")
+    dps = base_stock_data.get("dividends", {}).get("dps", 0)
 
     # Đơn vị trong BCTC: Tỷ đồng (Bn. VND)
     scale = 1_000_000_000
-    base_rev_bn = round(rev / scale) if rev else 10000
-    base_ni_bn = round(ni / scale) if ni else 1000
-    base_assets_bn = round(assets / scale) if assets else 20000
-    base_debt_bn = round(debt / scale) if debt else 5000
-    base_equity_bn = max(100, base_assets_bn - base_debt_bn)
-    bvps = round((base_equity_bn * scale) / shares) if shares else 20000
+    base_rev_bn = round(rev / scale) if rev else None
+    base_ni_bn = round(ni / scale) if ni else None
+    base_assets_bn = round(assets / scale) if assets else None
+    base_debt_bn = round(debt / scale) if debt is not None else None
+    base_equity_bn = (base_assets_bn - base_debt_bn) if (base_assets_bn is not None and base_debt_bn is not None) else None
+    bvps = base_stock_data.get("valuation", {}).get("bvps") or (round((base_equity_bn * scale) / shares) if (shares and base_equity_bn is not None) else None)
 
     # NẠP DỮ LIỆU BCTC THẬT 100% (TUYỆT ĐỐI KHÔNG DÙNG HỆ SỐ NỘI SUY GIẢ ĐỊNH)
     if real_statements and (real_statements.get("quarterly") or real_statements.get("annual")):
         quarterly_data = real_statements.get("quarterly", [])
         annual_data = real_statements.get("annual", [])
-        source_name = "Yahoo Finance Audit Statements & VAS TT200"
+        source_name = real_statements.get("source") or "Yahoo Finance Audit Statements & VAS TT200"
         status_name = "AUDITED_REAL_DATA"
     else:
         quarterly_data = []
@@ -368,16 +420,17 @@ def build_statement_from_cache_or_defaults(symbol: str, base_stock_data: Dict[st
     cogs_q = latest_q.get("costOfGoodsSold", 0)
     rec_q = latest_q.get("accountsReceivable", 0)
 
-    current_ratio = round(st_assets / st_debt, 2) if st_debt else (1.8 if quarterly_data else None)
-    quick_ratio = round((st_assets - inventory) / st_debt, 2) if st_debt else (1.2 if quarterly_data else None)
-    cash_ratio = round(cash_inv / st_debt, 2) if st_debt else (0.6 if quarterly_data else None)
-    interest_coverage = round(ebit_bn / interest_exp, 1) if interest_exp else (6.5 if quarterly_data else None)
+    current_ratio = round(st_assets / st_debt, 2) if (st_debt and st_debt > 0) else None
+    quick_ratio = round((st_assets - inventory) / st_debt, 2) if (st_debt and st_debt > 0) else None
+    cash_ratio = round(cash_inv / st_debt, 2) if (st_debt and st_debt > 0) else None
+    interest_coverage = round(ebit_bn / interest_exp, 1) if (interest_exp and interest_exp > 0) else None
 
     # Chu kỳ tiền mặt (Cash Conversion Cycle)
-    dso = round((rec_q * 90) / rev_q) if rev_q else 0
-    dio = round((inventory * 90) / cogs_q) if cogs_q else 0
-    dpo = round((st_debt * 0.3 * 90) / cogs_q) if cogs_q else 0
-    ccc = dso + dio - dpo
+    ap_q = latest_q.get("accountsPayable", 0)
+    dso = round((rec_q * 90) / rev_q) if (rev_q and rev_q > 0) else None
+    dio = round((inventory * 90) / cogs_q) if (cogs_q and cogs_q > 0) else None
+    dpo = round((ap_q * 90) / cogs_q) if (cogs_q and cogs_q > 0 and ap_q > 0) else None
+    ccc = (dso + dio - dpo) if (dso is not None and dio is not None and dpo is not None) else None
 
     altman_z = base_stock_data.get("altmanZScore")
 
@@ -550,63 +603,56 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
     if not quarterly_data:
         return doc
 
-    # Cập nhật ngày cơ cấu cổ đông sang năm hiện hành (loại bỏ ngày cũ 2024)
+    # Cập nhật ngày cơ cấu cổ đông (bảo toàn ngày thực tế từ vnstock nếu có)
     cur_year = datetime.now().year
     for sh in doc.get("shareholders", []):
-        sh["update_date"] = f"{cur_year}-06-30"
+        if not sh.get("updateDate") and not sh.get("update_date"):
+            sh["updateDate"] = f"{cur_year}-06-30"
+        elif sh.get("updateDate") and not sh.get("update_date"):
+            sh["update_date"] = sh["updateDate"]
 
     latest_q = quarterly_data[-1]
     ratios = doc.get("financialRatios", {})
-    close = float(stock_item.get("close") or latest_q.get("close") or 20000)
-    shares_count = float(stock_item.get("scale", {}).get("sharesOutstanding") or 1_000_000_000)
+    close = float(stock_item.get("close") or latest_q.get("close") or 0)
+    shares_count = float(stock_item.get("scale", {}).get("sharesOutstanding") or stock_item.get("shares") or 0)
 
-    # Đảm bảo 16 chỉ tiêu trong doc["yearly"] được điền đầy đủ cho tất cả các năm
+    # Đảm bảo các chỉ tiêu trong doc["yearly"] được tính toán chuẩn xác từ số liệu thực
     for i, y_dict in enumerate(doc.get("yearly", [])):
-        y_rev = float(y_dict.get("revenue") or 1)
-        y_ni = float(y_dict.get("netIncome") or 0)
-        y_gp = float(y_dict.get("grossProfit") or (y_rev * 0.18))
-        y_assets = float(y_dict.get("totalAssets") or (y_rev * 1.2))
-        y_debt = float(y_dict.get("totalDebt") or (y_assets * 0.35))
-        y_eq = float(y_dict.get("equity") or max(1, y_assets - y_debt))
-        y_interest = float(y_dict.get("interestExpense") or (y_gp * 0.15))
-        y_deprec = float(y_dict.get("depreciation") or (y_ni * 0.45))
+        y_rev = float(y_dict.get("revenue")) if y_dict.get("revenue") is not None else None
+        y_ni = float(y_dict.get("netIncome")) if y_dict.get("netIncome") is not None else None
+        y_gp = float(y_dict.get("grossProfit")) if y_dict.get("grossProfit") is not None else None
+        y_assets = float(y_dict.get("totalAssets")) if y_dict.get("totalAssets") is not None else None
+        y_debt = float(y_dict.get("totalDebt")) if y_dict.get("totalDebt") is not None else None
+        y_eq = float(y_dict.get("equity")) if y_dict.get("equity") is not None else ((y_assets - y_debt) if (y_assets is not None and y_debt is not None) else None)
+        y_interest = float(y_dict.get("interestExpense")) if y_dict.get("interestExpense") is not None else None
+        y_deprec = float(y_dict.get("depreciation")) if y_dict.get("depreciation") is not None else None
 
-        if y_dict.get("grossMargin") is None and y_rev > 0:
+        if y_dict.get("grossMargin") is None and y_gp is not None and y_rev and y_rev > 0:
             y_dict["grossMargin"] = round((y_gp / y_rev) * 100, 2)
-        if y_dict.get("netMargin") is None and y_rev > 0:
+        if y_dict.get("netMargin") is None and y_ni is not None and y_rev and y_rev > 0:
             y_dict["netMargin"] = round((y_ni / y_rev) * 100, 2)
-        if y_dict.get("roe") is None and y_eq > 0:
+        if y_dict.get("roe") is None and y_ni is not None and y_eq and y_eq > 0:
             y_dict["roe"] = round((y_ni / y_eq) * 100, 2)
-        if y_dict.get("roa") is None and y_assets > 0:
+        if y_dict.get("roa") is None and y_ni is not None and y_assets and y_assets > 0:
             y_dict["roa"] = round((y_ni / y_assets) * 100, 2)
-        if y_dict.get("roic") is None and (y_eq + y_debt) > 0:
-            y_dict["roic"] = round(((y_ni + y_interest * 0.8) / (y_eq + y_debt)) * 100, 2)
-        if y_dict.get("ebitda") is None:
+        if y_dict.get("roic") is None and y_ni is not None and y_eq is not None and y_debt is not None and (y_eq + y_debt) > 0:
+            y_interest_v = y_interest if y_interest is not None else 0.0
+            y_dict["roic"] = round(((y_ni + y_interest_v * 0.8) / (y_eq + y_debt)) * 100, 2)
+        if y_dict.get("ebitda") is None and y_ni is not None and y_interest is not None and y_deprec is not None:
             y_dict["ebitda"] = round(y_ni + y_interest + y_deprec)
-        if y_dict.get("debtToEquity") is None and y_eq > 0:
+        if y_dict.get("debtToEquity") is None and y_debt is not None and y_eq and y_eq > 0:
             y_dict["debtToEquity"] = round(y_debt / y_eq, 2)
-        if y_dict.get("currentRatio") is None and y_debt > 0:
-            y_inv = float(y_dict.get("inventory") or 0)
-            y_rec = float(y_dict.get("accountsReceivable") or 0)
-            y_dict["currentRatio"] = round((y_inv + y_rec + y_assets * 0.12) / (y_debt * 0.65), 2)
-        if y_dict.get("cashRatio") is None and y_debt > 0:
-            y_dict["cashRatio"] = round((y_assets * 0.12) / (y_debt * 0.65), 2)
-        if y_dict.get("eps") is None and shares_count > 0:
-            y_dict["eps"] = round((y_ni * 1_000_000_000) / shares_count)
-        if y_dict.get("bvps") is None and shares_count > 0:
-            y_dict["bvps"] = round((y_eq * 1_000_000_000) / shares_count)
-        if y_dict.get("pe") is None:
-            y_eps = float(y_dict.get("eps") or 0)
-            y_dict["pe"] = round(close / y_eps, 2) if (close > 0 and y_eps > 0) else None
-        if y_dict.get("pb") is None:
-            y_bvps = float(y_dict.get("bvps") or 0)
-            y_dict["pb"] = round(close / y_bvps, 2) if (close > 0 and y_bvps > 0) else None
+        if y_dict.get("eps") is None and y_ni is not None and shares_count > 0:
+            y_dict["eps"] = round((y_ni * 1_000_000_000) / shares_count) if abs(y_ni) < 1e8 else round(y_ni / shares_count)
+        if y_dict.get("bvps") is None and y_eq is not None and shares_count > 0:
+            y_dict["bvps"] = round((y_eq * 1_000_000_000) / shares_count) if abs(y_eq) < 1e8 else round(y_eq / shares_count)
 
     # 1. Extended DuPont 5 nhân tố
     doc["extendedDupont"] = calculate_extended_dupont(latest_q, quarterly_data)
 
-    # 2. Thước đo sức khỏe tổng thể 0-100
-    doc["healthScore"] = calculate_overall_health_score(ratios)
+    # 2. Thước đo sức khỏe tổng thể 0-100 (phân nhánh chuyên biệt cho ngân hàng)
+    ind_category = doc.get("_meta", {}).get("industry") or stock_item.get("industry") or stock_item.get("sector") or "GENERAL"
+    doc["healthScore"] = calculate_overall_health_score(ratios, industry_category=ind_category)
 
     # 3. Cảnh báo sớm rủi ro & Red Flags
     altman_z = stock_item.get("altmanZScore")
@@ -637,7 +683,8 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
         current_price=close,
         high_52w=high_52w,
         low_52w=low_52w,
-        beta=beta
+        beta=beta,
+        rf_rate=get_current_vn10y_yield()
     )
 
     # 6. Chuỗi TTM trượt 4 quý khử tính mùa vụ
@@ -645,6 +692,7 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
 
     # 7. Phân tích DCF (FCFF) 3 Kịch Bản, Reverse DCF & Ma Trận Độ Nhạy Cảm
     ind_cat = doc.get("industrySpecific", {}).get("category", "GENERAL")
+    sec_name = doc.get("_meta", {}).get("sector", "") or stock_item.get("sector", "")
     wacc_benchmark = get_sector_wacc(ind_cat, beta)
 
     # Tính CAGR doanh thu thực tế từ lịch sử năm (nếu có)
@@ -662,52 +710,146 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
         except Exception:
             pass
 
-    latest_yearly = doc.get("yearly", [])[-1] if doc.get("yearly") else latest_q
-    y_fcf_bn = latest_yearly.get("freeCashFlow") or latest_q.get("freeCashFlow") or 0
-    if y_fcf_bn == 0 and latest_yearly.get("cfo"):
-        y_fcf_bn = latest_yearly.get("cfo") - abs(latest_yearly.get("capex", 0))
-    base_fcff_vnd = y_fcf_bn * 1_000_000_000
-
     net_debt_vnd = float(ratios.get("netDebt") or (latest_q.get("totalDebt", 0) - latest_q.get("cashAndEquivalents", 0))) * 1_000_000_000
     shares_count = float(stock_item.get("scale", {}).get("sharesOutstanding") or 1_000_000_000)
     current_market_cap = float(stock_item.get("scale", {}).get("marketCap") or (close * shares_count))
     current_ev = current_market_cap + net_debt_vnd
 
-    dcf_res = calc_dcf_fcff(
-        base_fcff=base_fcff_vnd,
-        wacc=wacc_benchmark,
-        terminal_g=0.03,
-        net_debt=net_debt_vnd,
-        shares=shares_count,
-        historical_cagr=historical_cagr
+    sec_str = (sec_name or stock_item.get("sector", "") or "").lower()
+    ind_str = (ind_cat or stock_item.get("industry", "") or "").lower()
+    is_financial = (
+        ind_cat.upper() in ["BANKING", "FINANCIAL_SERVICES", "INSURANCE"] or
+        any(k in sec_str for k in ["tài chính", "ngân hàng", "chứng khoán", "bảo hiểm", "finance", "financial", "banking"]) or
+        any(k in ind_str for k in ["bank", "broker", "securities", "insurance"])
     )
 
-    reverse_dcf_growth = calc_reverse_dcf(
-        current_ev=current_ev,
-        base_fcff=base_fcff_vnd,
-        wacc=wacc_benchmark,
-        terminal_g=0.03
-    )
+    if is_financial:
+        dcf_res = {
+            "status": "NOT_APPLICABLE_FINANCIAL",
+            "basePrice": None,
+            "bullPrice": None,
+            "bearPrice": None,
+            "fairPrice": None,
+            "wacc": round(wacc_benchmark * 100, 2),
+            "terminalG": 3.0,
+            "note": "Mô hình DCF (FCFF) không áp dụng cho nhóm ngành Ngân hàng / Tài chính do đặc thù cấu trúc vốn và dòng tiền gửi. Khuyến nghị sử dụng mô hình DDM (Cổ tức), Gordon P/B hoặc Residual Income (RIM/EVA)."
+        }
+        doc["dcfAnalysis"] = {
+            "sectorWacc": round(wacc_benchmark * 100, 2),
+            "industryCategory": ind_cat,
+            "baseFcff": 0,
+            "isNormalizedFcf": False,
+            "isFinancialSector": True,
+            "historicalCagr": round(historical_cagr * 100, 2) if historical_cagr is not None else None,
+            "dcfScenarios": dcf_res,
+            "reverseDcfImpliedGrowth": None,
+            "sensitivityMatrix": {"waccList": [], "gList": [], "matrix": []},
+            "alternativeMethodFlag": True
+        }
+    else:
+        # B. Doanh nghiệp phi tài chính: Đối soát dòng tiền đa kỳ (TTM 4 quý vs Năm gần nhất)
+        q_series = doc.get("quarterly", [])
+        ttm_cfo = 0.0
+        ttm_capex = 0.0
+        ttm_depr = 0.0
+        has_ttm = False
+        if len(q_series) >= 4:
+            last_4_q = q_series[-4:]
+            ttm_cfo = sum(float(q.get("cfo", 0) or 0) for q in last_4_q)
+            ttm_capex = sum(abs(float(q.get("capex", 0) or 0)) for q in last_4_q)
+            ttm_depr = sum(float(q.get("depreciation", 0) or 0) for q in last_4_q)
+            has_ttm = (ttm_cfo != 0 or ttm_capex != 0)
 
-    sensitivity_mat = calc_dcf_sensitivity_matrix(
-        base_fcff=base_fcff_vnd,
-        net_debt=net_debt_vnd,
-        shares=shares_count,
-        wacc_list=[max(0.08, wacc_benchmark - 0.015), wacc_benchmark, wacc_benchmark + 0.01, wacc_benchmark + 0.02],
-        g_list=[0.02, 0.03, 0.04],
-        historical_cagr=historical_cagr
-    )
+        latest_yearly = doc.get("yearly", [])[-1] if doc.get("yearly") else latest_q
+        y_cfo = float(latest_yearly.get("cfo", 0) or 0)
+        y_capex = abs(float(latest_yearly.get("capex", 0) or 0))
+        y_depr = float(latest_yearly.get("depreciation", 0) or 0)
 
-    doc["dcfAnalysis"] = {
-        "sectorWacc": round(wacc_benchmark * 100, 2),
-        "industryCategory": ind_cat,
-        "baseFcff": y_fcf_bn,
-        "historicalCagr": round(historical_cagr * 100, 2) if historical_cagr is not None else None,
-        "dcfScenarios": dcf_res,
-        "reverseDcfImpliedGrowth": reverse_dcf_growth,
-        "sensitivityMatrix": sensitivity_mat,
-        "alternativeMethodFlag": dcf_res.get("status") == "NEGATIVE_FCF"
-    }
+        active_cfo = ttm_cfo if has_ttm else y_cfo
+        active_capex = ttm_capex if has_ttm else y_capex
+        active_depr = ttm_depr if (has_ttm and ttm_depr > 0) else y_depr
+        active_fcf = active_cfo - active_capex
+
+        base_fcff_bn = active_fcf
+        is_normalized = False
+        dcf_res = None
+
+        # 1. Thử nghiệm DCF trực tiếp từ FCF thực tế
+        if base_fcff_bn > 0:
+            test_dcf = calc_dcf_fcff(
+                base_fcff=base_fcff_bn * 1_000_000_000,
+                wacc=wacc_benchmark,
+                terminal_g=0.03,
+                net_debt=net_debt_vnd,
+                shares=shares_count,
+                historical_cagr=historical_cagr
+            )
+            if test_dcf.get("basePrice") is not None and test_dcf.get("basePrice") > 0:
+                dcf_res = test_dcf
+
+        # 2. Xử lý chu kỳ đại đầu tư (Growth CapEx Expansion Cycle):
+        # Nếu FCF <= 0 hoặc làm Equity âm nhưng CFO dương mạnh và Doanh nghiệp có lãi
+        latest_ni = float(latest_q.get("netIncome", 0) or 0)
+        yearly_ni = float(latest_yearly.get("netIncome", 0) or 0)
+        if (dcf_res is None or dcf_res.get("basePrice") is None) and active_cfo > 0 and (latest_ni > 0 or yearly_ni > 0):
+            maint_capex = active_depr if (active_depr > 0 and active_depr < active_cfo) else (active_cfo * 0.40)
+            norm_fcff = active_cfo - maint_capex
+            if norm_fcff > 0:
+                norm_dcf = calc_dcf_fcff(
+                    base_fcff=norm_fcff * 1_000_000_000,
+                    wacc=wacc_benchmark,
+                    terminal_g=0.03,
+                    net_debt=net_debt_vnd,
+                    shares=shares_count,
+                    historical_cagr=historical_cagr
+                )
+                if norm_dcf.get("basePrice") is not None and norm_dcf.get("basePrice") > 0:
+                    base_fcff_bn = round(norm_fcff)
+                    is_normalized = True
+                    dcf_res = norm_dcf
+                    dcf_res["status"] = "NORMALIZED_FCF"
+                    dcf_res["note"] = f"Áp dụng FCFF Chuẩn Hóa ({base_fcff_bn:,.0f} tỷ: CFO trừ Khấu hao duy trì) do doanh nghiệp đang trong chu kỳ đại đầu tư mở rộng công suất lớn (Growth CapEx)."
+
+        # 3. Fallback an toàn nếu doanh nghiệp thực sự cạn kiệt dòng tiền
+        if dcf_res is None:
+            dcf_res = calc_dcf_fcff(
+                base_fcff=base_fcff_bn * 1_000_000_000,
+                wacc=wacc_benchmark,
+                terminal_g=0.03,
+                net_debt=net_debt_vnd,
+                shares=shares_count,
+                historical_cagr=historical_cagr
+            )
+
+        base_fcff_vnd = base_fcff_bn * 1_000_000_000
+        reverse_dcf_growth = calc_reverse_dcf(
+            current_ev=current_ev,
+            base_fcff=base_fcff_vnd if base_fcff_bn > 0 else None,
+            wacc=wacc_benchmark,
+            terminal_g=0.03
+        )
+
+        sensitivity_mat = calc_dcf_sensitivity_matrix(
+            base_fcff=base_fcff_vnd if base_fcff_bn > 0 else None,
+            net_debt=net_debt_vnd,
+            shares=shares_count,
+            wacc_list=[max(0.08, wacc_benchmark - 0.015), wacc_benchmark, wacc_benchmark + 0.01, wacc_benchmark + 0.02],
+            g_list=[0.02, 0.03, 0.04],
+            historical_cagr=historical_cagr
+        )
+
+        doc["dcfAnalysis"] = {
+            "sectorWacc": round(wacc_benchmark * 100, 2),
+            "industryCategory": ind_cat,
+            "baseFcff": base_fcff_bn,
+            "isNormalizedFcf": is_normalized,
+            "isFinancialSector": False,
+            "historicalCagr": round(historical_cagr * 100, 2) if historical_cagr is not None else None,
+            "dcfScenarios": dcf_res,
+            "reverseDcfImpliedGrowth": reverse_dcf_growth,
+            "sensitivityMatrix": sensitivity_mat,
+            "alternativeMethodFlag": dcf_res.get("status") in ["NEGATIVE_FCF", "NOT_APPLICABLE_FINANCIAL"]
+        }
 
     # 8. Hồ sơ Hành vi Thị trường Định lượng (Market Profile & Wyckoff) từ Nến Ngày Thực Tế
     daily_candles = fetch_real_daily_candles(symbol, count=60)
@@ -764,17 +906,54 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
 
     # 12. Cập nhật Động cơ Định giá Doanh nghiệp Toàn diện (Enterprise Valuation Engine 10 mô hình)
     engine = StockValuationEngine()
+    latest_ttm = doc["ttmSeries"][-1] if doc.get("ttmSeries") else {}
+
     ttm_eps_candidate = stock_item.get("profitability", {}).get("eps") or ratios.get("valuation", {}).get("eps")
     if not ttm_eps_candidate and len(quarterly_data) >= 4:
         ttm_eps_candidate = sum(float(q.get("eps") or 0) for q in quarterly_data[-4:])
     if not ttm_eps_candidate or ttm_eps_candidate <= 0:
-        ttm_ni_bn = (latest_q.get("netIncomeParent") or latest_q.get("netIncome", 0)) * 4
-        ttm_eps_candidate = round((ttm_ni_bn * 1_000_000_000) / shares_count) if shares_count else 2000
-    val_eps = float(ttm_eps_candidate)
+        if len(quarterly_data) >= 4:
+            ttm_ni_bn = sum(float(q.get("netIncomeParent") or q.get("netIncome") or 0) for q in quarterly_data[-4:])
+        elif latest_ttm.get("netIncome") is not None:
+            ttm_ni_bn = float(latest_ttm["netIncome"])
+        else:
+            ttm_ni_bn = (latest_q.get("netIncomeParent") or latest_q.get("netIncome", 0)) * 4
+        ttm_eps_candidate = round((ttm_ni_bn * 1_000_000_000) / shares_count) if (shares_count and ttm_ni_bn) else None
+    val_eps = float(ttm_eps_candidate) if ttm_eps_candidate is not None else None
 
-    val_bvps = round(float(latest_q.get("equity", 1)) * 1_000_000_000 / shares_count) if shares_count else 15000
-    val_pe = float(ratios.get("valuation", {}).get("pe") or stock_item.get("valuation", {}).get("pe") or (round(close / val_eps, 2) if val_eps > 0 else 9.5))
-    val_pb = float(ratios.get("valuation", {}).get("pb") or stock_item.get("valuation", {}).get("pb") or (round(close / val_bvps, 2) if val_bvps > 0 else 1.2))
+    latest_equity = latest_q.get("equity")
+    val_bvps = round(float(latest_equity) * 1_000_000_000 / shares_count) if (shares_count and latest_equity is not None) else stock_item.get("valuation", {}).get("bvps")
+    raw_pe = ratios.get("valuation", {}).get("pe") or stock_item.get("valuation", {}).get("pe") or (round(close / val_eps, 2) if (close and val_eps and val_eps > 0) else None)
+    val_pe = float(raw_pe) if raw_pe is not None else None
+    raw_pb = ratios.get("valuation", {}).get("pb") or stock_item.get("valuation", {}).get("pb") or (round(close / val_bvps, 2) if (close and val_bvps and val_bvps > 0) else None)
+    val_pb = float(raw_pb) if raw_pb is not None else None
+    if not val_bvps and close and val_pb and val_pb > 0:
+        val_bvps = round(close / val_pb)
+
+    # Tính dòng tiền và lưu chuyển theo TTM trượt 4 quý để triệt tiêu mùa vụ (bán lẻ Q1, BĐS Q4)
+    if len(quarterly_data) >= 4:
+        last4 = quarterly_data[-4:]
+        rev_input = sum(float(q.get("revenue") or 0) for q in last4) * 1_000_000_000
+        ni_input = sum(float(q.get("netIncomeParent") or q.get("netIncome") or 0) for q in last4) * 1_000_000_000
+        cfo_input = sum(float(q.get("cfo") or 0) for q in last4) * 1_000_000_000
+        capex_input = sum(abs(float(q.get("capex") or 0)) for q in last4) * 1_000_000_000
+        q_ebitdas = [float(q.get("ebitda")) for q in last4 if q.get("ebitda") is not None]
+        ebitda_input = sum(q_ebitdas) * 1_000_000_000 if len(q_ebitdas) == 4 else None
+    elif latest_ttm:
+        rev_input = (float(latest_ttm["revenue"]) * 1_000_000_000) if latest_ttm.get("revenue") is not None else None
+        ni_input = (float(latest_ttm["netIncome"]) * 1_000_000_000) if latest_ttm.get("netIncome") is not None else None
+        cfo_input = (float(latest_ttm["cfo"]) * 1_000_000_000) if latest_ttm.get("cfo") is not None else None
+        capex_input = (abs(float(latest_q.get("capex"))) * 1_000_000_000 * 4) if latest_q.get("capex") is not None else None
+        ebitda_input = (float(latest_q.get("ebitda")) * 1_000_000_000 * 4) if latest_q.get("ebitda") is not None else None
+    else:
+        rev_input = (float(latest_q.get("revenue")) * 1_000_000_000 * 4) if latest_q.get("revenue") is not None else None
+        ni_input = (float(latest_q.get("netIncomeParent") or latest_q.get("netIncome")) * 1_000_000_000 * 4) if (latest_q.get("netIncomeParent") or latest_q.get("netIncome")) is not None else None
+        cfo_input = (float(latest_q.get("cfo")) * 1_000_000_000 * 4) if latest_q.get("cfo") is not None else None
+        capex_input = (abs(float(latest_q.get("capex"))) * 1_000_000_000 * 4) if latest_q.get("capex") is not None else None
+        ebitda_input = (float(latest_q.get("ebitda")) * 1_000_000_000 * 4) if latest_q.get("ebitda") is not None else None
+
+    if ebitda_input is None and ratios.get("profitability", {}).get("ebitda") is not None:
+        ebitda_input = float(ratios.get("profitability", {}).get("ebitda")) * 1_000_000_000
 
     val_res = engine.evaluate({
         "close": close,
@@ -783,22 +962,22 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
         "pb": val_pb,
         "bvps": val_bvps,
         "dps": float(stock_item.get("dividends", {}).get("dps") or 0),
-        "revenue": float(latest_q.get("revenue", 0)) * 1_000_000_000 * 4,
-        "netIncome": float(latest_q.get("netIncomeParent") or latest_q.get("netIncome", 0)) * 1_000_000_000 * 4,
-        "totalAssets": float(latest_q.get("totalAssets", 0)) * 1_000_000_000,
-        "totalDebt": float(latest_q.get("totalDebt", 0)) * 1_000_000_000,
-        "ebitda": float(ratios.get("profitability", {}).get("ebitda") or 0) * 1_000_000_000 * 4,
-        "cfo": float(latest_q.get("cfo", 0)) * 1_000_000_000 * 4,
-        "capex": abs(float(latest_q.get("capex", 0))) * 1_000_000_000 * 4,
+        "revenue": rev_input,
+        "netIncome": ni_input,
+        "totalAssets": (float(latest_q.get("totalAssets")) * 1_000_000_000) if latest_q.get("totalAssets") is not None else None,
+        "totalDebt": (float(latest_q.get("totalDebt")) * 1_000_000_000) if latest_q.get("totalDebt") is not None else None,
+        "ebitda": ebitda_input,
+        "cfo": cfo_input,
+        "capex": capex_input,
         "shares": shares_count,
-        "roe": float(ratios.get("profitability", {}).get("roe") or stock_item.get("profitability", {}).get("roe") or 15.0),
-        "roa": float(ratios.get("profitability", {}).get("roa") or stock_item.get("profitability", {}).get("roa") or 8.0),
-        "roic": float(ratios.get("profitability", {}).get("roic") or 8.0),
-        "grossMargin": float(ratios.get("profitability", {}).get("grossMargin") or 18.0),
-        "netMargin": float(ratios.get("profitability", {}).get("netMargin") or latest_q.get("netMargin") or 10.0),
-        "debtToEquity": float(ratios.get("leverage", {}).get("debtToEquity") or 0.6),
-        "currentRatio": float(ratios.get("liquidity", {}).get("currentRatio") or 1.8),
-        "cashRatio": float(ratios.get("liquidity", {}).get("cashRatio") or 0.6),
+        "roe": float(ratios.get("profitability", {}).get("roe") or stock_item.get("profitability", {}).get("roe")) if (ratios.get("profitability", {}).get("roe") or stock_item.get("profitability", {}).get("roe")) is not None else None,
+        "roa": float(ratios.get("profitability", {}).get("roa") or stock_item.get("profitability", {}).get("roa")) if (ratios.get("profitability", {}).get("roa") or stock_item.get("profitability", {}).get("roa")) is not None else None,
+        "roic": float(ratios.get("profitability", {}).get("roic")) if ratios.get("profitability", {}).get("roic") is not None else None,
+        "grossMargin": float(ratios.get("profitability", {}).get("grossMargin")) if ratios.get("profitability", {}).get("grossMargin") is not None else None,
+        "netMargin": float(ratios.get("profitability", {}).get("netMargin") or latest_q.get("netMargin")) if (ratios.get("profitability", {}).get("netMargin") or latest_q.get("netMargin")) is not None else None,
+        "debtToEquity": float(ratios.get("leverage", {}).get("debtToEquity")) if ratios.get("leverage", {}).get("debtToEquity") is not None else None,
+        "currentRatio": float(ratios.get("liquidity", {}).get("currentRatio")) if ratios.get("liquidity", {}).get("currentRatio") is not None else None,
+        "cashRatio": float(ratios.get("liquidity", {}).get("cashRatio")) if ratios.get("liquidity", {}).get("cashRatio") is not None else None,
         "sector": stock_item.get("sector") or doc.get("_meta", {}).get("sector") or "Khác",
         "industry": stock_item.get("industry") or "Khác",
         "yearlyHistory": doc.get("yearly", []),
@@ -834,7 +1013,7 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
     return doc
 
 
-def fetch_and_save_financials(symbols: List[str]):
+def fetch_and_save_financials(symbols: List[str], backfill_deep: bool = False, recalculate_only: bool = False):
     """Thu thập và lưu trọn vẹn toàn bộ các nhóm dữ liệu BCTC và Ratios cho danh sách mã."""
     FINANCIALS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -870,14 +1049,61 @@ def fetch_and_save_financials(symbols: List[str]):
             except Exception:
                 existing_doc = {}
 
-        # TẦNG 1: Dữ liệu BCTC kiểm toán thật 100% từ Yahoo Finance (yfinance)
-        real_res = financial_fetcher.fetch_real_yfinance_statements(sym_upper)
-        if real_res and (real_res.get("quarterly") or real_res.get("annual")):
+        if recalculate_only:
+            if existing_doc and existing_doc.get("quarterly") and len(existing_doc["quarterly"]) > 0:
+                print(f"   🔄 [TÍNH LẠI TOÀN BỘ ĐỊNH GIÁ & CHỈ TIÊU TTM] {sym_upper}")
+                fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item, real_statements={
+                    "quarterly": existing_doc.get("quarterly", []),
+                    "annual": existing_doc.get("yearly", existing_doc.get("annual", [])),
+                    "source": existing_doc.get("_meta", {}).get("source", "Yahoo Finance & vnstock Guest Mode"),
+                    "status": existing_doc.get("_meta", {}).get("status", "AUDITED_REAL_DATA")
+                })
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(fin_doc, f, ensure_ascii=False, indent=2)
+                print(f"   💾 Đã làm mới chỉ số & 10 mô hình định giá: {out_path.name}")
+            else:
+                print(f"   ⚠️ Không tìm thấy BCTC cũ để tính lại cho {sym_upper}")
+            continue
+
+        # TẦNG 1: Nguồn BCTC kiểm toán chính từ Yahoo Finance (yfinance - tối đa 6 Quý & 5 Năm)
+        yf_res = financial_fetcher.fetch_real_yfinance_statements(sym_upper)
+
+        # TẦNG 2: Nguồn BCTC bổ sung từ vnstock Guest Mode (VCI/KBS - 4 Quý & 4 Năm)
+        vnstock_res = financial_fetcher.fetch_supplementary_vnstock_statements(sym_upper)
+
+        # HỢP NHẤT TƯƠNG HỖ 2 NGUỒN ĐỂ LẤY NHIỀU NHẤT CÓ THỂ (CROSS-SOURCE MAXIMUM EXTRACTION)
+        combined_new = None
+        if yf_res and vnstock_res:
+            combined_new = merge_financial_series(yf_res, vnstock_res)
+            combined_new["source"] = "Yahoo Finance & vnstock Guest Mode Official Statements"
+        elif yf_res:
+            combined_new = yf_res
+        elif vnstock_res:
+            combined_new = vnstock_res
+
+        # TẦNG 3: Cứu cánh Fallback từ CafeF HTML Scraper
+        # Kích hoạt khi CẢ Yahoo Finance và vnstock đều không có dữ liệu, hoặc khi người dùng yêu cầu --backfill-deep
+        if not combined_new or len(combined_new.get("quarterly", [])) == 0 or backfill_deep:
+            try:
+                cafef_res = financial_fetcher.fetch_fallback_cafef_statements(sym_upper, backfill_deep=backfill_deep)
+                if cafef_res:
+                    if not combined_new:
+                        print(f"   ℹ️ [TẦNG 3 CAFEF FALLBACK] Thu thập BCTC dự phòng từ CafeF cho {sym_upper}")
+                        combined_new = cafef_res
+                    else:
+                        # Ghép dữ liệu lịch sử sâu từ CafeF vào phía sau (không ghi đè kỳ kiểm toán đã có)
+                        combined_new = merge_financial_series(cafef_res, combined_new)
+                        print(f"   ℹ️ [TẦNG 3 CAFEF DEEP BACKFILL] Bổ sung chuỗi lịch sử quá khứ từ CafeF cho {sym_upper}")
+            except Exception as e:
+                pass
+
+        if combined_new and (combined_new.get("quarterly") or combined_new.get("annual")):
             # HỢP NHẤT TÍCH LŨY LỊCH SỬ KHÔNG PHÁ HỦY (CUMULATIVE HISTORICAL MERGING)
-            merged_res = merge_financial_series(existing_doc, real_res)
+            merged_res = merge_financial_series(existing_doc, combined_new)
             n_q = len(merged_res.get("quarterly", []))
             n_y = len(merged_res.get("annual", []))
-            print(f"   ✅ [TẦNG 1 AUDIT] Lấy thành công BCTC KIỂM TOÁN THẬT từ Yahoo Finance cho {sym_upper}")
+            src_name = merged_res.get("source", "Yahoo Finance & vnstock / CafeF")
+            print(f"   ✅ [BCTC KIỂM TOÁN THẬT] Thu thập thành công ({src_name}) cho {sym_upper}")
             print(f"      📦 Tích lũy chuỗi lịch sử hợp nhất: {n_q} Quý & {n_y} Năm kiểm toán")
             fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item, real_statements=merged_res)
             with open(out_path, "w", encoding="utf-8") as f:
@@ -885,25 +1111,13 @@ def fetch_and_save_financials(symbols: List[str]):
             print(f"   💾 Đã cập nhật BCTC tích lũy: {out_path.name}")
             continue
 
-        # TẦNG 2: vnstock Live API (dành cho các mã Việt Nam nếu có thư viện)
-        raw_vnstock = try_vnstock_fetch(sym_upper)
-        if raw_vnstock:
-            print(f"   ✅ [TẦNG 2 LIVE] Lấy thành công BCTC từ vnstock API cho {sym_upper}")
-            fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item)
-            fin_doc["_meta"]["source"] = "vnstock (VCI Live API)"
-            fin_doc["_meta"]["status"] = "OFFICIAL_VERIFIED"
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(fin_doc, f, ensure_ascii=False, indent=2)
-            print(f"   💾 Đã cập nhật BCTC chính thức: {out_path.name}")
-            continue
-
-        # TẦNG 3: Bảo toàn dữ liệu cũ nếu tạm thời không fetch được, hoặc đánh dấu NO_AUDITED_DATA
+        # TẦNG 4: Bảo toàn dữ liệu cũ nếu tạm thời không fetch được mạng
         if existing_doc and existing_doc.get("quarterly") and len(existing_doc["quarterly"]) > 0:
             print(f"   🛡️ [BẢO TOÀN LỊCH SỬ] Giữ nguyên {len(existing_doc['quarterly'])} Quý & {len(existing_doc.get('yearly', []))} Năm BCTC đã có cho {sym_upper}")
             fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item, real_statements={
                 "quarterly": existing_doc.get("quarterly", []),
                 "annual": existing_doc.get("yearly", existing_doc.get("annual", [])),
-                "source": existing_doc.get("_meta", {}).get("source", "Yahoo Finance Audit Statements & VAS TT200"),
+                "source": existing_doc.get("_meta", {}).get("source", "Yahoo Finance & vnstock Guest Mode"),
                 "status": existing_doc.get("_meta", {}).get("status", "AUDITED_REAL_DATA")
             })
             with open(out_path, "w", encoding="utf-8") as f:
@@ -912,7 +1126,7 @@ def fetch_and_save_financials(symbols: List[str]):
             continue
 
         is_etf = sym_upper.startswith("E1") or sym_upper.startswith("FU") or "ETF" in sym_upper
-        print(f"   ℹ️ [TẦNG 3] {sym_upper} chưa có BCTC kiểm toán trên sàn niêm yết (hoặc ETF). Gắn nhãn chuẩn xác, không sinh số giả.")
+        print(f"   ℹ️ [TẦNG 5] {sym_upper} chưa có BCTC kiểm toán trên sàn niêm yết (hoặc ETF). Gắn nhãn chuẩn xác, không sinh số giả.")
         fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item, real_statements=None)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(fin_doc, f, ensure_ascii=False, indent=2)
@@ -923,6 +1137,8 @@ def fetch_and_save_financials(symbols: List[str]):
 def main():
     parser = argparse.ArgumentParser(description="Thu thập BCTC toàn diện cho cổ phiếu VN")
     parser.add_argument("--symbols", type=str, default="", help="Danh sách mã cổ phiếu (phân tách bởi dấu phẩy, ví dụ: HPG,PNJ,DXG)")
+    parser.add_argument("--backfill-deep", action="store_true", help="Kích hoạt cào lịch sử sâu từ CafeF để bổ sung các năm/quý quá khứ xa")
+    parser.add_argument("--recalculate-only", action="store_true", help="Tính lại toàn bộ 10 mô hình định giá, TTM và ratios từ file BCTC địa phương mà không gọi mạng")
     args = parser.parse_args()
 
     symbols = []
@@ -941,7 +1157,7 @@ def main():
         combined = list(dict.fromkeys(loaded + existing_syms))
         symbols = combined if combined else ["HPG", "PNJ", "DXG", "MBB", "VND", "FPT", "VCB", "VHM"]
 
-    fetch_and_save_financials(symbols)
+    fetch_and_save_financials(symbols, backfill_deep=args.backfill_deep, recalculate_only=args.recalculate_only)
 
 if __name__ == "__main__":
     main()

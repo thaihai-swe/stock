@@ -95,14 +95,12 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
 
         if (histVals.length > 0) {
           smaVal = histVals.reduce((acc, curr) => acc + curr, 0) / histVals.length;
-        } else if (currentVal != null) {
-          smaVal = currentVal; // Giữ nguyên hiện tại nếu thiếu dữ liệu quá khứ
         }
       }
 
       // 3. Chuẩn hóa tỷ lệ biến động deltaPct và đánh giá chu kỳ
       let deltaPct = existing.deltaPct;
-      let status = existing.status || 'Ổn định';
+      let status = existing.status || (smaVal == null ? 'Chưa đủ dữ liệu LS' : 'Ổn định');
       let badgeColor = existing.badgeColor || 'text-gray-400';
 
       if (deltaPct == null && currentVal != null && smaVal != null && smaVal !== 0) {
@@ -140,7 +138,8 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
   // Thống kê nhanh
   const improvedCount = items.filter(it => it.status === 'Cải thiện rõ rệt').length;
   const worseCount = items.filter(it => it.status === 'Suy giảm so với TB').length;
-  const stableCount = items.length - improvedCount - worseCount;
+  const stableCount = items.filter(it => it.status === 'Ổn định').length;
+  const unratedCount = items.filter(it => it.status === 'Chưa đủ dữ liệu LS').length;
 
   const filteredItems = items.filter(it => {
     if (filterType === 'improved') return it.status === 'Cải thiện rõ rệt';
@@ -215,6 +214,7 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
         <div className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
           <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase block">Duy Trì Ổn Định (±15%)</span>
           <span className="text-xl font-black text-gray-800 dark:text-gray-200 mt-0.5 block">{stableCount} chỉ số</span>
+          {unratedCount > 0 && <span className="text-[10px] text-gray-400 block mt-0.5 font-medium">({unratedCount} chưa đủ LS)</span>}
         </div>
         <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60">
           <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase block">Suy Giảm Đáng Kể (&lt;-15%)</span>

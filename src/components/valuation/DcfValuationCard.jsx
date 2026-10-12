@@ -14,6 +14,8 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
     sectorWacc,
     industryCategory,
     baseFcff,
+    isNormalizedFcf,
+    isFinancialSector,
     dcfScenarios = {},
     reverseDcfImpliedGrowth,
     sensitivityMatrix = {},
@@ -29,6 +31,9 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
     status,
     note
   } = dcfScenarios;
+
+  const isFinancial = isFinancialSector || status === 'NOT_APPLICABLE_FINANCIAL' || industryCategory === 'BANKING';
+  const isNormalized = isNormalizedFcf || status === 'NORMALIZED_FCF';
 
   const curPrice = currentPrice || 0;
 
@@ -58,7 +63,7 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              WACC Ngành: {sectorWacc || 10.5}%
+              WACC Ngành: {sectorWacc ? `${sectorWacc}%` : '—'}
             </span>
             <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-purple-50 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
               Ngành: {industryCategory || 'GENERAL'}
@@ -66,7 +71,51 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
           </div>
         </div>
 
-        {alternativeMethodFlag && (
+        {/* 1. Trường hợp Ngân Hàng / Tài Chính */}
+        {isFinancial && (
+          <div className="mt-6 p-6 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+            <div className="flex items-start gap-4">
+              <span className="text-3xl">🏛️</span>
+              <div className="space-y-2">
+                <div className="text-sm font-bold text-indigo-900 dark:text-indigo-200">
+                  Miễn trừ áp dụng mô hình DCF (FCFF) cho Nhóm Ngân Hàng / Tài Chính
+                </div>
+                <p className="text-xs text-indigo-800/80 dark:text-indigo-300/80 leading-relaxed">
+                  Theo chuẩn mực định giá quốc tế (Aswath Damodaran &amp; CFA Institute), mô hình chiết khấu dòng tiền tự do doanh nghiệp (FCFF) không áp dụng cho các tổ chức tài chính do tiền gửi khách hàng và huy động vốn được tính trực tiếp vào dòng tiền hoạt động (CFO), làm méo mó dòng tiền tự do.
+                </p>
+                <div className="pt-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                  💡 Khuyến nghị sử dụng các mô hình chuyên biệt cho nhóm này:
+                  <ul className="list-disc list-inside mt-1 font-normal space-y-0.5 text-gray-700 dark:text-gray-300">
+                    <li><strong>Mô hình Chiết khấu Cổ tức DDM</strong> (phù hợp với ngân hàng trả cổ tức đều)</li>
+                    <li><strong>Mô hình P/B Ngành &amp; Gordon Growth</strong> (dựa trên ROE vs Chi phí vốn)</li>
+                    <li><strong>Mô hình Thu nhập thặng dư RIM / EVA</strong> (đo lường giá trị gia tăng trên vốn chủ sở hữu)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 2. Trường hợp Doanh nghiệp trong chu kỳ đại đầu tư (Normalized FCF) */}
+        {!isFinancial && isNormalized && (
+          <div className="mt-4 p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 flex items-start gap-3">
+            <span className="text-blue-500 text-lg">⚡</span>
+            <div className="text-xs text-blue-900 dark:text-blue-200 space-y-1">
+              <div className="font-bold flex items-center gap-2">
+                <span>Dòng Tiền Tự Do Chuẩn Hóa (Normalized FCFF):</span>
+                <span className="text-[10px] bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded-full uppercase">
+                  Growth CapEx Adjustment
+                </span>
+              </div>
+              <p className="leading-relaxed text-blue-800 dark:text-blue-300">
+                {note || 'Doanh nghiệp đang trong chu kỳ đại đầu tư mở rộng công suất lớn (Growth CapEx), hệ thống sử dụng dòng tiền chuẩn hóa (CFO trừ Khấu hao duy trì) để phản ánh trung thực năng lực tạo tiền dài hạn.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Trường hợp FCF âm thực sự (Thua lỗ / Dòng tiền cạn kiệt) */}
+        {!isFinancial && !isNormalized && alternativeMethodFlag && (
           <div className="mt-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-start gap-3">
             <span className="text-amber-500 text-lg">⚠️</span>
             <div className="text-xs text-amber-800 dark:text-amber-200">
@@ -76,7 +125,8 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
           </div>
         )}
 
-        {/* ── 3 KỊCH BẢN DCF ── */}
+        {/* ── 3 KỊCH BẢN DCF (Chỉ hiển thị cho doanh nghiệp phi tài chính) ── */}
+        {!isFinancial && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           {/* 1. Bear Case */}
           <div className="p-4 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 space-y-2">
@@ -104,7 +154,7 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
             </div>
             <div className="flex items-center justify-between text-xs font-bold text-indigo-700 dark:text-indigo-300">
               <span>🎯 Cơ Sở (Base Case)</span>
-              <span>g: 3.0% · WACC: {wacc || 10.5}%</span>
+              <span>g: {terminalG ? `${terminalG}%` : '3.0%'} · WACC: {wacc ? `${wacc}%` : (sectorWacc ? `${sectorWacc}%` : '—')}</span>
             </div>
             <div className="flex items-baseline justify-between">
               <span className="text-2xl font-black text-indigo-800 dark:text-indigo-200">
@@ -138,114 +188,120 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
             <p className="text-[11px] text-gray-500 dark:text-gray-400">Hiệu suất vận hành tối đa, thị phần gia tăng và chi phí vốn tối ưu.</p>
           </div>
         </div>
-      </div>
-
-      {/* ── REVERSE DCF & TỐC ĐỘ TĂNG TRƯỞNG NGỤ Ý ── */}
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-xs">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🔄</span>
-            <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-              Reverse DCF — Tốc Độ Tăng Trưởng Ngụ Ý Thị Trường Phản Ánh
-            </h4>
-          </div>
-          {reverseDcfImpliedGrowth != null && (
-            <span className={`text-sm font-black px-2.5 py-1 rounded-xl ${reverseDcfImpliedGrowth <= 6.0
-              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-              : reverseDcfImpliedGrowth <= 15.0
-                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
-                : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-              }`}>
-              g ngụ ý: {reverseDcfImpliedGrowth}% / năm
-            </span>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-xs text-gray-600 dark:text-gray-300">
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/40 space-y-2">
-            <div className="font-bold text-gray-800 dark:text-gray-200">Ý nghĩa phương pháp Reverse DCF:</div>
-            <p className="leading-relaxed">
-              Giải ngược bài toán: Tại thị giá hiện tại ({formatVND(curPrice)}), thị trường đang kỳ vọng dòng tiền của {symbol} phải tăng trưởng bình quân
-              <span className="font-bold text-indigo-600 dark:text-indigo-400"> {reverseDcfImpliedGrowth != null ? `${reverseDcfImpliedGrowth}%/năm` : '—'} </span>
-              trong 5 năm tới để bù đắp mức định giá.
-            </p>
-          </div>
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/40 space-y-2">
-            <div className="font-bold text-gray-800 dark:text-gray-200">Đối chiếu với tiềm năng thực tế:</div>
-            <p className="leading-relaxed">
-              {reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 8.0
-                ? '✅ Thị trường đang định giá rất thận trọng (kỳ vọng tăng trưởng thấp hơn GDP/ngành), tạo biên an toàn hấp dẫn cho nhà đầu tư tích lũy dài hạn.'
-                : reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 18.0
-                  ? '⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.'
-                  : '⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá.'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── MA TRẬN PHÂN TÍCH ĐỘ NHẠY CẢM 2 CHIỀU (SENSITIVITY MATRIX) ── */}
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-xs">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">📊</span>
-            <div>
-              <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                Bảng Phân Tích Độ Nhạy Cảm 2 Chiều (DCF Sensitivity Matrix)
-              </h4>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                Ma trận giá trị hợp lý trên từng cặp giả định: Chi Phí Vốn WACC (Hàng) vs Tăng Trưởng Vĩnh Viễn g (Cột)
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {matrix.length > 0 ? (
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full text-xs text-center border-collapse">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300">
-                  <th className="p-3 text-left font-bold border border-gray-200 dark:border-gray-700">WACC \ g</th>
-                  {gList.map((gVal, idx) => (
-                    <th key={idx} className="p-3 font-bold border border-gray-200 dark:border-gray-700">
-                      g = {gVal}%
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {waccList.map((wVal, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
-                    <td className="p-3 text-left font-bold bg-gray-50 dark:bg-gray-700/40 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
-                      WACC = {wVal}%
-                    </td>
-                    {matrix[rIdx]?.map((cellVal, cIdx) => {
-                      const isBase = Math.abs(wVal - (sectorWacc || 10.5)) < 0.3 && gList[cIdx] === 3.0;
-                      return (
-                        <td
-                          key={cIdx}
-                          className={`p-3 font-mono font-bold border border-gray-200 dark:border-gray-700 ${isBase
-                            ? 'bg-indigo-100/70 text-indigo-900 dark:bg-indigo-900/60 dark:text-indigo-200 ring-2 ring-indigo-500'
-                            : cellVal && curPrice && cellVal >= curPrice
-                              ? 'text-emerald-700 dark:text-emerald-300'
-                              : 'text-rose-700 dark:text-rose-300'
-                            }`}
-                        >
-                          {cellVal ? formatVND(cellVal) : '—'}
-                          {isBase && <span className="block text-[10px] text-indigo-600 dark:text-indigo-300 font-sans font-normal">(Base)</span>}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-6 text-center text-xs text-gray-400">
-            Không đủ dữ liệu dòng tiền để sinh ma trận độ nhạy cảm.
-          </div>
         )}
       </div>
+
+      {!isFinancial && (
+        <>
+          {/* ── REVERSE DCF & TỐC ĐỘ TĂNG TRƯỞNG NGỤ Ý ── */}
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔄</span>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                  Reverse DCF — Tốc Độ Tăng Trưởng Ngụ Ý Thị Trường Phản Ánh
+                </h4>
+              </div>
+              {reverseDcfImpliedGrowth != null && (
+                <span className={`text-sm font-black px-2.5 py-1 rounded-xl ${reverseDcfImpliedGrowth <= 6.0
+                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                  : reverseDcfImpliedGrowth <= 15.0
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                  }`}>
+                  g ngụ ý: {reverseDcfImpliedGrowth}% / năm
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-xs text-gray-600 dark:text-gray-300">
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/40 space-y-2">
+                <div className="font-bold text-gray-800 dark:text-gray-200">Ý nghĩa phương pháp Reverse DCF:</div>
+                <p className="leading-relaxed">
+                  Giải ngược bài toán: Tại thị giá hiện tại ({formatVND(curPrice)}), thị trường đang kỳ vọng dòng tiền của {symbol} phải tăng trưởng bình quân
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400"> {reverseDcfImpliedGrowth != null ? `${reverseDcfImpliedGrowth}%/năm` : '—'} </span>
+                  trong 5 năm tới để bù đắp mức định giá.
+                </p>
+              </div>
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/40 space-y-2">
+                <div className="font-bold text-gray-800 dark:text-gray-200">Đối chiếu với tiềm năng thực tế:</div>
+                <p className="leading-relaxed">
+                  {reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 8.0
+                    ? '✅ Thị trường đang định giá rất thận trọng (kỳ vọng tăng trưởng thấp hơn GDP/ngành), tạo biên an toàn hấp dẫn cho nhà đầu tư tích lũy dài hạn.'
+                    : reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 18.0
+                      ? '⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.'
+                      : '⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── MA TRẬN PHÂN TÍCH ĐỘ NHẠY CẢM 2 CHIỀU (SENSITIVITY MATRIX) ── */}
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">📊</span>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                    Bảng Phân Tích Độ Nhạy Cảm 2 Chiều (DCF Sensitivity Matrix)
+                  </h4>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Ma trận giá trị hợp lý trên từng cặp giả định: Chi Phí Vốn WACC (Hàng) vs Tăng Trưởng Vĩnh Viễn g (Cột)
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {matrix.length > 0 ? (
+              <div className="overflow-x-auto mt-4">
+                <table className="w-full text-xs text-center border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300">
+                      <th className="p-3 text-left font-bold border border-gray-200 dark:border-gray-700">WACC \ g</th>
+                      {gList.map((gVal, idx) => (
+                        <th key={idx} className="p-3 font-bold border border-gray-200 dark:border-gray-700">
+                          g = {gVal}%
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {waccList.map((wVal, rIdx) => (
+                      <tr key={rIdx} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                        <td className="p-3 text-left font-bold bg-gray-50 dark:bg-gray-700/40 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
+                          WACC = {wVal}%
+                        </td>
+                        {matrix[rIdx]?.map((cellVal, cIdx) => {
+                          const baseWacc = wacc || sectorWacc;
+                          const isBase = baseWacc != null && Math.abs(wVal - baseWacc) < 0.3 && (gList[cIdx] === 3.0 || gList[cIdx] === terminalG);
+                          return (
+                            <td
+                              key={cIdx}
+                              className={`p-3 font-mono font-bold border border-gray-200 dark:border-gray-700 ${isBase
+                                ? 'bg-indigo-100/70 text-indigo-900 dark:bg-indigo-900/60 dark:text-indigo-200 ring-2 ring-indigo-500'
+                                : cellVal && curPrice && cellVal >= curPrice
+                                  ? 'text-emerald-700 dark:text-emerald-300'
+                                  : 'text-rose-700 dark:text-rose-300'
+                                }`}
+                            >
+                              {cellVal ? formatVND(cellVal) : '—'}
+                              {isBase && <span className="block text-[10px] text-indigo-600 dark:text-indigo-300 font-sans font-normal">(Base)</span>}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-6 text-center text-xs text-gray-400">
+                Không đủ dữ liệu dòng tiền để sinh ma trận độ nhạy cảm.
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

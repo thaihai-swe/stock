@@ -79,15 +79,18 @@ export default function HistoricalValuationBandCard({ historicalBands, currentPr
         {/* 3 Milestones */}
         <div className="grid grid-cols-3 text-center pt-1 text-[11px]">
           <div>
-            <span className="text-gray-400 block text-[10px]">P25 (Đáy 5 năm)</span>
+            <span className="text-gray-400 block text-[10px]">P25 (Đáy {band.yearsUsed ? `${band.yearsUsed} năm` : '5 năm'})</span>
             <span className="font-bold text-emerald-600 dark:text-emerald-400">{p25 > 0 ? `${p25.toFixed(2)}${unit}` : '—'}</span>
           </div>
           <div>
             <span className="text-gray-400 block text-[10px]">P50 (Trung vị)</span>
             <span className="font-bold text-gray-700 dark:text-gray-300">{p50 > 0 ? `${p50.toFixed(2)}${unit}` : '—'}</span>
+            {band.mean != null && (
+              <span className="text-[9px] text-gray-400 block font-normal">Mean: {band.mean.toFixed(2)}{unit}</span>
+            )}
           </div>
           <div>
-            <span className="text-gray-400 block text-[10px]">P75 (Đỉnh chu kỳ)</span>
+            <span className="text-gray-400 block text-[10px]">P75 (Đỉnh {band.yearsUsed ? `${band.yearsUsed} năm` : 'chu kỳ'})</span>
             <span className="font-bold text-rose-600 dark:text-rose-400">{p75 > 0 ? `${p75.toFixed(2)}${unit}` : '—'}</span>
           </div>
         </div>
@@ -105,7 +108,7 @@ export default function HistoricalValuationBandCard({ historicalBands, currentPr
               Thống Kê Phân Vị Lịch Sử
             </span>
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
-              Dải Băng P25 - P50 - P75 Chu Kỳ 5 Năm
+              Dải Băng P25 - P50 - P75 Chu Kỳ {peBand.yearsUsed ? `${peBand.yearsUsed} Năm` : '5 Năm'}
             </span>
           </div>
           <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1">
@@ -123,8 +126,8 @@ export default function HistoricalValuationBandCard({ historicalBands, currentPr
 
       {/* ── 2 GAUGES P/E & P/B BANDS ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {renderBandGauge('Thang Đo P/E 5 Năm (Price to Earnings)', peBand)}
-        {renderBandGauge('Thang Đo P/B 5 Năm (Price to Book)', pbBand)}
+        {renderBandGauge(`Thang Đo P/E ${peBand.yearsUsed ? `${peBand.yearsUsed} Năm` : '5 Năm'} (Price to Earnings)`, peBand)}
+        {renderBandGauge(`Thang Đo P/B ${pbBand.yearsUsed ? `${pbBand.yearsUsed} Năm` : '5 Năm'} (Price to Book)`, pbBand)}
       </div>
 
       {/* ── BẢNG THỊ GIÁ TƯƠNG ỨNG CÁC MỐC PHÂN VỊ ── */}

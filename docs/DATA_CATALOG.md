@@ -12,11 +12,11 @@ Toàn bộ hệ thống được phân định rạch ròi theo triết lý **Hy
 
 | Tầng Dữ Liệu | Đối Tượng Dữ Liệu | File / DB Lưu Trữ | Trạng Thái Git | Chu Kỳ Cập Nhật & Trigger | Mục Đích Sử Dụng |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **TẦNG 1: ACID Relational Database** | Sổ lệnh Mua/Bán (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, cấu hình | `data/stock.db` (Local) / Turso Cloud (Vercel) | **GITIGNORED (100%)** | Realtime khi user thao tác. Sao lưu/khôi phục qua `scripts/db_manager.py`. | Đảm bảo toàn vẹn giao dịch (ACID), bảo mật thông tin cá nhân. |
+| **TẦNG 1: ACID Relational Database** | Sổ lệnh Mua/Bán (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, hàng đợi yêu cầu (`requested_stocks`), cấu hình | `data/stock.db` (Local) / Turso Cloud (Vercel) | **GITIGNORED (100%)** | Realtime khi user thao tác. Sao lưu/khôi phục qua `scripts/db_manager.py`. | Đảm bảo toàn vẹn giao dịch (ACID), bảo mật thông tin cá nhân. |
 | **TẦNG 2: Ephemeral Intraday Cache** | Thị giá khớp lệnh realtime, điểm số VNINDEX & VN30 trong phiên | RAM Node.js + `data/prices_cache.json` | **GITIGNORED (100%)** | Trong phiên (9:00 - 15:00 T2-T6). Cache TTL 1h (`priceService.js`). | Phục vụ realtime UI mà không gây ô nhiễm lịch sử Git. |
-| **TẦNG 3: Daily EOD Snapshot JSON** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` (`run_pipeline.py --cadence daily`). | Đảm bảo web Vercel có số liệu EOD mới nhất mà không cần crawler. |
+| **TẦNG 3: Daily EOD Snapshot JSON** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE, Snapshot Hàng đợi yêu cầu | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json`, `data/requested_stocks.json`, `data/supported_stocks.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` (`run_pipeline.py --cadence daily`). | Đảm bảo web Vercel có số liệu EOD mới nhất và tự động nạp mã yêu cầu mới. |
 | **TẦNG 4: Weekly Macro & Sector JSON** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS Vietstock, Lịch sử Simply Wall St, Tin tức 30 ngày | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` (`run_pipeline.py --cadence weekly`). | Cung cấp dữ liệu vĩ mô và luân chuyển ngành 1 tuần/lần. |
-| **TẦNG 5: Quarterly BCTC Repository** | 122+ chỉ tiêu BCTC 8 quý & 5 năm, 54 Ratios, Extended DuPont, DCF 3 kịch bản, Cổ đông | `data/financials/<MÃ>.json`, `data/vnindex_valuation_cache/` | **COMMIT VỀ GIT** | **Quarterly (Mùa BCTC)** hoặc **On-demand**: `run_pipeline.py --cadence quarterly`. | Kho tri thức phân tích chuyên sâu doanh nghiệp cho từng mã. |
+| **TẦNG 5: Quarterly BCTC Repository** | 122+ chỉ tiêu BCTC 8 quý & 5 năm, 54 Ratios, Extended DuPont, DCF 3 kịch bản, Cổ đông | `data/financials/<MÃ>.json`, `data/vnindex_valuation_cache/` | **COMMIT VỀ GIT** | **Quarterly (Mùa BCTC)**: GitHub Actions `quarterly-bctc-sync.yml` (`run_pipeline.py --cadence quarterly`). | Kho tri thức phân tích chuyên sâu doanh nghiệp cho từng mã. |
 
 ### Bộ Điều Phối Dữ Liệu Thống Nhất (`scripts/run_pipeline.py`):
 ```bash
@@ -55,14 +55,20 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 ---
 
 ### PHÂN HỆ 1: BÁO CÁO TÀI CHÍNH (FINANCIAL STATEMENTS)
-* **Nguồn cung cấp chính**: **Yahoo Finance (`yfinance`, Ticker `<MÃ>.VN`) — BCTC Kiểm Toán Thật 100%** từ sàn niêm yết (HOSE/HNX) kết hợp TradingView Scanner Fundamental API.
+* **Kiến trúc phân tầng thu thập 4 tầng (Cascading Multi-Source Fallback Architecture)**:
+  1. **TẦNG 1: Nguồn chính (Primary Feed)**: **Yahoo Finance (`yfinance`, Ticker `<MÃ>.VN`) — BCTC Kiểm Toán Thật 100%** từ sàn niêm yết (HOSE/HNX). Thu thập bằng cơ chế Union cả 3 báo cáo để trích xuất tối đa toàn bộ các kỳ kiểm toán có sẵn (lên tới 6 Quý và 5 Năm).
+  2. **TẦNG 2: Nguồn bổ sung & Dự phòng (Secondary / Fast API)**: **`vnstock 4.0` (Guest Mode — 100% Không Cần API Key)**. Trích xuất 4 Quý và 4 Năm chuẩn mực VAS TT200 từ VCI/KBS, cung cấp cơ cấu cổ đông lớn và lịch sử sự kiện cổ tức thực tế.
+  3. **TẦNG 3: Cứu cánh Fallback & Lấp đầy lịch sử sâu (Deep Fallback & Historical Backfill)**: **CafeF HTML Scraper (`curl_cffi` + `BeautifulSoup`)**.
+     - Tự động kích hoạt khi CẢ Yahoo Finance và vnstock đều thiếu dữ liệu (mã UPCoM mới, công ty nhỏ).
+     - Hỗ trợ cào ngược về quá khứ sâu (2018–2021) qua cờ `--backfill-deep` để nối dài chuỗi thời gian lên 7–10 năm mà không ghi đè lên các kỳ kiểm toán đã có.
+  4. **TẦNG 4: Dự phòng khẩn cấp (Emergency Fallback)**: **Vietstock Finance Scraper**.
+  5. **Động cơ hợp nhất bảo toàn (`merge_financial_series`)**: Hợp nhất đa nguồn có phân cấp ưu tiên (T1 > T2 > T3 > T4), bảo đảm dữ liệu tầng dưới không ghi đè tầng trên, lấp đầy các khoảng trống và bảo toàn vĩnh viễn dữ liệu lịch sử trong kho.
 * **Cam kết toàn vẹn dữ liệu (CRITICAL)**: **100% Số liệu thật từ Báo cáo kiểm toán**. Hệ thống đã **xóa bỏ hoàn toàn mọi thuật toán giả định và hệ số nội suy mùa vụ** (`seasonal_factors`, `margin_factors`, `y_growth`). Toàn bộ tính toán phân tích (Extended DuPont, 54 Ratios, 10 Mô hình định giá, DCF 3 kịch bản, Piotroski F-Score, Beneish M-Score) đều vận hành thuần túy trên các con số thật này.
 * **Trạng thái kiểm toán & Metadata**:
-  * Mã có BCTC: `_meta.status = "AUDITED_REAL_DATA"`, `_meta.source = "Yahoo Finance Audit Statements & VAS TT200"`.
+  * Mã có BCTC: `_meta.status = "AUDITED_REAL_DATA"`, `_meta.source = "Yahoo Finance & vnstock Guest Mode Official Statements"`.
   * Mã chưa công bố BCTC hoặc chứng chỉ quỹ ETF: `_meta.status = "NO_AUDITED_DATA"` (hoặc `"ETF_INDEX_FUND"`), hiển thị minh bạch cho người dùng, tuyệt đối không tự chế số liệu.
-* **Thời gian/Kỳ báo cáo & Cơ Chế Tích Lũy Lịch Sử (Cumulative Merging)**:
-  * Chuỗi báo cáo thật khởi đầu gồm 5–6 Quý kiểm toán và 4–5 Năm tài chính từ Yahoo Finance.
-  * **Cơ chế Upsert Hợp Nhất Không Phá Hủy (`merge_financial_series`)**: Hệ thống tự động gộp dữ liệu mới vào dữ liệu cũ theo khóa `period` (`YYYY-Qx`) và `year` (`YYYY`). Khi có quý/năm mới công bố, các kỳ cũ trong quá khứ được **bảo toàn nguyên vẹn vĩnh viễn**, giúp kho dữ liệu tự động tích lũy phình to (8Q, 12Q, 16Q... và 6Y, 8Y, 10Y...) mà không bao giờ bị mất đi dù Yahoo Finance đẩy ra khỏi rolling window.
+* **Thời gian/Kỳ báo cáo & Cơ Chế Tích Lũy Lịch Sử Không Giới Hạn (Cumulative Merging)**:
+  * **Cơ chế Upsert Hợp Nhất Không Phá Hủy (`merge_financial_series`)**: Hệ thống tự động gộp dữ liệu mới vào dữ liệu cũ trong kho theo khóa `period` (`YYYY-Qx`) và `year` (`YYYY`). Khi có quý/năm mới công bố, các kỳ cũ trong quá khứ được **bảo toàn nguyên vẹn vĩnh viễn**, giúp kho dữ liệu tự động tích lũy phình to (6Q, 8Q, 12Q, 16Q... và 5Y, 8Y, 10Y...) mà không bao giờ bị mất đi dù các API nguồn chỉ cung cấp rolling window ngắn hạn.
   * Giao diện React hiển thị nhãn động theo số lượng thực tế trong kho: `${quarterlyCount} Quý` và `${yearlyCount} Năm`.
 * **Đơn vị chuẩn hóa**: **Tỷ đồng (Bn. VND)** đối với số tuyệt đối; **đồng/cổ phiếu** đối với EPS/BVPS.
 * **Vị trí lưu trữ**: `data/financials/<MÃ>.json` (trong mảng `quarterly` và `yearly`).
@@ -265,7 +271,15 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
     - `basePrice`: Tăng trưởng theo CAGR kế hoạch, WACC theo ngành, $g_{\text{terminal}} = 3.0\%$.
     - `bullPrice`: Tăng trưởng $+3\%$, WACC $-0.5\%$, $g_{\text{terminal}} = 3.5\%$.
     - `bearPrice`: Tăng trưởng $-4\%$, WACC $+1.0\%$, $g_{\text{terminal}} = 2.0\%$.
-    - **Sanity Check (Học từ LC-005)**: Nếu $FCF_0 \le 0$, kích hoạt cờ `NEGATIVE_FCF` và khuyến nghị dùng phương pháp thay thế EV/EBITDA, tuyệt đối không xuất giá âm.
+    - **Miễn trừ Nhóm Ngân Hàng & Tài Chính (`NOT_APPLICABLE_FINANCIAL`)**:
+      - Nhóm Ngân hàng, Bảo hiểm, Chứng khoán (`isFinancialSector = true`) được miễn trừ khỏi mô hình FCFF do dòng tiền gửi của khách hàng và hoạt động tín dụng chảy qua CFO làm sai lệch bản chất dòng tiền tự do. Hệ thống hiển thị thẻ khuyến nghị sử dụng DDM, Gordon P/B, RIM/EVA.
+    - **Cơ chế Dòng Tiền Tự Do Chuẩn Hóa (`NORMALIZED_FCF`) cho Chu Kỳ Đại Đầu Tư**:
+      - Khi doanh nghiệp kinh doanh cốt lõi tăng trưởng mạnh ($\text{LNST} > 0, \text{CFO} > 0$) nhưng đang trong đại chu kỳ đầu tư mở rộng công suất lớn (Growth CapEx như Hòa Phát Dung Quất 2 với CapEx 27.5k tỷ vượt CFO) dẫn đến FCF thô âm tạm thời, hệ thống tự động kích hoạt **Normalized FCFF** ($\text{CFO} - \text{Khấu hao duy trì}$, trong đó Maintenance CapEx lấy xấp xỉ chi phí khấu hao) với trạng thái `NORMALIZED_FCF` (`isNormalizedFcf = true`) kèm nhãn giải trình minh bạch.
+    - **Sanity Check (Học từ LC-005)**: Nếu $FCF_0 \le 0$ do thua lỗ kinh doanh thực sự, kích hoạt cờ `NEGATIVE_FCF` và khuyến nghị dùng phương pháp thay thế EV/EBITDA, tuyệt đối không xuất giá âm.
+  * **Đa Nguồn Dữ Liệu LCTT Độc Lập & Hợp Nhất Không Phá Hủy**:
+    - Dữ liệu lưu chuyển tiền tệ (CFO, CapEx, Depr) được đối soát qua 4 nguồn: Yahoo Finance, vnstock (VCI VAS TT200), CafeF HTML Scraper và Cache cục bộ.
+    - Bộ từ điển Universal Cash Flow Taxonomy nhận diện đầy đủ các biến thể danh pháp tiếng Việt và tiếng Anh.
+    - Cơ chế Non-Destructive Field Merge bảo vệ dữ liệu đã kiểm toán không bị giá trị 0 hoặc null từ nguồn khác đè lên.
   * **Reverse DCF (Tốc độ tăng trưởng ngụ ý)**:
     - Thuật toán Binary Search tìm $g_{\text{implied}}$ sao cho $PV(FCFF, g, WACC) = \text{EV hiện tại}$.
     - Đưa ra góc nhìn trực quan: thị trường đang bi quan thái quá ($g_{\text{implied}} < 6\%$) hay kỳ vọng quá cao ($g_{\text{implied}} > 18\%$).
@@ -317,16 +331,16 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 
 ### PHÂN HỆ 3: CỔ TỨC, CỔ ĐÔNG & BAN LÃNH ĐẠO (CORPORATE PROFILE)
 * **Nguồn cung cấp**: 
-  * *Tầng 1 (Live Real-time Extraction)*: Tự động trích xuất các sự kiện cổ tức tiền mặt, cổ tức cổ phiếu, họp ĐHĐCĐ, giao dịch mua/bán của cổ đông lớn từ feed tin tức thời gian thực của doanh nghiệp qua NLP Event Extractor (`scripts/lib/news_sentiment_engine.py`).
-  * *Tầng 2 (vnstock / VCI / KBS)*: Báo cáo công bố thông tin doanh nghiệp chính thức.
+  * *Tầng 1 (`vnstock 4.0` Guest Mode — VCI Official)*: Trích xuất trực tiếp danh sách 60+ cổ đông lớn thật (`Company.shareholders()`) và lịch sử 50+ sự kiện doanh nghiệp, giao dịch nội bộ, chia cổ tức tiền mặt/cổ phiếu (`Company.events()`).
+  * *Tầng 2 (Live NLP News Extraction)*: Trích xuất bổ sung các sự kiện cổ tức mới nhất từ feed tin tức thời gian thực của doanh nghiệp qua NLP Event Extractor (`scripts/lib/news_sentiment_engine.py`).
   * *Tầng 3 (Dynamic Annual Milestones)*: Các mốc sự kiện động năm hiện hành (VD: 2026), cam kết không tồn tại ngày cũ 2023–2024.
 * **Vị trí lưu trữ**: `data/financials/<MÃ>.json` trong `corporateEvents` và `shareholders`.
 
 | Nhóm Dữ Liệu | Lệnh Gọi Code | Các Trường Thông Tin Chi Tiết |
 | :--- | :--- | :--- |
-| **Lịch Sử Cổ Tức & Sự Kiện** | `extract_corporate_events_from_news()` / `c.events()` | • `date`: Ngày sự kiện thực tế (ISO YYYY-MM-DD)<br>• `type`: Phân loại sự kiện (Cổ tức tiền mặt, Cổ tức cổ phiếu, ĐHĐCĐ, Giao dịch nội bộ, Phát hành)<br>• `content`: Tiêu đề / nội dung công bố thông tin<br>• `ratio`: Tỷ lệ chi trả (10%, 15%...)<br>• `value`: Giá trị tiền mặt (đ/cp)<br>• `source` & `link`: Nguồn báo / link bài viết gốc |
-| **Cơ Cấu Cổ Đông Lớn** | `c_kbs.shareholders()` / FinancialFetcher | • `name`: Tên cá nhân hoặc tổ chức (Nội bộ, Ngoại khối, Quỹ, Đại chúng)<br>• `percentage`: Tỷ lệ sở hữu phần trăm (%)<br>• `type`: Phân loại cổ đông (Nội bộ, Nước ngoài, Tổ chức, Cá nhân)<br>• `update_date`: Ngày cập nhật kỳ báo cáo gần nhất của năm hiện hành |
-| **Ban Lãnh Đạo & HĐQT** | `c.officers()` | • `officer_name`: Họ tên lãnh đạo<br>• `officer_position`: Chức vụ (Chủ tịch HĐQT, Tổng Giám đốc)<br>• `officer_own_percent`: Tỷ lệ sở hữu cổ phần của lãnh đạo |
+| **Lịch Sử Cổ Tức & Sự Kiện** | `Company(sym, source='VCI').events()` | • `date`: Ngày sự kiện thực tế (ISO YYYY-MM-DD)<br>• `type`: Phân loại sự kiện (Cổ tức tiền mặt, Cổ tức cổ phiếu, ĐHĐCĐ, Giao dịch nội bộ, Phát hành)<br>• `content`: Tiêu đề / nội dung công bố thông tin<br>• `ratio`: Tỷ lệ chi trả (10%, 15%...)<br>• `value`: Giá trị tiền mặt (đ/cp)<br>• `source` & `link`: Nguồn báo / link bài viết gốc |
+| **Cơ Cấu Cổ Đông Lớn** | `Company(sym, source='VCI').shareholders()` | • `name`: Tên cá nhân hoặc tổ chức (Nội bộ, Ngoại khối, Quỹ, Đại chúng)<br>• `percentage`: Tỷ lệ sở hữu phần trăm (%)<br>• `quantity`: Số lượng cổ phiếu sở hữu<br>• `type`: Phân loại cổ đông (Cổ đông lớn, Nội bộ, Nước ngoài)<br>• `updateDate`: Ngày cập nhật kỳ báo cáo thực tế |
+| **Ban Lãnh Đạo & HĐQT** | `Company(sym, source='VCI').officers()` | • `officer_name`: Họ tên lãnh đạo<br>• `officer_position`: Chức vụ (Chủ tịch HĐQT, Tổng Giám đốc)<br>• `officer_own_percent`: Tỷ lệ sở hữu cổ phần của lãnh đạo |
 | **Công Ty Con & Liên Kết** | `c.subsidiaries()` | • `organ_name`: Tên công ty con<br>• `ownership_percent`: Tỷ lệ biểu quyết / Tỷ lệ sở hữu vốn (%) |
 | **Lịch Sử Tăng Vốn Điều Lệ** | `c_kbs.capital_history()`| • `date`: Ngày có hiệu lực<br>• `charter_capital`: Vốn điều lệ sau khi tăng (đồng) |
 
@@ -803,8 +817,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 ### B. Bảng Đặc Tả 7 Mô Hình Định Giá Nội Tại:
 
 | Mô Hình Định Giá | Công Thức Toán Học | Tham Số Mặc Định VN | Điều Kiện Áp Dụng |
-| :--- | :--- | :--- | :--- |
-| **1. Benjamin Graham Number** | $V = \sqrt{22.5 \times EPS \times BVPS}$ | Hệ số kết hợp $22.5$ ($15 \times 1.5$) | $EPS > 0$ và $BVPS > 0$ |
+| **1. Benjamin Graham Dynamic** | $V = EPS \times (PE_{\text{base}} + hs \times g) \times \frac{\text{Hằng số}_{\text{vn}}}{y}$ | $PE_{\text{base}} = \min(7.0, \max(3.0, PE_{\text{avg}}))$, $hs \in [0.8, 1.0]$, $g = 5.0\%$ cho ngành chu kỳ hoặc $\min(12\%, \text{CAGR})$ cho ngành tăng trưởng, $\text{Hằng số} = \max(4.4, VN10Y)$, $y = \max(5.0, VN10Y)$ | $EPS > 0$ |
 | **2. Gordon DDM** | $V = \frac{DPS \times (1 + g)}{r - g}$ | $r = 11.5\%$ (WACC), $g = 3.5\%$ (GDP thận trọng) | $DPS > 0$ và $r > g$ |
 | **3. P/E Mục Tiêu Ngành** | $V = EPS \times TargetPE$ | $TargetPE = 11.5x$ | $EPS > 0$ |
 | **4. P/B Mục Tiêu Ngành** | $V = BVPS \times TargetPB$ | $TargetPB = 1.35x$ | $BVPS > 0$ |
@@ -888,7 +901,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 * **Đặc tả các khối dữ liệu mới**:
 
 #### 1. Lưới 10 Mô Hình Định Lượng Độc Lập (`models10`):
-* **Mô hình 1: Graham Normalized**: $V = \sqrt{\text{Multiplier} \times EPS_{norm} \times BVPS}$ với hệ số thích ứng động $\text{Multiplier} = \min(22.5, \max(4.0, PE_{avg} \times PB_{avg}))$ thay vì dùng cứng $22.5$ ($15.0x \times 1.5x$), giúp tránh định giá quá hào phóng cho các ngành chu kỳ/thâm dụng vốn; $EPS_{norm} = \text{Trung vị}(EPS_{3Y}, EPS_{TTM})$.
+* **Mô hình 1: Graham Dynamic Real-Data**: $V = EPS \times (PE_{\text{base}} + hs \times g) \times \frac{\text{Hằng số}_{\text{vn}}}{y}$ với $PE_{\text{base}} = \min(12.0, \max(4.0, PE_{\text{p50}}))$ (P/E trung vị chu kỳ 5 năm), $hs \in [0.8, 1.0]$ (hệ số nhạy cảm chất lượng doanh nghiệp theo ROE & cổ tức), $g = \min(20.0, \max(3.0, CAGR_{\text{5Y}}))$ (tốc độ tăng trưởng kép lợi nhuận thực tế), $\text{Hằng số}_{\text{vn}} = \max(4.4, VN10Y)$ và $y = \max(5.0, VN10Y)$ từ lợi suất TPCP 10Y HNX Portal thực tế.
 * **Mô hình 2: P/E Median Chu Kỳ**: $V = EPS_{norm} \times PE_{med5Y}$.
 * **Mô hình 3: Gordon P/B**: $V = BVPS \times \frac{ROE - g}{r - g}$ (Đặc biệt phù hợp cho Ngân hàng, Chứng khoán, Bảo hiểm).
 * **Mô hình 4: Multi-Stage DCF**: Chiết khấu dòng tiền 3 pha (Tăng trưởng cao $\rightarrow$ Chuyển tiếp Fade $\rightarrow$ Vĩnh viễn).
@@ -896,12 +909,12 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 * **Mô hình 6: DCF FCFF (Free Cash Flow to Firm)**: Dòng tiền tự do doanh nghiệp chiết khấu theo WACC ngành.
 * **Mô hình 7: FCFE (Free Cash Flow to Equity)**: Dòng tiền tự do vốn chủ $FCFE = CFO - CapEx + \text{Vay nợ ròng}$ chiết khấu theo Cost of Equity.
 * **Mô hình 8: RIM / EVA (Residual Income Model)**: $V = BVPS + \sum \frac{RI_t}{(1+r)^t} + TV$ với $RI = BVPS \times (ROE - r)$.
-* **Mô hình 9: RNAV / Book NAV**: Định giá tài sản ròng tái định giá (Áp dụng BĐS: thặng dư quỹ đất + chiết khấu rủi ro nợ).
+* **Mô hình 9: Book NAV / P/B Chuẩn Hóa**: Định giá tài sản ròng kết hợp P/B mục tiêu chu kỳ ($V = BVPS \times PB_{\text{norm}}$) dựa trên 100% số liệu kế toán thực tế từ BCTC (với $PB_{\text{norm}}$ là median P/B chu kỳ 5 năm hoặc 1.0x cho Book NAV thuần túy).
 * **Mô hình 10: Advanced Multiples**: EV/EBITDA ngành ($7.5x$) và EV/Sales ($1.5x$).
 * **Ma trận 23 Phân Ngành GICS (`SECTOR_WEIGHTS_23`)**: Tự động gán trọng số $w_i$ phù hợp đặc thù ngành (Tài chính tắt hoàn toàn DCF/FCFF/FCFE/EV-EBITDA).
 * **Thuật toán Lọc Ngoại Lai ±60% & Consensus (`consensusDetails`)**: Loại trừ các mô hình vượt quá $\pm 60\%$ so với median sơ bộ để bảo vệ giá trị hội tụ Consensus thận trọng.
 * **Schema Chi Tiết Từng Phần Tử trong `models10`**:
-  * `id` (string): Định danh mô hình (`graham`, `pe`, `pb`, `multi_stage_dcf`, `ddm`, `fcff`, `fcfe`, `rim`, `rnav`, `multiples`).
+  * `id` (string): Định danh mô hình (`graham`, `pe`, `pb`, `multi_stage_dcf`, `ddm`, `fcff`, `fcfe`, `rim`, `nav`, `evebitda`).
   * `name` (string): Tên mô hình ngắn gọn.
   * `fullName` (string): Tên đầy đủ kèm chỉ số thứ tự (ví dụ: `1. Benjamin Graham`).
   * `cleanName` (string): Tên hiển thị sạch đã loại bỏ số thứ tự thừa (ví dụ: `Benjamin Graham`).
@@ -918,7 +931,17 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   * `parameters` (object): Bảng biến số đầu vào chi tiết dùng trong công thức thế số.
   * `statusNote` (string): Trạng thái áp dụng (`Phù hợp` hoặc lý do không áp dụng).
 
-#### 2. Bản Đồ 7 Vùng Giá Định Giá (`sevenPriceZones`):
+#### 2. Quy Chuẩn Xử Lý Dữ Liệu BVPS & Lưu Chuyển TTM 4 Quý (Accounting & Data Pipeline Standards):
+* **Chuẩn hóa BVPS 3 Tầng Kế Toán & Thị Trường (3-Tier BVPS Hierarchy)**:
+  * **Tầng 1 (Kế toán BCTC thực tế - Bắt buộc)**: $BVPS = \frac{\text{Vốn Chủ Sở Hữu (Equity)}}{\text{Số CP Lưu Hành (Shares)}}$. Nếu Equity tính bằng Tỷ đồng thì quy đổi chuẩn sang VNĐ ($Equity \times 10^9$).
+  * **Tầng 2 (Thị trường tức thời TradingView/VPS)**: $BVPS = \text{round}\left(\frac{\text{Thị giá (Close)}}{P/B}\right)$ từ scanner real-time khi chưa có BCTC bóc tách.
+  * **Tầng 3 (Fallback dự phòng)**: Lấy từ snapshot định giá lịch sử gần nhất.
+  * *Loại bỏ vĩnh viễn*: Toàn bộ công thức fallback legacy rác không theo chuẩn kế toán (như phép chia qua tổng tài sản).
+* **Khử Tính Mùa Vụ Dòng Tiền & Doanh Thu Bằng TTM Trượt 4 Quý Thực Tế**:
+  * Các chỉ tiêu lưu chuyển thời kỳ (`revenue`, `netIncomeParent`, `cfo`, `capex`, `ebitda`) **bắt buộc** tính bằng tổng 4 quý trượt gần nhất ($\sum_{i=1}^{4} Q_i$) khi có đủ 4 quý.
+  * Tuyệt đối tránh việc nhân 4 quý gần nhất ($Q_{latest} \times 4$) gây méo mó nghiêm trọng cho các nhóm ngành có tính chu kỳ/mùa vụ cao (như Bất động sản hạch toán bàn giao Q4, Bán lẻ tiêu dùng dịp Tết Q1).
+
+#### 3. Bản Đồ 7 Vùng Giá Định Giá (`sevenPriceZones`):
 * `Deep Value` ($< 0.75x$ Fair Value): Vùng giá trị sâu, biên an toàn vượt trội.
 * `Safe Buy` ($0.75 - 0.85x$ Fair Value): Vùng mua an toàn (MoS 15-25%).
 * `Accumulate` ($0.85 - 0.95x$ Fair Value): Vùng mua tích luỹ định kỳ DCA (MoS 5-15%).
@@ -943,12 +966,20 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 * **Cơ Chế Phạt Trần**: Khi rủi ro bẫy ở mức `CAO` ($\ge 4.0$), hệ thống tự động khóa trần khuyến nghị $\le 5.0/10$ (`HOLD`), ngăn ngừa mua vào các cổ phiếu rẻ giả tạo.
 
 #### 5. Dải Băng Định Giá Lịch Sử 3 Tầng P25 - P50 - P75 (`historicalBands`):
-* Thống kê phân vị chu kỳ định giá 5 năm thực tế từ BCTC (P/E Band và P/B Band).
-* `peBand` (`p25`, `p50`, `p75`, `current`): Phân vị P/E và P/E hiện tại thực tế.
-* `pbBand` (`p25`, `p50`, `p75`, `current`): Phân vị P/B và P/B hiện tại thực tế.
+* Thống kê phân vị chu kỳ định giá thực tế từ BCTC (P/E Band và P/B Band).
+* **Cơ Chế Trung Vị $N$ Năm Động (Rolling $N$-Year Median)**: Nếu mã cổ phiếu không đủ 5 năm dữ liệu BCTC, hệ thống tự động tính trung vị của số năm hiện tại đang có ($N \ge 3$, $N=2$ lấy trung bình 2 năm, $N=1$ lấy đúng năm đó). Chỉ khi hoàn toàn không có năm nào ($N=0$), hệ thống mới dự phòng sang bội số ngành/mặc định.
+* `peYearsUsed`: Số năm dữ liệu P/E thực tế được sử dụng để tính trung vị/phân vị.
+* `pbYearsUsed`: Số năm dữ liệu P/B thực tế được sử dụng để tính trung vị/phân vị.
+* `peMean`, `pbMean`: Giá trị Trung bình cộng số học (Arithmetic Mean) của $N$ năm lịch sử, phục vụ đối chiếu song song với Trung vị $P_{50}$.
+* `peBand` (`p25`, `p50`, `p75`, `mean`, `current`, `yearsUsed`): Phân vị P/E, P/E trung bình và P/E hiện tại thực tế.
+* `pbBand` (`p25`, `p50`, `p75`, `mean`, `current`, `yearsUsed`): Phân vị P/B, P/B trung bình và P/B hiện tại thực tế.
 * `priceBands`: Mốc giá tương ứng: `peP25Price`, `peP50Price`, `peP75Price`, `pbP25Price`, `pbP50Price`, `pbP75Price`.
 * `band25`, `band50`, `band75`, `bandPosition`, `bandWidthPct`: Mức giá tổng hợp các phân vị.
+* **Chuẩn Hóa Công Thức Mô Hình**:
+  - Mô hình 2 (P/E Chuẩn Hóa): `formula = "EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)"`, tham số trả về `peMedian` ($P_{50}$), `peAvg` (Mean), `yearsUsed`, `isFallback`. Chuỗi thế số thực tế `formulaDetail` hiển thị cả Trung vị $N$ năm và P/E Trung bình.
+  - Mô hình 3 (P/B Chuẩn Hóa): `formula = "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)"` (hoặc Gordon Growth cho nhóm Tài chính), tham số trả về `pbMedian`, `pbAvg`, `yearsUsed`.
 * Giao diện trực quan hoá bằng 2 Thang đo Gauge (P/E và P/B) định vị thị giá hiện tại so với các mốc phân vị kèm Lưới 6 mốc thị giá tương ứng, bảo đảm 100% dữ liệu tài chính thực tế và không sử dụng dữ liệu giả định/nội suy.
+* `dcfScenarios`: Kết quả định giá Chiết khấu dòng tiền FCFF với 3 kịch bản `basePrice`, `bullPrice`, `bearPrice`, `fairPrice`, `wacc`, `terminalG`.
 
 #### 6. Kiểm Toán Độ Bền Vững Cổ Tức (`dividendSustainability`):
 * `fcfPayoutRatio`: Tỷ lệ chi trả cổ tức trên Dòng tiền tự do FCF ($< 60\%$ = rất an toàn; $> 100\%$ = cảnh báo bẫy cổ tức).
@@ -987,19 +1018,31 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 
 #### Ma Trận Nhóm Tham Số Cấu Hình:
 1. **`valuation` (Định Giá Doanh Nghiệp)**:
-   - `wacc`: 0.115 (11.5% Chi phí vốn bình quân thị trường).
+   - `wacc`: 0.115 (11.5% Chi phí vốn bình quân thị trường chung).
    - `growthRate`: 0.035 (3.5% Tốc độ tăng trưởng dài hạn g).
    - `peMultiple`: 11.5 | `pbMultiple`: 1.35 | `evEbitdaMultiple`: 7.5 | `pcfMultiple`: 8.0 | `psMultiple`: 1.1 | `riskFreeRate`: 0.045.
+   - `sectorWaccBenchmarks`: WACC cơ sở cho 11 nhóm ngành (BANKING: 10.0%, TECH: 9.0%, RETAIL: 9.0%, REAL_ESTATE: 11.5%, HEAVY_INDUSTRY: 10.5%, v.v.).
+   - `waccAdjustment`: Điều chỉnh WACC theo Beta cổ phiếu (`betaSensitivity`: 0.015, `minWacc`: 7.5%, `maxWacc`: 16.0%).
+   - `valuationTraps`: Trọng số và ngưỡng cảnh báo 7 bẫy định giá (`highRiskThreshold`: 4.0, `mediumRiskThreshold`: 2.0).
+   - `sevenPriceZones`: Tỷ lệ phân định 7 vùng giá hành động (`deepValueRatio`: 0.75, `buyRatio`: 0.85, `fairLowRatio`: 0.95, `fairHighRatio`: 1.10, v.v.).
+   - `methodSuitability`: Hệ số độ tin cậy mô hình cho từng nhóm ngành (`finGrahamSuitability`: 0.35, `nonFinRimSuitability`: 0.55, `nonFinNavSuitability`: 0.85).
    - `graham`: `maxMultiplier`: 22.5, `minMultiplier`: 4.0, `basePe`: 7.0, `growthFactor`: 1.0, `benchmarkYield`: 4.4.
    - `outlierFilter`: `outlierGapThreshold`: 0.60 (ngưỡng lọc ngoại lai ±60%), `minModels`: 2.
    - `marginOfSafety`: `strongBuyPct`: 15.0, `fairValuePct`: 0.0.
    - `sectorWeights`: Ma trận trọng số 10 mô hình định giá cho 23 nhóm ngành GICS/Vietstock.
-2. **`macro` (Kinh Tế Vĩ Mô & Chu Kỳ)**:
+2. **`financialAnalytics` (Phân Tích BCTC & Sức Khỏe Doanh Nghiệp)**:
+   - `healthScore`: Trọng số 4 trụ cột cho doanh nghiệp phi tài chính vs ngân hàng (`pillarWeightsCorporate`, `pillarWeightsBanking`) và ngưỡng xếp hạng (`gradeThresholds`).
+   - `beneishMScore`: Ngưỡng an toàn (`safeThreshold`: -2.22) và cảnh báo gian lận (`alertThreshold`: -1.78).
+   - `magicFormula`: Ngưỡng phân loại Joel Greenblatt Magic Formula (`minEarningsYieldTopTier`: 9.0%, `minRoicTopTier`: 18.0%).
+   - `dupontBenchmarks`: Ngưỡng quy chuẩn phân rã 5 nhân tố DuPont.
+3. **`macro` (Kinh Tế Vĩ Mô & Chu Kỳ)**:
    - `phaseRules`: Ngưỡng quy tắc 6 động lực (sbv_refinancing_rate, interbank_rate, cpi_yoy, credit_growth_yoy, pmi, usdvnd) phân định 5 pha chu kỳ.
    - `riskScoreWeights`: Trọng số 4 tầng rủi ro vĩ mô (monetary: 0.35, growth: 0.25, price: 0.20, external: 0.20).
+   - `vnindexPeBands`: Dải P/E định giá thị trường (deepValue: 11.5, cheap: 13.5, fair: 16.0, expensive: 18.0).
    - `goldArbitrage`: Thuế phí gia công vàng trong nước (1.5%) và ngưỡng chênh lệch giá vàng (high: 10%, low: 3%).
    - `marketValuationBands`: Cảnh báo z-score cực đoan (|z| > 2.0) và ngưỡng tích số Benjamin Graham (22.5).
-3. **`tradingAndFees` (Giao Dịch, Thuế, Phí)**:
+   - `fallbackIndicators`: Giá trị dự phòng trung tâm cho 10 chỉ số vĩ mô khi thiếu dữ liệu nguồn sống (cpiYoY, interbankRate, sbvRefinancingRate, vn10yYield, us10yYield, usdvnd, oilBrent, pmi, creditGrowthYoY, gdpGrowthYoY).
+4. **`tradingAndFees` (Giao Dịch, Thuế, Phí)**:
    - `personalIncomeTaxRate`: 0.001 (0.1% thuế TNCN khi bán CP).
    - `defaultBrokerFeeRate`: 0.0015 (0.15% phí môi giới mặc định).
    - `brokerFeePresets`: [0.0, 0.001, 0.0015].
@@ -1009,10 +1052,29 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
    - `defaultBankInterestRate`: 5.0 (5.0%/năm lãi suất tiết kiệm tính chi phí cơ hội).
    - `tradingDaysPerYear`: 252.
    - `defaultTags`: Danh sách các thẻ gợi ý giao dịch.
-4. **`systemAndNetwork` (Hệ Thống & Tần Suất Gọi API)**:
+5. **`systemAndNetwork` (Hệ Thống & Tần Suất Gọi API)**:
    - `serverPort`: 3001.
    - `inSessionTtlMs`: 3,600,000 (1 giờ).
    - `fundamentalsTtlMs`: 43,200,000 (12 giờ).
    - `httpTimeoutSeconds`: 30.
    - `httpMaxRetries`: 2.
    - `rateLimitsPerMinute`: VCI: 45, TCBS: 45, TRADINGVIEW: 60, DEFAULT: 45.
+
+---
+
+### PHÂN HỆ 8: HÀNG ĐỢI YÊU CẦU MÃ CỔ PHIẾU & AUTO-BACKFILL ENGINE (`requested_stocks`)
+* **Vị trí lưu trữ**:
+  - Tầng 1 (ACID DB): Bảng `requested_stocks` trong SQLite (`data/stock.db`) và Turso Cloud.
+  - Tầng 3 (Snapshot JSON): `data/requested_stocks.json`.
+* **Mục đích**: Tự động ghi nhận các mã cổ phiếu mà người dùng tra cứu nhưng chưa có sẵn trong kho lưu trữ BCTC (`data/financials/<MÃ>.json`), đưa vào hàng đợi ưu tiên để chu kỳ quét Daily EOD (18:00) tự động tải dữ liệu sống và bổ sung vào `data/supported_stocks.json`.
+* **Schema chuẩn 5 trường (Strict 5-Field Schema)**:
+  1. `symbol` (TEXT PRIMARY KEY): Mã cổ phiếu được yêu cầu (ví dụ: `MWG`, `TCB`, `VNM`).
+  2. `requested_at` (TEXT NOT NULL): Thời điểm người dùng gửi yêu cầu (ISO 8601 string, ví dụ: `2026-10-12T22:50:00Z`).
+  3. `status` (TEXT DEFAULT 'PENDING'): Trạng thái xử lý (`PENDING`, `SYNCED`, `FAILED`).
+  4. `synced_at` (TEXT): Thời điểm hoàn tất thu thập dữ liệu (hoặc `NULL` nếu chưa hoàn tất).
+  5. `error_message` (TEXT): Thông báo lỗi nếu quá trình cào dữ liệu gặp sự cố (hoặc `NULL`).
+* **Bộ điều phối & Chu kỳ vận hành**:
+  - Python Engine: `scripts/lib/requested_stocks_manager.py` (API: `get_pending_requested_symbols`, `filter_missing_financials`, `mark_symbol_synced`, `mark_symbol_failed`, `add_to_supported_stocks`).
+  - Daily EOD Sync: `scripts/run_pipeline.py --cadence daily` tự động rà soát hàng đợi lúc 18:00 T2-T6, kích hoạt cào TradingView + BCTC + DCF, tự động thêm vào `data/supported_stocks.json` và commit & push về Git.
+  - Quarterly BCTC Sync: `.github/workflows/quarterly-bctc-sync.yml` kích hoạt `scripts/run_pipeline.py --cadence quarterly` định kỳ ngày 1 và ngày 15 các tháng 1, 4, 7, 10 lúc 09:00 sáng VN.
+

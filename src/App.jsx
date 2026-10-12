@@ -68,7 +68,7 @@ const TAB_GROUPS = [
   {
     groupTitle: 'Định Giá & Phân Tích Chuyên Sâu',
     items: [
-      { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: '6 mô hình Graham, DDM, multiples & BCTC 122+ chỉ tiêu' },
+      { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: '10 mô hình định lượng (Graham, DCF, RIM, NAV...), 7 Vùng giá & BCTC 122+ chỉ tiêu' },
       { id: 'macro', label: 'Vĩ Mô & VN-Index', icon: '🌐', desc: 'Regime chu kỳ, nhiệt kế định giá & 10 nhóm ngành' },
       { id: 'dca', label: 'Kế Hoạch DCA', icon: '🪜', desc: 'Mô phỏng & lộ trình mua gom đa tầng' },
       { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách & kỷ luật' },

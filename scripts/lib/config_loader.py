@@ -29,12 +29,75 @@ FALLBACK_CONFIG: Dict[str, Any] = {
         "pcfMultiple": 8.0,
         "psMultiple": 1.1,
         "riskFreeRate": 0.045,
+        "sectorWaccBenchmarks": {
+            "BANKING": 0.100,
+            "FINANCIAL_SERVICES": 0.105,
+            "INSURANCE": 0.100,
+            "HEAVY_INDUSTRY": 0.105,
+            "REAL_ESTATE": 0.115,
+            "RETAIL": 0.090,
+            "CONSUMER": 0.090,
+            "TECHNOLOGY": 0.090,
+            "ENERGY": 0.100,
+            "OIL_GAS": 0.100,
+            "GENERAL": 0.105,
+        },
+        "waccAdjustment": {
+            "betaSensitivity": 0.015,
+            "minWacc": 0.075,
+            "maxWacc": 0.160,
+        },
+        "valuationTraps": {
+            "highRiskThreshold": 4.0,
+            "mediumRiskThreshold": 2.0,
+            "weights": {
+                "valueTrap": 2.5,
+                "bookTrap": 2.5,
+                "cyclicalPeak": 2.0,
+                "debtStress": 2.0,
+                "dividendTrap": 1.5,
+                "shareDilution": 1.5,
+                "wcStress": 1.5,
+            },
+        },
+        "sevenPriceZones": {
+            "deepValueRatio": 0.75,
+            "buyRatio": 0.85,
+            "fairLowRatio": 0.95,
+            "fairHighRatio": 1.10,
+            "aboveFairRatio": 1.20,
+            "expensiveRatio": 1.35,
+        },
+        "methodSuitability": {
+            "finGrahamSuitability": 0.35,
+            "nonFinRimSuitability": 0.55,
+            "nonFinNavSuitability": 0.85,
+            "reDdmSuitability": 0.25,
+        },
         "graham": {
+            "basePeMax": 7.0,
+            "basePeMin": 3.0,
+            "defaultBasePe": 7.0,
+            "highQualityHs": 1.0,
+            "standardHs": 0.8,
+            "roeQualityThreshold": 15.0,
+            "cyclicalGrowthRate": 5.0,
+            "maxNonCyclicalGrowthRate": 12.0,
+            "minGrowthRate": 3.0,
+            "defaultGrowthRate": 5.0,
+            "minBenchmarkConstant": 4.4,
+            "minDiscountYield": 5.0,
+            "cyclicalSectors": [
+                "Thép",
+                "Hóa Chất",
+                "Dầu Khí",
+                "Thủy Sản",
+                "Khai Khoáng",
+                "Phân Bón",
+                "Cao Su"
+            ],
             "maxMultiplier": 22.5,
             "minMultiplier": 4.0,
-            "basePe": 7.0,
-            "growthFactor": 1.0,
-            "benchmarkYield": 4.4,
         },
         "outlierFilter": {
             "outlierGapThreshold": 0.60,
@@ -69,6 +132,45 @@ FALLBACK_CONFIG: Dict[str, Any] = {
             "Nông Nghiệp": {"pe": 0.20, "pb": 0.12, "graham": 0.05, "dcf": 0.18, "fcff": 0.12, "fcfe": 0.08, "rim": 0.00, "nav": 0.05, "evebitda": 0.15, "ddm": 0.05},
             "Cao Su": {"pe": 0.20, "pb": 0.12, "graham": 0.05, "dcf": 0.18, "fcff": 0.12, "fcfe": 0.08, "rim": 0.00, "nav": 0.05, "evebitda": 0.15, "ddm": 0.05},
             "Khác": {"pe": 0.15, "pb": 0.15, "graham": 0.08, "dcf": 0.15, "fcff": 0.12, "fcfe": 0.08, "rim": 0.08, "nav": 0.07, "evebitda": 0.07, "ddm": 0.05},
+        },
+    },
+    "financialAnalytics": {
+        "healthScore": {
+            "pillarWeightsCorporate": {
+                "profitability": 0.30,
+                "efficiency": 0.25,
+                "leverage": 0.25,
+                "liquidity": 0.20,
+            },
+            "pillarWeightsBanking": {
+                "profitability": 0.45,
+                "efficiency": 0.20,
+                "leverage": 0.35,
+                "liquidity": 0.00,
+            },
+            "gradeThresholds": {
+                "excellent": 80,
+                "good": 65,
+                "fair": 50,
+                "weak": 35,
+            },
+        },
+        "beneishMScore": {
+            "safeThreshold": -2.22,
+            "alertThreshold": -1.78,
+        },
+        "magicFormula": {
+            "minEarningsYieldTopTier": 9.0,
+            "minRoicTopTier": 18.0,
+            "eyBenchmark": 15.0,
+            "roicBenchmark": 30.0,
+        },
+        "dupontBenchmarks": {
+            "taxBurden": 0.80,
+            "interestBurden": 0.80,
+            "operatingMargin": 0.10,
+            "assetTurnover": 0.80,
+            "financialLeverage": 2.50,
         },
     },
     "macro": {
@@ -130,6 +232,18 @@ FALLBACK_CONFIG: Dict[str, Any] = {
         "marketValuationBands": {
             "zScoreExtremeThreshold": 2.0,
             "grahamPePbThreshold": 22.5,
+        },
+        "fallbackIndicators": {
+            "cpiYoY": 3.63,
+            "interbankRate": 4.50,
+            "sbvRefinancingRate": 4.50,
+            "vn10yYield": 4.47,
+            "us10yYield": 4.30,
+            "usdvnd": 25400,
+            "oilBrent": 75.0,
+            "pmi": 50.5,
+            "creditGrowthYoY": 14.0,
+            "gdpGrowthYoY": 6.5,
         },
     },
     "tradingAndFees": {
@@ -212,6 +326,12 @@ def get_valuation_config() -> Dict[str, Any]:
     """Lấy cấu hình cho phân hệ định giá doanh nghiệp & cổ phiếu."""
     cfg = load_system_constants()
     return cfg.get("valuation", FALLBACK_CONFIG["valuation"])
+
+
+def get_financial_analytics_config() -> Dict[str, Any]:
+    """Lấy cấu hình cho phân hệ phân tích BCTC, health score, fraud detection và magic formula."""
+    cfg = load_system_constants()
+    return cfg.get("financialAnalytics", FALLBACK_CONFIG["financialAnalytics"])
 
 
 def get_macro_config() -> Dict[str, Any]:

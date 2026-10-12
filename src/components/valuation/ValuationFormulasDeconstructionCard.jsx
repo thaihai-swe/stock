@@ -17,9 +17,14 @@ export default function ValuationFormulasDeconstructionCard({
   const closePrice = currentPrice || valData.close || 0;
   const bvps = valData.bvps || 0;
   const eps = valData.eps || (financials?.quarterly?.[financials.quarterly.length - 1]?.eps) || 0;
-  const roe = financials?.financialRatios?.profitability?.roe || 0;
-  const wacc = 10.5; // %
-  const gTerm = 3.5; // %
+  const roe = financials?.financialRatios?.profitability?.roe ?? valData.dupont?.roe;
+  
+  const dcfModel = models10.find(m => m.id === 'dcf' || m.id === 'fcff');
+  const dcfParams = dcfModel?.parameters || {};
+  const rawWacc = dcfParams.wacc ?? valData.dcfScenarios?.wacc ?? financials?.dcfScenarios?.wacc;
+  const wacc = rawWacc != null ? (rawWacc > 1 ? Number(rawWacc).toFixed(1) : (Number(rawWacc) * 100).toFixed(1)) : null;
+  const rawG = dcfParams.terminalG ?? valData.dcfScenarios?.terminalG ?? financials?.dcfScenarios?.terminalG;
+  const gTerm = rawG != null ? (rawG > 1 ? Number(rawG).toFixed(1) : (Number(rawG) * 100).toFixed(1)) : null;
 
   const filteredModels = selectedModelId === 'all'
     ? models10
@@ -89,11 +94,11 @@ export default function ValuationFormulasDeconstructionCard({
           </div>
           <div className="p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
             <span className="text-[10px] text-gray-400 block">Chi phí vốn (WACC / CoE)</span>
-            <span className="font-black text-amber-600 dark:text-amber-400 text-sm mt-0.5 block">{wacc}%</span>
+            <span className="font-black text-amber-600 dark:text-amber-400 text-sm mt-0.5 block">{wacc != null ? `${wacc}%` : '—'}</span>
           </div>
           <div className="p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
             <span className="text-[10px] text-gray-400 block">Tăng trưởng dài hạn (g)</span>
-            <span className="font-black text-teal-600 dark:text-teal-400 text-sm mt-0.5 block">{gTerm}%</span>
+            <span className="font-black text-teal-600 dark:text-teal-400 text-sm mt-0.5 block">{gTerm != null ? `${gTerm}%` : '—'}</span>
           </div>
         </div>
       </div>
@@ -106,9 +111,10 @@ export default function ValuationFormulasDeconstructionCard({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredModels.map((m, idx) => {
-            const hasVal = m.value != null;
             const targetVal = m.value ?? m.targetPrice;
+            const hasVal = targetVal != null && targetVal > 0;
             const isOutlier = m.isOutlier;
+            const isContributing = hasVal && !isOutlier && (m.weight || 0) > 0;
             const diff = m.diffPercent;
 
             return (
@@ -116,9 +122,9 @@ export default function ValuationFormulasDeconstructionCard({
                 key={m.id || idx}
                 className={`p-5 rounded-2xl border transition-all space-y-3.5 flex flex-col justify-between ${isOutlier
                     ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/60'
-                    : hasVal
-                      ? 'bg-gray-50/60 dark:bg-gray-900/40 border-gray-200/80 dark:border-gray-700/80'
-                      : 'bg-gray-50/30 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800 opacity-75'
+                    : isContributing
+                      ? 'bg-white dark:bg-gray-800/90 border-indigo-200 dark:border-indigo-700/80 shadow-xs ring-1 ring-indigo-500/15'
+                      : 'bg-gray-50/50 dark:bg-gray-800/40 border-gray-200/70 dark:border-gray-700/50'
                   }`}
               >
                 {/* Header Thẻ Mô Hình */}
@@ -129,11 +135,25 @@ export default function ValuationFormulasDeconstructionCard({
                         <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
                           {idx + 1}. {m.cleanName || m.name}
                         </span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                          Trọng số: {Math.round((m.weight || 0) * 100)}%
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md transition-all ${isContributing
+                              ? 'font-bold bg-indigo-600 text-white dark:bg-indigo-500 shadow-2xs'
+                              : isOutlier
+                                ? 'font-medium bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 line-through border border-rose-200 dark:border-rose-800'
+                                : 'font-medium bg-gray-100/70 dark:bg-gray-800/70 text-gray-400 dark:text-gray-500 border border-gray-200/60 dark:border-gray-700/60 opacity-60'
+                            }`}
+                          title={
+                            isContributing
+                              ? `Mô hình hợp lệ, đóng góp ${Math.round((m.weight || 0) * 100)}% vào Giá Trị Nội Tại Hội Tụ`
+                              : isOutlier
+                                ? 'Bị loại trừ do lệch quá ±60% so với median'
+                                : 'Không đủ dữ liệu hoặc không áp dụng cho ngành này'
+                          }
+                        >
+                          {isContributing ? '✓ ' : ''}Trọng số: {Math.round((m.weight || 0) * 100)}%
                         </span>
                       </div>
-                      <span className="text-[10px] text-gray-400 mt-0.5 block">
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 block">
                         Đặc thù ngành: {m.suitabilityNote || 'Phù hợp'}
                       </span>
                     </div>
@@ -159,8 +179,8 @@ export default function ValuationFormulasDeconstructionCard({
                         </div>
                       ) : (
                         <div>
-                          <span className="text-xs font-bold text-gray-400">Không áp dụng</span>
-                          <span className="text-[10px] text-gray-400 block mt-0.5">{m.statusNote || 'Thiếu số liệu'}</span>
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-300">Không áp dụng</span>
+                          <span className="text-[10px] text-gray-500 dark:text-gray-400 block mt-0.5">{m.statusNote || 'Thiếu số liệu'}</span>
                         </div>
                       )}
                     </div>
@@ -169,10 +189,10 @@ export default function ValuationFormulasDeconstructionCard({
                   {/* Khối Công Thức Toán Học */}
                   <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Công Thức Toán Học:</span>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Công Thức Toán Học:</span>
                       {m.id === 'graham' && (
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                          Hệ số thích ứng Min(22.5, PE×PB)
+                          Graham Dynamic (100% Dữ Liệu Thật)
                         </span>
                       )}
                     </div>
@@ -180,7 +200,7 @@ export default function ValuationFormulasDeconstructionCard({
                       {m.formula || '—'}
                     </div>
                     {m.formulaDetail && (
-                      <div className="text-[11px] text-gray-600 dark:text-gray-400 font-mono pt-1 border-t border-gray-100 dark:border-gray-700">
+                      <div className="text-[11px] text-gray-700 dark:text-gray-300 font-mono pt-1 border-t border-gray-100 dark:border-gray-700">
                         {m.formulaDetail}
                       </div>
                     )}
@@ -190,17 +210,58 @@ export default function ValuationFormulasDeconstructionCard({
                 {/* Bảng Tham Số Thế Số */}
                 {m.parameters && Object.keys(m.parameters).length > 0 && (
                   <div className="pt-2 border-t border-gray-200/60 dark:border-gray-700/60 text-[10px]">
-                    <span className="text-gray-400 font-bold block mb-1">Các Biến Số Đầu Vào:</span>
+                    <span className="text-gray-500 dark:text-gray-400 font-bold block mb-1">Các Biến Số Đầu Vào:</span>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(m.parameters).map(([k, v]) => {
                         if (v == null) return null;
+                        const labelMap = {
+                          eps: 'EPS TTM',
+                          epsAvg: 'EPS Trung bình 5Y',
+                          peBase: 'P/E Cơ sở',
+                          peMedian: 'P/E Trung vị (P50)',
+                          peAvg: 'P/E Trung bình (Mean)',
+                          targetPe: 'P/E Mục tiêu',
+                          targetPb: 'P/B Mục tiêu',
+                          pbMedian: 'P/B Trung vị (P50)',
+                          pbAvg: 'P/B Trung bình (Mean)',
+                          yearsUsed: 'Số năm lịch sử',
+                          isFallback: 'Dùng mặc định ngành',
+                          bvps: 'BVPS',
+                          roe: 'ROE (%)',
+                          coe: 'Chi phí vốn CoE',
+                          terminalG: 'Tăng trưởng g_term',
+                          hs: 'Hệ số nhạy cảm hs',
+                          gCagr: 'Tăng trưởng g (CAGR %)',
+                          constantVn: 'Hằng số VN',
+                          yVn: 'Lãi suất y',
+                          vn10yYield: 'Lợi suất TPCP 10Y'
+                        };
+                        const displayKey = labelMap[k] || k;
                         return (
-                          <span key={k} className="px-2 py-0.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-mono">
-                            {k}: <strong>{typeof v === 'number' ? Number(v).toLocaleString('vi-VN') : String(v)}</strong>
+                          <span key={k} className="px-2 py-0.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-mono">
+                            {displayKey}: <strong>{typeof v === 'number' ? Number(v).toLocaleString('vi-VN') : (typeof v === 'boolean' ? (v ? 'Có' : 'Không') : String(v))}</strong>
                           </span>
                         );
                       })}
                     </div>
+                    {m.id === 'graham' && (
+                      <div className="mt-2 text-[10px] text-gray-500 dark:text-gray-400 bg-indigo-50/50 dark:bg-indigo-950/30 p-2 rounded-lg border border-indigo-100/60 dark:border-indigo-900/40 space-y-0.5">
+                        <div>• <strong>P/E Cơ sở:</strong> Lấy <code>min(7.0, P/E Trung vị 5Y)</code> — Chặn trần an toàn 7.0x cho tăng trưởng 0% theo triết lý Graham VN.</div>
+                        <div>• <strong>Tăng trưởng g:</strong> Chuẩn hóa 5.0% đối với ngành chu kỳ (tránh ảo giác đáy chu kỳ) hoặc CAGR LNST thực tế trần an toàn 12.0%.</div>
+                        <div>• <strong>Lãi suất & Hằng số VN:</strong> Chiết khấu theo Lợi suất TPCP 10 năm thực tế từ HNX ({m.parameters?.vn10yYield || 4.47}%).</div>
+                      </div>
+                    )}
+                    {m.id === 'pe' && (
+                      <div className="mt-2 text-[10px] text-gray-500 dark:text-gray-400 bg-indigo-50/50 dark:bg-indigo-950/30 p-2 rounded-lg border border-indigo-100/60 dark:border-indigo-900/40 space-y-0.5">
+                        <div>• <strong>P/E Mục Tiêu:</strong> Sử dụng <strong>Trung vị P50</strong> ({m.parameters?.yearsUsed ? `${m.parameters.yearsUsed} năm` : 'chu kỳ'} = <strong>{m.parameters?.peMedian || m.parameters?.targetPe}x</strong>) thay vì Trung bình cộng ({m.parameters?.peAvg != null ? `${m.parameters.peAvg}x` : '—'}) để triệt tiêu các đột biến ngoại lai (outliers) khi EPS sụt giảm trong các đáy chu kỳ kinh doanh.</div>
+                        <div>• <strong>Nguồn dữ liệu:</strong> Trích xuất từ BCTC lịch sử thực tế của doanh nghiệp; chỉ dùng bội số ngành khi doanh nghiệp hoàn toàn chưa có dữ liệu lịch sử.</div>
+                      </div>
+                    )}
+                    {m.id === 'pb' && (
+                      <div className="mt-2 text-[10px] text-gray-500 dark:text-gray-400 bg-indigo-50/50 dark:bg-indigo-950/30 p-2 rounded-lg border border-indigo-100/60 dark:border-indigo-900/40 space-y-0.5">
+                        <div>• <strong>P/B Mục Tiêu:</strong> Sử dụng <strong>Trung vị P50</strong> ({m.parameters?.yearsUsed ? `${m.parameters.yearsUsed} năm` : 'chu kỳ'} = <strong>{m.parameters?.pbMedian || m.parameters?.targetPb}x</strong>) {m.parameters?.pbAvg != null ? `| P/B Trung bình: ${m.parameters.pbAvg}x` : ''} hoặc Mô hình Gordon Growth chuyên biệt cho nhóm Tài chính (Ngân hàng, Chứng khoán, Bảo hiểm).</div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

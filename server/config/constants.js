@@ -16,6 +16,7 @@ export const FUNDAMENTALS_CACHE_FILE = path.join(DATA_DIR, 'fundamentals_cache.j
 export const SUPPORTED_STOCKS_FILE = path.join(DATA_DIR, 'supported_stocks.json');
 export const MACRO_VALUATION_FILE = path.join(DATA_DIR, 'macro_valuation.json');
 export const DEFAULT_CONSTANTS_FILE = path.join(DATA_DIR, 'default-constant-value.json');
+export const REQUESTED_STOCKS_FILE = path.join(DATA_DIR, 'requested_stocks.json');
 export const DIST_DIR = path.join(ROOT_DIR, 'dist');
 
 export const PORT = process.env.PORT || sysConfig.serverPort || 3001;

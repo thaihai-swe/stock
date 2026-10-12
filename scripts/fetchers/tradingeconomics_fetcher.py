@@ -215,7 +215,15 @@ class TradingEconomicsFetcher(BaseFetcher):
             for it in cat_info.get("items", []):
                 headline_map[it["name"]] = it["value"]
 
-        # Fallback động cho stock_index từ snapshot macro cache
+        # Fallback động từ snapshot cache sẵn có nếu HTML bị thiếu chỉ số
+        prev_macro_core = {}
+        if INDICATORS_CACHE_FILE.exists():
+            try:
+                with open(INDICATORS_CACHE_FILE, "r", encoding="utf-8") as f:
+                    prev_macro_core = json.load(f).get("macroCore", {})
+            except Exception:
+                pass
+
         cached_stock_idx = 0.0
         try:
             macro_cache_path = DATA_DIR / "macro_valuation.json"
@@ -228,20 +236,20 @@ class TradingEconomicsFetcher(BaseFetcher):
 
         # Trích xuất các macro driver chính
         macro_core = {
-            "gdp_growth_yoy": headline_map.get("GDP Annual Growth Rate", 9.95),
-            "cpi_yoy": headline_map.get("Inflation Rate", 5.08),
-            "cpi_core": headline_map.get("Core Inflation Rate", 4.45),
-            "sbv_refinancing_rate": headline_map.get("Interest Rate", 4.5),
-            "interbank_rate": headline_map.get("Interbank Rate", 6.47),
-            "credit_growth_yoy": headline_map.get("Loan Growth", 15.08) or 15.08,
-            "pmi": headline_map.get("Manufacturing PMI", 51.9),
-            "iip_growth": headline_map.get("Industrial Production", 16.7),
-            "retail_sales_yoy": headline_map.get("Retail Sales YoY", 14.1),
-            "unemployment_rate": headline_map.get("Unemployment Rate", 2.22),
-            "trade_balance_bn_usd": headline_map.get("Balance of Trade", 1.27),
-            "govt_debt_to_gdp": headline_map.get("Government Debt to GDP", 33.6),
-            "usdvnd": headline_map.get("Currency", 25881.0),
-            "stock_index": headline_map.get("Stock Market", cached_stock_idx),
+            "gdp_growth_yoy": headline_map.get("GDP Annual Growth Rate") if headline_map.get("GDP Annual Growth Rate") is not None else prev_macro_core.get("gdp_growth_yoy"),
+            "cpi_yoy": headline_map.get("Inflation Rate") if headline_map.get("Inflation Rate") is not None else prev_macro_core.get("cpi_yoy"),
+            "cpi_core": headline_map.get("Core Inflation Rate") if headline_map.get("Core Inflation Rate") is not None else prev_macro_core.get("cpi_core"),
+            "sbv_refinancing_rate": headline_map.get("Interest Rate") if headline_map.get("Interest Rate") is not None else prev_macro_core.get("sbv_refinancing_rate", 4.5),
+            "interbank_rate": headline_map.get("Interbank Rate") if headline_map.get("Interbank Rate") is not None else prev_macro_core.get("interbank_rate", 4.5),
+            "credit_growth_yoy": headline_map.get("Loan Growth") if headline_map.get("Loan Growth") is not None else prev_macro_core.get("credit_growth_yoy", 15.0),
+            "pmi": headline_map.get("Manufacturing PMI") if headline_map.get("Manufacturing PMI") is not None else prev_macro_core.get("pmi", 50.0),
+            "iip_growth": headline_map.get("Industrial Production") if headline_map.get("Industrial Production") is not None else prev_macro_core.get("iip_growth"),
+            "retail_sales_yoy": headline_map.get("Retail Sales YoY") if headline_map.get("Retail Sales YoY") is not None else prev_macro_core.get("retail_sales_yoy"),
+            "unemployment_rate": headline_map.get("Unemployment Rate") if headline_map.get("Unemployment Rate") is not None else prev_macro_core.get("unemployment_rate"),
+            "trade_balance_bn_usd": headline_map.get("Balance of Trade") if headline_map.get("Balance of Trade") is not None else prev_macro_core.get("trade_balance_bn_usd"),
+            "govt_debt_to_gdp": headline_map.get("Government Debt to GDP") if headline_map.get("Government Debt to GDP") is not None else prev_macro_core.get("govt_debt_to_gdp"),
+            "usdvnd": headline_map.get("Currency") if headline_map.get("Currency") is not None else prev_macro_core.get("usdvnd", 25400.0),
+            "stock_index": headline_map.get("Stock Market") if headline_map.get("Stock Market") is not None else (prev_macro_core.get("stock_index") or cached_stock_idx),
         }
 
         total_indicators = sum(c["count"] for c in categories.values())

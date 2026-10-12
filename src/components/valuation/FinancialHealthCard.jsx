@@ -3,14 +3,14 @@ import React from 'react';
 export default function FinancialHealthCard({ healthScore, earlyWarning }) {
   if (!healthScore && !earlyWarning) return null;
 
-  const score = healthScore?.overallScore ?? 75;
-  const grade = healthScore?.grade || 'Mạnh';
+  const score = healthScore?.overallScore ?? null;
+  const grade = healthScore?.grade || (score != null ? 'Mạnh' : 'Chưa đủ dữ liệu');
   const pillars = healthScore?.pillars || {};
   const alerts = earlyWarning?.alerts || [];
   const positiveSignals = earlyWarning?.positiveSignals || [];
-  const riskScore = earlyWarning?.riskScore ?? 25;
-  const riskLevel = earlyWarning?.riskLevel || 'An Toàn';
-  const riskBadge = earlyWarning?.riskBadge || 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200';
+  const riskScore = earlyWarning?.riskScore ?? null;
+  const riskLevel = earlyWarning?.riskLevel || (riskScore != null ? 'An Toàn' : 'Chưa đủ dữ liệu');
+  const riskBadge = earlyWarning?.riskBadge || (riskScore != null ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border-gray-300');
 
   // Màu sắc theo điểm số sức khỏe
   const getScoreColor = (s) => {
@@ -68,17 +68,17 @@ export default function FinancialHealthCard({ healthScore, earlyWarning }) {
                   cx="50"
                   cy="50"
                   r="40"
-                  className={`transition-all duration-1000 ease-out ${getScoreColor(score)}`}
+                  className={`transition-all duration-1000 ease-out ${getScoreColor(score ?? 50)}`}
                   strokeWidth="10"
                   strokeDasharray="251.2"
-                  strokeDashoffset={251.2 - (251.2 * score) / 100}
+                  strokeDashoffset={score != null ? 251.2 - (251.2 * score) / 100 : 251.2}
                   strokeLinecap="round"
                   fill="transparent"
                 />
               </svg>
               <div className="absolute flex flex-col items-center">
                 <span className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-                  {score}
+                  {score != null ? score : '—'}
                 </span>
                 <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
                   / 100 Điểm
@@ -89,7 +89,7 @@ export default function FinancialHealthCard({ healthScore, earlyWarning }) {
               Xếp Hạng: <span className="text-indigo-600 dark:text-indigo-400">{grade}</span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-              {healthScore?.description}
+              {healthScore?.description || (score != null ? '' : 'Chưa đủ dữ liệu BCTC để tính toán điểm sức khỏe tài chính.')}
             </p>
           </div>
 
@@ -135,7 +135,7 @@ export default function FinancialHealthCard({ healthScore, earlyWarning }) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">Risk Score:</span>
             <span className={`px-3 py-1 rounded-full text-xs font-black border ${riskBadge}`}>
-              {riskScore}/100 · {riskLevel}
+              {riskScore != null ? `${riskScore}/100 · ${riskLevel}` : 'Chưa đủ dữ liệu'}
             </span>
           </div>
         </div>

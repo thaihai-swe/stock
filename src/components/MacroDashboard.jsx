@@ -164,8 +164,8 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
           {/* So sánh định giá 4 phong cách vốn hóa (VN30, Diamond, Midcap vs VN-Index) */}
           <StyleValuationComparison
             styleIndices={macroData?.styleIndices}
-            vnindexPE={market.currentPE || 10.72}
-            vnindexPB={market.currentPB || 1.8}
+            vnindexPE={market.currentPE || null}
+            vnindexPB={market.currentPB || null}
           />
 
           {/* Tóm tắt căng thẳng thị trường nợ & LSS */}
@@ -207,7 +207,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
             dualMatrix={macroData?.dualMatrix}
             sectorValuations={macroData?.sectorValuations}
             sectorRotation={macroData?.sectorRotation}
-            vnindexPE={market.currentPE || 10.72}
+            vnindexPE={market.currentPE || null}
             regime={regime}
           />
         </div>

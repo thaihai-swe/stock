@@ -9,8 +9,8 @@ Hệ thống quản trị danh mục đầu tư chứng khoán cá nhân và đ�
 * **📊 Quản Trị Danh Mục & Sổ Cái Khớp Lệnh FIFO**: Tự động tính toán giá vốn bình quân, Realized P/L từng lô bán, Unrealized P/L so với thị giá thời gian thực, quản lý cổ tức tiền mặt & cổ tức bằng cổ phiếu (khấu trừ thuế TNCN 5%).
 * **🏢 Tra Cứu & Định Giá Doanh Nghiệp (Single-Stock Deep Dive)**:
   * Tra cứu bất kỳ mã cổ phiếu nào trên cả 3 sàn HOSE, HNX, UPCoM.
-  * **Hero Card Giá Trị Nội Tại Hội Tụ**: Tính điểm hội tụ từ 6 mô hình định giá độc lập kèm Biên An Toàn (MoS %) và khuyến nghị hành động (*Mua gom tích lũy*, *Theo dõi nắm giữ*, *Cân nhắc chốt lời*).
-  * **Lưới 6 Mô Hình Định Giá Độc Lập**: Benjamin Graham, Chiết khấu Cổ tức Gordon DDM, EV/EBITDA, P/CF, Target P/E, Target P/B.
+  * **Hero Card Giá Trị Nội Tại Hội Tụ**: Tính điểm hội tụ từ 10 mô hình định lượng độc lập (sau khi lọc ngoại lai ±60% và trọng số ngành) kèm Biên An Toàn (MoS %) và khuyến nghị hành động (*Mua gom tích lũy*, *Theo dõi nắm giữ*, *Cân nhắc chốt lời*).
+  * **Lưới 10 Mô Hình Định Lượng Độc Lập**: Benjamin Graham Dynamic, Gordon DDM Fade, Target P/E Median 5Y, Target P/B Gordon, Multi-Stage DCF, DCF FCFF, FCFE Damodaran, RIM/EVA, Book NAV / P/B Chuẩn Hóa, Advanced Multiples EV/EBITDA & EV/Sales.
   * **4 Chế Độ Xem Báo Cáo Tài Chính Chuyên Sâu**: 122+ chỉ tiêu BCTC (8 quý & 5 năm), 54 Chỉ số Ratios & DuPont 3 nhân tố, Lịch sử cổ tức & cơ cấu cổ đông lớn, Giải phẫu công thức toán học & tham số WACC.
   * **Raw JSON Inspector**: Trực quan hóa và tải trực tiếp dữ liệu thô.
 * **🪜 Kế Hoạch Mua Gom DCA Đa Tầng**: Thiết lập lộ trình phân bổ vốn theo từng vùng giá mục tiêu.

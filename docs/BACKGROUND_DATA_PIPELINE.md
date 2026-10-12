@@ -29,7 +29,7 @@ Hệ thống kết hợp mô hình Hybrid 3 tầng phân định rạch ròi tr�
 │                 TẦNG 3: PYTHON DATA & VALUATION ENGINE                 │
 │  • Thu thập dữ liệu đa nguồn: vnstock, TCBS, DNSE, TradingView, PNJ    │
 │  • Chuẩn hóa dữ liệu theo từ điển tài chính Việt Nam (financial_taxonomy)│
-│  • Chạy 6 mô hình định giá, DCF 3 kịch bản, DuPont 3 nhân tố, Z-Score   │
+│  • Chạy 10 mô hình định lượng độc lập, DCF 3 kịch bản, DuPont 3 nhân tố  │
 │  • Ghi dữ liệu nguyên tử (Atomic write) vào thư mục data/              │
 └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -65,7 +65,7 @@ sequenceDiagram
     Node->>PyReport: execFile(.venv/bin/python, [reportScript, '--symbols', 'VNM'])
     PyReport->>Sources: Kéo 122+ chỉ tiêu BCTC 8Q & 5Y, Cổ tức, Cổ đông, Tin tức 30 ngày
     Sources-->>PyReport: Trả về Raw Financials
-    PyReport->>Engine: Chuẩn hóa Taxonomy & Chạy 6 mô hình định giá, DCF, DuPont, Z-Score
+    PyReport->>Engine: Chuẩn hóa Taxonomy & Chạy 10 mô hình định lượng, DCF, DuPont, Z-Score
     Engine-->>PyReport: Bộ chỉ số tài chính & Giá trị hợp lý hội tụ
     PyReport->>File: Ghi đĩa nguyên tử data/financials/VNM.json
     PyReport-->>Node: Exit Code 0 (Hoàn tất bước 2)

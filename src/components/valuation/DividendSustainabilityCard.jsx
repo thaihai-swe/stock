@@ -4,15 +4,15 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
   if (!dividendSustainability) return null;
 
   const {
-    score = 5.0,
-    status = 'Bình thường',
+    score = null,
+    status = 'Chưa đủ số liệu',
     payoutRatio = null,
     fcfPayoutRatio = null,
     consistency = null
   } = dividendSustainability;
 
-  const isSafe = status.includes('an toàn') || status.includes('Bền vững');
-  const isTrap = status.includes('Bẫy') || status.includes('Cắt giảm') || (fcfPayoutRatio != null && fcfPayoutRatio > 100);
+  const isSafe = status?.includes('an toàn') || status?.includes('Bền vững');
+  const isTrap = status?.includes('Bẫy') || status?.includes('Cắt giảm') || (fcfPayoutRatio != null && fcfPayoutRatio > 100);
 
   return (
     <div className="p-5 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xs space-y-5">
@@ -41,7 +41,7 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
               : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
           }`}>
             <span>{isSafe ? '🛡️' : isTrap ? '🚨' : '⚠️'}</span>
-            <span>{status} ({score}/10)</span>
+            <span>{status} {score != null ? `(${score}/10)` : ''}</span>
           </span>
         </div>
       </div>

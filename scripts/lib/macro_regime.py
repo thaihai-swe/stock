@@ -22,6 +22,24 @@ except ImportError:
 
 _macro_cfg = get_macro_config()
 
+_pe_bands = _macro_cfg.get("vnindexPeBands") or {}
+PE_BAND_DEEP_VALUE = float(_pe_bands.get("deepValue", 11.5))
+PE_BAND_CHEAP = float(_pe_bands.get("cheap", 13.5))
+PE_BAND_FAIR = float(_pe_bands.get("fair", 16.0))
+PE_BAND_EXPENSIVE = float(_pe_bands.get("expensive", 18.0))
+
+_fallback_inds = _macro_cfg.get("fallbackIndicators") or {}
+FALLBACK_USDVND = float(_fallback_inds.get("usdvnd", 25400.0))
+FALLBACK_INTERBANK = float(_fallback_inds.get("interbankRate", 4.5))
+FALLBACK_SBV_RATE = float(_fallback_inds.get("sbvRefinancingRate", 4.5))
+FALLBACK_CPI = float(_fallback_inds.get("cpiYoY", 3.63))
+FALLBACK_VN10Y = float(_fallback_inds.get("vn10yYield", 4.47))
+FALLBACK_US10Y = float(_fallback_inds.get("us10yYield", 4.30))
+FALLBACK_OIL = float(_fallback_inds.get("oilBrent", 75.0))
+FALLBACK_PMI = float(_fallback_inds.get("pmi", 50.5))
+FALLBACK_CREDIT = float(_fallback_inds.get("creditGrowthYoY", 14.0))
+FALLBACK_GDP = float(_fallback_inds.get("gdpGrowthYoY", 6.5))
+
 PHASES = ("Recovery", "Expansion", "Overheating", "Slowdown", "Recession")
 
 PHASE_META = {
@@ -150,13 +168,13 @@ def calculate_risk_score_and_layers(macro: Dict[str, Any]) -> Dict[str, Any]:
     """
     Tính Risk Score (0-100) theo 8 thành phần và phân rã 4 lớp (Monetary, Growth, Price, External).
     """
-    cpi = float(macro.get("cpi_yoy") or 4.5)
-    sbv_rate = float(macro.get("sbv_refinancing_rate") or 4.5)
-    gdp_growth = float(macro.get("gdp_growth_yoy") or 7.0)
-    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
-    us10y = float(macro.get("us10yYield") or macro.get("us10y") or 4.3)
-    credit = float(macro.get("credit_growth_yoy") or 14.0)
-    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25500.0)
+    cpi = float(macro.get("cpi_yoy") or FALLBACK_CPI)
+    sbv_rate = float(macro.get("sbv_refinancing_rate") or FALLBACK_SBV_RATE)
+    gdp_growth = float(macro.get("gdp_growth_yoy") or FALLBACK_GDP)
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or FALLBACK_VN10Y)
+    us10y = float(macro.get("us10yYield") or macro.get("us10y") or FALLBACK_US10Y)
+    credit = float(macro.get("credit_growth_yoy") or FALLBACK_CREDIT)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or FALLBACK_USDVND)
 
     # 1. Tính các gap thành phần
     s_infl = (cpi - 4.0) / 1.5
@@ -311,12 +329,12 @@ _SENSITIVITY_MATRIX = _GICS_SENSITIVITY_MATRIX
 
 def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Tính toán ma trận tác động vĩ mô và xoay vòng 10 nhóm ngành chuẩn GICS Việt Nam (HOSE)."""
-    interbank = float(macro.get("interbank_rate") or 6.47)
-    sbv_rate = float(macro.get("sbv_refinancing_rate") or 4.5)
-    cpi = float(macro.get("cpi_yoy") or 5.08)
-    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
-    oil = float(macro.get("oilBrent") or 104.7)
-    pmi = float(macro.get("pmi") or 51.9)
+    interbank = float(macro.get("interbank_rate") or FALLBACK_INTERBANK)
+    sbv_rate = float(macro.get("sbv_refinancing_rate") or FALLBACK_SBV_RATE)
+    cpi = float(macro.get("cpi_yoy") or FALLBACK_CPI)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or FALLBACK_USDVND)
+    oil = float(macro.get("oilBrent") or FALLBACK_OIL)
+    pmi = float(macro.get("pmi") or FALLBACK_PMI)
 
     # Xác định driver strength (+1 / 0 / -1)
     str_interbank = 1 if interbank < 3.0 else (-1 if interbank > 5.5 else 0)
@@ -403,12 +421,12 @@ def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str,
 
 def evaluate_leading_signals(macro: Dict[str, Any]) -> Dict[str, Any]:
     """Đánh giá 6 chỉ báo sớm để xác định trạng thái Risk-On / Risk-Off."""
-    interbank = float(macro.get("interbank_rate") or 6.47)
-    credit = float(macro.get("credit_growth_yoy") or 15.08)
-    cpi = float(macro.get("cpi_yoy") or 5.08)
-    pmi = float(macro.get("pmi") or 51.9)
-    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
-    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
+    interbank = float(macro.get("interbank_rate") or FALLBACK_INTERBANK)
+    credit = float(macro.get("credit_growth_yoy") or FALLBACK_CREDIT)
+    cpi = float(macro.get("cpi_yoy") or FALLBACK_CPI)
+    pmi = float(macro.get("pmi") or FALLBACK_PMI)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or FALLBACK_USDVND)
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or FALLBACK_VN10Y)
 
     signals = [
         {
@@ -771,24 +789,28 @@ def detect_scenarios_and_tail_risks(
     """
     Ma trận 3 Kịch bản thị trường (Base / Bull / Bear) và 6 Named Tail-Risks tự động kiểm tra trigger thực tế.
     """
-    cpi = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or 5.08)
-    sbv_rate = float(macro.get("sbvRefinancingRate") or macro.get("sbv_refinancing_rate") or 4.5)
-    interbank = float(macro.get("interbank_rate") or macro.get("vn_interbank_overnight_rate") or 6.47)
-    gdp = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or 7.0)
-    credit = float(macro.get("credit_growth_yoy") or 15.08)
-    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
-    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
-    us10y = float(macro.get("us10yYield") or macro.get("us10y") or 4.3)
+    cached_macro = {}
+    cached_vn = 0.0
+    try:
+        cache_p = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
+        if cache_p.exists():
+            with open(cache_p, "r", encoding="utf-8") as f:
+                c_json = json.load(f)
+                cached_macro = c_json.get("macro", {})
+                cached_vn = float(c_json.get("marketIndex", {}).get("currentPoint") or 0.0)
+    except Exception:
+        pass
 
-    vn_candidate = current_vnindex or macro.get("vnindex") or macro.get("currentPoint") or macro.get("stock_index")
-    if not vn_candidate or float(vn_candidate) <= 500:
-        try:
-            cache_p = Path(__file__).resolve().parent.parent.parent / "data" / "macro_valuation.json"
-            if cache_p.exists():
-                with open(cache_p, "r", encoding="utf-8") as f:
-                    vn_candidate = float(json.load(f).get("marketIndex", {}).get("currentPoint") or 0.0)
-        except Exception:
-            pass
+    cpi = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or cached_macro.get("cpi") or 4.0)
+    sbv_rate = float(macro.get("sbvRefinancingRate") or macro.get("sbv_refinancing_rate") or cached_macro.get("sbvRefinancingRate") or 4.5)
+    interbank = float(macro.get("interbank_rate") or macro.get("vn_interbank_overnight_rate") or cached_macro.get("interbankRate") or 4.5)
+    gdp = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or cached_macro.get("gdpGrowthYoY") or 6.5)
+    credit = float(macro.get("credit_growth_yoy") or cached_macro.get("creditGrowthYoY") or 15.0)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or cached_macro.get("usdVndRate") or 25400.0)
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or cached_macro.get("vn10yYield") or 4.47)
+    us10y = float(macro.get("us10yYield") or macro.get("us10y") or cached_macro.get("us10yYield") or 4.3)
+
+    vn_candidate = current_vnindex or macro.get("vnindex") or macro.get("currentPoint") or macro.get("stock_index") or cached_vn
     vn = float(vn_candidate) if (vn_candidate and float(vn_candidate) > 500) else 1250.0
 
     # Phân bổ xác suất 3 kịch bản theo Risk Score
@@ -930,12 +952,12 @@ def compute_lead_lag_divergence(macro: Dict[str, Any]) -> Dict[str, Any]:
     """
     Phân tích độ lệch pha giữa nhóm chỉ báo tài chính dẫn dắt (Leading) và kinh tế thực đi sau (Lagging).
     """
-    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or 3.45)
-    interbank = float(macro.get("interbank_rate") or macro.get("vn_interbank_overnight_rate") or 6.47)
-    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
-    cpi = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or 5.08)
-    gdp = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or 7.0)
-    credit = float(macro.get("credit_growth_yoy") or 15.08)
+    vn10y = float(macro.get("vn10yYield") or macro.get("vn10y") or FALLBACK_VN10Y)
+    interbank = float(macro.get("interbank_rate") or macro.get("vn_interbank_overnight_rate") or FALLBACK_INTERBANK)
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or FALLBACK_USDVND)
+    cpi = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or FALLBACK_CPI)
+    gdp = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or FALLBACK_GDP)
+    credit = float(macro.get("credit_growth_yoy") or FALLBACK_CREDIT)
 
     # 1. Nhóm Dẫn dắt (Financial Market & Liquidity)
     s_curve = (3.45 - vn10y) / 1.0
@@ -1070,7 +1092,7 @@ def generate_executive_summary(
     regime: Dict[str, Any],
     scenarios: Dict[str, Any],
     active_tail_risks: List[Dict[str, Any]],
-    market_pe: float = 10.72
+    market_pe: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Tổng hợp báo cáo điều hành cấp cao:
@@ -1078,11 +1100,13 @@ def generate_executive_summary(
     - 3-5 Động lực tăng trưởng (Growth Catalysts)
     - 3 Key Takeaways có gắn ⭐ Insight tổng hợp
     """
-    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or 25881.0)
-    interbank = float(macro.get("interbank_rate") or 6.47)
-    cpi = float(macro.get("cpi_yoy") or 5.08)
-    pmi = float(macro.get("pmi") or 51.9)
-    gdp = float(macro.get("gdp_growth_yoy") or 7.0)
+    if market_pe is None:
+        market_pe = PE_BAND_DEEP_VALUE
+    usdvnd = float(macro.get("usdVndRate") or macro.get("usdvnd") or FALLBACK_USDVND)
+    interbank = float(macro.get("interbank_rate") or FALLBACK_INTERBANK)
+    cpi = float(macro.get("cpi_yoy") or FALLBACK_CPI)
+    pmi = float(macro.get("pmi") or FALLBACK_PMI)
+    gdp = float(macro.get("gdp_growth_yoy") or FALLBACK_GDP)
     risk_score = risk_info.get("riskScore", 50.0)
 
     # 1. Key Risks (Sắp xếp theo mức độ nghiêm trọng)
@@ -1143,7 +1167,7 @@ def generate_executive_summary(
             "desc": f"Chỉ số PMI đạt {pmi:.1f} điểm, phản ánh lượng đơn hàng mới và sản lượng xuất khẩu tiếp tục tăng trưởng khả quan.",
             "color": "text-teal-400 bg-teal-500/10 border-teal-500/30"
         })
-    if market_pe < 13.5:
+    if market_pe < PE_BAND_CHEAP:
         catalysts.append({
             "level": "Cao",
             "title": "Định Giá Thị Trường Chiết Khấu Hấp Dẫn",
@@ -1176,10 +1200,10 @@ def generate_executive_summary(
 
 def calculate_style_indices(
     macro: Dict[str, Any],
-    vnindex_pe: float = 10.72,
-    vnindex_pb: float = 1.80,
-    vn30_pe: float = 11.08,
-    vn30_pb: float = 2.19
+    vnindex_pe: Optional[float] = None,
+    vnindex_pb: Optional[float] = None,
+    vn30_pe: Optional[float] = None,
+    vn30_pb: Optional[float] = None
 ) -> List[Dict[str, Any]]:
     """
     Tính toán và định chuẩn ma trận so sánh 4 phân khúc phong cách đầu tư:
@@ -1189,6 +1213,15 @@ def calculate_style_indices(
     4. VN Midcap (Tăng trưởng vốn hóa vừa - FUEDCMID)
     5. VN100 (Hợp nhất VN30 + VN Midcap)
     """
+    if vnindex_pe is None:
+        vnindex_pe = PE_BAND_DEEP_VALUE
+    if vnindex_pb is None:
+        vnindex_pb = 1.80
+    if vn30_pe is None:
+        vn30_pe = round(vnindex_pe * 1.03, 2)
+    if vn30_pb is None:
+        vn30_pb = round(vnindex_pb * 1.10, 2)
+
     # VN Diamond có P/E chiết khấu hơn VN30 khoảng 15-20% do tỷ trọng Bank/Bán lẻ lớn và room ngoại kín
     diamond_pe = round(vn30_pe * 0.82, 2)
     diamond_pb = round(vn30_pb * 0.88, 2)
@@ -1210,7 +1243,7 @@ def calculate_style_indices(
             "pe": vnindex_pe,
             "pb": vnindex_pb,
             "beta": 1.00,
-            "peBand": "Rất Rẻ" if vnindex_pe < 11.5 else ("Rẻ" if vnindex_pe < 13.5 else "Hợp Lý"),
+            "peBand": "Rất Rẻ" if vnindex_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if vnindex_pe < PE_BAND_CHEAP else "Hợp Lý"),
             "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
             "flowCharacter": "Dòng tiền toàn thị trường, phản ánh tổng thể chu kỳ kinh tế",
             "strategy": "Tích lũy DCA dài hạn theo nhịp điều chỉnh của chỉ số",
@@ -1225,7 +1258,7 @@ def calculate_style_indices(
             "pe": vn30_pe,
             "pb": vn30_pb,
             "beta": 0.95,
-            "peBand": "Rất Rẻ" if vn30_pe < 11.5 else ("Rẻ" if vn30_pe < 13.5 else "Hợp Lý"),
+            "peBand": "Rất Rẻ" if vn30_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if vn30_pe < PE_BAND_CHEAP else "Hợp Lý"),
             "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
             "flowCharacter": "Trụ đỡ thị trường, nơi dòng vốn ETF và tổ chức nước ngoài giải ngân đầu tiên",
             "strategy": "Phòng thủ vững chắc, hưởng lợi khi thị trường nâng hạng FTSE",
@@ -1255,7 +1288,7 @@ def calculate_style_indices(
             "pe": midcap_pe,
             "pb": midcap_pb,
             "beta": 1.32,
-            "peBand": "Hấp Dẫn" if midcap_pe < 13.5 else "Cân Bằng",
+            "peBand": "Hấp Dẫn" if midcap_pe < PE_BAND_CHEAP else "Cân Bằng",
             "peBandColor": "text-teal-400 bg-teal-500/20 border-teal-500/40",
             "flowCharacter": "Tập trung BĐS, Thép, Chứng khoán, dòng tiền cá nhân ưa chuộng, sóng tăng bốc nhất",
             "strategy": "Gia tăng tỷ trọng khi chu kỳ nới lỏng tiền tệ mở rộng để tối đa hóa hiệu suất",
@@ -1282,7 +1315,7 @@ def calculate_style_indices(
 def calculate_dual_sweet_spot_matrix(
     sector_valuations: List[Dict[str, Any]],
     sector_rotations: List[Dict[str, Any]],
-    vnindex_pe: float = 10.72
+    vnindex_pe: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Tính toán Ma Trận Thiên Thời Hội Tụ (Dual Sweet Spot Matrix):
@@ -1293,6 +1326,9 @@ def calculate_dual_sweet_spot_matrix(
       - momentum: Vùng Quá Nhiệt / Đà Tăng (Vĩ mô mạnh nhưng định giá đắt)
       - defense: Vùng Phòng Thủ / Tránh Né (Vĩ mô bất lợi và định giá đắt)
     """
+    if vnindex_pe is None:
+        vnindex_pe = PE_BAND_DEEP_VALUE
+
     if not sector_valuations:
         return {"items": [], "quadrants": {}, "stats": {}}
 
@@ -1329,8 +1365,8 @@ def calculate_dual_sweet_spot_matrix(
         pe = sec.get("pe") if sec.get("pe") is not None else 12.0
         pb = sec.get("pb") if sec.get("pb") is not None else 2.0
 
-        is_valuation_cheap = pe <= vnindex_pe or pe <= 11.5
-        is_valuation_expensive = pe >= 13.5
+        is_valuation_cheap = pe <= vnindex_pe or pe <= PE_BAND_DEEP_VALUE
+        is_valuation_expensive = pe >= PE_BAND_CHEAP
         is_macro_favorable = macro_score >= 0.0
 
         if is_macro_favorable and is_valuation_cheap:

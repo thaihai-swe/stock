@@ -276,6 +276,16 @@ def fetch_and_save_macro():
     except Exception as e:
         print(f"⚠️ Lỗi fetch dữ liệu định giá ngành: {e}")
 
+    try:
+        from lib.config_loader import get_macro_config
+    except ImportError:
+        from scripts.lib.config_loader import get_macro_config
+
+    m_cfg = get_macro_config()
+    m_fallbacks = m_cfg.get("fallbackIndicators", {})
+    fb_cpi = float(m_fallbacks.get("cpiYoY", 3.63))
+    fb_interbank = float(m_fallbacks.get("interbankRate", 4.50))
+
     # 4f. Bảng Giám Sát Đường Cong Lợi Suất & Lãi Suất 17 Dòng (VN vs US Yield Curve Monitor - ref-vn_macro)
     yield_curve_monitor = compute_yield_curve_monitor({
         **macro_live,
@@ -285,8 +295,8 @@ def fetch_and_save_macro():
         "us10y": us10y,
         "usd": usdvnd,
         "pe": current_pe,
-        "cpiYoY": te_core.get("cpi_yoy", 5.08),
-        "interbankRate": te_core.get("interbank_rate", 6.47),
+        "cpiYoY": te_core.get("cpi_yoy", fb_cpi),
+        "interbankRate": te_core.get("interbank_rate", fb_interbank),
     })
 
     macro_doc = {

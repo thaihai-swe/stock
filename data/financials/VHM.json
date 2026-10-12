@@ -2,52 +2,55 @@
   "_meta": {
     "symbol": "VHM",
     "companyName": "VHM",
-    "updatedAt": "2026-10-11T15:55:20Z",
+    "updatedAt": "2026-10-12T16:49:09Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
-    "source": "Yahoo Finance Audit Statements & VAS TT200",
+    "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 82740,
-    "ddmTarget": 38812,
-    "peTarget": 110656,
-    "pbTarget": 42688,
-    "evEbitdaFairPrice": 112316,
-    "pcfFairPrice": 203527,
-    "psFairPrice": 28239,
-    "consensusFairValue": 78422,
-    "marginOfSafety": 15.8,
-    "upside": 18.8,
-    "consensusDiffPercent": 18.8,
-    "valuationRating": "🟡 HOLD",
-    "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
-    "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-    "validModelsCount": 5,
+    "grahamNumber": 90324,
+    "ddmTarget": 44357,
+    "peTarget": 182342,
+    "pbTarget": 90120,
+    "evEbitdaFairPrice": 53293,
+    "pcfFairPrice": 87222,
+    "psFairPrice": 29572,
+    "consensusFairValue": 92777,
+    "marginOfSafety": 31.1,
+    "upside": 45.2,
+    "consensusDiffPercent": 45.2,
+    "valuationRating": "🟢 STRONG BUY",
+    "valuationRatingText": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
+    "valuationRatingBadge": "bg-emerald-600 text-white",
+    "validModelsCount": 6,
     "models10": [
       {
         "id": "graham",
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 82740,
-        "targetPrice": 82740,
-        "diffPercent": 25.4,
+        "value": 90324,
+        "targetPrice": 90324,
+        "diffPercent": 41.4,
         "weight": 0.08,
         "baseWeight": 0.08,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 16.4,
-        "formula": "√(Min(22.5, PE_avg × PB_avg) × EPS × BVPS)",
-        "formulaDetail": "V = √(22.5 × 9,622 × 31,621) | Hệ số = Min(22.5, 18.9x × 2.85x = 54.01)",
+        "outlierGapPct": 10.7,
+        "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
+        "formulaDetail": "V = 9,622 × (7.0x + 1.0 × 3.5%) × (4.47% / 5.0%) | Bội số=10.50x, Tỷ số LS=0.894",
         "parameters": {
           "eps": 9622.2696,
-          "bvps": 31621,
-          "multiplier": 22.5,
-          "peAvg": 18.95,
-          "pbAvg": 2.85,
-          "maxMultiplier": 22.5
+          "epsAvg": 2705,
+          "peBase": 7.0,
+          "peMedian": 18.95,
+          "hs": 1.0,
+          "gCagr": 3.5,
+          "constantVn": 4.47,
+          "yVn": 5.0,
+          "vn10yYield": 4.47
         },
         "statusNote": "Phù hợp"
       },
@@ -56,20 +59,24 @@
         "name": "P/E Chuẩn Hóa",
         "fullName": "2. P/E Chuẩn Hóa",
         "cleanName": "P/E Chuẩn Hóa",
-        "value": 110656,
-        "targetPrice": 110656,
-        "diffPercent": 67.7,
+        "value": 182342,
+        "targetPrice": 182342,
+        "diffPercent": 185.4,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": false,
-        "outlierGapPct": 11.9,
-        "formula": "EPS × P/E Mục Tiêu (11.5x)",
-        "formulaDetail": "V = 9,622 × 11.5x (Median chu kỳ 5Y)",
+        "isOutlier": true,
+        "outlierGapPct": 80.3,
+        "formula": "EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)",
+        "formulaDetail": "V = 9,622 × 18.9x (Trung vị 4 năm | PE Trung bình: 3313.8x)",
         "parameters": {
           "eps": 9622.2696,
-          "targetPe": 11.5
+          "targetPe": 18.95,
+          "peMedian": 18.95,
+          "peAvg": 3313.78,
+          "yearsUsed": 4,
+          "isFallback": false
         },
         "statusNote": "Phù hợp"
       },
@@ -78,22 +85,27 @@
         "name": "P/B Ngành & Gordon",
         "fullName": "3. P/B Ngành & Gordon",
         "cleanName": "P/B Ngành & Gordon",
-        "value": 42688,
-        "targetPrice": 42688,
-        "diffPercent": -35.3,
+        "value": 90120,
+        "targetPrice": 90120,
+        "diffPercent": 41.0,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 56.8,
-        "formula": "BVPS × [(ROE - g)/(r - g)]",
-        "formulaDetail": "V = 31,621 × Gordon Multiple",
+        "outlierGapPct": 10.9,
+        "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
+        "formulaDetail": "V = 31,621 × 2.85x (Trung vị 4 năm | PB Trung bình: 2.93x)",
         "parameters": {
           "bvps": 31621,
           "roe": 34.78,
-          "coe": 0.115,
-          "terminalG": 0.035
+          "coe": 0.105,
+          "terminalG": 0.035,
+          "targetPb": 2.85,
+          "pbMedian": 2.85,
+          "pbAvg": 2.93,
+          "yearsUsed": 4,
+          "isFallback": false
         },
         "statusNote": "Phù hợp"
       },
@@ -102,21 +114,21 @@
         "name": "DCF Đa Giai Đoạn",
         "fullName": "4. DCF Đa Giai Đoạn",
         "cleanName": "DCF Đa Giai Đoạn",
-        "value": 370763,
-        "targetPrice": 370763,
-        "diffPercent": 461.8,
+        "value": 181878,
+        "targetPrice": 181878,
+        "diffPercent": 184.6,
         "weight": 0.15,
         "baseWeight": 0.15,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": true,
-        "outlierGapPct": 274.8,
+        "outlierGapPct": 79.9,
         "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
-        "formulaDetail": "FCF Base, WACC=11.5%, g1=7.0%, g_term=3.5%",
+        "formulaDetail": "FCF Base, WACC=10.5%, g1=7.0%, g_term=3.5%",
         "parameters": {
-          "baseFcf": 208992000000000.0,
+          "baseFcf": 89564000000000.0,
           "shares": 8214820000.0,
-          "wacc": 0.115,
+          "wacc": 0.105,
           "g1": 0.07,
           "terminalG": 0.035
         },
@@ -127,20 +139,20 @@
         "name": "Chiết Khấu DDM",
         "fullName": "5. Chiết Khấu DDM",
         "cleanName": "Chiết Khấu DDM",
-        "value": 38812,
-        "targetPrice": 38812,
-        "diffPercent": -41.2,
+        "value": 44357,
+        "targetPrice": 44357,
+        "diffPercent": -30.6,
         "weight": 0.05,
         "baseWeight": 0.05,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": true,
-        "outlierGapPct": 60.8,
+        "isOutlier": false,
+        "outlierGapPct": 56.1,
         "formula": "[DPS × (1 + g)] / (r - g) × Fade",
-        "formulaDetail": "DPS=3,000 đ, r=11.5%, g=3.5%",
+        "formulaDetail": "DPS=3,000 đ, r=10.5%, g=3.5%",
         "parameters": {
           "dps": 3000.0,
-          "coe": 0.115,
+          "coe": 0.105,
           "g": 0.035
         },
         "statusNote": "Phù hợp"
@@ -150,22 +162,32 @@
         "name": "FCFF Doanh Nghiệp",
         "fullName": "6. FCFF Doanh Nghiệp",
         "cleanName": "FCFF Doanh Nghiệp",
-        "value": 370763,
-        "targetPrice": 370763,
-        "diffPercent": 461.8,
+        "value": 114160,
+        "targetPrice": 114160,
+        "diffPercent": 78.7,
         "weight": 0.12,
         "baseWeight": 0.12,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": true,
-        "outlierGapPct": 274.8,
+        "isOutlier": false,
+        "outlierGapPct": 12.9,
         "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
-        "formulaDetail": "FCFF chiết khấu WACC=11.5%",
+        "formulaDetail": "FCFF chiết khấu WACC=10.5%, Terminal g=3.5%",
         "parameters": {
-          "fcff": 208992000000000.0,
+          "fcff": 66610000000000.0,
           "netDebt": 215453000000000.0,
-          "wacc": 0.115,
-          "shares": 8214820000.0
+          "wacc": 0.105,
+          "shares": 8214820000.0,
+          "scenarios": {
+            "status": "SUCCESS",
+            "basePrice": 114160,
+            "bullPrice": 156529,
+            "bearPrice": 69633,
+            "fairPrice": 114160,
+            "wacc": 10.5,
+            "terminalG": 3.5,
+            "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
+          }
         },
         "statusNote": "Phù hợp"
       },
@@ -174,21 +196,21 @@
         "name": "FCFE Cổ Đông",
         "fullName": "7. FCFE Cổ Đông",
         "cleanName": "FCFE Cổ Đông",
-        "value": 241774,
-        "targetPrice": 241774,
-        "diffPercent": 266.3,
+        "value": 111898,
+        "targetPrice": 111898,
+        "diffPercent": 75.1,
         "weight": 0.08,
         "baseWeight": 0.08,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": true,
-        "outlierGapPct": 144.4,
+        "isOutlier": false,
+        "outlierGapPct": 10.7,
         "formula": "PV(FCFE) / Shares (CFO - CapEx + Nợ ròng)",
-        "formulaDetail": "FCFE chiết khấu CoE=11.5%",
+        "formulaDetail": "FCFE chiết khấu CoE=10.5%",
         "parameters": {
-          "cfo": 208992000000000.0,
-          "capex": 45880000000000.0,
-          "coe": 0.115,
+          "cfo": 89564000000000.0,
+          "capex": 22954000000000.0,
+          "coe": 0.105,
           "shares": 8214820000.0
         },
         "statusNote": "Phù hợp"
@@ -198,71 +220,70 @@
         "name": "Residual Income RIM/EVA",
         "fullName": "8. Residual Income RIM/EVA",
         "cleanName": "Residual Income RIM/EVA",
-        "value": 707525,
-        "targetPrice": 707525,
-        "diffPercent": 972.0,
+        "value": 830491,
+        "targetPrice": 830491,
+        "diffPercent": 1199.7,
         "weight": 0.044,
         "baseWeight": 0.08,
         "suitability": 0.55,
         "suitabilityNote": "Thứ cấp phi TC",
         "isOutlier": true,
-        "outlierGapPct": 615.2,
+        "outlierGapPct": 721.4,
         "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
-        "formulaDetail": "BVPS=31,621 đ, ROE=34.8%, CoE=11.5%",
+        "formulaDetail": "BVPS=31,621 đ, ROE=34.8%, CoE=10.5%",
         "parameters": {
           "equity": 895283000000000.0,
           "bvps": 31621,
           "roe": 34.78,
-          "coe": 0.115,
+          "coe": 0.105,
           "shares": 8214820000.0
         },
         "statusNote": "Thứ cấp phi TC"
       },
       {
         "id": "nav",
-        "name": "Book NAV / RNAV",
-        "fullName": "9. Book NAV / RNAV",
-        "cleanName": "Book NAV / RNAV",
-        "value": 87187,
-        "targetPrice": 87187,
-        "diffPercent": 32.1,
-        "weight": 0.032,
+        "name": "Book NAV / P/B Chuẩn Hóa",
+        "fullName": "9. Book NAV / P/B Chuẩn Hóa",
+        "cleanName": "Book NAV / P/B Chuẩn Hóa",
+        "value": 90120,
+        "targetPrice": 90120,
+        "diffPercent": 41.0,
+        "weight": 0.06,
         "baseWeight": 0.07,
-        "suitability": 0.45,
-        "suitabilityNote": "Thứ cấp phi TC/BĐS",
+        "suitability": 0.85,
+        "suitabilityNote": "Phù hợp tài sản ròng",
         "isOutlier": false,
-        "outlierGapPct": 11.9,
-        "formula": "RNAV = Equity + ΔQuỹĐất - ChiếtKhấuNợ",
-        "formulaDetail": "Equity + Thặng dư quỹ đất (+10%) - Chiết khấu nợ ngắn (-15%)",
+        "outlierGapPct": 10.9,
+        "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
+        "formulaDetail": "V = 31,621 đ × 2.85x (Median P/B chu kỳ)",
         "parameters": {
+          "bvps": 31621,
+          "targetPb": 2.85,
           "equity": 895283000000000.0,
-          "totalAssets": 1110736000000000.0,
-          "totalDebt": 215453000000000.0,
-          "inventory": null,
           "shares": 8214820000.0
         },
-        "statusNote": "Thứ cấp phi TC/BĐS"
+        "statusNote": "Phù hợp tài sản ròng"
       },
       {
         "id": "evebitda",
         "name": "EV/EBITDA & EV/Sales",
         "fullName": "10. EV/EBITDA & EV/Sales",
         "cleanName": "EV/EBITDA & EV/Sales",
-        "value": 57164,
-        "targetPrice": 57164,
-        "diffPercent": -13.4,
+        "value": 28319,
+        "targetPrice": 28319,
+        "diffPercent": -55.7,
         "weight": 0.07,
         "baseWeight": 0.07,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
-        "isOutlier": false,
-        "outlierGapPct": 42.2,
+        "isOutlier": true,
+        "outlierGapPct": 72.0,
         "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
         "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
         "parameters": {
-          "ebitda": 151748000000000.0,
+          "ebitda": 87099000000000.0,
           "multiple": 7.5,
-          "revenue": 210888000000000.0,
+          "revenue": 220846000000000.0,
           "salesMultiple": 1.1,
           "netDebt": 215453000000000.0,
           "shares": 8214820000.0
@@ -271,20 +292,19 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 75544,
-      "cleanMedian": 82740,
-      "dispersionPct": 8.7,
+      "cleanWeightedAvg": 94481,
+      "cleanMedian": 90222,
+      "dispersionPct": 4.7,
       "consensusLevel": "HIGH",
-      "coveragePct": 50.0,
-      "confidenceScore": 75.0,
-      "modelsUsed": 5,
+      "coveragePct": 60.0,
+      "confidenceScore": 82.0,
+      "modelsUsed": 6,
       "modelsValid": 10,
       "excludedOutliers": [
+        "P/E Chuẩn Hóa",
         "DCF Đa Giai Đoạn",
-        "Chiết Khấu DDM",
-        "FCFF Doanh Nghiệp",
-        "FCFE Cổ Đông",
-        "Residual Income RIM/EVA"
+        "Residual Income RIM/EVA",
+        "EV/EBITDA & EV/Sales"
       ]
     },
     "valuationTraps": {
@@ -338,31 +358,31 @@
       ]
     },
     "sevenPriceZones": {
-      "currentZone": "Accumulate",
-      "zoneBadge": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-      "safeBuyPrice": 58816,
-      "acceptableBuyPrice": 66659,
-      "bearPrice": 54895,
-      "bullPrice": 98028,
+      "currentZone": "Buy Zone",
+      "zoneBadge": "bg-emerald-500 text-white",
+      "safeBuyPrice": 69583,
+      "acceptableBuyPrice": 78860,
+      "bearPrice": 64944,
+      "bullPrice": 115971,
       "boundaries": {
-        "deepValue": 52934,
-        "safeBuy": 58816,
-        "accumulate": 66659,
-        "fairLow": 70580,
-        "fairHigh": 86264,
-        "aboveFair": 93126,
-        "expensive": 112732
+        "deepValue": 62625,
+        "safeBuy": 69583,
+        "accumulate": 78860,
+        "fairLow": 88138,
+        "fairHigh": 102055,
+        "aboveFair": 110173,
+        "expensive": 133367
       }
     },
     "threeLayerDecision": {
-      "compositeScore": 7.5,
-      "valuationLayerScore": 7.2,
+      "compositeScore": 8.6,
+      "valuationLayerScore": 10.0,
       "qualityLayerScore": 8.5,
       "timingLayerScore": 6.5,
-      "roeCoeSpread": 23.28,
-      "buyRecommendation": "🟡 HOLD",
-      "decisionReason": "Thiếu độ phủ mô hình hoặc phân tán cao",
-      "isGateOpen": false,
+      "roeCoeSpread": 24.28,
+      "buyRecommendation": "🟢 STRONG BUY",
+      "decisionReason": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
+      "isGateOpen": true,
       "isTrapCapped": false
     },
     "historicalBands": {
@@ -371,17 +391,26 @@
       "band75": 15999249,
       "bandPosition": "Dưới P25 (Vùng Rẻ)",
       "bandWidthPct": 11651.5,
+      "peYearsUsed": 4,
+      "pbYearsUsed": 4,
+      "peMean": 3313.78,
+      "pbMean": 2.93,
+      "isFallbackToSector": false,
       "peBand": {
         "p25": 17.77,
         "p50": 18.95,
         "p75": 3314.95,
-        "current": 6.86
+        "mean": 3313.78,
+        "current": 6.64,
+        "yearsUsed": 4
       },
       "pbBand": {
         "p25": 2.58,
         "p50": 2.85,
         "p75": 3.2,
-        "current": 2.09
+        "mean": 2.93,
+        "current": 2.02,
+        "yearsUsed": 4
       },
       "priceBands": {
         "peP25Price": 171036,
@@ -396,7 +425,7 @@
       "score": 4.2,
       "status": "✓✓ Rất an toàn",
       "payoutRatio": 31.2,
-      "fcfPayoutRatio": 11.8,
+      "fcfPayoutRatio": 27.5,
       "consistency": 50.0
     },
     "finvalLab": {
@@ -427,7 +456,7 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 6.86,
+          "current": 6.64,
           "sma5y": 3313.78,
           "deltaPct": -99.8,
           "status": "Cải thiện rõ rệt",
@@ -438,9 +467,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 2.28,
+          "current": 2.2,
           "sma5y": 2.93,
-          "deltaPct": -22.2,
+          "deltaPct": -24.7,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -504,9 +533,9 @@
           "key": "revenue",
           "label": "Doanh Thu Thuần",
           "unit": "Tỷ",
-          "current": 210888.0,
+          "current": 220846.0,
           "sma5y": 84308.8,
-          "deltaPct": 150.1,
+          "deltaPct": 161.9,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
@@ -515,9 +544,9 @@
           "key": "netIncome",
           "label": "Lợi Nhuận Sau Thuế",
           "unit": "Tỷ",
-          "current": 90332.0,
+          "current": 74861.0,
           "sma5y": 27179.6,
-          "deltaPct": 232.4,
+          "deltaPct": 175.4,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
@@ -526,9 +555,9 @@
           "key": "ebitda",
           "label": "Chỉ số EBITDA",
           "unit": "Tỷ",
-          "current": 151748.0,
+          "current": 87099.0,
           "sma5y": 33978.8,
-          "deltaPct": 346.6,
+          "deltaPct": 156.3,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
@@ -537,9 +566,9 @@
           "key": "freeCashFlow",
           "label": "Dòng Tiền Tự Do FCF",
           "unit": "Tỷ",
-          "current": 208992.0,
+          "current": 89564.0,
           "sma5y": -507.4,
-          "deltaPct": 41288.8,
+          "deltaPct": 17751.6,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": false
@@ -579,16 +608,16 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 308374
+    "impliedFcfYieldPrice": 132154
   },
   "financialRatios": {
     "valuation": {
-      "pe": 6.859088629152524,
-      "pb": 2.27730388659608,
+      "pe": 6.640844900043125,
+      "pb": 2.2048442174771137,
       "ps": 1.1,
-      "pCf": 2.6,
-      "evEbitda": 3.8,
-      "dividendYield": 4.55
+      "pCf": 2.5,
+      "evEbitda": 3.7,
+      "dividendYield": 4.69
     },
     "profitability": {
       "roe": 34.78,
@@ -610,8 +639,8 @@
       "inventoryTurnover": 0.35,
       "dso": 0,
       "dio": 1034,
-      "dpo": 95,
-      "ccc": 939
+      "dpo": null,
+      "ccc": null
     },
     "leverage": {
       "debtToEquity": 0.83,
@@ -667,6 +696,13 @@
       "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQQ3JId1NxUkJsdktQcXV2WXhqV1RtcHNFY0pkSVBKb2t1TXN4RmZSOXVTN003UXhxajloR1FGbTBvM2pNclJrQWtDa2otWkhXbjlPT1NKam5SbjBfNW95UXhxazFKUUh3dHNnTnpZNHdSWDR1UU42RF9rUEFlNDZndU1VZnF2TWI4TEp0Tkp4R2thei0xOW94blRTYWJ1dDF2cVk2cDVpc2xiS0RLM3ZkZzUtNzlHS2dqQkZyYw?oc=5"
     },
     {
+      "date": "2026-08-28",
+      "type": "Niêm yết thêm",
+      "content": "VHM - Niêm yết bổ sung 4.107.412.004 cổ phiếu",
+      "ratio": null,
+      "value": null
+    },
+    {
       "date": "2026-08-17",
       "type": "Cổ tức cổ phiếu",
       "content": "Vinhomes hé lộ “deadline” 4,1 tỷ cổ phiếu trả cổ tức về tài khoản nhà đầu tư",
@@ -683,6 +719,13 @@
       "value": 3000,
       "source": "CafeF",
       "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPMnEyM0dhWnpwTjFJSEIxRVJ1QURQQVQzQW1JZVJNaUlVM3lLaXpQR0t6a0JKdXRCdTFCNEJVTlVsbDd0b0ZObkoxdEVVeE15cGFzMDVhanA4MEN3SldsU1F2T3Vna1dFa1JaazN5VHpMb3FPZllOaFdOQ1V6S0FqSlYyaXhSVnhoeHBCRDRQUkJDdndQRlFBTmVPUGRYUElwT0tZSEY1Qlc0bG9QTXFWbWQxRENWVjJRNDhkS0hENFpvZTZ4?oc=5"
+    },
+    {
+      "date": "2026-07-24",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Trả Cổ tức bằng Cổ phiếu tỉ lệ 100.0%",
+      "ratio": "1.0",
+      "value": null
     },
     {
       "date": "2026-07-11",
@@ -713,21 +756,21 @@
     },
     {
       "date": "2026-07-04",
-      "type": "Cổ tức cổ phiếu",
-      "content": "Cổ đông Vinhomes sắp nhận cổ tức cổ phiếu tỷ lệ 100%",
-      "ratio": "10%",
-      "value": null,
-      "source": "Chứng khoán DNSE",
-      "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQcHhCVjJZam9oYWhvQjBTNlJPS0tQbzNXalV1cnE1YXVEZFFISktYMTRLVmpIdWJKcGxpR0ZOQkFiT2pMckEyWVZiUEh5NnBuRHhnSGtoNFNaWEZHVTBwbmRaM0VRV2M4ZVJpdjk5WDhzaVVyQnplbDZhSjQyRWpFb3dKWU9zS053TFJoWjNYWEZtNzhnRkd1VmIwVUVPcnc?oc=5"
-    },
-    {
-      "date": "2026-07-04",
       "type": "Phát hành / Tăng vốn",
       "content": "NÓNG: Vinhomes thông báo ngày \"lăn chốt\" thương vụ phát hành cổ phiếu lớn nhất lịch sử",
       "ratio": "—",
       "value": null,
       "source": "CafeF",
       "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPSnFZWVRkd2x3TzgtQVFYVzVOd0JNSzA2dTlsNGxsbEdYUzZwWDF1ZmN4MElNd3FJQVlOU0tuQ2V6MDF4NnVESXhCVkRrcXZMZEhVeGpLRmpjaEZ5YWJORmx2VXhZaUxUR1c4MVgwRmwydWZSanpaRHZWR0RvOXhIVm1nWkNBbm9fQkxnQU5zSU9VQ0FZc091UEl4dmo5T0RWQ3dRVERuWmxtQjRXWXczRno3REFnRWJTbk02dUhLUG8?oc=5"
+    },
+    {
+      "date": "2026-07-04",
+      "type": "Cổ tức cổ phiếu",
+      "content": "Cổ đông Vinhomes sắp nhận cổ tức cổ phiếu tỷ lệ 100%",
+      "ratio": "10%",
+      "value": null,
+      "source": "Chứng khoán DNSE",
+      "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQcHhCVjJZam9oYWhvQjBTNlJPS0tQbzNXalV1cnE1YXVEZFFISktYMTRLVmpIdWJKcGxpR0ZOQkFiT2pMckEyWVZiUEh5NnBuRHhnSGtoNFNaWEZHVTBwbmRaM0VRV2M4ZVJpdjk5WDhzaVVyQnplbDZhSjQyRWpFb3dKWU9zS053TFJoWjNYWEZtNzhnRkd1VmIwVUVPcnc?oc=5"
     },
     {
       "date": "2026-07-03",
@@ -740,41 +783,269 @@
     },
     {
       "date": "2026-06-26",
-      "type": "Phát hành / Tăng vốn",
-      "content": "UBCKNN thông báo về thương vụ phát hành lớn nhất lịch sử của Vinhomes",
-      "ratio": "—",
-      "value": null,
-      "source": "CafeF",
-      "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQN3Ita3h5UTYteGJiR3FfZEpHWlREakljTm45bWEtN2RtWEo5b1lkN2JMMzZURFZoYWtITHdNZTVtRFhQTnlubnVTLVFLVTVnME5KbkJyLVBSa2FRT2JOX3pjQTRiV29KLV9RNVZ4OC1kY0w1MkJURHNsWU1nenp2ckhRSWNoTnpSY2VRMXFOV1YxalVuSEw1VW1LM09LZGh1RXVkUFdmSVlyUW9o?oc=5"
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Tập đoàn Vingroup - Công ty CP - Đăng kí Bán 15,226,260 VHM",
+      "ratio": null,
+      "value": null
     },
     {
-      "date": "2026-06-26",
-      "type": "Cổ tức cổ phiếu",
-      "content": "UBCKNN tiếp nhận hồ sơ phát hành cổ phiếu trả cổ tức khủng của Vinhomes, dự kiến tăng vốn lên hơn 80.000 tỷ",
-      "ratio": "10%",
-      "value": null,
-      "source": "Báo Dân Việt",
-      "link": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxORXJjdnRvR2JhOEZqd2ctdkxlenFRX1dMNGNweWFiT0tHZVVzVDdYX1J5RGN4V2lZRjdLbnVrTkg0YXpKS21UYXdTcFlHSGFxemg0VWgwS3BRUXhjMjYxak14NUtjTk5kYThET013X2tsT0loLXdDQ3lXMWVNUjJXZEtVaUtFYnZ0TndVZGZOajVOTWRjZ09hQlFXQmZhTW1jdDZURUxoVUtKYk5fdzlpY18zckJRSC05Y0dFNXo1UGc3dHhlN0JkM2lCUnc5SlZDcEpLaXhJNDZrTHp1?oc=5"
+      "date": "2026-06-24",
+      "type": "Trả cổ tức bằng tiền mặt",
+      "content": "Trả cổ tức bằng tiền mặt - Cả năm 2025 - 6,000 VND",
+      "ratio": "0.6",
+      "value": 6000.0
+    },
+    {
+      "date": "2026-06-08",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Tập đoàn Vingroup - Công ty CP - Đăng kí Bán 15,226,260 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-04-13",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Tập đoàn Vingroup - Công ty CP - Đăng kí Bán 59,001,762 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2026-03-06",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "VHM - Tổ chức ĐHĐCĐ thường niên 2026",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2025-03-07",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "VHM - Tổ chức ĐHĐCĐ thường niên 2025",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2022-06-07",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Government Of Singapore - Đăng kí Mua VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2022-05-25",
+      "type": "Trả cổ tức bằng tiền mặt",
+      "content": "Trả cổ tức bằng tiền mặt - Cả năm 2021 - 2,000 VND",
+      "ratio": "0.2",
+      "value": 2000.0
+    },
+    {
+      "date": "2022-03-25",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "VHM - Tổ chức ĐHĐCĐ thường niên 2022",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2021-10-05",
+      "type": "Niêm yết thêm",
+      "content": "VHM - Niêm yết bổ sung 1.004.853.570 cổ phiếu",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2021-09-15",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Viking Asia Holdings II Pte.Ltd - Đăng kí Bán 31,964,480 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2021-09-09",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Trả Cổ tức bằng Cổ phiếu tỉ lệ 30.0%",
+      "ratio": "0.3",
+      "value": null
+    },
+    {
+      "date": "2021-09-09",
+      "type": "Trả cổ tức bằng tiền mặt",
+      "content": "Trả cổ tức bằng tiền mặt - Cả năm 2020 - 1,500 VND",
+      "ratio": "0.15",
+      "value": 1500.0
+    },
+    {
+      "date": "2021-09-07",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Tập đoàn Vingroup - Công ty CP - Đăng kí Bán 100,485,418 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2021-04-29",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Công ty Cổ phần Sản xuất và Kinh doanh Vinfast - Đăng kí Bán 89,804,000 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2021-04-20",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "VHM - Tổ chức ĐHĐCĐ thường niên 2021",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2021-03-16",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Công ty Cổ phần Sản xuất và Kinh doanh Vinfast - Đăng kí Mua 89,804,000 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2020-06-19",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Công ty Cổ phần Nghiên cứu và Sản xuất Vinsmart - Đăng kí Bán VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2020-06-18",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Viking Asia Holdings II Pte.Ltd - Đăng kí Mua VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2020-06-05",
+      "type": "Giao dịch nội bộ: Giao dịch tổ chức",
+      "content": "Công ty Cổ phần Nghiên cứu và Sản xuất Vinsmart - Đăng kí Mua VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2020-04-08",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "VHM - Tổ chức ĐHĐCĐ thường niên 2020",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2019-08-06",
+      "type": "Trả cổ tức bằng tiền mặt",
+      "content": "Trả cổ tức bằng tiền mặt - Cả năm 2018 - 1,000 VND",
+      "ratio": "0.1",
+      "value": 1000.0
+    },
+    {
+      "date": "2019-04-25",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "VHM - Tổ chức ĐHĐCĐ thường niên 2019",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2018-12-04",
+      "type": "Giao dịch nội bộ: Giao dịch người liên quan",
+      "content": "Phạm Thị Tuyết Mai - Đăng kí Bán 21,795 VHM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2018-10-04",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Trả Cổ tức bằng Cổ phiếu tỉ lệ 25.0%",
+      "ratio": "0.25",
+      "value": null
+    },
+    {
+      "date": "2018-05-10",
+      "type": "Niêm yết mới",
+      "content": "VHM - Chính thức niêm yết trên sàn HOSE",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2018-02-28",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Phát hành riêng lẻ",
+      "ratio": "0.0",
+      "value": null
+    },
+    {
+      "date": "2018-01-31",
+      "type": "Phát hành cổ phiếu",
+      "content": "Phát hành cổ phiếu - Phát hành để sáp nhập",
+      "ratio": "0.0",
+      "value": null
+    },
+    {
+      "date": "2017-12-31",
+      "type": "Trả cổ tức bằng tiền mặt",
+      "content": "Trả cổ tức bằng tiền mặt - Cả năm 2017 - 4,500 VND",
+      "ratio": "0.45",
+      "value": 4500.0
+    },
+    {
+      "date": "2017-07-10",
+      "type": "Tạm dừng Niêm yết",
+      "content": "NHN-Huỷ đăng ký giao dịch trên UPCoM",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2017-06-26",
+      "type": "Nghị quyết đại hội cổ đông thường niên",
+      "content": "NHN-hị quyết đại hội cổ đông thường niên năm 2017",
+      "ratio": null,
+      "value": null
+    },
+    {
+      "date": "2017-05-13",
+      "type": "Đại hội Đồng Cổ đông",
+      "content": "NHN-Tổ chức ĐHĐCĐ thường niên năm 2017",
+      "ratio": null,
+      "value": null
     }
   ],
   "shareholders": [
     {
-      "share_holder": "Cổ đông lớn nội bộ & Sáng lập VHM",
-      "quantity": 2500000000,
-      "share_own_percent": 32.5,
-      "update_date": "2026-06-30"
+      "name": "Tập đoàn Vingroup - Công ty CP",
+      "percentage": 71.7,
+      "quantity": 5889999316,
+      "type": "Cổ đông lớn",
+      "updateDate": "2026-08-17",
+      "update_date": "2026-08-17"
     },
     {
-      "share_holder": "Nhà đầu tư tổ chức nước ngoài (Quỹ ngoại)",
-      "quantity": 1800000000,
-      "share_own_percent": 23.4,
-      "update_date": "2026-06-30"
+      "name": "Government Of Singapore",
+      "percentage": 4.99,
+      "quantity": 217405283,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
     },
     {
-      "share_holder": "Cổ đông đại chúng khác",
-      "quantity": 3390000000,
-      "share_own_percent": 44.1,
-      "update_date": "2026-06-30"
+      "name": "Viking Asia Holdings II Pte.Ltd",
+      "percentage": 4.6,
+      "quantity": 153875520,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "PYN Elite Fund",
+      "percentage": 1.17,
+      "quantity": 50977106,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
+    },
+    {
+      "name": "Trần Kiên Cường",
+      "percentage": 0.0,
+      "quantity": 13136,
+      "type": "Cổ đông lớn",
+      "updateDate": "2025-10-05",
+      "update_date": "2025-10-05"
     }
   ],
   "quarterly": [
@@ -860,7 +1131,8 @@
       "cff": 2273,
       "netCashChange": 27179,
       "freeCashFlow": 38423,
-      "cfoToNetIncome": 5.39
+      "cfoToNetIncome": 5.39,
+      "ebitda": 10591
     },
     {
       "period": "2025-Q3",
@@ -902,7 +1174,8 @@
       "cff": 51001,
       "netCashChange": 96,
       "freeCashFlow": -995,
-      "cfoToNetIncome": 1.0
+      "cfoToNetIncome": 1.0,
+      "ebitda": 403
     },
     {
       "period": "2025-Q4",
@@ -944,7 +1217,8 @@
       "cff": -1803,
       "netCashChange": 1194,
       "freeCashFlow": -9980,
-      "cfoToNetIncome": -0.06
+      "cfoToNetIncome": -0.06,
+      "ebitda": 30291
     },
     {
       "period": "2026-Q1",
@@ -986,7 +1260,8 @@
       "cff": 15563,
       "netCashChange": -13249,
       "freeCashFlow": 36807,
-      "cfoToNetIncome": 1.46
+      "cfoToNetIncome": 1.46,
+      "ebitda": 28726
     },
     {
       "period": "2026-Q2",
@@ -1028,7 +1303,8 @@
       "cff": 53112,
       "netCashChange": 17341,
       "freeCashFlow": 40778,
-      "cfoToNetIncome": 2.31
+      "cfoToNetIncome": 2.31,
+      "ebitda": 27679
     }
   ],
   "yearly": [
@@ -1333,12 +1609,12 @@
       },
       {
         "id": "unearned_revenue",
-        "name": "Người Mua Trả Tiền Trước",
-        "value": 33.5,
-        "unit": "% vốn hóa",
-        "benchmark": "> 20%",
-        "rating": "Của để dành lớn",
-        "desc": "Khoản tiền đặt cọc từ khách hàng sẽ ghi nhận thành doanh thu khi bàn giao"
+        "name": "Người Mua Trả Tiền Trước / Tổng TS",
+        "value": null,
+        "unit": "%",
+        "benchmark": "> 15%",
+        "rating": "Cần bổ sung CĐKT",
+        "desc": "Khoản tiền đặt cọc từ khách hàng mua nhà/đất ghi nhận doanh thu khi bàn giao"
       },
       {
         "id": "net_debt_equity",
@@ -1410,19 +1686,21 @@
   "dcfAnalysis": {
     "sectorWacc": 11.5,
     "industryCategory": "REAL_ESTATE",
-    "baseFcff": 25758,
+    "baseFcff": 66610.0,
+    "isNormalizedFcf": false,
+    "isFinancialSector": false,
     "historicalCagr": null,
     "dcfScenarios": {
       "status": "SUCCESS",
-      "basePrice": 25574,
-      "bullPrice": 37447,
-      "bearPrice": 12530,
-      "fairPrice": 25574,
+      "basePrice": 97464,
+      "bullPrice": 128167,
+      "bearPrice": 63731,
+      "fairPrice": 97464,
       "wacc": 11.5,
       "terminalG": 3.0,
       "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
     },
-    "reverseDcfImpliedGrowth": 23.78,
+    "reverseDcfImpliedGrowth": -0.23,
     "sensitivityMatrix": {
       "waccList": [
         10.0,
@@ -1437,24 +1715,24 @@
       ],
       "matrix": [
         [
-          30059,
-          35443,
-          42622
+          109061,
+          122984,
+          141549
         ],
         [
-          22037,
-          25574,
-          30054
+          88317,
+          97464,
+          109050
         ],
         [
-          17966,
-          20729,
-          24142
+          77790,
+          84935,
+          93761
         ],
         [
-          14606,
-          16809,
-          19476
+          69100,
+          74797,
+          81694
         ]
       ]
     },
@@ -1469,8 +1747,8 @@
           "priceLow": 63450,
           "priceHigh": 64815,
           "priceMid": 64132,
-          "volume": 8235300.0,
-          "volumePercent": 1.8
+          "volume": 13405100.0,
+          "volumePercent": 2.9
         },
         {
           "index": 1,
@@ -1478,7 +1756,7 @@
           "priceHigh": 66180,
           "priceMid": 65498,
           "volume": 49267900.0,
-          "volumePercent": 10.8
+          "volumePercent": 10.7
         },
         {
           "index": 2,
@@ -1493,8 +1771,8 @@
           "priceLow": 67545,
           "priceHigh": 68910,
           "priceMid": 68228,
-          "volume": 80593800.0,
-          "volumePercent": 17.6
+          "volume": 76053600.0,
+          "volumePercent": 16.6
         },
         {
           "index": 4,
@@ -1546,12 +1824,12 @@
         }
       ],
       "poc": {
-        "index": 3,
-        "priceLow": 67545,
-        "priceHigh": 68910,
-        "priceMid": 68228,
-        "volume": 80593800.0,
-        "volumePercent": 17.6
+        "index": 7,
+        "priceLow": 73005,
+        "priceHigh": 74370,
+        "priceMid": 73688,
+        "volume": 77057900.0,
+        "volumePercent": 16.8
       },
       "hvn": [
         {
@@ -1559,8 +1837,8 @@
           "priceLow": 67545,
           "priceHigh": 68910,
           "priceMid": 68228,
-          "volume": 80593800.0,
-          "volumePercent": 17.6
+          "volume": 76053600.0,
+          "volumePercent": 16.6
         },
         {
           "index": 4,
@@ -1593,8 +1871,8 @@
           "priceLow": 63450,
           "priceHigh": 64815,
           "priceMid": 64132,
-          "volume": 8235300.0,
-          "volumePercent": 1.8
+          "volume": 13405100.0,
+          "volumePercent": 2.9
         },
         {
           "index": 2,
@@ -1617,12 +1895,12 @@
         "min": 63450,
         "max": 77100
       },
-      "totalVolume": 457686700
+      "totalVolume": 458316300
     },
     "moneyFlow": {
-      "vpci": 0.75,
+      "vpci": 0.77,
       "vpciStatus": "VOLUME_FADING",
-      "cmf": -0.417,
+      "cmf": -0.428,
       "cmfStatus": "DISTRIBUTION",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -1633,7 +1911,7 @@
     },
     "tailRisk": {
       "skewness": 0.06,
-      "kurtosis": 0.93,
+      "kurtosis": 1.04,
       "var95": 4.2,
       "var99": 6.01,
       "es95": 5.77,
@@ -1652,20 +1930,48 @@
     "items": [
       {
         "id": "news-VHM-1",
-        "title": "VIC, VHM hụt hơi, VN-Index đối mặt kịch bản nào trong tuần tới?",
-        "summary": "Bản tin phân tích về VHM từ nguồn 24HMoney. Cập nhật ngày 2026-10-11.",
+        "title": "Cổ phiếu thép 'đồng khởi', PNJ lại giảm sàn",
+        "summary": "Bản tin phân tích về VHM từ nguồn Mekong ASEAN. Cập nhật ngày 2026-10-12.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-11",
-        "source": "24HMoney",
-        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxORUtwTVliTURTUzVCVkxKWmxMdTRWR1BDYU0wN0tBUFY2enVuaFRyUXMyeTR2WTd6dkdLLS1OV19aTmdxSVhrRmwtUnI3cWlDSXJIYkhUdm05ZmI2MjhJZzlRSEJWdkY0UmlqTzJEaF9DaXNsd2tXeXdiTkh3NGlUbVVMRTV6enNxR1NPN2d3bUplblBFS1lhT0ZpOHRfMTc5R2lr?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
+        "date": "2026-10-12",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9ESEx4YlliYkI1MHQyQ1lwa2t3WUlNV1NtRU5NMWFkUV95aFpZRGtGZ1JSUkxBaWI4UDdRdldkTUUzTTlXMHJkbTJ0UU01a0JaaDFvbGxEYUVzSXp2TmVqUTliWVN2alRybU5iMHRJbnV3dGZSNHZLSGdaSDJCc2M?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
         "id": "news-VHM-2",
+        "title": "Nhịp đập Thị trường 12/10: Bộ đôi VIC, VHM lấy đi gần 14 điểm, VN-Index tiếp tục lao dốc",
+        "summary": "Bản tin phân tích về VHM từ nguồn Vietstock. Cập nhật ngày 2026-10-12.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-12",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQM3AwbkV4Rzltc0RzSUxxb2lmU3F4Mk02ekZtQ293QnVmM2QtZm11M3dZUU4wTWhaWXp0Q1JRVUNab1RadXFoTjFFZXhfVmZXQUJ1dkpmLWZPUl9BUVdjV3pJd1BtcFNZRWZQLVhKWlpDVllvX3hEWDhRLTgxWEpmVGlOU3FGdGRQSlN6SHpyN0FZR3ZkUTdCMjJRNFA1Zy1PTjJGWFdOUlFHLWZVMWFXaE1QUHpyOEtXczNGZXR3QU9yWFByLWo4YlBn?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VHM-3",
+        "title": "\"Tội đồ\" VIC, VHM khiến VN-Index giảm 14 điểm, lùi về mốc 1720 điểm",
+        "summary": "Bản tin phân tích về VHM từ nguồn index.vn. Cập nhật ngày 2026-10-12.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-12",
+        "source": "index.vn",
+        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQRW00M0xJNWJhV21RSmFVcVBvbFRyTEFicC1Eall0UHFvdF9ZeFZpX2pyRUJ4U3lSQ3htRFFXcXRyUkRMM0ZMMVJEYkd5YXIzanVFTl9peHhpejdKeFZEekxKdWlLai1JUGM0QU03WFRkQkMweVJGSkpJY25NTmE1THlDQ2JTcXhxejNqRVRCV0w4VEMy?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VHM-4",
         "title": "Tuần 05-09/10: VIC và VHM kéo VN-Index theo hai hướng trái ngược",
         "summary": "Bản tin phân tích về VHM từ nguồn Vietstock. Cập nhật ngày 2026-10-10.",
         "category": "biz",
@@ -1679,7 +1985,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-3",
+        "id": "news-VHM-5",
         "title": "Vimarko (VMK) rục rịch phát hành cổ phiếu trả cổ tức tỷ lệ 6%, tăng vốn lên 84 tỷ đồng",
         "summary": "Bản tin phân tích về VHM từ nguồn Vietnam.vn. Cập nhật ngày 2026-10-10.",
         "category": "disclosure",
@@ -1693,7 +1999,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-4",
+        "id": "news-VHM-6",
         "title": "Ngành nào sẽ dẫn đầu tăng trưởng lợi nhuận quý III/2026?",
         "summary": "Bản tin phân tích về VHM từ nguồn Tạp chí Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-10-09.",
         "category": "biz",
@@ -1707,7 +2013,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-VHM-5",
+        "id": "news-VHM-7",
         "title": "Chứng khoán phiên 8/10: Cổ phiếu tài chính gây áp lực lên chỉ số",
         "summary": "Bản tin phân tích về VHM từ nguồn baodautu. Cập nhật ngày 2026-10-08.",
         "category": "biz",
@@ -1721,7 +2027,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-6",
+        "id": "news-VHM-8",
         "title": "Một \"ông lớn\" đầu ngành được dự báo lãi quý 3 tăng sốc hơn 700%",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-10-08.",
         "category": "sector",
@@ -1735,7 +2041,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-7",
+        "id": "news-VHM-9",
         "title": "VHM kéo lợi nhuận BĐS quý 3 tăng vọt",
         "summary": "Bản tin phân tích về VHM từ nguồn 24HMoney. Cập nhật ngày 2026-10-08.",
         "category": "biz",
@@ -1749,7 +2055,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-8",
+        "id": "news-VHM-10",
         "title": "Cổ phiếu cần quan tâm ngày 7/10: VHM, MWG, DCM",
         "summary": "Bản tin phân tích về VHM từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-10-06.",
         "category": "biz",
@@ -1763,21 +2069,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-9",
-        "title": "10 doanh nghiệp được dự báo vượt kế hoạch lợi nhuận sau 9 tháng: Masan, Vinhomes, Vietjet đều có mặt",
-        "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-05.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-05",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPakdzR25mTUxrTl9QNUZYRkFKeTVZcFJrbDJqS05IV1NoMThNX3RxQ2xtU09VLUJVZVJka3F6cDNJa1JpUWx0aWtJODdXeFQxZkxaeU5xeGh3YVJ5NnFGWnBILTZMaV80dGZyTWN1TlFXQVZxR2cwelFod1dHaXNPZzQwYzh0WnhZMFdnemowclJTX2hyX0c3RE50ZzJkeHFkODJ0XzNTdGNST3NuRDgtbWsyMjJKUmI3d05nbFNjc3RpZHVUR29RaTNkXzZpUQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
-        "id": "news-VHM-10",
+        "id": "news-VHM-11",
         "title": "Những doanh nghiệp được dự báo vượt kế hoạch lợi nhuận sau 9 tháng - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về VHM từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-10-05.",
         "category": "biz",
@@ -1791,21 +2083,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-VHM-11",
-        "title": "Lãi suất cao, thanh khoản chậm ảnh hưởng tới lợi nhuận doanh nghiệp bất động sản quý 3/2026",
-        "summary": "Bản tin phân tích về VHM từ nguồn VnEconomy. Cập nhật ngày 2026-10-02.",
+        "id": "news-VHM-12",
+        "title": "10 doanh nghiệp được dự báo vượt kế hoạch lợi nhuận sau 9 tháng: Masan, Vinhomes, Vietjet đều có mặt",
+        "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-05.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-02",
-        "source": "VnEconomy",
-        "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNeUhpU3lYanFIdU9tRTN1ak0wcm1hd1hGWHA0UVE0UjVlY0ZLa3MwTllJNVRqel9CMHhZZTJjWlFUTnllalNPdkhHcC1oa1doM0I5ZTRiWUozWGxtZ21ObndZb1NpWEJUMHQ3MU10WWFHRFJScVowa0dadGVLSnpIdU43MzdXcG5BbEVlSEtXWEJBTEhqZHBncEM4MG9uTzc5MzJWZlB6dElsNVFvcWVDZ0lpTF8?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
+        "date": "2026-10-05",
+        "source": "nguoiquansat.vn",
+        "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPakdzR25mTUxrTl9QNUZYRkFKeTVZcFJrbDJqS05IV1NoMThNX3RxQ2xtU09VLUJVZVJka3F6cDNJa1JpUWx0aWtJODdXeFQxZkxaeU5xeGh3YVJ5NnFGWnBILTZMaV80dGZyTWN1TlFXQVZxR2cwelFod1dHaXNPZzQwYzh0WnhZMFdnemowclJTX2hyX0c3RE50ZzJkeHFkODJ0XzNTdGNST3NuRDgtbWsyMjJKUmI3d05nbFNjc3RpZHVUR29RaTNkXzZpUQ?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
       },
       {
-        "id": "news-VHM-12",
+        "id": "news-VHM-13",
         "title": "Chịu sức ép từ lãi suất cao, kết quả kinh doanh quý III của các doanh nghiệp bất động sản phân hoá mạnh",
         "summary": "Bản tin phân tích về VHM từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-02.",
         "category": "biz",
@@ -1819,21 +2111,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-13",
-        "title": "Vinhomes tăng mức đầu tư dự án 1.254ha ven vịnh Cam Ranh lên 194.000 tỷ đồng",
-        "summary": "Bản tin phân tích về VHM từ nguồn CafeLand. Cập nhật ngày 2026-10-01.",
-        "category": "sector",
-        "categoryLabel": "Ngành & Dự Án",
-        "date": "2026-10-01",
-        "source": "CafeLand",
-        "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNUkNSbl9WNS1uYzg0eE52X1NhTXdfOUl5c0JQdVZYY0stYk5GaHJEUVp2LVBwT1o4YWh0enFfdWVYQnRzcjRnclowYVRKTWZIMkgzMFp6NThGSlF6Q2NkN3pRMTNmX05tLXlPeWVEemcwT2VCSjhVZzFHT2dFbnIyZHUwak54ZlppN0lQc0tlM2JyQkZPYi1lUjZ6cFV5eHZzRWgyNjBRVXNCY1BSMWE1WXkwbnk?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
+        "id": "news-VHM-14",
+        "title": "Lãi suất cao, thanh khoản chậm ảnh hưởng tới lợi nhuận doanh nghiệp bất động sản quý 3/2026",
+        "summary": "Bản tin phân tích về VHM từ nguồn VnEconomy. Cập nhật ngày 2026-10-02.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-02",
+        "source": "VnEconomy",
+        "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNeUhpU3lYanFIdU9tRTN1ak0wcm1hd1hGWHA0UVE0UjVlY0ZLa3MwTllJNVRqel9CMHhZZTJjWlFUTnllalNPdkhHcC1oa1doM0I5ZTRiWUozWGxtZ21ObndZb1NpWEJUMHQ3MU10WWFHRFJScVowa0dadGVLSnpIdU43MzdXcG5BbEVlSEtXWEJBTEhqZHBncEM4MG9uTzc5MzJWZlB6dElsNVFvcWVDZ0lpTF8?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
       },
       {
-        "id": "news-VHM-14",
+        "id": "news-VHM-15",
         "title": "Backlog gần 200.000 tỷ đồng, Vinhomes (VHM) được dự báo lãi quý III tăng 312%",
         "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-29.",
         "category": "biz",
@@ -1847,7 +2139,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-15",
+        "id": "news-VHM-16",
+        "title": "Dự báo KQKD quý III: BSR, VHM tăng bằng lần, DXG giảm 40%",
+        "summary": "Bản tin phân tích về VHM từ nguồn Investing.com Việt Nam. Cập nhật ngày 2026-09-28.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-09-28",
+        "source": "Investing.com Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxORmwxMGFlV1VQYXJsbFlIZmppTk5FSHZyUXV1M1FIVkRmYnZEQVRnSVgyYXExSEdacXM1Y1E1WE5wNHZzc2hwM1dEYWd4R2NZOUNpOEVZeHNTYTBrSzJVN2NsMDhkSlczM3g0d0R4bXVMTksxTU00dzdpNWowV0pqRUFaTzRXQi1mWF9zakc4QkRucWRSUVFMOW9CR2M1Nlo1VE1vaXhUUWVjRUpCYkE?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VHM-17",
         "title": "Vinhomes dự báo lãi kỷ lục hơn 81.000 tỷ đồng, nhóm bất động sản đón sóng tăng trưởng",
         "summary": "Bản tin phân tích về VHM từ nguồn Vietnam.vn. Cập nhật ngày 2026-09-28.",
         "category": "biz",
@@ -1861,7 +2167,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-16",
+        "id": "news-VHM-18",
         "title": "VCBS dự báo loạt doanh nghiệp tăng trưởng lợi nhuận quý III/2026 bằng lần",
         "summary": "Bản tin phân tích về VHM từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-09-25.",
         "category": "biz",
@@ -1875,21 +2181,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-VHM-17",
-        "title": "Mùa lợi nhuận quý III: Nhiều doanh nghiệp được dự báo tăng trưởng mạnh",
-        "summary": "Bản tin phân tích về VHM từ nguồn Nhadautu.. Cập nhật ngày 2026-09-25.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-25",
-        "source": "Nhadautu.",
-        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQQnZOcDQ4UWlsY1pJLUg5SVdNT2hwMlQtRWxGTXRYdzlQd3ZZMmxrUDhiQXQ5Vk45dHIwS3FoSEdtTlREX09ESkxFTjdvX1lILWVaWThLWDRsMjZWMGNvdkdIQ3BqZEhBOWxsUEJYV1IzWDJEdURFN3c3OFVLV0xSUWRqZ3JuVldydXRpOVhPMDNJaHdhdWZHQ3ZUVENyODgwRGt5cg?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
-        "id": "news-VHM-18",
+        "id": "news-VHM-19",
         "title": "Dự báo KQKD quý III/2026 nhóm bất động sản: Vinhomes lãi tăng hơn 240%, Nam Long và Phát Đạt khởi sắc",
         "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-25.",
         "category": "biz",
@@ -1903,7 +2195,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-19",
+        "id": "news-VHM-20",
         "title": "CTCK dự báo KQKD quý 3 của 54 doanh nghiệp \"hot\": Lợi nhuận một ông lớn có thể tăng 446%, bất ngờ với nhóm chứng khoán",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-09-25.",
         "category": "biz",
@@ -1917,7 +2209,21 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-20",
+        "id": "news-VHM-21",
+        "title": "Mùa lợi nhuận quý III: Nhiều doanh nghiệp được dự báo tăng trưởng mạnh",
+        "summary": "Bản tin phân tích về VHM từ nguồn Nhadautu.. Cập nhật ngày 2026-09-25.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-09-25",
+        "source": "Nhadautu.",
+        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQQnZOcDQ4UWlsY1pJLUg5SVdNT2hwMlQtRWxGTXRYdzlQd3ZZMmxrUDhiQXQ5Vk45dHIwS3FoSEdtTlREX09ESkxFTjdvX1lILWVaWThLWDRsMjZWMGNvdkdIQ3BqZEhBOWxsUEJYV1IzWDJEdURFN3c3OFVLV0xSUWRqZ3JuVldydXRpOVhPMDNJaHdhdWZHQ3ZUVENyODgwRGt5cg?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-VHM-22",
         "title": "VN-Index “chìm” sâu dưới 1800 điểm, nguy cơ thủng đáy ngắn hạn",
         "summary": "Bản tin phân tích về VHM từ nguồn VnEconomy. Cập nhật ngày 2026-09-24.",
         "category": "biz",
@@ -1931,7 +2237,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-21",
+        "id": "news-VHM-23",
         "title": "Vinhomes lên kế hoạch phát hành thêm 8.000 tỷ đồng trái phiếu",
         "summary": "Bản tin phân tích về VHM từ nguồn Mekong ASEAN. Cập nhật ngày 2026-09-24.",
         "category": "disclosure",
@@ -1945,7 +2251,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-VHM-22",
+        "id": "news-VHM-24",
+        "title": "Vinhomes phê duyệt phương án chào bán 8.000 tỷ đồng trái phiếu",
+        "summary": "Bản tin phân tích về VHM từ nguồn MoneyF. Cập nhật ngày 2026-09-24.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-09-24",
+        "source": "MoneyF",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNSHZ5MW5vd19lUVFyMzFhYWl3bEh5ejZ0R3VuRkFHNmNYbmY1Q0J2bndncHMwYktHOXl3cUxTTWU3LWdfWWg0ODhpaFpsYzB1YmZTSWt0aVYzQlMzT1lka2VKRzNueU1hZEp4U09IRi1hcXVBNkw3dWJrb01BSXRIOHBiRQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VHM-25",
         "title": "SSI Research nâng dự báo lợi nhuận Vinhomes (VHM)",
         "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-18.",
         "category": "biz",
@@ -1959,7 +2279,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-23",
+        "id": "news-VHM-26",
         "title": "Đúng 9 giờ ngày 9/9, Vinhomes có một sự thay đổi lớn",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-09-09.",
         "category": "biz",
@@ -1973,7 +2293,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-24",
+        "id": "news-VHM-27",
         "title": "Ngày mai, hơn 4,1 tỷ cổ phiếu Vinhomes về tài khoản nhà đầu tư, được phép giao dịch",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-09-08.",
         "category": "disclosure",
@@ -1987,7 +2307,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-25",
+        "id": "news-VHM-28",
         "title": "Đúng 5 ngày nữa, cổ đông Vinhomes sẽ chứng kiến một thay đổi quan trọng",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-09-04.",
         "category": "biz",
@@ -2001,7 +2321,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-26",
+        "id": "news-VHM-29",
         "title": "Tin vui với cổ đông Vinhomes: Hơn 4,1 tỷ cổ phiếu VHM sắp giao dịch",
         "summary": "Bản tin phân tích về VHM từ nguồn MoneyF. Cập nhật ngày 2026-09-01.",
         "category": "disclosure",
@@ -2015,7 +2335,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-27",
+        "id": "news-VHM-30",
         "title": "Chính thức chốt ngày 4,1 tỷ cổ phiếu Vinhomes phát hành trả cổ tức được giao dịch",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-08-29.",
         "category": "disclosure",
@@ -2029,7 +2349,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-28",
+        "id": "news-VHM-31",
         "title": "Tin vui với các 'ông chủ' của Vinhomes",
         "summary": "Bản tin phân tích về VHM từ nguồn Vietnam.vn. Cập nhật ngày 2026-08-29.",
         "category": "biz",
@@ -2043,7 +2363,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-29",
+        "id": "news-VHM-32",
+        "title": "Cổ phiếu đáng chú ý ngày 19/8: VHM hưởng lợi từ doanh số, NLG được đánh giá thấp về định giá",
+        "summary": "Bản tin phân tích về VHM từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-08-19.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-08-19",
+        "source": "Thuonghieucongluan.com.vn",
+        "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPVWowVmxscjdpWmYwRi04MkRCRkh0dVVqdUFiRWJydncyVzNjUGt1QjZ6TU1HMFN5RGd4ekdIeXJZMGtqSjlyT0hJWWVyOHhNZDZicUFVUXZEMTg5SUdOeEhramd2MDgyVG9OYktzMEdFanZpUVk3ZnBqa19va1JNdnJJR1ppM1RUU3JQalhlUjlUUDNoZnRnX1ZNQlV5S0NXUWoyWGl3elpxdUQwSC1mbGc2TC1JUW00OGFzYmVDU2xBRkdtekVjWWp0bXJjd3dVNlZJ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VHM-33",
         "title": "Vinhomes hé lộ “deadline” 4,1 tỷ cổ phiếu trả cổ tức về tài khoản nhà đầu tư",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-08-17.",
         "category": "disclosure",
@@ -2057,7 +2391,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-30",
+        "id": "news-VHM-34",
         "title": "Vingroup chuyển nhượng gần 5 triệu cổ phiếu VHM",
         "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-08-10.",
         "category": "biz",
@@ -2071,7 +2405,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-31",
+        "id": "news-VHM-35",
         "title": "Sau VIC, VHM cũng tăng mạnh ngay ngày chia cổ phiếu, kịch bản cũ đang lặp lại?",
         "summary": "Bản tin phân tích về VHM từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-08-06.",
         "category": "biz",
@@ -2085,7 +2419,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-32",
+        "id": "news-VHM-36",
         "title": "Lịch chốt quyền cổ tức tuần đầu tháng 8: Vinhomes \"lăn chốt\", cổ tức tiền mặt cao nhất 100%",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-08-02.",
         "category": "disclosure",
@@ -2099,7 +2433,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-33",
+        "id": "news-VHM-37",
         "title": "Bàn giao dự án lớn, Vinhomes lãi kỷ lục hơn 52.000 tỷ đồng",
         "summary": "Bản tin phân tích về VHM từ nguồn Báo Dân trí. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2113,7 +2447,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-34",
+        "id": "news-VHM-38",
         "title": "Công ty chứng khoán tỷ đô phê duyệt 2 phương án mua cổ phiếu Vingroup và Vinhomes",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-07-30.",
         "category": "analyst",
@@ -2127,7 +2461,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-35",
+        "id": "news-VHM-39",
         "title": "Vinhomes đạt gần 87% kế hoạch lợi nhuận sau 6 tháng, doanh số bán hàng vượt 148,000 tỷ",
         "summary": "Bản tin phân tích về VHM từ nguồn Vietstock. Cập nhật ngày 2026-07-30.",
         "category": "biz",
@@ -2141,7 +2475,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-VHM-36",
+        "id": "news-VHM-40",
         "title": "Điều gì khiến lợi nhuận quý II/2026 của Vinhomes tăng gấp 3 lần?",
         "summary": "Bản tin phân tích về VHM từ nguồn Nhadautu.. Cập nhật ngày 2026-07-30.",
         "category": "biz",
@@ -2155,7 +2489,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-37",
+        "id": "news-VHM-41",
         "title": "Vinhomes lập kỷ lục chưa từng có, lãi 52.000 tỷ chỉ sau nửa năm",
         "summary": "Bản tin phân tích về VHM từ nguồn Znews. Cập nhật ngày 2026-07-30.",
         "category": "biz",
@@ -2169,7 +2503,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-38",
+        "id": "news-VHM-42",
         "title": "Vinhomes báo lãi sau thuế 6T2026 kỷ lục hơn 52.000 tỷ đồng, gấp 5 lần cùng kỳ",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-07-30.",
         "category": "biz",
@@ -2183,21 +2517,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-39",
-        "title": "Vinhomes báo lãi kỷ lục hơn 52.000 tỷ chỉ sau 6 tháng",
-        "summary": "Bản tin phân tích về VHM từ nguồn 24HMoney. Cập nhật ngày 2026-07-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-07-30",
-        "source": "24HMoney",
-        "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOQ2hobWxNX09GVE5YbUJWejVOSGVXeWlsWmlNY0lFNGQ0aVEwdHF3Vkl1Z3d5UTJmbUtfS3BNYnE1SWplSEltVXZ1Ni0yOGw5Z1lQd1d0Ti1Bd3ZkeXhVUUN5UGNRenhiX3FVV3RnUWlkOWxNQ2NyS1pnNXZIZkt5b2U1ZXJETE9qSGhuMTFFNU1PaXZ3SzhOT3NR?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-VHM-40",
+        "id": "news-VHM-43",
         "title": "Tổng tài sản của Vinhomes vượt một triệu tỷ đồng",
         "summary": "Bản tin phân tích về VHM từ nguồn Mekong ASEAN. Cập nhật ngày 2026-07-30.",
         "category": "biz",
@@ -2211,7 +2531,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-41",
+        "id": "news-VHM-44",
         "title": "Vingroup muốn chuyển quyền sở hữu hơn 4,8 triệu cổ phiếu VHM",
         "summary": "Bản tin phân tích về VHM từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-07-20.",
         "category": "biz",
@@ -2225,7 +2545,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-42",
+        "id": "news-VHM-45",
         "title": "Diễn biến giá cổ phiếu VHM trước tin chia cổ tức hơn 4,1 tỉ cổ phiếu tỉ lệ 1:1",
         "summary": "Bản tin phân tích về VHM từ nguồn Một Thế Giới. Cập nhật ngày 2026-07-11.",
         "category": "disclosure",
@@ -2239,7 +2559,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-43",
+        "id": "news-VHM-46",
         "title": "Vinhomes phát hành 4,1 tỷ cổ phiếu trả cổ tức: Chuyên gia kỳ vọng trở thành \"ngòi nổ\" cho VN-Index",
         "summary": "Bản tin phân tích về VHM từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-07-07.",
         "category": "disclosure",
@@ -2253,7 +2573,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-44",
+        "id": "news-VHM-47",
         "title": "Vinhomes chốt ngày trả cổ tức bằng cổ phiếu tỷ lệ 100%",
         "summary": "Bản tin phân tích về VHM từ nguồn Mekong ASEAN. Cập nhật ngày 2026-07-05.",
         "category": "disclosure",
@@ -2267,21 +2587,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VHM-45",
-        "title": "Cổ đông Vinhomes sắp nhận cổ tức cổ phiếu tỷ lệ 100%",
-        "summary": "Bản tin phân tích về VHM từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-07-04.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-07-04",
-        "source": "Chứng khoán DNSE",
-        "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQcHhCVjJZam9oYWhvQjBTNlJPS0tQbzNXalV1cnE1YXVEZFFISktYMTRLVmpIdWJKcGxpR0ZOQkFiT2pMckEyWVZiUEh5NnBuRHhnSGtoNFNaWEZHVTBwbmRaM0VRV2M4ZVJpdjk5WDhzaVVyQnplbDZhSjQyRWpFb3dKWU9zS053TFJoWjNYWEZtNzhnRkd1VmIwVUVPcnc?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-VHM-46",
+        "id": "news-VHM-48",
         "title": "NÓNG: Vinhomes thông báo ngày \"lăn chốt\" thương vụ phát hành cổ phiếu lớn nhất lịch sử",
         "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-07-04.",
         "category": "disclosure",
@@ -2295,7 +2601,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-VHM-47",
+        "id": "news-VHM-49",
+        "title": "Cổ đông Vinhomes sắp nhận cổ tức cổ phiếu tỷ lệ 100%",
+        "summary": "Bản tin phân tích về VHM từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-07-04.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-07-04",
+        "source": "Chứng khoán DNSE",
+        "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQcHhCVjJZam9oYWhvQjBTNlJPS0tQbzNXalV1cnE1YXVEZFFISktYMTRLVmpIdWJKcGxpR0ZOQkFiT2pMckEyWVZiUEh5NnBuRHhnSGtoNFNaWEZHVTBwbmRaM0VRV2M4ZVJpdjk5WDhzaVVyQnplbDZhSjQyRWpFb3dKWU9zS053TFJoWjNYWEZtNzhnRkd1VmIwVUVPcnc?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VHM-50",
         "title": "Vinhomes (VHM) trả cổ tức bằng tiền và cổ phiếu, phát hành trái phiếu",
         "summary": "Bản tin phân tích về VHM từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-07-03.",
         "category": "disclosure",
@@ -2307,69 +2627,27 @@
         "sentimentValue": 0,
         "impact": "Rất cao",
         "weight": 2.0
-      },
-      {
-        "id": "news-VHM-48",
-        "title": "Vingroup hoàn tất chuyển quyền sở hữu 15,2 triệu cổ phiếu VHM",
-        "summary": "Bản tin phân tích về VHM từ nguồn Tuổi Trẻ. Cập nhật ngày 2026-06-27.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-06-27",
-        "source": "Tuổi Trẻ",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPck04SXBaMlA5eHVPRGlqQUhvT1g0MEJBanhySGFWY1Iwamx6ZXpOMmlIeUI5VnpEZFFfaldfVm5zanZrbmhWOHUzbzdZaEhDQWJQUVJxOE9UT05UQU91bnhJenBtclB6aTNxV3BlcHhPNDdIajZEUlN4TXA3M19Ick14R1VjdDJLT21LSkdfMXVBOHNNTDhZVU9QTlBUMFR3WWtlRlhrTQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VHM-49",
-        "title": "UBCKNN thông báo về thương vụ phát hành lớn nhất lịch sử của Vinhomes",
-        "summary": "Bản tin phân tích về VHM từ nguồn CafeF. Cập nhật ngày 2026-06-26.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-06-26",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQN3Ita3h5UTYteGJiR3FfZEpHWlREakljTm45bWEtN2RtWEo5b1lkN2JMMzZURFZoYWtITHdNZTVtRFhQTnlubnVTLVFLVTVnME5KbkJyLVBSa2FRT2JOX3pjQTRiV29KLV9RNVZ4OC1kY0w1MkJURHNsWU1nenp2ckhRSWNoTnpSY2VRMXFOV1YxalVuSEw1VW1LM09LZGh1RXVkUFdmSVlyUW9o?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VHM-50",
-        "title": "UBCKNN tiếp nhận hồ sơ phát hành cổ phiếu trả cổ tức khủng của Vinhomes, dự kiến tăng vốn lên hơn 80.000 tỷ",
-        "summary": "Bản tin phân tích về VHM từ nguồn Báo Dân Việt. Cập nhật ngày 2026-06-26.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-06-26",
-        "source": "Báo Dân Việt",
-        "link": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxORXJjdnRvR2JhOEZqd2ctdkxlenFRX1dMNGNweWFiT0tHZVVzVDdYX1J5RGN4V2lZRjdLbnVrTkg0YXpKS21UYXdTcFlHSGFxemg0VWgwS3BRUXhjMjYxak14NUtjTk5kYThET013X2tsT0loLXdDQ3lXMWVNUjJXZEtVaUtFYnZ0TndVZGZOajVOTWRjZ09hQlFXQmZhTW1jdDZURUxoVUtKYk5fdzlpY18zckJRSC05Y0dFNXo1UGc3dHhlN0JkM2lCUnc5SlZDcEpLaXhJNDZrTHp1?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
       }
     ],
     "sentiment": {
-      "score": 53.1,
+      "score": 41.7,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 24,
+      "bullishCount": 21,
       "neutralCount": 25,
-      "bearishCount": 1,
+      "bearishCount": 4,
       "totalCount": 50,
       "categoryScores": {
-        "biz": 64.3,
-        "disclosure": 31.4,
+        "biz": 48.9,
+        "disclosure": 26.7,
         "sector": 100.0,
         "analyst": 0.0
       }
     },
     "tldr": {
       "title": "VHM 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về VHM nghiêng rõ rệt về chiều hướng tích cực với 24/50 tin tức mang gam màu tươi sáng (48.0%). Tâm điểm chú ý xoay quanh: 'VIC, VHM hụt hơi, VN-Index đối mặt kịch bản nào trong tuần tới?'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về VHM nghiêng rõ rệt về chiều hướng tích cực với 21/50 tin tức mang gam màu tươi sáng (42.0%). Tâm điểm chú ý xoay quanh: 'Cổ phiếu thép 'đồng khởi', PNJ lại giảm sàn'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2378,12 +2656,12 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "48.0%",
+          "value": "42.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+53.1",
+          "value": "+41.7",
           "type": "positive"
         },
         {
@@ -2478,14 +2756,14 @@
     "summary": "M-Score = -1.62 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
   },
   "magicFormula": {
-    "earningsYield": 17.66,
-    "roic": 18.13,
-    "compositeScore": 80.2,
-    "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
-    "tier": "TOP_TIER",
-    "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
+    "earningsYield": 13.08,
+    "roic": 13.43,
+    "compositeScore": 66.0,
+    "category": "Hạng 3: Định Giá Rẻ nhưng Hiệu Quả Vốn Trung Bình",
+    "tier": "VALUE_PLAY",
+    "recommendation": "Cổ phiếu định giá hời, cần kiểm tra thêm nguy cơ bẫy giá trị (Value Trap).",
     "parameters": {
-      "ebitTTM": 101062.4,
+      "ebitTTM": 74861.0,
       "enterpriseValue": 572230.4,
       "marketCap": 542178.4,
       "netDebt": 30052.0,
@@ -2597,14 +2875,14 @@
       "summary": "M-Score = -1.62 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
     },
     "magicFormula": {
-      "earningsYield": 17.66,
-      "roic": 18.13,
-      "compositeScore": 80.2,
-      "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
-      "tier": "TOP_TIER",
-      "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
+      "earningsYield": 13.08,
+      "roic": 13.43,
+      "compositeScore": 66.0,
+      "category": "Hạng 3: Định Giá Rẻ nhưng Hiệu Quả Vốn Trung Bình",
+      "tier": "VALUE_PLAY",
+      "recommendation": "Cổ phiếu định giá hời, cần kiểm tra thêm nguy cơ bẫy giá trị (Value Trap).",
       "parameters": {
-        "ebitTTM": 101062.4,
+        "ebitTTM": 74861.0,
         "enterpriseValue": 572230.4,
         "marketCap": 542178.4,
         "netDebt": 30052.0,

@@ -22,6 +22,23 @@ ROOT_DIR = CURRENT_DIR.parent
 DATA_DIR = ROOT_DIR / "data"
 SUPPORTED_FILE = DATA_DIR / "supported_stocks.json"
 
+try:
+    from lib.requested_stocks_manager import (
+        get_pending_requested_symbols,
+        filter_missing_financials,
+        mark_symbol_synced,
+        mark_symbol_failed,
+        add_to_supported_stocks
+    )
+except ImportError:
+    from scripts.lib.requested_stocks_manager import (
+        get_pending_requested_symbols,
+        filter_missing_financials,
+        mark_symbol_synced,
+        mark_symbol_failed,
+        add_to_supported_stocks
+    )
+
 
 def get_configured_symbols() -> List[str]:
     """Lấy danh sách mã cấu hình theo dõi từ supported_stocks.json hoặc cache."""
@@ -76,8 +93,53 @@ def execute_step(step_name: str, script_name: str, args: Optional[List[str]] = N
         return False
 
 
+def check_and_backfill_requested_stocks() -> List[str]:
+    """
+    Rà soát hàng đợi requested_stocks:
+    Tìm các mã đang PENDING mà chưa có file hợp lệ trong data/financials/.
+    Tự động đồng bộ ngay, tạo BCTC và chuyển sang SYNCED.
+    """
+    print("\n🔍 [RÀ SOÁT HÀNG ĐỢI] Kiểm tra các mã cổ phiếu được người dùng yêu cầu...")
+    pending = get_pending_requested_symbols()
+    if not pending:
+        print("   ℹ️ Không có mã nào đang chờ trong hàng đợi requested_stocks.")
+        return []
+
+    missing = filter_missing_financials(pending)
+    if not missing:
+        print(f"   ✅ Tất cả {len(pending)} mã trong hàng đợi đã có sẵn BCTC trong kho lưu trữ.")
+        for p in pending:
+            mark_symbol_synced(p)
+        return []
+
+    print(f"   🎯 Phát hiện {len(missing)} mã yêu cầu chưa có BCTC: {', '.join(missing)}")
+    backfilled = []
+    for sym in missing:
+        print(f"\n   👉 Đang tiến hành tự động cào dữ liệu cho mã yêu cầu {sym}...")
+        # 1. TradingView Fundamentals
+        execute_step(f"Auto-Sync TradingView Scanner cho {sym}", "sync_fundamentals.py", ["--symbols", sym])
+        # 2. BCTC 8Q/5Y & DCF
+        execute_step(f"Auto-Fetch BCTC Toàn Diện & DCF cho {sym}", "fetch_financial_reports.py", ["--symbols", sym])
+
+        fin_path = DATA_DIR / "financials" / f"{sym}.json"
+        if fin_path.exists():
+            mark_symbol_synced(sym)
+            backfilled.append(sym)
+            print(f"   ✅ Hoàn tất nạp dữ liệu và bổ sung mã yêu cầu {sym} vào danh sách theo dõi!")
+        else:
+            mark_symbol_failed(sym, "Không thể tải BCTC từ các nguồn")
+            print(f"   ⚠️ Thất bại khi nạp dữ liệu cho mã yêu cầu {sym}")
+
+    return backfilled
+
+
 def run_daily_pipeline(symbols: List[str]):
     """Chu kỳ Hằng Ngày (EOD 18:00 T2-T6): TradingView Scanner, Nhiệt kế VN-Index, 60 nến DNSE."""
+    # 0. Tự động rà soát và tải dữ liệu cho các mã trong hàng đợi yêu cầu
+    backfilled = check_and_backfill_requested_stocks()
+    if backfilled:
+        symbols = sorted(list(set(symbols + backfilled)))
+
     print("\n========================================================")
     print(f"☀️ PIPELINE HẰNG NGÀY (DAILY EOD SYNC) — {len(symbols)} MÃ")
     print("========================================================")
@@ -116,14 +178,22 @@ def run_weekly_pipeline(symbols: List[str]):
     execute_step("2.5 Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày", "fetch_financial_reports.py", ["--symbols", sym_arg])
 
 
-def run_quarterly_pipeline(symbols: List[str]):
+def run_quarterly_pipeline(symbols: List[str], backfill_deep: bool = False):
     """Chu kỳ Hằng Quý (Mùa BCTC): 122+ chỉ tiêu BCTC 8Q/5Y, 54 Ratios, DuPont, DCF."""
+    # 0. Tự động rà soát hàng đợi yêu cầu
+    backfilled = check_and_backfill_requested_stocks()
+    if backfilled:
+        symbols = sorted(list(set(symbols + backfilled)))
+
     print("\n========================================================")
     print(f"📑 PIPELINE HẰNG QUÝ (QUARTERLY BCTC & RATIOS) — {len(symbols)} MÃ")
     print("========================================================")
 
     sym_arg = ",".join(symbols)
-    execute_step("3.1 Trích Xuất Toàn Bộ BCTC 122+ Chỉ Tiêu, 54 Ratios & DCF", "fetch_financial_reports.py", ["--symbols", sym_arg])
+    extra_args = ["--symbols", sym_arg]
+    if backfill_deep:
+        extra_args.append("--backfill-deep")
+    execute_step("3.1 Trích Xuất Toàn Bộ BCTC 122+ Chỉ Tiêu, 54 Ratios & DCF", "fetch_financial_reports.py", extra_args)
 
 
 def main():
@@ -138,6 +208,11 @@ def main():
         "--symbols", "-s",
         help="Danh sách mã cổ phiếu cần cập nhật (phân tách bởi dấu phẩy, ví dụ: HPG,PNJ,MWG)",
         default=None
+    )
+    parser.add_argument(
+        "--backfill-deep",
+        action="store_true",
+        help="Cào dữ liệu lịch sử sâu từ CafeF cho kỳ BCTC"
     )
 
     args = parser.parse_args()
@@ -156,11 +231,11 @@ def main():
     elif args.cadence == "weekly":
         run_weekly_pipeline(symbols)
     elif args.cadence == "quarterly":
-        run_quarterly_pipeline(symbols)
+        run_quarterly_pipeline(symbols, backfill_deep=args.backfill_deep)
     elif args.cadence == "all":
         run_daily_pipeline(symbols)
         run_weekly_pipeline(symbols)
-        run_quarterly_pipeline(symbols)
+        run_quarterly_pipeline(symbols, backfill_deep=args.backfill_deep)
 
     total_time = round(time.time() - t_start, 2)
     print("\n==================================================================")

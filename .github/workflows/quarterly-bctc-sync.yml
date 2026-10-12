@@ -1,0 +1,71 @@
+name: Quarterly Stock Financials & DCF Valuation Sync (Python)
+
+on:
+  schedule:
+    # Chạy tự động vào Mùa BCTC: Ngày 1 và Ngày 15 của các tháng 1, 4, 7, 10 lúc 02:00 UTC (09:00 Sáng VN)
+    - cron: '0 2 1,15 1,4,7,10 *'
+
+  workflow_dispatch:
+    # Nút bấm kích hoạt thủ công từ GitHub Actions UI
+    inputs:
+      symbols:
+        description: 'Danh sách mã cổ phiếu cần chạy BCTC (phân tách bởi dấu phẩy, để trống để chạy toàn bộ)'
+        required: false
+        default: ''
+      backfill_deep:
+        description: 'Cào dữ liệu lịch sử sâu từ CafeF (true/false)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  quarterly-bctc-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 1. Checkout mã nguồn
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 2. Cài đặt Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 3. Cài đặt dependencies với uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          export PATH="$HOME/.local/bin:$PATH"
+          uv pip install --system pandas requests beautifulsoup4 yfinance curl_cffi lxml numpy
+
+      - name: ⚡ 4. Chạy Quarterly BCTC & DCF Pipeline
+        run: |
+          EXTRA_ARGS=""
+          if [ "${{ inputs.backfill_deep }}" = "true" ]; then
+            EXTRA_ARGS="--backfill-deep"
+          fi
+          if [ -n "${{ inputs.symbols }}" ]; then
+            python scripts/run_pipeline.py --cadence quarterly --symbols "${{ inputs.symbols }}" $EXTRA_ARGS
+          else
+            python scripts/run_pipeline.py --cadence quarterly $EXTRA_ARGS
+          fi
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+
+      - name: 💾 5. Tự động Commit & Push dữ liệu BCTC mới
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/financials/ data/fundamentals_cache.json data/supported_stocks.json data/requested_stocks.json
+          if git diff --staged --quiet; then
+            echo "ℹ️ Không có thay đổi BCTC mới."
+          else
+            git commit -m "chore(data): quarterly financial reports & DCF valuation sync [skip ci]"
+            git pull --rebase origin main || (git rebase --abort && git pull -X theirs --no-edit origin main)
+            git push origin main
+            echo "✅ Đã commit và push dữ liệu BCTC mới lên GitHub thành công!"
+          fi
