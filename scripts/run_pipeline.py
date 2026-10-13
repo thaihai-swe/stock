@@ -177,6 +177,12 @@ def run_weekly_pipeline(symbols: List[str]):
     sym_arg = ",".join(symbols)
     execute_step("2.5 Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày", "fetch_financial_reports.py", ["--symbols", sym_arg])
 
+    # 6. Sinh Báo Cáo Chiến Lược Vĩ Mô CIO (AI Macro Briefing)
+    execute_step("2.6 Sinh Báo Cáo Chiến Lược Vĩ Mô CIO (AI Macro Briefing)", "generate_ai_insights.py", ["--scope", "macro"])
+
+    # 7. Sinh Nhịp Đập Thị Trường Cuối Tuần (AI Weekly Market Pulse)
+    execute_step("2.7 Sinh Nhịp Đập Thị Trường Cuối Tuần (AI Weekly Market Pulse)", "generate_ai_insights.py", ["--scope", "weekly_market"])
+
 
 def run_quarterly_pipeline(symbols: List[str], backfill_deep: bool = False):
     """Chu kỳ Hằng Quý (Mùa BCTC): 122+ chỉ tiêu BCTC 8Q/5Y, 54 Ratios, DuPont, DCF."""
@@ -194,6 +200,9 @@ def run_quarterly_pipeline(symbols: List[str], backfill_deep: bool = False):
     if backfill_deep:
         extra_args.append("--backfill-deep")
     execute_step("3.1 Trích Xuất Toàn Bộ BCTC 122+ Chỉ Tiêu, 54 Ratios & DCF", "fetch_financial_reports.py", extra_args)
+
+    # 2. Sinh Báo Cáo Phân Tích Định Giá Chuyên Sâu (AI Stock Deep Dive)
+    execute_step("3.2 Sinh Báo Cáo Định Giá Chuyên Sâu (AI Stock Deep Dive)", "generate_ai_insights.py", ["--scope", "stocks", "--symbols", sym_arg])
 
 
 def main():

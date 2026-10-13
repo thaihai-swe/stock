@@ -42,7 +42,7 @@ const prefetchTab = (tabId) => {
 const TABS = [
   // Cụm 1: Quản Trị Danh Mục & Giao Dịch
   { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊', group: 'portfolio' },
-  { id: 'trade', label: '⚡ Đặt Lệnh', shortLabel: 'Đặt Lệnh', icon: '⚡', group: 'portfolio' },
+  { id: 'trade', label: '⚡ Nhật Ký', shortLabel: 'Nhật Ký', icon: '⚡', group: 'portfolio' },
   { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋', group: 'portfolio' },
 
   // Cụm 2: Định Giá & Phân Tích Chuyên Sâu
@@ -449,7 +449,6 @@ export default function App({ hasGoogleClientId = false }) {
               <span className="text-2xl drop-shadow-2xs">📈</span>
               <div className="leading-tight">
                 <span className="font-extrabold text-slate-800 dark:text-white text-base sm:text-lg tracking-tight block">
-                  Nhật Ký Giao Dịch
                 </span>
               </div>
             </div>
@@ -459,9 +458,8 @@ export default function App({ hasGoogleClientId = false }) {
               {/* P&L badge: Dạng đầy đủ trên Desktop, Dạng cô đọng trên Mobile */}
               {(data.sellOrders || []).length > 0 && (
                 <div
-                  className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full transition-all border ${
-                    totalRealizedPL >= 0 ? 'badge-gain' : 'badge-loss'
-                  }`}
+                  className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full transition-all border ${totalRealizedPL >= 0 ? 'badge-gain' : 'badge-loss'
+                    }`}
                   title={`Tổng lãi/lỗ đã chốt: ${new Intl.NumberFormat('vi-VN').format(Math.round(totalRealizedPL))}đ`}
                 >
                   <span>{totalRealizedPL >= 0 ? '▲' : '▼'}</span>
@@ -974,33 +972,30 @@ export default function App({ hasGoogleClientId = false }) {
                   <button
                     type="button"
                     onClick={() => setThemeMode('light')}
-                    className={`py-1 rounded-lg font-semibold transition-all ${
-                      themeMode === 'light'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`py-1 rounded-lg font-semibold transition-all ${themeMode === 'light'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     ☀️ Sáng
                   </button>
                   <button
                     type="button"
                     onClick={() => setThemeMode('dark')}
-                    className={`py-1 rounded-lg font-semibold transition-all ${
-                      themeMode === 'dark'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`py-1 rounded-lg font-semibold transition-all ${themeMode === 'dark'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     🌙 Tối
                   </button>
                   <button
                     type="button"
                     onClick={() => setThemeMode('system')}
-                    className={`py-1 rounded-lg font-semibold transition-all ${
-                      themeMode === 'system'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`py-1 rounded-lg font-semibold transition-all ${themeMode === 'system'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     💻 Tự động
                   </button>
@@ -1036,10 +1031,10 @@ export default function App({ hasGoogleClientId = false }) {
       {toast && (
         <div
           className={`fixed bottom-20 md:bottom-6 right-4 z-50 max-w-sm sm:max-w-md px-4 py-3 rounded-2xl shadow-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-200 ${toast.type === 'success'
-              ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-950/20'
-              : toast.type === 'error'
-                ? 'bg-rose-600 text-white border-rose-500 shadow-rose-950/20'
-                : 'bg-slate-900 text-white border-slate-800 shadow-slate-950/20'
+            ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-950/20'
+            : toast.type === 'error'
+              ? 'bg-rose-600 text-white border-rose-500 shadow-rose-950/20'
+              : 'bg-slate-900 text-white border-slate-800 shadow-slate-950/20'
             }`}
         >
           <div className="flex items-center gap-2 min-w-0">

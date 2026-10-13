@@ -1,4 +1,5 @@
 import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
   if (!riskMetrics) return null;
@@ -27,6 +28,7 @@ export default function StockRiskMetricsCard({ riskMetrics, symbol }) {
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200">
               Biến Động & Drawdown
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình toán học định lượng rủi ro danh mục (VaR 95%, Sharpe, Sortino, Max Drawdown)" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-1">
             Chỉ Số Rủi Ro Thị Giá Cổ Phiếu ({symbol})

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 const METRIC_DEFINITIONS = [
   { key: 'eps', label: 'EPS (Thu nhập mỗi CP)', unit: 'đ', invertLogic: false },
@@ -152,10 +153,11 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Phân Tích Thống Kê Chu Kỳ
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình thống kê định lượng chu kỳ 5 năm vs hiện tại" />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               FinVal Lab: Hiện Tại vs SMA 5 Năm
             </span>

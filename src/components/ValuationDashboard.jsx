@@ -455,7 +455,10 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
 
               {/* Phân Rã DuPont 5 Nhân Tố Mở Rộng */}
               {financials.extendedDupont && (
-                <ExtendedDupontCard extendedDupont={financials.extendedDupont} />
+                <ExtendedDupontCard
+                  extendedDupont={financials.extendedDupont}
+                  aiAuditComment={financials.forensicAnalysis?.aiAuditComment}
+                />
               )}
 
               {/* Chỉ Số Đặc Thù Phân Ngành */}

@@ -2,7 +2,15 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
-import { ROOT_DIR, DATA_DIR, REQUESTED_STOCKS_FILE } from '../config/constants.js';
+import {
+  ROOT_DIR,
+  DATA_DIR,
+  REQUESTED_STOCKS_FILE,
+  MACRO_CONFIG,
+  MACRO_THRESHOLDS,
+  MACRO_NARRATIVES,
+  AI_MACRO_CONFIG,
+} from '../config/constants.js';
 import { db } from '../storage/db.js';
 
 const router = express.Router();
@@ -108,6 +116,60 @@ router.get('/valuation/macro', (req, res) => {
     });
   } catch (error) {
     console.error('Lỗi đọc macro_valuation.json:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * 2a. GET /api/valuation/macro/config
+ * Lấy toàn bộ ngưỡng số liệu (thresholds), mô tả chu kỳ & narrative từ file cấu hình & macro JSON
+ */
+router.get('/valuation/macro/config', (req, res) => {
+  try {
+    let macroData = {};
+    if (fs.existsSync(MACRO_FILE)) {
+      try {
+        macroData = JSON.parse(fs.readFileSync(MACRO_FILE, 'utf-8'));
+      } catch {}
+    }
+    const aiInsight = macroData.aiInsight || {};
+    return res.json({
+      thresholds: MACRO_THRESHOLDS,
+      narratives: MACRO_NARRATIVES,
+      aiConfig: {
+        enabled: AI_MACRO_CONFIG?.enabled ?? true,
+        mode: 'background_pipeline',
+        provider: aiInsight.provider || 'python_pipeline',
+        model: aiInsight.model || 'Gemini 2.5 Flash / CIO Heuristic',
+        hasApiKey: true,
+        updatedAt: aiInsight.updatedAt || macroData.updatedAt || null,
+      },
+    });
+  } catch (error) {
+    console.error('Lỗi lấy macro config:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * 2a-2. POST /api/valuation/macro/ai-analysis
+ * Trả về báo cáo chiến lược CIO sinh bởi Python Background Pipeline (0ms, 0 API cost).
+ */
+router.post('/valuation/macro/ai-analysis', async (req, res) => {
+  try {
+    let macroData = {};
+    if (fs.existsSync(MACRO_FILE)) {
+      try {
+        macroData = JSON.parse(fs.readFileSync(MACRO_FILE, 'utf-8'));
+      } catch {}
+    }
+    return res.json(macroData.aiInsight || {
+      headline: 'Chiến Lược Phân Bổ CIO Toàn Diện',
+      summary: 'Dữ liệu phân tích vĩ mô được đồng bộ tự động từ Python Background Pipeline.',
+      bullets: [],
+    });
+  } catch (error) {
+    console.error('Lỗi thực thi AI Macro Analysis:', error);
     return res.status(500).json({ error: error.message });
   }
 });

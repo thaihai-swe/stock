@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { addBuyOrder } from '../utils/api.js';
 import { DEFAULT_TAGS, fmtMoney, getTodayDate } from '../utils/format.js';
+import { PRESET_FEE_PCTS } from '../utils/constants.js';
 
 export default function BuyForm({
   onSuccess,
@@ -343,7 +344,7 @@ export default function BuyForm({
                 Phí Mua (%)
               </label>
               <div className="flex items-center gap-1">
-                {['0', '0.1', '0.15'].map(pct => (
+                {(Array.isArray(PRESET_FEE_PCTS) ? PRESET_FEE_PCTS : ['0', '0.1', '0.15']).map(pct => (
                   <button
                     key={pct}
                     type="button"

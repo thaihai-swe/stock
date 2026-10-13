@@ -1,4 +1,5 @@
 import ScenarioAllocationMatrix from './ScenarioAllocationMatrix.jsx';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function MacroAllocationGoldSection({
   macroData = {},
@@ -20,9 +21,12 @@ export default function MacroAllocationGoldSection({
         {/* ── 2. BOX 1: MÔ HÌNH PHÂN BỔ 4 LỚP TÀI SẢN ĐỘNG ── */}
         <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-5 transition-colors">
           <div>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              Mô Hình Phân Bổ 4 Lớp Tài Sản (Dynamic Allocation)
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                Mô Hình Phân Bổ 4 Lớp Tài Sản (Dynamic Allocation)
+              </span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình phân bổ 4 lớp tài sản tối ưu hóa theo chu kỳ vĩ mô" />
+            </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
               Tỷ Trọng Khuyến Nghị Chu Kỳ {regime.phase}
             </h3>
@@ -56,9 +60,12 @@ export default function MacroAllocationGoldSection({
         <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-5 transition-colors">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                Chênh Lệch Giá Vàng (Gold Arbitrage)
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                  Chênh Lệch Giá Vàng (Gold Arbitrage)
+                </span>
+                <IntelligenceBadge type="heuristic" tooltip="Mô hình chênh lệch giá vàng SJC/PNJ so với thế giới" />
+              </div>
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
                 Thị Trường Trong Nước vs Thế Giới
               </h3>

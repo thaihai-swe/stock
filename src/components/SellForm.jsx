@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { addSellOrder } from '../utils/api.js';
 import { DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate, fmtMoney, getTodayDate, plBg, plColor } from '../utils/format.js';
+import { DEFAULT_TRADE_FEE_PCT } from '../utils/constants.js';
 
 export default function SellForm({
   onSuccess,
@@ -528,7 +529,7 @@ export default function SellForm({
 
                   <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center text-xs sm:text-sm">
                     <span className="font-bold text-gray-700 dark:text-slate-300">
-                      Dự kiến Lãi/Lỗ ròng (sau phí {form.feePct || 0.1}%):
+                      Dự kiến Lãi/Lỗ ròng (sau phí {form.feePct || DEFAULT_TRADE_FEE_PCT}%):
                     </span>
                     <span className={`font-extrabold text-sm sm:text-base ${plColor(costPreview.estPL)}`}>
                       {costPreview.estPL >= 0 ? '+' : ''}{fmtMoney(costPreview.estPL)}đ
@@ -554,7 +555,7 @@ export default function SellForm({
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder="0.1"
+                  placeholder={String(DEFAULT_TRADE_FEE_PCT)}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 pr-9 transition-all"
                 />
                 <span className="absolute right-3.5 top-3 text-gray-400 text-xs font-bold">%</span>
@@ -662,7 +663,7 @@ export default function SellForm({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {DISCIPLINE_TAGS.map(item => {
+              {(Array.isArray(DISCIPLINE_TAGS) ? DISCIPLINE_TAGS : Object.values(DISCIPLINE_TAGS || {})).map(item => {
                 const isSelected = selectedDiscipline === item.label;
                 return (
                   <button

@@ -1,4 +1,5 @@
 import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function ValuationTrapsCard({ valuationTraps, symbol }) {
   if (!valuationTraps) return null;
@@ -30,10 +31,11 @@ export default function ValuationTrapsCard({ valuationTraps, symbol }) {
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-rose-600 dark:text-rose-400">
               Kiểm Toán Rủi Ro Định Giá
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Hệ quy tắc 7 bẫy định giá & kiểm toán rủi ro" />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
               7 Bẫy Định Giá Kinh Điển
             </span>

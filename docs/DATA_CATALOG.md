@@ -1078,3 +1078,294 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   - Daily EOD Sync: `scripts/run_pipeline.py --cadence daily` tự động rà soát hàng đợi lúc 18:00 T2-T6, kích hoạt cào TradingView + BCTC + DCF, tự động thêm vào `data/supported_stocks.json` và commit & push về Git.
   - Quarterly BCTC Sync: `.github/workflows/quarterly-bctc-sync.yml` kích hoạt `scripts/run_pipeline.py --cadence quarterly` định kỳ ngày 1 và ngày 15 các tháng 1, 4, 7, 10 lúc 09:00 sáng VN.
 
+---
+
+### PHÂN HỆ 9: TRUNG TÂM CẤU HÌNH VĨ MÔ & NỀN TẢNG AI STRATEGIC COPILOT (`macroConstants` & `aiMacroConfig`)
+* **Vị trí lưu trữ**:
+  - Gốc Single Source of Truth: `data/default-constant-value.json` (`macro.macroThresholds`, `macro.macroNarratives`, `macro.aiMacroConfig`).
+  - Cổng nạp Node.js: `server/config/configLoader.js` & `server/config/constants.js` (`MACRO_THRESHOLDS`, `MACRO_NARRATIVES`, `AI_MACRO_CONFIG`).
+  - Cổng nạp Python: `scripts/lib/config_loader.py` (`get_macro_thresholds()`, `get_macro_narratives()`, `get_ai_macro_config()`).
+  - Snapshot Cache Runtime: `data/macro_valuation.json` -> trường `aiInsight`.
+
+* **1. Bóc tách 100% Ngưỡng Số Liệu Đo Lường (`macroThresholds`)**:
+  - `usdvnd`: `criticalHigh: 25900`, `high: 25600`, `bearishDriver: 26000`, `bullishDriver: 25000`, `externalShock: 25700`, `fallback: 25400`.
+  - `interbankRate`: `criticalHigh: 6.5`, `high: 5.0`, `bearishDriver: 6.0`, `tightening: 5.5`, `bullishDriver: 3.0`, `liquidityCrisisSpread: 2.0`, `fallback: 4.5`.
+  - `cpi`: `criticalHigh: 5.5`, `ceilingTarget: 4.5`, `bullish: 4.0`, `cool: 3.5`, `fallback: 3.63`.
+  - `gdp`: `highGrowth: 6.5`, `moderateGrowth: 6.0`, `slowdown: 5.5`, `recessionAlert: 4.0`, `fallback: 6.5`.
+  - `pmi`: `expansion: 51.0`, `neutral: 50.0`, `contraction: 49.0`, `fallback: 50.5`.
+  - `credit`: `crunchThreshold: 10.0`, `optimalMin: 12.0`, `optimalMax: 16.5`, `fallback: 14.0`.
+  - `oilBrent`: `criticalHigh: 95.0`, `extremeHigh: 105.0`, `low: 50.0`, `optimalMin: 65.0`, `optimalMax: 90.0`, `fallback: 75.0`.
+  - `yieldCurve`: `vnFallback` (VN02Y, VN05Y, VN10Y, SBV rate, ON INBR, CPI, USD/VND, P/E), `usFallback` (US02Y, US05Y, US10Y, Fed Funds, US CPI), `slopeThresholds`, `levelThresholds`, `stressScores`, `transmissionLinks` (A, B, C), `assetDecisionErp`.
+  - `marketValuation`: `meanPe: 14.2`, `stdPe: 2.1`, `grahamPePbThreshold: 22.5`, `zScoreExtreme: 2.0`.
+
+* **2. Bóc tách Toàn Bộ Chuỗi Mô Tả & Luận Điểm Định Lượng (`macroNarratives`)**:
+  - `phaseMeta`: Định danh, mô tả chi tiết, badge màu sắc của 5 pha kinh tế (Recovery, Expansion, Overheating, Slowdown, Recession).
+  - `macroClock`: 4 góc phần tư chu kỳ kinh tế (Goldilocks/Expansion, Overheating, Stagflation, Reflation).
+  - `scenarios`: 3 kịch bản dự phóng thị trường VN-Index (Cơ sở Base 55%, Tích cực Bull 25%, Thận trọng Bear 20%).
+  - `tailRisks`: Danh mục các sự kiện rủi ro đuôi (Áp lực tỷ giá, Căng thẳng liên ngân hàng, Lạm phát đình trệ, Lợi suất TPCP bùng nổ).
+  - `sectorQuadrants`: 4 vùng ma trận thiên thời & định giá GICS (Sweet Spot, Value Trap, Momentum, Defense).
+  - `peBandsAdvice`: Khuyến nghị tỷ trọng Cổ phiếu vs Tiền mặt theo 5 dải P/E lịch sử VN-Index.
+  - `compositeSignals`: 5 mức độ tín hiệu hội tụ định lượng (DEEP VALUE, VALUE BUY, HOLD, TRIM, DEFENSIVE).
+  - `valuationWindows`: Định danh 4 cửa sổ thời gian (5 Năm, 10 Năm, Từ 2007, Toàn Bộ 25 Năm).
+  - `yieldCurveRegimes`: 5 hình thái đường cong lợi suất TPCP (YC0 - YC4).
+  - `transmissionStages`: 5 nấc chuỗi truyền dẫn rủi ro 3 mắt xích (FULL_TRANSMISSION, LIQUIDITY_SQUEEZE, EXTERNAL_TRAPPED, LOCAL_BOTTLENECK, BENIGN_MACRO).
+  - `styleIndices`: 5 phân khúc phong cách đầu tư (VNINDEX, VN30, VNDIAMOND, VNMIDCAP, VN100).
+
+* **3. Động Cơ AI Macro Strategist Copilot 2 Tầng (Two-Tier AI Engine)**:
+  - **Tier 1: Cloud LLM (Gemini 1.5 Pro / OpenAI)**:
+    - Kích hoạt khi có biến môi trường `GEMINI_API_KEY` hoặc `OPENAI_API_KEY`.
+    - Truyền tải toàn bộ bối cảnh vĩ mô thời gian thực vào prompt điều hành, ràng buộc chặt chẽ theo JSON schema chuẩn hóa.
+  - **Tier 2: Built-in Heuristic Quantitative CIO Engine (Offline 100%, 0ms, 0 chi phí)**:
+    - Tự động kích hoạt làm fallback dự phòng khi không có API key hoặc kết nối mạng bị gián đoạn.
+    - Tổng hợp tự động các mối tương quan liên thị trường giữa P/E, Z-Score, Lợi suất thực, Áp lực tỷ giá, Chuỗi truyền dẫn nợ và Nhóm ngành Sweet Spot, sinh bản tin CIO chuyên nghiệp.
+  - **REST API Endpoints (Phục vụ dữ liệu 0ms từ Local JSON)**:
+    - `GET /api/valuation/macro-summary`: Trả về toàn bộ dữ liệu vĩ mô kèm trường `aiInsight` đã tính toán sẵn.
+    - `GET /api/valuation/macro/config`: Trả về toàn bộ thresholds, narratives và cấu hình vĩ mô.
+  - **Cấu trúc trường `aiInsight` trong `macro_valuation.json`**:
+    ```json
+    {
+      "status": "success",
+      "provider": "gemini | openai | offline-heuristic-engine",
+      "model": "Tên mô hình AI (vd: gemini-3.1-flash-lite) hoặc heuristic version",
+      "updatedAt": "ISO 8601 timestamp",
+      "headline": "Tiêu đề chiến lược cô đọng",
+      "executiveSummary": "Đoạn văn 3-4 câu tóm tắt bức tranh vĩ mô và định hướng hành động",
+      "macroRegimeAssessment": "Nhận định về pha chu kỳ, tăng trưởng GDP và lạm phát",
+      "yieldCurveDiagnosis": "Chẩn đoán đường cong lợi suất, chi phí vốn và thanh khoản hệ thống",
+      "sectorActionStrategy": "Chiến lược ngành và nhóm cổ phiếu ưu tiên đón sóng",
+      "assetAllocationAdvice": "Khuyến nghị tỷ trọng Cổ phiếu vs Tiền mặt vs Vàng",
+      "strategicTakeaways": ["Luận điểm 1", "Luận điểm 2", "Luận điểm 3"],
+      "actionPlan": ["Hành động 1", "Hành động 2", "Hành động 3"],
+      "riskAlerts": ["Cảnh báo rủi ro 1", "Cảnh báo rủi ro 2"]
+    }
+    ```
+
+---
+
+### PHÂN HỆ 10: HỆ SINH THÁI AI COPILOT CHUYÊN SÂU & BỘ ĐIỀU PHỐI NỀN (BACKGROUND AI SERVICE)
+> 📘 **Đặc tả chi tiết nguyên lý suy luận, prompts và JSON schemas:** Xem tại [`docs/AI_INSIGHTS_ARCHITECTURE_AND_PROMPTS.md`](file:///Users/thaihai-swe/Desktop/stock/docs/AI_INSIGHTS_ARCHITECTURE_AND_PROMPTS.md).
+
+* **Vị trí lưu trữ**:
+  - Tầng 3 (Daily/Weekly Snapshot JSON): `data/macro_valuation.json` -> trường `aiInsight` (Báo cáo điều hành vĩ mô CIO) và `weeklyPulse` (Bản tin nhịp đập thị trường cuối tuần, commit về Git, phục vụ 0ms).
+  - Tầng 4 (Weekly Market Pulse Cache Backup): `data/ai_insights_cache.json` -> trường `weeklyPulse`.
+  - Tầng 5 (BCTC Snapshot): `data/financials/<MÃ>.json` -> trường `aiDeepDive` (Commit về Git, phục vụ phân tích định giá doanh nghiệp 0ms).
+* **Mục đích & Kiến trúc tối ưu chi phí (Cost-Optimized Background Generation)**:
+  - **Không gọi LLM thời gian thực theo từng cú nhấp chuột trên Client / Web**: Toàn bộ nội dung phân tích vĩ mô, nhịp đập tuần và thẩm định cổ phiếu được sinh trước trong các tác vụ nền định kỳ qua GitHub Actions (`weekly-macro-sync.yml`, `quarterly-bctc-sync.yml`) hoặc CLI `scripts/generate_ai_insights.py`. Daily EOD pipeline không gọi AI để loại bỏ nhiễu ngắn hạn và hoàn tất trong ~5s.
+  - Frontend React đọc kết quả pre-computed ở tốc độ 0ms mà không tốn chi phí API hay chịu rủi ro nghẽn mạng/rate limit/timeout.
+* **Hỗ trợ Đa Nhà Cung Cấp Chuẩn Mực (Multi-Provider Support)**:
+  - **Google Gemini**: Direct REST API (`gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-1.5-flash`, `gemini-3.1-flash-lite`, v.v.) kèm cơ chế **Smart Model Cascade** tự động chuyển model dự phòng khi gặp HTTP 503 / 429.
+  - **OpenAI Standard API**: Hỗ trợ chuẩn `POST /v1/chat/completions`, tương thích 100% với OpenAI (GPT-4o, GPT-4o-mini), DeepSeek, Groq, OpenRouter, vLLM, và Ollama cục bộ. Hỗ trợ tự động xử lý cả JSON và Server-Sent Events (SSE).
+  - **Cấu hình qua Biến Môi Trường (.env & GitHub Actions)**:
+    - `AI_PROVIDER`: `auto` | `gemini` | `openai` | `heuristic`.
+    - `GEMINI_API_KEY`: API key Google Gemini (Lấy miễn phí tại Google AI Studio).
+    - `GEMINI_MODEL`: Tên mô hình Gemini ưu tiên (mặc định: `gemini-2.5-flash`).
+    - `OPENAI_API_KEY`: API key OpenAI / DeepSeek / Groq / OpenRouter.
+    - `OPENAI_MODEL`: Tên mô hình khi sử dụng OpenAI Standard API (ví dụ: `gpt-4o-mini`, `super-vip`).
+    - `OPENAI_BASE_URL`: Base URL chuẩn OpenAI (mặc định: `https://api.openai.com/v1`).
+    - `AI_MODEL`: Tên mô hình LLM chung (dự phòng cho cả hai provider).
+  - **Động cơ Fallback Heuristic 2 Tầng**: Nếu không có API key hoặc LLM gặp sự cố, hệ thống tự động sinh báo cáo phân tích định lượng dựa trên các quy tắc tài chính học thuật (0ms, 0 chi phí, không bao giờ crash).
+
+* **Cấu Trúc Chi Tiết Thẩm Định Cổ Phiếu Chuyên Sâu (`aiDeepDive` trong `data/financials/<MÃ>.json`)**:
+  ```json
+  {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ | 🟡 NẮM GIỮ THEO DÕI | 🔴 CÂN NHẮC HẠ TỶ TRỌNG",
+    "convictionScore": 85,
+    "thesisHeadline": "Tiêu đề luận điểm đầu tư cốt lõi",
+    "valuationConvergenceAnalysis": "Nhận định về biên an toàn MoS% và sự đồng thuận giữa 10 mô hình",
+    "financialHealthCheck": "Đánh giá chất lượng BCTC: F-Score, M-Score, cấu trúc vốn, đòn bẩy D/E",
+    "growthAndMoatAnalysis": "Lợi thế cạnh tranh kinh tế (Economic Moat), động lực tăng trưởng ROE/EPS",
+    "catalysts": [
+      "Động lực xúc tác 1 trong 6-12 tháng tới",
+      "Động lực xúc tác 2"
+    ],
+    "downsideRisks": [
+      "Rủi ro giảm giá 1 cần lưu ý",
+      "Rủi ro giảm giá 2"
+    ],
+    "actionStrategy": "Chiến lược hành động: vùng giá gom, phương pháp DCA, phân bổ tỷ trọng NAV",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "model": "Tên model thực tế",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Nhịp Đập Thị Trường Cuối Tuần (`weeklyPulse` trong `data/macro_valuation.json` & `data/ai_insights_cache.json`)**:
+  ```json
+  {
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "model": "Tên model thực tế",
+    "updatedAt": "ISO 8601 timestamp",
+    "pulseHeadline": "Tiêu đề nhịp đập thị trường tuần cô đọng, bao quát xu hướng tuần",
+    "weeklySummary": "Đoạn văn 3-4 câu tóm tắt bức tranh giao dịch tuần, biến động điểm số VN-Index, thanh khoản và tâm lý chung",
+    "institutionalFlow": "Đánh giá chi tiết dòng tiền tổ chức (Khối ngoại, tự doanh) trong cả tuần",
+    "keyDevelopments": [
+      "Diễn biến 1 trọng yếu trong tuần",
+      "Diễn biến 2",
+      "Diễn biến 3"
+    ],
+    "weeklyLeadingSectors": [
+      "Nhóm ngành dẫn dắt hút tiền mạnh nhất tuần",
+      "Nhóm ngành phòng thủ / điều chỉnh"
+    ],
+    "nextWeekOutlook": "Kịch bản dự phóng và xu hướng vận động của thị trường cho tuần giao dịch tiếp theo",
+    "actionableAdvice": "Chiến lược hành động khuyến nghị cho nhà đầu tư (tỷ trọng cổ phiếu, phương pháp DCA, quản trị rủi ro)"
+  }
+  ```
+
+* **Cấu Trúc Phân Tích Tin Tức & Động Lực Tăng Trưởng NLP (`aiNewsAnalysis` trong `financials.newsDigest`)**:
+  ```json
+  {
+    "overallSentiment": "Tích Cực | Trung Tính | Thận Trọng",
+    "sentimentScore": 65,
+    "executiveSummary": "Đoạn văn 2-3 câu tổng hợp sắc thái truyền thông 30 ngày qua",
+    "catalysts": [
+      "Động lực tăng trưởng kinh doanh 1",
+      "Động lực 2"
+    ],
+    "keyRisks": [
+      "Rủi ro pháp lý/thị trường 1",
+      "Rủi ro 2"
+    ],
+    "catalystTimeline": "Ngắn hạn (1-3 tháng) | Trung hạn (6-12 tháng)",
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Chẩn Đoán Kiểm Toán Pháp Y & Chất Lượng ROE (`aiAuditComment` trong `financials.forensicAnalysis`)**:
+  ```json
+  {
+    "auditVerdict": "Sạch Sẽ & Minh Bạch | Cần Lưu Ý Kế Toán | Rủi Ro Thao Túng BCTC",
+    "forensicDiagnosis": "Chẩn đoán chi tiết các biến số Beneish M-Score bất thường (DSRI, AQI, TATA) và tính minh bạch của BCTC",
+    "dupontEarningsQuality": "Đánh giá chất lượng ROE: Thực chất từ biên ròng & vòng quay tài sản hay từ thủ thuật đòn bẩy nợ vay",
+    "auditorChecklist": [
+      "Câu hỏi kiểm toán chất vấn Ban Điều Hành tại ĐHCĐ 1",
+      "Câu hỏi chất vấn 2"
+    ],
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Luận Giải Hội Tụ Định Giá & Độ Nhạy (`aiConvergence` trong `financials.valuationMultiples`)**:
+  ```json
+  {
+    "convergenceHeadline": "Tiêu đề luận điểm hội tụ định giá ngắn gọn",
+    "divergenceExplanation": "Giải thích lý do phân kỳ giữa DCF và các bội số P/E, P/B dựa trên chu kỳ tái đầu tư CapEx",
+    "sensitivityStory": "Mô phỏng thử tải: Nếu chi phí vốn WACC tăng 1.5% do lãi suất thì biên an toàn MoS biến động ra sao",
+    "preferredModelRecommendation": "Khuyến nghị mô hình định giá tin cậy nhất cho phân ngành đặc thù",
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Dẫn Truyền Vĩ Mô Vào 10 Nhóm Ngành (`sectorTransmission` trong `data/macro_valuation.json`)**:
+  ```json
+  {
+    "transmissionHeadline": "Tiêu đề thông điệp dẫn truyền vĩ mô vào ngành",
+    "beneficiarySectors": [
+      "Nhóm ngành hưởng lợi 1 kèm lý do dẫn truyền",
+      "Nhóm ngành 2"
+    ],
+    "pressuredSectors": [
+      "Nhóm ngành chịu áp lực chi phí vốn/tỷ giá 1",
+      "Nhóm ngành 2"
+    ],
+    "portfolioAction": "Khuyến nghị luân chuyển danh mục thực chiến",
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Danh Sách API Endpoints Backend Express (Phục vụ tĩnh 0ms từ JSON)**:
+  - `GET /api/valuation/macro-summary`: Đọc `data/macro_valuation.json`, trả về kèm `aiInsight`, `weeklyPulse`, và `sectorTransmission`.
+  - `GET /api/valuation/financials/:symbol`: Đọc `data/financials/<MÃ>.json`, trả về kèm `aiDeepDive`, `newsDigest.aiNewsAnalysis`, `forensicAnalysis.aiAuditComment`, và `valuationMultiples.aiConvergence`.
+
+* **CLI Python Đồng Bộ Dữ Liệu AI (`scripts/generate_ai_insights.py`)**:
+  ```bash
+  # 1. Sinh nhận định Vĩ mô CIO
+  .venv/bin/python scripts/generate_ai_insights.py --scope macro
+
+  # 2. Sinh nhận định Nhịp Đập Thị Trường Cuối Tuần
+  .venv/bin/python scripts/generate_ai_insights.py --scope weekly_market
+
+  # 3. Sinh cả Vĩ mô CIO + Nhịp Đập Cuối Tuần
+  .venv/bin/python scripts/generate_ai_insights.py --scope weekly
+
+  # 4. Sinh nhận định Cổ phiếu Deep-Dive (cho 1 hoặc nhiều mã)
+  .venv/bin/python scripts/generate_ai_insights.py --scope stocks --symbols HPG,VNM,TCB
+
+  # 5. Sinh toàn bộ (Vĩ mô + Nhịp đập tuần + Tất cả cổ phiếu trong danh mục)
+  .venv/bin/python scripts/generate_ai_insights.py --scope all
+  ```
+
+---
+
+### PHÂN HỆ 9: QUY CHUẨN ĐỊNH DANH TRÍ TUỆ NHÂN TẠO & THUẬT TOÁN ĐỊNH LƯỢNG TRÊN GIAO DIỆN (UI INTELLIGENCE BADGING: AI VS HEURISTIC)
+
+Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử dụng, hệ thống phân định rạch ròi 100% nguồn gốc của mọi nhận định, phân tích và khuyến nghị hiển thị trên giao diện:
+
+| Thẻ Định Danh (Badge) | Màu Sắc & Nhận Diện | Định Nghĩa & Phạm Vi Áp Dụng | Cơ Chế Phân Giải Dữ Liệu |
+| :--- | :--- | :--- | :--- |
+| **`AI`** *(Trí Tuệ Nhân Tạo)* | Tím / Indigo (`bg-purple-100 text-purple-700 dark:bg-purple-950/90 dark:text-purple-300 border-purple-300/80`) | Nhận định ngôn ngữ tự nhiên được sinh bởi Large Language Model (OpenAI hoặc Google Gemini). Giao diện hiển thị nhãn tinh gọn `AI`, không hiển thị tên vendor hay model để giữ giao diện trung lập và chuyên nghiệp. Tooltip: *"Trí tuệ nhân tạo (AI Copilot)"*. | Đọc trường `provider`: chỉ hiển thị khi `provider === 'openai'` hoặc `provider === 'gemini'`. |
+| **`H`** *(Heuristic & Định Lượng)* | Hổ phách / Amber (`bg-amber-100 text-amber-800 dark:bg-amber-950/90 dark:text-amber-300 border-amber-300/80`) | Công thức toán học định lượng tài chính, mô hình xác suất thống kê (DCF, Graham, Beneish, Altman Z, Dupont, Volume Profile, VaR), thuật toán phân loại dữ liệu, hoặc kịch bản dự phòng offline engine. Tooltip: *"Mô hình định lượng Heuristic / Thuật toán tài chính quy tắc"*. | Hiển thị cố định cho các khối định lượng toán học, hoặc **tự động chuyển đổi động** khi AI gặp sự cố (`provider === 'offline-heuristic-engine'`). |
+
+#### Cơ Chế Tự Động Chuyển Đổi Động (Dynamic Fallback Detection):
+* Component chuẩn [`src/components/common/IntelligenceBadge.jsx`](file:///Users/thaihai-swe/Desktop/stock/src/components/common/IntelligenceBadge.jsx) cung cấp hàm trợ năng `getIntelligenceSource(data)`:
+  * Nếu `data?.provider === 'openai' || data?.provider === 'gemini'` -> Trả về `{ type: 'ai', provider, isFallback: false }` -> Hiển thị badge `AI` kèm tooltip *"Trí tuệ nhân tạo (AI Copilot)"*.
+  * Nếu `data?.provider === 'offline-heuristic-engine'` hoặc không có AI metadata -> Trả về `{ type: 'heuristic', isFallback: true }` -> Tự động chuyển sang badge `H` kèm tooltip *"Mô hình định lượng Heuristic & Thuật toán tài chính quy tắc"*.
+  * **Lưu ý**: Thông tin kỹ thuật `provider` và `model` được bảo toàn nguyên vẹn trong JSON cho mục đích kiểm toán dữ liệu và phân giải fallback, nhưng được loại bỏ 100% khỏi lớp hiển thị UI người dùng.
+
+#### Bản Đồ Phân Phối Thẻ Trí Tuệ Trên Toàn Giao Diện:
+1. **Tab Phân Tích Vĩ Mô (`MacroDashboard.jsx`)**:
+   - `ExecutiveSummaryCard.jsx`:
+     - Tab 1: *Chiến Lược CIO* -> `AI` / `H` động.
+     - Tab 2: *Nhịp Đập Tuần* -> `AI` / `H` động.
+     - Tab 3: *Tổng Hợp 4 Trụ Cột* -> `H` (Tổng hợp quy chuẩn kinh tế).
+   - `MacroValuationWindowCard.jsx`: *Định Giá P/E Bands 5Y & Nhiệt Kế Thị Trường* -> `H`.
+   - `MacroRegimeRadarSection.jsx`: *Ma Trận Kịch Bản, Đồng Hồ Chu Kỳ, Pha Tăng Trưởng & Độ Lệch Pha* -> `H`.
+   - `SectorValuationHeatmap.jsx`: *Bản Đồ Nhiệt & Luân Chuyển 10 Ngành GICS* -> `H`.
+   - `MacroAllocationGoldSection.jsx`: *Phân Bổ Tài Sản Động & Arbitrage Giá Vàng* -> `H`.
+   - `YieldCurveMonitorCard.jsx`: *Đường Cong Lợi Suất & Rủi Ro Đảo Ngược* -> `H`.
+   - `ScenarioAllocationMatrix.jsx`: *Ma Trận Phân Bổ Danh Mục 3 Kịch Bản* -> `H`.
+   - `OpportunityCostCard.jsx`: *So Sánh Chi Phí Cơ Hội Lãi Suất Tiết Kiệm* -> `H`.
+
+2. **Tab Định Giá & Phân Tích Chuyên Sâu Cổ Phiếu (`ValuationDashboard.jsx`)**:
+   - `StockCockpitHeader.jsx`:
+     - *CFA Equity Research Copilot* -> `AI` / `H` động.
+     - *Consensus Fair Value (Giá trị nội tại hội tụ)* -> `H`.
+   - `FullResearchReportModal.jsx`:
+     - Chương 1: *CFA Investment Thesis* -> `AI` / `H` động.
+     - Chương 2: *10 Mô Hình Định Lượng & Độ Nhạy* -> `H`.
+     - Chương 3: *Gian Lận BCTC Beneish M-Score* -> `H`.
+     - Chương 4: *Công Thức Kỳ Diệu Joel Greenblatt* -> `H`.
+     - Chương 5: *Dòng Tiền Tự Do FCF & Biến Số Kế Toán Accruals* -> `H`.
+     - Chương 6: *Extended DuPont 5-Factor CFA* -> `H`.
+     - Chương 7: *Sức Khỏe Tài Chính (Altman Z & Piotroski F)* -> `H`.
+     - Chương 8: *Cấu Trúc Khối Lượng Volume Profile & Wyckoff* -> `H`.
+     - Chương 9: *Đo Lường Rủi Ro Định Lượng (VaR & Sharpe)* -> `H`.
+     - Chương 10: *Tổng Hợp Tin Tức & Khảo Sát Tâm Lý NLP* -> `H`.
+   - Các Thẻ Định Lượng Độc Lập:
+     - `ValuationSevenZonesCard.jsx`: *7 Vùng Biên An Toàn* -> `H`.
+     - `ValuationTrapsCard.jsx`: *Nhận Diện 5 Bẫy Giá Trị* -> `H`.
+     - `DcfValuationCard.jsx`: *DCF Chiết Khấu Dòng Tiền 3 Kịch Bản* -> `H`.
+     - `ForensicAccountingCard.jsx`: *Kế Toán Pháp Y & M-Score* -> `H`.
+     - `FinancialHealthCard.jsx`: *Khám Sức Khỏe Altman Z & Piotroski F* -> `H`.
+     - `ExtendedDupontCard.jsx`: *DuPont 5 Nhân Tố Phân Rã ROE* -> `H`.
+     - `FinValLabCard.jsx`: *Phòng Thí Nghiệm Tài Chính Định Lượng* -> `H`.
+     - `DividendSustainabilityCard.jsx`: *Bền Vững Cổ Tức Tiền Mặt* -> `H`.
+     - `NewsSentimentCard.jsx`: *Phân Tích Cảm Xúc Tin Tức Báo Chí* -> `H`.
+     - `HistoricalValuationBandCard.jsx`: *Dải Băng Phân Vị P25-P50-P75 5Y* -> `H`.
+     - `IndustrySpecificCard.jsx`: *Chỉ Số Đặc Thù Ngành Nghề GICS* -> `H`.
+     - `StockRiskMetricsCard.jsx`: *Đo Lường Biến Động, VaR & Drawdown* -> `H`.
+     - `MarketProfileCard.jsx`: *15-Block Market Profile & VAP* -> `H`.
+     - `ValuationFormulasDeconstructionCard.jsx`: *Giải Phẫu 10 Công Thức Toán Học* -> `H`.
+
+
+
+

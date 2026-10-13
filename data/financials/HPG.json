@@ -606,7 +606,17 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 42352
+    "impliedFcfYieldPrice": 42352,
+    "aiConvergence": {
+      "convergenceHeadline": "Phân kỳ định giá cực đại do hiệu ứng chu kỳ CapEx: Đỉnh điểm đầu tư Dung Quất 2 làm méo mó dòng tiền ngắn hạn",
+      "divergenceExplanation": "Khoảng cách lớn giữa các mô hình bắt nguồn từ đặc thù chu kỳ vốn của HPG. DCF (58.287) và RIM (52.783) phản ánh giá trị tương lai khi dự án Dung Quất 2 hoàn thành và tối ưu hóa quy mô công suất, tạo ra dòng tiền đột biến dài hạn. Ngược lại, FCFE (3.130) và DDM (6.728) bị nén xuống mức tối thiểu do doanh nghiệp đang trong chu kỳ giải ngân tài sản cố định khổng lồ (ước tính ~85.000 tỷ VND), dòng tiền tự do cho cổ đông tạm thời âm/thấp và chính sách cổ tức chuyển dịch sang cổ phiếu để giữ lại vốn. Trong khi đó, P/E chuẩn hóa (38.500) và P/B (30.505) đóng vai trò là 'mỏ neo giá trị trung tính', phản ánh đúng giá trị thay thế của tài sản và năng lực sinh lời xuyên chu kỳ (through-the-cycle earnings) mà không bị nhiễu bởi biến động dòng tiền tức thời.",
+      "sensitivityStory": "Thực hiện stress-test kịch bản vĩ mô bất lợi: Khi WACC tăng 1.5% (từ 10.5% lên 12.0%) do mặt bằng lãi suất gia tăng hoặc rủi ro ngành thép tăng cao, kết hợp tăng trưởng dài hạn (g) giảm 1.0% (từ 3.0% về 2.0%), định giá DCF sẽ sụt giảm từ 58.287 xuống vùng 43.500 - 45.000 (-23% đến -25%). Sự suy giảm này trực tiếp kéo giá trị hợp lý bình quân theo trọng số giảm khoảng 12-14%, khiến biên an toàn (Margin of Safety) hiện tại từ mức 27.1% co hẹp về vùng 11.5% - 13.0%, tiệm cận ngưỡng rủi ro biến động giá nguyên vật liệu (quặng sắt, than cốc) và rủi ro hấp thụ thị trường HRC.",
+      "preferredModelRecommendation": "Khuyến nghị kết hợp mô hình P/B chuẩn hóa dựa trên ROE mục tiêu (Gordon Growth Framework) với tỷ trọng 40%, P/E chuẩn hóa xuyên chu kỳ (30%) và DCF điều chỉnh sau năm vận hành thương mại Dung Quất 2 (30%). Loại bỏ hoàn toàn FCFE và DDM trong giai đoạn 2024-2026 vì tính thâm dụng vốn cao làm sai lệch bản chất năng lực tạo giá trị của doanh nghiệp sản xuất đầu ngành.",
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -3292,6 +3302,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 0,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của HPG duy trì trạng thái trung tính, phản ánh sự ổn định trong hoạt động kinh doanh cốt lõi và thanh khoản thị trường.",
+      "catalysts": [
+        "Kỳ vọng tăng trưởng sản lượng và mở rộng thị phần trong các quý tới.",
+        "Tiến độ giải ngân các dự án trọng điểm và kế hoạch trả cổ tức tiền mặt."
+      ],
+      "keyRisks": [
+        "Biến động giá nguyên vật liệu đầu vào và sức ép cạnh tranh trong ngành.",
+        "Rủi ro thị trường chung và sự đảo chiều dòng vốn khối ngoại."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "status": "success",
+      "provider": "offline-heuristic-engine",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
   },
   "beneishMScore": {
@@ -3530,6 +3557,41 @@
       "latestCfo": 5825.0,
       "latestCapex": 7034.0,
       "constructionInProgress": 13987.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Dù Altman Z-Score đạt 3.0 thể hiện nền tảng tài chính an toàn tuyệt đối, điểm Beneish M-Score ở mức -1.56 (> -1.78) đã chạm ngưỡng cờ đỏ kỹ thuật về rủi ro thao túng số liệu. Sự bất thường này chủ yếu bắt nguồn từ chỉ số chất lượng tài sản (AQI) và kế toán dồn tích (TATA) bị phình to do quy mô vốn hóa chi phí xây dựng dở dang và tồn kho lớn trong chu kỳ đầu tư dự án Dung Quất. Tính minh bạch doanh thu (DSRI) không có dấu hiệu ảo hóa, nhưng việc ghi nhận tài sản dài hạn cần được giám sát nghiêm ngặt.",
+      "dupontEarningsQuality": "Chất lượng ROE 18.01% có tính thực chất rất cao nhờ biên hoạt động cốt lõi vượt trội (EBIT đạt 15.34%) kết hợp với tối ưu hóa gánh nặng thuế, hoàn toàn không phụ thuộc vào thủ thuật lạm dụng đòn bẩy tài chính (hệ số đòn bẩy duy trì ở mức an toàn 1.97x). Hiệu suất ROE tạm thời bị kìm hãm bởi vòng quay tài sản ở mức 0.79x do tổng tài sản mở rộng nhanh hơn doanh thu trong giai đoạn thi công đại dự án.",
+      "auditorChecklist": [
+        "Đề nghị Ban Lãnh đạo thuyết minh chi tiết tiêu chuẩn vốn hóa chi phí đi vay và chi phí chạy thử vào tài sản dở dang tại Dung Quất, liệu có hiện tượng trì hoãn ghi nhận chi phí sản xuất để nâng đỡ biên EBIT?",
+        "Chênh lệch dồn tích (accruals) giữa lợi nhuận thuần và dòng tiền hoạt động kinh doanh (CFO) xuất phát từ chiến lược gia tăng tồn kho nguyên liệu hay do áp lực phải nới lỏng chính sách công nợ cho các đại lý phân phối?"
+      ],
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
+  },
+  "aiDeepDive": {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ",
+    "convictionScore": 88,
+    "thesisHeadline": "Vị thế đầu ngành thép bứt phá chu kỳ tăng trưởng mới nhờ Dung Quất 2 và định giá P/E 7.5x hấp dẫn",
+    "valuationConvergenceAnalysis": "Sự hội tụ từ các mô hình định lượng (DCF, RIM, P/E, P/B tương đối) xác lập vùng giá trị hợp lý của HPG dao động từ 26.990 - 31.251 VNĐ/cổ phiếu. Mức thị giá hiện tại đặt cổ phiếu nằm trọn trong 'Vùng Mua An Toàn' (Buy Zone: 21.308 - 24.148 VNĐ) với Biên an toàn (Margin of Safety - MoS) đạt 27,1%. Định giá P/B ở mức 1,35x là vùng chiết khấu đáng kể đối với một doanh nghiệp có ROE duy trì mạnh mẽ ở mức 18,16% (vượt xa chi phí vốn chủ sở hữu CoE ước tính 11-12%), phản ánh tiềm năng sinh lời thặng dư kinh tế (Economic Value Added) bền vững.",
+    "trapAssessment": "Hệ thống ghi nhận điểm rủi ro bẫy định giá tuyệt đối an toàn (Trap Score: 0,0 - THẤP). Bẫy giá trị (Value Trap) và bẫy giá trị sổ sách (Book Trap) hoàn toàn bị loại trừ khi biên lợi nhuận ròng cải thiện đạt 11,65% và ROE duy trì vượt trội. Mặc dù nợ ròng đạt 61.274 tỷ VNĐ do đang trong chu kỳ Capex lớn cho Dung Quất 2, tỷ lệ Đòn bẩy D/E ở mức 0,70x và hệ số thanh toán hiện hành 1,68x khẳng định cấu trúc vốn được kiểm soát thận trọng, không có dấu hiệu căng thẳng thanh khoản hay rủi ro đỉnh chu kỳ.",
+    "catalysts": [
+      "Đại dự án Khu liên hợp Gang thép Dung Quất 2 vận hành thương mại từng phần giai đoạn 2024-2025, nâng công suất thép thô thêm 5,6 triệu tấn HRC chất lượng cao/năm (+66% tổng công suất).",
+      "Tiến trình áp thuế chống bán phá giá đối với HRC nhập khẩu từ Trung Quốc và Ấn Độ tạo lá chắn bảo hộ thị phần nội địa và cải thiện biên lợi nhuận gộp.",
+      "Làn sóng giải ngân đầu tư công các dự án hạ tầng trọng điểm cùng sự hồi phục của thị trường bất động sản dân dụng kích hoạt sức cầu tiêu thụ thép xây dựng."
+    ],
+    "keyRisks": [
+      "Biến động bất lợi của giá nguyên liệu đầu vào then chốt (quặng sắt, than mỡ coke) và áp lực bán tháo thép giá rẻ từ Trung Quốc trước khi hàng rào thuế quan phát huy tác dụng.",
+      "Tiến độ hấp thụ sản lượng HRC mới từ Dung Quất 2 chậm hơn dự kiến nếu nhu cầu thị trường xuất khẩu và tiêu dùng nội địa suy yếu.",
+      "Áp lực chi phí tài chính và khấu hao tài sản cố định tăng mạnh trong giai đoạn đầu vận hành dự án mới."
+    ],
+    "targetPriceHorizon12M": "31.500",
+    "status": "success",
+    "provider": "openai",
+    "model": "super-vip",
+    "updatedAt": "2026-10-13T16:21:30.900791+00:00"
   }
 }

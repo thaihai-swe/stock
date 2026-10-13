@@ -1,4 +1,5 @@
 import ExecutiveSummaryCard from './ExecutiveSummaryCard.jsx';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function MacroRegimeRadarSection({
   macroData = {},
@@ -16,7 +17,11 @@ export default function MacroRegimeRadarSection({
   return (
     <div className="space-y-6">
       {/* ── 1. BÁO CÁO ĐIỀU HÀNH TRỌNG YẾU (EXECUTIVE SUMMARY) ── */}
-      <ExecutiveSummaryCard executiveSummary={macroData?.executiveSummary} />
+      <ExecutiveSummaryCard
+        executiveSummary={macroData?.executiveSummary}
+        aiInsight={macroData?.aiInsight}
+        weeklyPulse={macroData?.weeklyPulse}
+      />
 
       {/* ── 2. CẢNH BÁO TAIL-RISKS NẾU ĐƯỢC KÍCH HOẠT ── */}
       {hasActiveTailRisk && tailRisks?.length > 0 && (
@@ -60,9 +65,12 @@ export default function MacroRegimeRadarSection({
       <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-5 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-slate-800">
           <div>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              Dự Phóng Vĩ Mô & Định Lượng Kịch Bản (Scenario Matrix)
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                Dự Phóng Vĩ Mô & Định Lượng Kịch Bản (Scenario Matrix)
+              </span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình dự phóng xác suất 3 kịch bản VN-Index & phân bổ ngành" />
+            </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
               3 Kịch Bản Định Giá VN-Index & Phân Bổ Ngành
             </h3>
@@ -206,9 +214,12 @@ export default function MacroRegimeRadarSection({
       <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-5 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-slate-800">
           <div>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              Đồng Hồ Vĩ Mô (Macro Clock Framework)
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                Đồng Hồ Vĩ Mô (Macro Clock Framework)
+              </span>
+              <IntelligenceBadge type="heuristic" tooltip="Khung lý thuyết Macro Clock 4 góc phần tư GDP vs Lạm phát" />
+            </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
               4 Góc Phần Tư Tăng Trưởng GDP & Lạm Phát
             </h3>
@@ -219,117 +230,93 @@ export default function MacroRegimeRadarSection({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {/* Q1: Goldilocks / Expansion */}
-          <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-            macroClock?.quadrantKey === 'expansion' || macroClock?.quadrantKey === 'goldilocks'
-              ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 shadow-xs'
-              : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
-          }`}>
-            <div className="flex items-center justify-between">
-              <span className="text-lg">🌟</span>
-              {(macroClock?.quadrantKey === 'expansion' || macroClock?.quadrantKey === 'goldilocks') && (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase">
-                  Đang Ở Đây
-                </span>
-              )}
-            </div>
-            <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
-              Tăng Trưởng Vững Vàng (Goldilocks)
-            </div>
-            <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-              GDP Tăng Trưởng Cao &bull; Lạm Phát Ổn Định
-            </div>
-            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-              Môi trường lý tưởng nhất cho thị trường chứng khoán. Lợi nhuận doanh nghiệp tăng trưởng mạnh.
-            </p>
-            <div className="mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] text-emerald-700 dark:text-emerald-300">
-              <b>Ngành ưu tiên:</b> Ngân hàng, Chứng khoán, Bán lẻ, Công nghệ
-            </div>
-          </div>
-
-          {/* Q2: Overheating */}
-          <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-            macroClock?.quadrantKey === 'overheating'
-              ? 'bg-amber-50/70 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xs'
-              : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
-          }`}>
-            <div className="flex items-center justify-between">
-              <span className="text-lg">🔥</span>
-              {macroClock?.quadrantKey === 'overheating' && (
-                <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-[10px] font-black uppercase">
-                  Đang Ở Đây
-                </span>
-              )}
-            </div>
-            <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
-              Quá Nhiệt / Tăng Tốc (Overheating)
-            </div>
-            <div className="text-xs font-bold text-amber-600 dark:text-amber-400 mt-1">
-              GDP Tăng Trưởng Tốt &bull; Lạm Phát Tăng Cao
-            </div>
-            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-              Sản xuất sôi động nhưng chi phí vốn bắt đầu tăng. Lợi nhuận phân hóa mạnh giữa các nhóm ngành.
-            </p>
-            <div className="mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] text-amber-700 dark:text-amber-300">
-              <b>Ngành ưu tiên:</b> Bất động sản, Thép, Hóa chất, Năng lượng
-            </div>
-          </div>
-
-          {/* Q3: Stagflation */}
-          <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-            macroClock?.quadrantKey === 'stagflation'
-              ? 'bg-rose-50/70 dark:bg-rose-950/30 border-2 border-rose-500 shadow-xs'
-              : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
-          }`}>
-            <div className="flex items-center justify-between">
-              <span className="text-lg">⚠️</span>
-              {macroClock?.quadrantKey === 'stagflation' && (
-                <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black uppercase">
-                  Đang Ở Đây
-                </span>
-              )}
-            </div>
-            <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
-              Đình Lạm (Stagflation)
-            </div>
-            <div className="text-xs font-bold text-rose-600 dark:text-rose-400 mt-1">
-              GDP Chậm Lại &bull; Lạm Phát Neo Cao
-            </div>
-            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-              Kịch bản rủi ro: chi phí đầu vào tăng xói mòn biên lợi nhuận trong khi sức mua sụt giảm.
-            </p>
-            <div className="mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] text-rose-700 dark:text-rose-300">
-              <b>Phòng thủ:</b> Tiện ích, Dược phẩm, Tiền mặt, Vàng
-            </div>
-          </div>
-
-          {/* Q4: Reflation */}
-          <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-            macroClock?.quadrantKey === 'reflation'
-              ? 'bg-blue-50/70 dark:bg-blue-950/30 border-2 border-blue-500 shadow-xs'
-              : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
-          }`}>
-            <div className="flex items-center justify-between">
-              <span className="text-lg">🌱</span>
-              {macroClock?.quadrantKey === 'reflation' && (
-                <span className="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase">
-                  Đang Ở Đây
-                </span>
-              )}
-            </div>
-            <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
-              Phục Hồi / Bơm Tiền (Reflation)
-            </div>
-            <div className="text-xs font-bold text-blue-600 dark:text-blue-400 mt-1">
-              GDP Tạo Đáy &bull; Lạm Phát Hạ Nhiệt
-            </div>
-            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-              Chính sách tiền tệ nới lỏng tạo thanh khoản dồi dào, định giá cổ phiếu phục hồi từ vùng trũng.
-            </p>
-            <div className="mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] text-blue-700 dark:text-blue-300">
-              <b>Ngành ưu tiên:</b> Chứng khoán, Công nghệ, Bán lẻ, Xây dựng
-            </div>
-          </div>
+          {[
+            {
+              key: 'expansion',
+              aliases: ['expansion', 'goldilocks'],
+              icon: '🌟',
+              title: 'Tăng Trưởng Vững Vàng (Goldilocks)',
+              sub: 'GDP Tăng Trưởng Cao • Lạm Phát Ổn Định',
+              desc: 'Môi trường lý tưởng nhất cho thị trường chứng khoán. Lợi nhuận doanh nghiệp tăng trưởng mạnh.',
+              sectors: 'Ngân hàng, Chứng khoán, Bán lẻ, Công nghệ',
+              activeClass: 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 shadow-xs',
+              badgeBg: 'bg-emerald-600',
+              subColor: 'text-emerald-600 dark:text-emerald-400',
+              sectorColor: 'text-emerald-700 dark:text-emerald-300'
+            },
+            {
+              key: 'overheating',
+              aliases: ['overheating'],
+              icon: '🔥',
+              title: 'Quá Nhiệt / Tăng Tốc (Overheating)',
+              sub: 'GDP Tăng Trưởng Tốt • Lạm Phát Tăng Cao',
+              desc: 'Sản xuất sôi động nhưng chi phí vốn bắt đầu tăng. Lợi nhuận phân hóa mạnh giữa các nhóm ngành.',
+              sectors: 'Bất động sản, Thép, Hóa chất, Năng lượng',
+              activeClass: 'bg-amber-50/70 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xs',
+              badgeBg: 'bg-amber-600',
+              subColor: 'text-amber-600 dark:text-amber-400',
+              sectorColor: 'text-amber-700 dark:text-amber-300'
+            },
+            {
+              key: 'stagflation',
+              aliases: ['stagflation'],
+              icon: '⚠️',
+              title: 'Đình Lạm (Stagflation)',
+              sub: 'GDP Chậm Lại • Lạm Phát Neo Cao',
+              desc: 'Kịch bản rủi ro: chi phí đầu vào tăng xói mòn biên lợi nhuận trong khi sức mua sụt giảm.',
+              sectors: 'Tiện ích, Dược phẩm, Tiền mặt, Vàng',
+              activeClass: 'bg-rose-50/70 dark:bg-rose-950/30 border-2 border-rose-500 shadow-xs',
+              badgeBg: 'bg-rose-600',
+              subColor: 'text-rose-600 dark:text-rose-400',
+              sectorColor: 'text-rose-700 dark:text-rose-300'
+            },
+            {
+              key: 'reflation',
+              aliases: ['reflation'],
+              icon: '🌱',
+              title: 'Phục Hồi / Bơm Tiền (Reflation)',
+              sub: 'GDP Tạo Đáy • Lạm Phát Hạ Nhiệt',
+              desc: 'Chính sách tiền tệ nới lỏng tạo thanh khoản dồi dào, định giá cổ phiếu phục hồi từ vùng trũng.',
+              sectors: 'Chứng khoán, Công nghệ, Bán lẻ, Xây dựng',
+              activeClass: 'bg-blue-50/70 dark:bg-blue-950/30 border-2 border-blue-500 shadow-xs',
+              badgeBg: 'bg-blue-600',
+              subColor: 'text-blue-600 dark:text-blue-400',
+              sectorColor: 'text-blue-700 dark:text-blue-300'
+            }
+          ].map((q) => {
+            const isCurrent = q.aliases.includes(macroClock?.quadrantKey);
+            return (
+              <div
+                key={q.key}
+                className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                  isCurrent
+                    ? q.activeClass
+                    : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-lg">{q.icon}</span>
+                  {isCurrent && (
+                    <span className={`px-2 py-0.5 rounded-full ${q.badgeBg} text-white text-[10px] font-black uppercase`}>
+                      Đang Ở Đây
+                    </span>
+                  )}
+                </div>
+                <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
+                  {q.title}
+                </div>
+                <div className={`text-xs font-bold ${q.subColor} mt-1`}>
+                  {q.sub}
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                  {q.desc}
+                </p>
+                <div className={`mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] ${q.sectorColor}`}>
+                  <b>Ngành ưu tiên:</b> {q.sectors}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Current Position Note */}
@@ -349,9 +336,12 @@ export default function MacroRegimeRadarSection({
       <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-6 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-slate-800">
           <div>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              Mô Hình Nhận Diện Chu Kỳ Kinh Tế (5 Phases)
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                Mô Hình Nhận Diện Chu Kỳ Kinh Tế (5 Phases)
+              </span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình nhận diện 5 pha chu kỳ kinh tế từ 6 động lực vĩ mô" />
+            </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
               Định Danh Pha Kinh Tế: <span className="text-indigo-600 dark:text-indigo-400">{regime.titleVi}</span>
             </h3>
@@ -484,9 +474,12 @@ export default function MacroRegimeRadarSection({
         <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                Độ Lệch Sớm - Trễ (Lead-Lag Divergence)
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                  Độ Lệch Sớm - Trễ (Lead-Lag Divergence)
+                </span>
+                <IntelligenceBadge type="heuristic" tooltip="Định lượng độ lệch sớm - trễ giữa thị trường tài chính và kinh tế thực" />
+              </div>
               <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-slate-100 mt-0.5">
                 Thị Trường Tài Chính vs Kinh Tế Thực
               </h3>

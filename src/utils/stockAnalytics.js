@@ -1,8 +1,39 @@
+import {
+  DEFAULT_BANK_INTEREST_RATE,
+  VNINDEX_VOLATILITY,
+  SHARPE_BRACKETS,
+  DOWNSIDE_DEVIATION_PARAMS,
+} from './constants.js';
+
 /**
  * Engine Phân Tích Lãi / Lỗ Tích Luỹ Theo Từng Mã Cổ Phiếu (Per-Stock Cumulative P&L Engine)
  */
 
-export function computeStockPerformance(buyOrders = [], sellOrders = [], dividends = [], marketPrices = {}) {
+export function computeStockPerformance(buyOrders = [], sellOrders = [], dividends = [], marketPrices = {}, options = {}) {
+  const { startDate = '', endDate = '' } = options;
+  const isPeriodFilterActive = Boolean(startDate || endDate);
+
+  // Bộ lọc ngày chuẩn YYYY-MM-DD
+  const isDateInPeriod = (dateStr) => {
+    if (!isPeriodFilterActive) return true;
+    const d = dateStr ? String(dateStr).slice(0, 10) : '';
+    if (startDate && d < startDate) return false;
+    if (endDate && d > endDate) return false;
+    return true;
+  };
+
+  const periodSellOrders = isPeriodFilterActive
+    ? sellOrders.filter(s => isDateInPeriod(s.date))
+    : sellOrders;
+
+  const periodDividends = isPeriodFilterActive
+    ? dividends.filter(d => isDateInPeriod(d.date))
+    : dividends;
+
+  const periodBuyOrders = isPeriodFilterActive
+    ? buyOrders.filter(b => isDateInPeriod(b.date))
+    : buyOrders;
+
   // 1. Gom nhóm danh sách các mã duy nhất từng xuất hiện
   const symbolSet = new Set();
   buyOrders.forEach(b => b.symbol && symbolSet.add(b.symbol.toUpperCase()));
@@ -12,20 +43,38 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
   const allSymbols = Array.from(symbolSet).sort();
 
   // 2. Tính toán chi tiết cho từng mã cổ phiếu
-  const stockList = allSymbols.map(symbol => {
-    const symbolBuys = buyOrders.filter(b => b.symbol?.toUpperCase() === symbol);
-    const symbolSells = sellOrders.filter(s => s.symbol?.toUpperCase() === symbol);
-    const symbolDivs = dividends.filter(d => d.symbol?.toUpperCase() === symbol);
+  const rawStockList = allSymbols.map(symbol => {
+    const allSymbolBuys = buyOrders.filter(b => b.symbol?.toUpperCase() === symbol);
+    const symbolBuysInPeriod = periodBuyOrders.filter(b => b.symbol?.toUpperCase() === symbol);
+    const symbolSells = periodSellOrders.filter(s => s.symbol?.toUpperCase() === symbol);
+    const symbolDivs = periodDividends.filter(d => d.symbol?.toUpperCase() === symbol);
 
-    // a. Tổng vốn đã giải ngân qua các đợt mua
-    const totalInvested = symbolBuys.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price)), 0);
-
-    // b. Khối lượng và giá vốn đang còn nắm giữ (vị thế mở)
-    const holdingQty = symbolBuys.reduce((sum, b) => sum + (b.remainingQty !== undefined ? b.remainingQty : b.quantity), 0);
-    const holdingCost = symbolBuys.reduce((sum, b) => sum + ((b.remainingQty || 0) * (b.costPerShare || b.price)), 0);
+    // a. Khối lượng và giá vốn đang còn nắm giữ (vị thế mở thực tế)
+    const holdingQty = allSymbolBuys.reduce((sum, b) => sum + (b.remainingQty !== undefined ? b.remainingQty : b.quantity), 0);
+    const holdingCost = allSymbolBuys.reduce((sum, b) => sum + ((b.remainingQty || 0) * (b.costPerShare || b.price)), 0);
     const avgCost = holdingQty > 0 ? Math.round(holdingCost / holdingQty) : 0;
+    const isHolding = holdingQty > 0;
+    const status = isHolding ? 'HOLDING' : 'CLOSED';
 
-    // c. Lãi / Lỗ đã chốt từ các lệnh bán trong quá khứ (Realized P&L)
+    // b. Nếu đang bật lọc chu kỳ mà mã này không có bất kỳ lệnh mua/bán/cổ tức nào trong kỳ và không nắm giữ, đánh dấu bỏ qua
+    const hasActivityInPeriod = symbolBuysInPeriod.length > 0 || symbolSells.length > 0 || symbolDivs.length > 0;
+    if (isPeriodFilterActive && !hasActivityInPeriod && !isHolding) {
+      return null;
+    }
+
+    // c. Tổng vốn đã giải ngân
+    let totalInvested = 0;
+    if (isPeriodFilterActive) {
+      const buysCost = symbolBuysInPeriod.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price)), 0);
+      const sellsCostBasis = symbolSells.reduce((sum, s) => sum + ((s.totalRevenue || (s.quantity * s.price)) - (s.profitLoss || 0)), 0);
+      totalInvested = buysCost > 0
+        ? buysCost
+        : (holdingCost > 0 ? holdingCost : (sellsCostBasis > 0 ? sellsCostBasis : allSymbolBuys.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price)), 0)));
+    } else {
+      totalInvested = allSymbolBuys.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price)), 0);
+    }
+
+    // d. Lãi / Lỗ đã chốt từ các lệnh bán trong kỳ (Realized P&L)
     const realizedPL = symbolSells.reduce((sum, s) => sum + (s.profitLoss || 0), 0);
     const sellCount = symbolSells.length;
     const winTrades = symbolSells.filter(s => (s.profitLoss || 0) > 0);
@@ -34,7 +83,7 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
     const lossCount = lossTrades.length;
     const winRate = sellCount > 0 ? parseFloat(((winCount / sellCount) * 100).toFixed(1)) : 0;
 
-    // d. Giá thị trường và Lãi / Lỗ tạm tính hiện tại (Unrealized P&L)
+    // e. Giá thị trường và Lãi / Lỗ tạm tính hiện tại (Unrealized P&L)
     const quote = marketPrices[symbol];
     const livePrice = quote?.price || null;
     let unrealizedPL = 0;
@@ -47,7 +96,7 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
       unrealizedPLPct = holdingCost > 0 ? parseFloat(((unrealizedPL / holdingCost) * 100).toFixed(2)) : 0;
     }
 
-    // e. Cổ tức đã nhận
+    // f. Cổ tức đã nhận trong kỳ
     const cashDividends = symbolDivs
       .filter(d => d.type === 'CASH')
       .reduce((sum, d) => sum + (d.netAmount || 0), 0);
@@ -55,20 +104,17 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
       .filter(d => d.type === 'STOCK')
       .reduce((sum, d) => sum + (d.quantity || 0), 0);
 
-    // f. Tổng Lãi / Lỗ Tích Luỹ Toàn Thời Gian (All-Time Cumulative P&L)
-    // = Lãi đã chốt + Lãi tạm tính hiện tại + Cổ tức tiền mặt đã nhận
+    // g. Tổng Lãi / Lỗ Tích Luỹ Chu Kỳ (Cumulative P&L)
+    // = Lãi đã chốt trong kỳ + Lãi tạm tính hiện tại (nếu đang giữ) + Cổ tức tiền mặt trong kỳ
     const cumulativePL = realizedPL + (holdingQty > 0 ? unrealizedPL : 0) + cashDividends;
 
-    // g. Tỷ suất sinh lời toàn thời gian (All-Time ROI %)
+    // h. Tỷ suất sinh lời chu kỳ (ROI %)
     const roiPct = totalInvested > 0 ? parseFloat(((cumulativePL / totalInvested) * 100).toFixed(2)) : 0;
 
-    // h. Trạng thái vị thế
-    const isHolding = holdingQty > 0;
-    const status = isHolding ? 'HOLDING' : 'CLOSED'; // 'HOLDING': Đang nắm giữ, 'CLOSED': Đã tất toán
-
-    // i. Mốc thời gian giao dịch đầu tiên & gần nhất
+    // i. Mốc thời gian giao dịch đầu tiên & gần nhất trong kỳ
+    const activeBuys = isPeriodFilterActive ? symbolBuysInPeriod : allSymbolBuys;
     const allDates = [
-      ...symbolBuys.map(b => b.date),
+      ...activeBuys.map(b => b.date),
       ...symbolSells.map(s => s.date),
       ...symbolDivs.map(d => d.date),
     ].filter(Boolean).sort();
@@ -96,13 +142,15 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
       stockDividends,
       cumulativePL,
       roiPct,
-      buyCount: symbolBuys.length,
+      buyCount: activeBuys.length,
       divCount: symbolDivs.length,
-      totalTrades: symbolBuys.length + symbolSells.length + symbolDivs.length,
+      totalTrades: activeBuys.length + symbolSells.length + symbolDivs.length,
       firstTradeDate,
       lastTradeDate,
     };
   });
+
+  const stockList = rawStockList.filter(Boolean);
 
   // 3. Tính toán các mã nổi bật (Key Highlights)
   const sortedByCumulative = [...stockList].sort((a, b) => b.cumulativePL - a.cumulativePL);
@@ -152,7 +200,7 @@ export function computeRiskAdjustedRatios(
   dividends = [],
   marketPrices = {},
   fundamentalsMap = {},
-  riskFreeRate = 5.0
+  riskFreeRate = DEFAULT_BANK_INTEREST_RATE
 ) {
   const totalInvested = buyOrders.reduce((s, o) => s + (o.totalCost || (o.quantity * o.price)), 0);
   if (totalInvested <= 0) {
@@ -214,14 +262,19 @@ export function computeRiskAdjustedRatios(
   });
 
   const avgBeta = validBetaWeight > 0 ? (weightedBeta / validBetaWeight) : 1.0;
-  // Biến động chuẩn VN-Index ~ 18.0%/năm
-  let portfolioVolatility = Math.max(5.0, avgBeta * 18.0);
+  // Biến động chuẩn VN-Index
+  let portfolioVolatility = Math.max(5.0, avgBeta * VNINDEX_VOLATILITY);
 
   // Tính độ lệch chuẩn giảm (Downside Deviation) cho Sortino
   // Dựa trên tỷ lệ lệnh lỗ
   const lossTrades = sellOrders.filter(s => (s.profitLoss || 0) < 0);
-  const lossRatio = sellOrders.length > 0 ? (lossTrades.length / sellOrders.length) : 0.3;
-  let downsideDeviation = Math.max(3.0, portfolioVolatility * Math.sqrt(Math.max(0.15, lossRatio)));
+  const lossRatio = sellOrders.length > 0
+    ? (lossTrades.length / sellOrders.length)
+    : (DOWNSIDE_DEVIATION_PARAMS.defaultLossRatio ?? 0.3);
+  let downsideDeviation = Math.max(
+    DOWNSIDE_DEVIATION_PARAMS.minDownsideFloor ?? 3.0,
+    portfolioVolatility * Math.sqrt(Math.max(DOWNSIDE_DEVIATION_PARAMS.minLossRatioFloor ?? 0.15, lossRatio))
+  );
 
   // Sharpe Ratio = (R_p - R_f) / Sigma
   const excessReturn = annualizedReturn - riskFreeRate;
@@ -230,22 +283,23 @@ export function computeRiskAdjustedRatios(
   // Sortino Ratio = (R_p - R_f) / Downside Sigma
   const sortino = parseFloat((excessReturn / downsideDeviation).toFixed(2));
 
-  // Xếp hạng chất lượng đầu tư
+  // Xếp hạng chất lượng đầu tư theo thang điểm từ cấu hình
   let ratingText = 'Chưa đủ dữ liệu';
   let ratingColor = 'text-gray-400';
 
-  if (sharpe >= 2.0) {
-    ratingText = 'Xuất sắc (Top-tier)';
-    ratingColor = 'text-emerald-600 dark:text-emerald-400';
-  } else if (sharpe >= 1.0) {
-    ratingText = 'Tốt (Đạt chuẩn)';
-    ratingColor = 'text-indigo-600 dark:text-indigo-400';
-  } else if (sharpe >= 0) {
-    ratingText = 'Khá (Bù đắp rủi ro)';
-    ratingColor = 'text-amber-600 dark:text-amber-400';
-  } else {
-    ratingText = 'Dưới lãi tiết kiệm';
-    ratingColor = 'text-rose-600 dark:text-rose-400';
+  const brackets = Array.isArray(SHARPE_BRACKETS)
+    ? SHARPE_BRACKETS
+    : (SHARPE_BRACKETS && typeof SHARPE_BRACKETS === 'object'
+        ? Object.values(SHARPE_BRACKETS)
+        : []);
+
+  for (const b of brackets) {
+    const minVal = b?.minSharpe ?? b?.min ?? -999;
+    if (sharpe >= minVal) {
+      ratingText = b?.text ?? b?.label ?? 'Chưa đủ dữ liệu';
+      ratingColor = b?.color ?? 'text-gray-400';
+      break;
+    }
   }
 
   return {
@@ -264,9 +318,9 @@ export function computeRiskAdjustedRatios(
  * Phân Tích Chi Phí Cơ Hội (Opportunity Cost vs Lãi Suất Tiết Kiệm Ngân Hàng)
  * @param {Array} buyOrders
  * @param {Number} totalCumulativePL
- * @param {Number} bankRate - Lãi suất gửi tiết kiệm %/năm (mặc định 5.0%)
+ * @param {Number} bankRate - Lãi suất gửi tiết kiệm %/năm (mặc định theo cấu hình)
  */
-export function computeOpportunityCost(buyOrders = [], totalCumulativePL = 0, bankRate = 5.0) {
+export function computeOpportunityCost(buyOrders = [], totalCumulativePL = 0, bankRate = DEFAULT_BANK_INTEREST_RATE) {
   if (!buyOrders || buyOrders.length === 0) {
     return {
       totalSimulatedInterest: 0,

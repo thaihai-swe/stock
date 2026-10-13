@@ -235,6 +235,552 @@
       "pmi": 50.5,
       "creditGrowthYoY": 14.0,
       "gdpGrowthYoY": 6.5
+    },
+    "macroThresholds": {
+      "usdvnd": {
+        "criticalHigh": 25900,
+        "high": 25600,
+        "bearishDriver": 26000,
+        "bullishDriver": 25000,
+        "externalShock": 25700,
+        "fallback": 25400
+      },
+      "interbankRate": {
+        "criticalHigh": 6.5,
+        "high": 5.0,
+        "bearishDriver": 6.0,
+        "tightening": 5.5,
+        "bullishDriver": 3.0,
+        "liquidityCrisisSpread": 2.0,
+        "fallback": 4.5
+      },
+      "cpi": {
+        "criticalHigh": 5.5,
+        "ceilingTarget": 4.5,
+        "bullish": 4.0,
+        "cool": 3.5,
+        "fallback": 3.63
+      },
+      "gdp": {
+        "highGrowth": 6.5,
+        "moderateGrowth": 6.0,
+        "slowdown": 5.5,
+        "recessionAlert": 4.0,
+        "fallback": 6.5
+      },
+      "pmi": {
+        "expansion": 51.0,
+        "neutral": 50.0,
+        "contraction": 49.0,
+        "fallback": 50.5
+      },
+      "credit": {
+        "crunchThreshold": 10.0,
+        "optimalMin": 12.0,
+        "optimalMax": 16.5,
+        "fallback": 14.0
+      },
+      "oilBrent": {
+        "criticalHigh": 95.0,
+        "extremeHigh": 105.0,
+        "low": 50.0,
+        "optimalMin": 65.0,
+        "optimalMax": 90.0,
+        "fallback": 75.0
+      },
+      "yieldCurve": {
+        "vnFallback": {
+          "vn02y": 2.45,
+          "vn05y": 3.20,
+          "vn10y": 3.45,
+          "sbvRefinancing": 4.5,
+          "interbankOvernight": 6.47,
+          "cpi": 5.08,
+          "usdvnd": 25881.0,
+          "peVnindex": 13.8
+        },
+        "usFallback": {
+          "us02y": 4.65,
+          "us05y": 5.02,
+          "us10y": 5.24,
+          "usPolicy": 4.85,
+          "usCpi": 2.9
+        },
+        "slopeThresholds": {
+          "inverted": 0.0,
+          "flat": 0.40,
+          "steep": 1.20
+        },
+        "usSlopeThresholds": {
+          "inverted": 0.0,
+          "flat": 0.30,
+          "steep": 0.80
+        },
+        "levelThresholds": {
+          "high": 3.80,
+          "low": 2.60
+        },
+        "usLevelThresholds": {
+          "high": 4.40,
+          "low": 3.40
+        },
+        "curvatureThresholds": {
+          "bellyFocus": 0.35,
+          "bellyMild": 0.20
+        },
+        "realRateStance": {
+          "tight": 1.5,
+          "loose": 0.0
+        },
+        "usPolicyStance": {
+          "restrictive": 4.50,
+          "accommodative": 2.50
+        },
+        "stressScores": {
+          "high": 75.0,
+          "low": 35.0,
+          "uiWarning": 60,
+          "uiCalm": 40
+        },
+        "transmissionLinkA": {
+          "policySpread": -0.50,
+          "us10yHigh": 4.35
+        },
+        "transmissionLinkB": {
+          "liqGap": 0.25
+        },
+        "transmissionLinkC": {
+          "slope": 0.0,
+          "curvature": 0.40,
+          "curveStress": 70.0
+        },
+        "assetDecisionErp": {
+          "equityFavored": 3.0,
+          "bondsFavored": 1.0
+        }
+      },
+      "marketValuation": {
+        "meanPe": 14.2,
+        "stdPe": 2.1,
+        "grahamPePbThreshold": 22.5,
+        "zScoreExtreme": 2.0
+      }
+    },
+    "macroNarratives": {
+      "phaseMeta": {
+        "Recovery": {
+          "titleVi": "Phục Hồi Kinh Tế",
+          "description": "Lãi suất hạ nhiệt, lạm phát thấp, thanh khoản dồi dào. Cổ phiếu chu kỳ, chứng khoán và bán lẻ dẫn dắt.",
+          "badgeColor": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+          "color": "emerald"
+        },
+        "Expansion": {
+          "titleVi": "Mở Rộng Tăng Trưởng",
+          "description": "Tăng trưởng tín dụng và sản xuất vững chắc, lợi nhuận DN bùng nổ. Ngân hàng, BĐS và công nghệ dẫn sóng.",
+          "badgeColor": "bg-blue-500/20 text-blue-400 border-blue-500/30",
+          "color": "blue"
+        },
+        "Overheating": {
+          "titleVi": "Tăng Nhiệt & Đỉnh Chu Kỳ",
+          "description": "Lãi suất bắt đầu nhích tăng, lạm phát áp lực cao. Dòng tiền dịch chuyển sang năng lượng, vật liệu và phòng thủ.",
+          "badgeColor": "bg-amber-500/20 text-amber-400 border-amber-500/30",
+          "color": "amber"
+        },
+        "Slowdown": {
+          "titleVi": "Chậm Lại & Thắt Chặt",
+          "description": "Lãi suất cao, tín dụng thắt chặt, biên lợi nhuận thu hẹp. Ưu tiên hàng tiêu dùng thiết yếu, tiện ích điện nước và tiền mặt.",
+          "badgeColor": "bg-orange-500/20 text-orange-400 border-orange-500/30",
+          "color": "orange"
+        },
+        "Recession": {
+          "titleVi": "Suy Thoái & Đáy Chu Kỳ",
+          "description": "Hoạt động sản xuất thu hẹp, PMI dưới 50, chuẩn bị bước vào chu kỳ nới lỏng chính sách tiền tệ mới.",
+          "badgeColor": "bg-rose-500/20 text-rose-400 border-rose-500/30",
+          "color": "rose"
+        }
+      },
+      "macroClock": {
+        "goldilocks": {
+          "quadrant": "🟢 GOLDILOCKS",
+          "quadrantKey": "goldilocks",
+          "titleVi": "Vàng Kinh Tế (Goldilocks)",
+          "subtitleVi": "GDP Tăng Trưởng Cao • Lạm Phát Ổn Định",
+          "desc": "Môi trường lý tưởng nhất cho thị trường chứng khoán. Lợi nhuận doanh nghiệp tăng trưởng mạnh.",
+          "favored": ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Bán Lẻ", "Công Nghệ"],
+          "avoided": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm", "Tiện Ích Điện Nước"]
+        },
+        "overheating": {
+          "quadrant": "🟠 OVERHEATING",
+          "quadrantKey": "overheating",
+          "titleVi": "Quá Nhiệt / Tăng Tốc (Overheating)",
+          "subtitleVi": "GDP Tăng Trưởng Tốt • Lạm Phát Tăng Cao",
+          "desc": "Sản xuất sôi động nhưng chi phí vốn bắt đầu tăng. Lợi nhuận phân hóa mạnh giữa các nhóm ngành.",
+          "favored": ["Năng Lượng & Dầu Khí", "Thép & Vật Liệu", "Tiện Ích Điện Nước", "Bất Động Sản"],
+          "avoided": ["Ngân Hàng", "Chứng Khoán"]
+        },
+        "stagflation": {
+          "quadrant": "🔴 STAGFLATION",
+          "quadrantKey": "stagflation",
+          "titleVi": "Đình Lạm (Stagflation)",
+          "subtitleVi": "GDP Chậm Lại • Lạm Phát Neo Cao",
+          "desc": "Kịch bản rủi ro: chi phí đầu vào tăng xói mòn biên lợi nhuận trong khi sức mua sụt giảm.",
+          "favored": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm & Y Tế", "Vàng", "Tiền Mặt"],
+          "avoided": ["Chứng Khoán", "Bất Động Sản", "Ngân Hàng", "Xây Dựng"]
+        },
+        "reflation": {
+          "quadrant": "🔵 REFLATION",
+          "quadrantKey": "reflation",
+          "titleVi": "Phục Hồi / Bơm Tiền (Reflation)",
+          "subtitleVi": "GDP Tạo Đáy • Lạm Phát Hạ Nhiệt",
+          "desc": "Chính sách tiền tệ nới lỏng tạo thanh khoản dồi dào, định giá cổ phiếu phục hồi từ vùng trũng.",
+          "favored": ["Chứng Khoán", "Ngân Hàng", "Đầu Tư Công & Xây Dựng", "Công Nghệ", "Bán Lẻ"],
+          "avoided": ["Tiêu Dùng Thiết Yếu (FMCG)", "Tiện Ích Điện Nước"]
+        },
+        "transition": {
+          "quadrant": "⚪ TRANSITION",
+          "quadrantKey": "transition",
+          "titleVi": "Chuyển Giao Cân Bằng (Transition)",
+          "subtitleVi": "Tín Hiệu Vĩ Mô Cân Bằng",
+          "desc": "Tín hiệu vĩ mô trung tính. Phù hợp nắm giữ danh mục và chọn lọc kỹ lưỡng.",
+          "favored": ["Ngân Hàng Lớn", "Công Nghệ", "Bán Lẻ Đầu Ngành"],
+          "avoided": ["BĐS Đầu Cơ", "Cổ Phiếu Đòn Bẩy Cao"]
+        }
+      },
+      "scenarios": {
+        "base": {
+          "name": "Kịch Bản Cơ Sở (Base Case)",
+          "badge": "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+          "conditions": "Lạm phát CPI ổn định < 4.5%, SBV giữ lãi suất hỗ trợ, GDP đạt mục tiêu 6.5-7.0%.",
+          "narrative": "Kinh tế tiếp tục quỹ đạo mở rộng vừa phải. Dòng tiền tập trung vào các cổ phiếu cơ bản có EPS tăng trưởng thực chất.",
+          "sectorBenefit": ["Ngân Hàng", "Bán Lẻ", "Công Nghệ Thông Tin"],
+          "sectorImpacted": ["Hàng Tiêu Dùng Thiết Yếu", "Vật Liệu Nhạy Giá"]
+        },
+        "bull": {
+          "name": "Kịch Bản Tích Cực (Bull Case)",
+          "badge": "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+          "conditions": "Fed tiếp tục hạ lãi suất nhanh, SBV nới lỏng tín dụng, dòng vốn ngoại ETF đảo chiều mua ròng, nâng hạng FTSE thành công.",
+          "narrative": "Thanh khoản bùng nổ, hệ số định giá thị trường được nâng lên — các nhóm ngành High-Beta dẫn dắt đà tăng điểm.",
+          "sectorBenefit": ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Công Nghệ"],
+          "sectorImpacted": ["Tiện Ích Điện Nước", "Dược Phẩm"]
+        },
+        "bear": {
+          "name": "Kịch Bản Thận Trọng (Bear Case)",
+          "badge": "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800",
+          "conditions": "Tỷ giá USD/VND căng thẳng kéo dài, chi phí đẩy tăng áp lực lạm phát, thanh khoản liên ngân hàng co hẹp.",
+          "narrative": "Lạm phát chi phí đẩy và thắt chặt thanh khoản ngắn hạn — ưu tiên nâng tỷ trọng tiền mặt và tài sản phòng vệ.",
+          "sectorBenefit": ["Năng Lượng & Dầu Khí", "Hàng Tiêu Dùng Thiết Yếu", "Vàng"],
+          "sectorImpacted": ["Bất Động Sản", "Chứng Khoán", "Ngân Hàng"]
+        }
+      },
+      "tailRisks": {
+        "liquidity_crisis": {
+          "name": "Khủng Hoảng Thanh Khoản (Liquidity Crisis)",
+          "signal": "STRONG SELL",
+          "severity": "CRITICAL",
+          "impact": "Áp lực thanh khoản hệ thống ngắn hạn căng thẳng, room tín dụng bị co hẹp, chi phí vốn ngân hàng tăng mạnh."
+        },
+        "stagflation": {
+          "name": "Đình Lạm (Stagflation Shock)",
+          "signal": "STRONG SELL",
+          "severity": "CRITICAL",
+          "impact": "Biên lợi nhuận của hầu hết doanh nghiệp niêm yết bị bào mòn bởi chi phí đầu vào, nguy cơ suy thoái tăng vọt."
+        },
+        "credit_crunch": {
+          "name": "Thắt Chặt Tín Dụng (Credit Crunch)",
+          "signal": "SELL",
+          "severity": "HIGH",
+          "impact": "Dòng vốn lưu động doanh nghiệp bị nghẽn, áp lực nợ xấu và đảo nợ ngân hàng gia tăng."
+        },
+        "external_shock": {
+          "name": "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)",
+          "signal": "CAUTION",
+          "severity": "MEDIUM",
+          "impact": "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng."
+        },
+        "soft_landing": {
+          "name": "Kinh Tế Hạ Cánh Mềm (Soft Landing)",
+          "signal": "BUY",
+          "severity": "POSITIVE",
+          "impact": "Kinh tế hạ nhiệt an toàn, tạo nền tảng vững chắc cho chu kỳ tăng trưởng lợi nhuận doanh nghiệp."
+        },
+        "bull_opportunity": {
+          "name": "Cơ Hội Bùng Nổ Vĩ Mô (Bull Opportunity)",
+          "signal": "STRONG BUY",
+          "severity": "POSITIVE",
+          "impact": "Cơ hội vàng giải ngân tích lũy cổ phiếu giá trị và nhóm cổ phiếu dẫn dắt thị trường."
+        }
+      },
+      "sectorQuadrants": {
+        "sweet_spot": {
+          "title": "Vùng Vàng Gom Mua (Sweet Spot)",
+          "icon": "💎",
+          "badge": "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+          "headerBg": "from-emerald-500/15 via-emerald-500/5 to-transparent",
+          "borderColor": "border-emerald-500/40",
+          "desc": "Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động tích sản dài hạn."
+        },
+        "value_trap": {
+          "title": "Vùng Bẫy Giá Rẻ (Value Trap)",
+          "icon": "⚠️",
+          "badge": "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30",
+          "headerBg": "from-amber-500/15 via-amber-500/5 to-transparent",
+          "borderColor": "border-amber-500/40",
+          "desc": "Định giá rất rẻ nhưng chịu áp lực vĩ mô / đòn bẩy. Nên chia nhỏ tỷ trọng gom từng nhịp hoặc chờ tín hiệu đảo chiều."
+        },
+        "momentum": {
+          "title": "Vùng Quá Nhiệt (Momentum / Overheated)",
+          "icon": "🔥",
+          "badge": "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30",
+          "headerBg": "from-purple-500/15 via-purple-500/5 to-transparent",
+          "borderColor": "border-purple-500/40",
+          "desc": "Động lực vĩ mô mạnh mẽ nhưng định giá đã vượt đỉnh lịch sử. Phù hợp giao dịch ngắn hạn theo dòng tiền, quản trị rủi ro chặt chẽ."
+        },
+        "defense": {
+          "title": "Vùng Phòng Thủ / Tránh Né (Defense)",
+          "icon": "🛡️",
+          "badge": "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30",
+          "headerBg": "from-rose-500/15 via-rose-500/5 to-transparent",
+          "borderColor": "border-rose-500/40",
+          "desc": "Vĩ mô bất lợi và định giá không hấp dẫn. Khuyến nghị đứng ngoài hoặc chủ động hạ tỷ trọng."
+        }
+      },
+      "peBandsAdvice": {
+        "DEEP_VALUE": {
+          "bandText": "Rất Rẻ (Vùng đáy lịch sử)",
+          "bandColor": "emerald",
+          "equityPct": 85,
+          "cashPct": 15,
+          "stance": "MUA GOM MẠNH",
+          "rationaleTemplate": "P/E thị trường ở mức chiết khấu cực sâu (<= {deepValue}x). Cơ hội vàng để gom cổ phiếu giá trị."
+        },
+        "CHEAP": {
+          "bandText": "Rẻ (Vùng định giá hấp dẫn)",
+          "bandColor": "emerald",
+          "equityPct": 80,
+          "cashPct": 20,
+          "stance": "TÍCH LŨY CỔ PHIẾU GIÁ TRỊ",
+          "rationaleTemplate": "P/E VN-Index ({currentPe}x) đang ở dải Rẻ so với trung bình chu kỳ 5 năm ({meanPe}x). Khuyến nghị duy trì 80% cổ phiếu cơ bản và giữ 20% tiền mặt linh hoạt."
+        },
+        "FAIR": {
+          "bandText": "Hợp Lý (Định giá cân bằng)",
+          "bandColor": "blue",
+          "equityPct": 65,
+          "cashPct": 35,
+          "stance": "NẮM GIỮ / CHỌN LỌC",
+          "rationaleTemplate": "P/E VN-Index ({currentPe}x) nằm trong dải trung vị hợp lý. Khuyến nghị duy trì 65% cổ phiếu có EPS tăng trưởng cao, 35% tiền mặt."
+        },
+        "EXPENSIVE": {
+          "bandText": "Đắt (Vùng chốt lời dần)",
+          "bandColor": "amber",
+          "equityPct": 45,
+          "cashPct": 55,
+          "stance": "PHÒNG THỦ",
+          "rationaleTemplate": "P/E VN-Index ({currentPe}x) vượt mức trung bình, bước vào vùng đắt. Khuyến nghị hạ tỷ trọng cổ phiếu, giữ 55% tiền mặt."
+        },
+        "OVERHEATED": {
+          "bandText": "Rất Đắt / Hưng Phấn Cực Đại",
+          "bandColor": "rose",
+          "equityPct": 30,
+          "cashPct": 70,
+          "stance": "QUẢN TRỊ RỦI RO CAO",
+          "rationaleTemplate": "P/E VN-Index ({currentPe}x) vượt {expensive}x, thị trường rất đắt. Khuyến nghị phòng thủ với tối đa 70% tiền mặt."
+        }
+      },
+      "compositeSignals": {
+        "DEEP_VALUE": {
+          "signal": "MUA MẠNH (DEEP VALUE)",
+          "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40",
+          "color": "#22c55e",
+          "description": "Định giá thị trường đang ở vùng đáy lịch sử (Percentile < 20%), cơ hội vàng tích lũy cổ phiếu giá trị."
+        },
+        "VALUE_BUY": {
+          "signal": "MUA TÍCH LŨY (VALUE BUY)",
+          "badge": "bg-teal-500/20 text-teal-300 border border-teal-400/40",
+          "color": "#14b8a6",
+          "description": "Định giá thị trường đang ở vùng hấp dẫn dưới trung vị lịch sử, thích hợp giải ngân DCA theo lộ trình."
+        },
+        "HOLD": {
+          "signal": "TRUNG LẬP / GIỮ (HOLD)",
+          "badge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
+          "color": "#3b82f6",
+          "description": "Định giá cân bằng quanh mức trung bình dài hạn, nắm giữ danh mục và chọn lọc cổ phiếu có câu chuyện riêng."
+        },
+        "TRIM": {
+          "signal": "HẠ TỶ TRỌNG (TRIM / CAUTION)",
+          "badge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+          "color": "#f59e0b",
+          "description": "Thị trường bước vào vùng định giá cao hơn trung bình, cân nhắc chốt lời từng phần và nâng tỷ trọng tiền mặt."
+        },
+        "DEFENSIVE": {
+          "signal": "PHÒNG THỦ / BÁN (DEFENSIVE)",
+          "badge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
+          "color": "#ef4444",
+          "description": "Thị trường ở vùng quá nóng (Percentile > 80%), nguy cơ điều chỉnh định giá cao, ưu tiên quản trị rủi ro tối đa."
+        }
+      },
+      "valuationWindows": {
+        "five_year": { "id": "five_year", "label": "5 Năm", "shortLabel": "5N", "desc": "Chu kỳ kinh tế & tiền tệ gần nhất" },
+        "ten_year": { "id": "ten_year", "label": "10 Năm", "shortLabel": "10N", "desc": "Cửa sổ chuẩn mực vĩ mô dài hạn (Khuyến nghị)" },
+        "modern": { "id": "modern", "label": "Từ 2007", "shortLabel": "2007", "desc": "Thời kỳ hội nhập WTO" },
+        "all_time": { "id": "all_time", "label": "Toàn Bộ (25 Năm)", "shortLabel": "25N", "desc": "Toàn cảnh từ ngày lập sàn HOSE" }
+      },
+      "yieldCurveRegimes": {
+        "YC0": {
+          "code": "YC0",
+          "label": "NEUTRAL_MIXED",
+          "desc": "Trạng thái cân bằng chu kỳ. Đường cong phân hóa.",
+          "favoredSectors": "Luân chuyển cân bằng (Neutral Rotation)"
+        },
+        "YC1": {
+          "code": "YC1",
+          "label": "EASING_MATURE",
+          "desc": "Nới lỏng chín muồi. Lợi suất thấp kéo dài, dòng tiền rẻ lan tỏa.",
+          "favoredSectors": "Tài chính (FIN), Bất động sản (REAL), Bán lẻ tiêu dùng"
+        },
+        "YC2": {
+          "code": "YC2",
+          "label": "EARLY_EASING",
+          "desc": "Nới lỏng sớm. Lãi suất thấp, đường cong dốc mạnh kích thích tín dụng.",
+          "favoredSectors": "Tài chính (FIN), Công nghiệp (IND), Vật liệu (MAT)"
+        },
+        "YC3": {
+          "code": "YC3",
+          "label": "LATE_TIGHTENING",
+          "desc": "Giai đoạn cuối thắt chặt. Lợi suất cao nhưng đường cong dốc lại.",
+          "favoredSectors": "Năng lượng (ENE), Tiện ích (UTI), Công nghệ (IT)"
+        },
+        "YC4": {
+          "code": "YC4",
+          "label": "TIGHT_INVERTED",
+          "desc": "Thắt chặt & Đảo ngược. Rủi ro thanh khoản cao.",
+          "favoredSectors": "Tiện ích (UTI), Hàng tiêu dùng (CONS), Tiền mặt"
+        }
+      },
+      "transmissionStages": {
+        "FULL_TRANSMISSION": {
+          "stage": "FULL TRANSMISSION",
+          "summary": "Rủi ro vĩ mô lan truyền toàn diện (Khuyến nghị Phòng thủ / Tiền mặt)",
+          "badge": "bg-rose-500/20 text-rose-400 border-rose-500/30"
+        },
+        "LIQUIDITY_SQUEEZE": {
+          "stage": "LIQUIDITY SQUEEZE",
+          "summary": "Áp lực tỷ giá kéo căng thanh khoản liên ngân hàng trong nước",
+          "badge": "bg-amber-500/20 text-amber-400 border-amber-500/30"
+        },
+        "EXTERNAL_TRAPPED": {
+          "stage": "EXTERNAL TRAPPED",
+          "summary": "Bộ đệm tỷ giá & dự trữ ngoại hối hấp thụ tốt áp lực từ USD",
+          "badge": "bg-blue-500/20 text-blue-400 border-blue-500/30"
+        },
+        "LOCAL_BOTTLENECK": {
+          "stage": "LOCAL BOTTLENECK",
+          "summary": "Nghẽn thanh khoản ngắn hạn cục bộ, kỳ hạn dài chưa bị ảnh hưởng",
+          "badge": "bg-orange-500/20 text-orange-400 border-orange-500/30"
+        },
+        "BENIGN_MACRO": {
+          "stage": "BENIGN MACRO",
+          "summary": "Môi trường vĩ mô thuận lợi, dòng tiền liên ngân hàng dồi dào",
+          "badge": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+        }
+      },
+      "styleIndices": {
+        "VNINDEX": {
+          "name": "VN-Index (Toàn Thị Trường)",
+          "proxy": "VNINDEX",
+          "icon": "🏛️",
+          "type": "Broad Market",
+          "flowCharacter": "Dòng tiền toàn thị trường, phản ánh tổng thể chu kỳ kinh tế",
+          "strategy": "Tích lũy DCA dài hạn theo nhịp điều chỉnh của chỉ số",
+          "weightAdvice": "Benchmark chuẩn mực"
+        },
+        "VN30": {
+          "name": "VN30 (Top 30 Blue-Chips)",
+          "proxy": "E1VFVN30",
+          "icon": "🏢",
+          "type": "Large-Cap",
+          "flowCharacter": "Dòng vốn ngoại và tổ chức lớn, thanh khoản cao nhất",
+          "strategy": "Nắm giữ nòng cốt danh mục, phòng thủ trước biến động",
+          "weightAdvice": "40% - 50% danh mục"
+        },
+        "VNDIAMOND": {
+          "name": "VN Diamond (Kín Room Ngoại)",
+          "proxy": "FUEVFVND",
+          "icon": "💎",
+          "type": "Quality / Foreign Room",
+          "flowCharacter": "Dòng vốn ngoại ủy thác chất lượng cao, cổ phiếu đầu ngành P/E hấp dẫn",
+          "strategy": "Tích sản dài hạn, hưởng lợi từ sóng nâng hạng và kết quả kinh doanh vượt trội",
+          "weightAdvice": "25% - 35% danh mục"
+        },
+        "VNMIDCAP": {
+          "name": "VN Midcap (Vốn Hóa Vừa)",
+          "proxy": "FUEDCMID",
+          "icon": "🚀",
+          "type": "Mid-Cap Growth",
+          "flowCharacter": "Dòng tiền cá nhân sôi động, Beta cao, nhạy sóng đầu cơ và tăng trưởng nhanh",
+          "strategy": "Tối ưu hóa lợi nhuận trong pha tăng trưởng (Expansion) và bùng nổ thanh khoản",
+          "weightAdvice": "15% - 25% danh mục"
+        }
+      },
+      "uiFallbacks": {
+        "heroStatus": {
+          "riskScore": 44.0,
+          "pe": 13.15,
+          "meanPe": 14.2,
+          "stance": "80% CP / 20% Tiền",
+          "bullishCount": 3,
+          "bearishCount": 1,
+          "confidence": 80
+        },
+        "riskLayers": {
+          "monetary": 44.9,
+          "growth": 35.8,
+          "price": 64.4,
+          "external": 46.9
+        },
+        "fourAssets": {
+          "equity": 60,
+          "bond": 25,
+          "cash": 10,
+          "gold": 5
+        },
+        "scenarioAlloc": {
+          "base": { "equity": 50.0, "bond": 30.0, "cash": 15.0, "gold": 5.0 },
+          "bull": { "equity": 65.0, "bond": 20.0, "cash": 10.0, "gold": 5.0 },
+          "bear": { "equity": 30.0, "bond": 35.0, "cash": 25.0, "gold": 10.0 }
+        }
+      },
+      "executiveSummary": {
+        "defaultKeyRisks": [
+          {
+            "level": "Trung bình",
+            "title": "Biến Động Địa Chính Trị Toàn Cầu",
+            "risk": "Biến động giá dầu thô Brent và chính sách lãi suất neo cao của Fed tạo rủi ro nhập khẩu lạm phát.",
+            "color": "text-blue-400 bg-blue-500/10 border-blue-500/30"
+          }
+        ],
+        "defaultCatalysts": [
+          {
+            "level": "Trung bình",
+            "title": "Kỳ Vọng Nâng Hạng Thị Trường FTSE / MSCI",
+            "desc": "Quy định Non-Pre-funding (Thông tư 68) đi vào thực thi tháo gỡ nút thắt lớn nhất cho dòng vốn ngoại tổ chức giải ngân.",
+            "color": "text-indigo-400 bg-indigo-500/10 border-indigo-500/30"
+          }
+        ],
+        "takeawaysTemplates": {
+          "insight": "⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha '{regimeName}' với điểm rủi ro vĩ mô {riskScore}/100. P/E thị trường {marketPe}x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
+          "risk": "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND ({usdvnd}) và thanh khoản liên ngân hàng ({interbank}%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
+          "opportunity": "Cơ hội lớn nhất: {stanceText}, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
+        }
+      }
+    },
+    "aiMacroConfig": {
+      "enabled": true,
+      "provider": "heuristic_fallback",
+      "model": "gemini-1.5-flash",
+      "temperature": 0.2,
+      "maxTokens": 1024,
+      "cacheTtlMs": 43200000,
+      "systemPrompt": "Bạn là Antigravity Macro Strategist, chuyên gia kinh tế trưởng (Chief Investment Officer) hàng đầu về thị trường chứng khoán Việt Nam. Nhiệm vụ của bạn là nhận định toàn cảnh kinh tế vĩ mô, chu kỳ lãi suất, định giá VN-Index và đưa ra khuyến nghị phân bổ tài sản thực chiến."
     }
   },
   "tradingAndFees": {
@@ -254,6 +800,162 @@
       "Kỹ thuật",
       "Cổ tức"
     ]
+  },
+  "portfolioAnalytics": {
+    "defaultBankInterestRate": 6.0,
+    "bankInterestPresets": [5.0, 6.0, 7.0, 8.0],
+    "maxBankRateAllowed": 30.0,
+    "riskPostures": [
+      { "id": "highDefense", "minCashPct": 50, "label": "🛡️ Phòng thủ cao", "bg": "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/80 dark:text-blue-200 dark:border-blue-700/50" },
+      { "id": "optimalBalance", "minCashPct": 20, "label": "⚖️ Cân bằng tối ưu", "bg": "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/80 dark:text-emerald-200 dark:border-emerald-700/50" },
+      { "id": "activeOffense", "minCashPct": 5, "label": "🚀 Tấn công chủ động", "bg": "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/80 dark:text-amber-200 dark:border-amber-700/50" },
+      { "id": "fullStock", "minCashPct": 0, "label": "⚡ Full 100% Cổ phiếu", "bg": "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-200 dark:border-rose-700/50" }
+    ],
+    "riskPostureBrackets": {
+      "highDefense": { "minCashPct": 50, "label": "🛡️ Phòng thủ cao" },
+      "optimalBalance": { "minCashPct": 20, "label": "⚖️ Cân bằng tối ưu" },
+      "activeOffense": { "minCashPct": 5, "label": "🚀 Tấn công chủ động" },
+      "fullStock": { "minCashPct": 0, "label": "⚡ Full 100% Cổ phiếu" }
+    },
+    "allocationTiers": [
+      { "id": "extreme", "minPct": 50, "label": "Cực cao (>50%)", "isWarning": true, "bg": "bg-red-50 dark:bg-rose-950/70", "text": "text-red-700 dark:text-rose-300", "border": "border-red-300 dark:border-rose-800/60", "bar": "bg-red-500" },
+      { "id": "veryHigh", "minPct": 40, "label": "Rất cao (40-50%)", "isWarning": false, "bg": "bg-amber-50 dark:bg-amber-950/70", "text": "text-amber-800 dark:text-amber-300", "border": "border-amber-300 dark:border-amber-800/60", "bar": "bg-amber-500" },
+      { "id": "core", "minPct": 25, "label": "Chủ lực (25-40%)", "isWarning": false, "bg": "bg-indigo-50 dark:bg-indigo-950/70", "text": "text-indigo-700 dark:text-indigo-300", "border": "border-indigo-200 dark:border-indigo-800/60", "bar": "bg-indigo-600" },
+      { "id": "moderate", "minPct": 10, "label": "Vừa phải (10-25%)", "isWarning": false, "bg": "bg-blue-50 dark:bg-blue-950/70", "text": "text-blue-700 dark:text-blue-300", "border": "border-blue-200 dark:border-blue-800/60", "bar": "bg-blue-500" },
+      { "id": "low", "minPct": 0, "label": "Thấp (<10%)", "isWarning": false, "bg": "bg-gray-50 dark:bg-slate-800", "text": "text-gray-600 dark:text-slate-400", "border": "border-gray-200 dark:border-slate-700", "bar": "bg-gray-400" }
+    ],
+    "riskAdjusted": {
+      "defaultRiskFreeRate": 5.0,
+      "annualizedReturnBounds": [-100, 500],
+      "vnindexAnnualVolatility": 18.0,
+      "minPortfolioVolatility": 5.0,
+      "downsideDeviationMin": 3.0,
+      "minLossVariance": 0.15,
+      "defaultLossRatioFallback": 0.30,
+      "minHoldingYears": 0.08,
+      "sharpeBrackets": [
+        { "minSharpe": 2.0, "text": "Xuất sắc (Top-tier)", "color": "text-emerald-600 dark:text-emerald-400" },
+        { "minSharpe": 1.0, "text": "Tốt (Đạt chuẩn)", "color": "text-indigo-600 dark:text-indigo-400" },
+        { "minSharpe": 0.0, "text": "Khá (Bù đắp rủi ro)", "color": "text-amber-600 dark:text-amber-400" },
+        { "minSharpe": -999.0, "text": "Dưới lãi tiết kiệm", "color": "text-rose-600 dark:text-rose-400" }
+      ]
+    }
+  },
+  "dcaPlannerConfig": {
+    "defaultDropPct": 3.0,
+    "dropPctPresets": [2.0, 3.0, 5.0],
+    "defaultSteps": 20,
+    "maxSteps": 30,
+    "minSteps": 2,
+    "defaultBaseLot": 100,
+    "baseLotPresets": [100, 200, 500, 1000],
+    "volumeStrategies": [
+      { "id": "cluster3", "label": "🌟 Kim tự tháp x2 mỗi 3 đợt", "pattern": "100 → 100 → 100 → 200... (Chuẩn mẫu)", "clusterSize": 3, "multiplier": 2 },
+      { "id": "fixed", "label": "📐 Khối lượng đều", "pattern": "100 → 100 → 100 → 100...", "clusterSize": 1, "multiplier": 1 },
+      { "id": "linear", "label": "📈 Tăng dần đều", "pattern": "100 → 200 → 300 → 400...", "clusterSize": 1, "multiplier": 1 },
+      { "id": "martingale", "label": "🚀 Gấp đôi mỗi bước", "pattern": "100 → 200 → 400 → 800...", "clusterSize": 1, "multiplier": 2 }
+    ],
+    "quickQuantityRatios": { "q20": 0.2, "q50": 0.5, "q100": 1.0, "base": 100 }
+  },
+  "strategyAndDiscipline": {
+    "riskAlertWinRateThreshold": 40.0,
+    "disciplineTags": [
+      { "id": "target", "label": "🎯 Đạt mục tiêu", "shortLabel": "Đạt mục tiêu", "desc": "Chốt lời chuẩn kế hoạch đã định", "type": "disciplined", "color": "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800" },
+      { "id": "stoploss", "label": "🛑 Cắt lỗ chuẩn", "shortLabel": "Cắt lỗ chuẩn", "desc": "Cắt lỗ dứt khoát theo kỷ luật, bảo vệ vốn", "type": "disciplined", "color": "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800" },
+      { "id": "early", "label": "🏃 Chốt non", "shortLabel": "Chốt non", "desc": "Bán vội khi vừa chớm lời, sợ mất lãi", "type": "emotional", "color": "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800" },
+      { "id": "late", "label": "😰 Cắt lỗ trễ", "shortLabel": "Cắt lỗ trễ", "desc": "Chần chừ để lỗ sâu (gồng lỗ) mới bán", "type": "emotional", "color": "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800" },
+      { "id": "panic", "label": "⚡ Bán hoảng / FOMO", "shortLabel": "Bán hoảng", "desc": "Bị tâm lý đám đông hoặc bảng điện chi phối", "type": "emotional", "color": "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800" },
+      { "id": "rebalance", "label": "🔄 Đảo hàng / Cơ cấu", "shortLabel": "Đảo hàng", "desc": "Bán để tái phân bổ vốn sang mã khác tốt hơn", "type": "neutral", "color": "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800" }
+    ],
+    "narrativeTemplates": {
+      "topProfit": "Chiến lược hiệu quả nhất: {tag} mang về tổng cộng +{amount}đ với tỷ lệ thắng {winRate}% ({wins}/{total} lệnh). Tiếp tục phát huy thế mạnh này.",
+      "riskAlert": "Cảnh báo chiến lược rủi ro: {tag} đang ghi nhận {lossInfo} với tỷ lệ thắng {winRate}%. Hãy kiểm tra lại tiêu chí chọn điểm mua và kỷ luật cắt lỗ sớm.",
+      "capitalConcentration": "Tập trung nguồn vốn: {tag} chiếm {allocPct}% tổng vốn đang nắm giữ ({capital}đ) qua {symbolCount} mã ({symbols})."
+    }
+  },
+  "valuationNarrativesAndPresets": {
+    "sevenPriceZonesMeta": [
+      { "id": "deep_value", "label": "Deep Value", "sub": "< 0.75x", "color": "from-purple-600 to-indigo-600", "text": "text-purple-400", "bg": "bg-purple-950/40 border-purple-800" },
+      { "id": "safe_buy", "label": "Mua An Toàn", "sub": "0.75 - 0.85x", "color": "from-emerald-600 to-teal-600", "text": "text-emerald-400", "bg": "bg-emerald-950/40 border-emerald-800" },
+      { "id": "accumulate", "label": "Tích Luỹ", "sub": "0.85 - 0.95x", "color": "from-teal-600 to-cyan-600", "text": "text-teal-400", "bg": "bg-teal-950/40 border-teal-800" },
+      { "id": "fair_range", "label": "Hợp Lý", "sub": "0.95 - 1.10x", "color": "from-blue-600 to-slate-600", "text": "text-blue-400", "bg": "bg-blue-950/40 border-blue-800" },
+      { "id": "above_fair", "label": "Chớm Đắt", "sub": "1.10 - 1.20x", "color": "from-amber-600 to-orange-500", "text": "text-amber-400", "bg": "bg-amber-950/40 border-amber-800" },
+      { "id": "expensive", "label": "Đắt", "sub": "1.20 - 1.35x", "color": "from-orange-600 to-rose-600", "text": "text-orange-400", "bg": "bg-orange-950/40 border-orange-800" },
+      { "id": "danger", "label": "Nguy Hiểm", "sub": "> 1.35x", "color": "from-rose-600 to-red-700", "text": "text-rose-400", "bg": "bg-rose-950/40 border-rose-800" }
+    ],
+    "dcfScenarios": {
+      "bearG": 2.0,
+      "bearWaccSpread": 1.0,
+      "bullG": 3.5,
+      "bullWaccSpread": -0.5,
+      "defaultTerminalG": 3.0
+    },
+    "reverseDcf": {
+      "conservativeThreshold": 8.0,
+      "moderateThreshold": 18.0,
+      "narratives": {
+        "conservative": "✅ Thị trường đang định giá rất thận trọng (kỳ vọng tăng trưởng thấp hơn GDP/ngành), tạo biên an toàn hấp dẫn cho nhà đầu tư tích lũy dài hạn.",
+        "moderate": "⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.",
+        "aggressive": "⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá."
+      }
+    },
+    "dividendSustainability": {
+      "fcfPayoutSafeThreshold": 60.0,
+      "fcfPayoutMaxThreshold": 100.0,
+      "accPayoutSafeThreshold": 70.0,
+      "narratives": {
+        "safe": "Doanh nghiệp có dòng tiền tự do FCF mạnh mẽ bảo chứng 100% cho việc chi trả cổ tức. Đây là ứng viên chất lượng cao cho danh mục đầu tư tích sản dài hạn hưởng cổ tức bền vững.",
+        "trap": "Cảnh báo bẫy cổ tức (Dividend Trap): Doanh nghiệp đang chia cổ tức cao hơn dòng tiền tự do tạo ra, có thể phải vay nợ để trả cổ tức hoặc sẽ buộc phải cắt giảm cổ tức trong các kỳ tới.",
+        "neutral": "Tỷ lệ chi trả ở mức trung tính. Cần theo dõi tiến độ Capex và khả năng tạo tiền từ hoạt động kinh doanh để đảm bảo cổ tức không bị gián đoạn."
+      }
+    },
+    "financialSectorExemption": {
+      "title": "Miễn trừ áp dụng mô hình DCF (FCFF) cho Nhóm Ngân Hàng / Tài Chính",
+      "reason": "Theo chuẩn mực định giá quốc tế (Aswath Damodaran & CFA Institute), mô hình chiết khấu dòng tiền tự do doanh nghiệp (FCFF) không áp dụng cho các tổ chức tài chính do tiền gửi khách hàng và huy động vốn được tính trực tiếp vào dòng tiền hoạt động (CFO), làm méo mó dòng tiền tự do."
+    },
+    "magicFormulaUi": {
+      "eyThreshold": 8.5,
+      "roicThreshold": 15.0,
+      "topTierScore": 70
+    }
+  },
+  "aiEngineHub": {
+    "provider": "auto",
+    "geminiModel": "gemini-1.5-flash",
+    "supportedGeminiModels": [
+      "gemini-1.5-flash",
+      "gemini-1.5-pro",
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite"
+    ],
+    "openaiModel": "gpt-4o-mini",
+    "openaiBaseUrl": "https://api.openai.com/v1",
+    "temperature": 0.2,
+    "maxTokens": 2048,
+    "cacheTtlMs": 86400000,
+    "portfolioDoctor": {
+      "enabled": true,
+      "systemPrompt": "Bạn là Antigravity Portfolio Doctor & Chief Risk Officer (CRO), chuyên gia thẩm định danh mục đầu tư chứng khoán Việt Nam. Nhiệm vụ của bạn là rà soát cơ cấu phân bổ vốn, tỷ trọng tiền mặt, hệ số Sharpe, đòn bẩy và rủi ro sụt giảm NAV, đưa ra hành động tái cân bằng danh mục thực chiến."
+    },
+    "stockCopilot": {
+      "enabled": true,
+      "systemPrompt": "Bạn là Antigravity Senior Equity Research Analyst (CFA Charterholder), chuyên viên phân tích định giá cổ phiếu thị trường Việt Nam. Nhiệm vụ của bạn là thẩm định điểm hội tụ của 10 mô hình định lượng, rà soát 7 bẫy định giá, kiểm tra năng lực tạo dòng tiền FCF và đưa ra vùng mua/bán an toàn."
+    },
+    "dcaAdvisor": {
+      "enabled": true,
+      "systemPrompt": "Bạn là Quantitative Execution Trader, chuyên gia lập kế hoạch gom hàng DCA đa tầng. Nhiệm vụ của bạn là đánh giá tính khả thi của lưới mua gom theo bước giá, mức độ chịu nhiệt tài khoản và tối ưu hóa giá vốn trung bình."
+    },
+    "strategyCoach": {
+      "enabled": true,
+      "systemPrompt": "Bạn là Trading Psychology & Performance Coach, huấn luyện viên kỷ luật giao dịch chứng khoán. Nhiệm vụ của bạn là nhận diện các thiên kiến tâm lý (FOMO, gồng lỗ, chốt non), phân tích Win Rate theo chiến lược và đưa ra giải pháp nâng cao tính kỷ luật."
+    }
+  },
+  "taxAndFees": {
+    "stockSaleTaxPct": 0.1,
+    "dividendCashTaxPct": 5.0,
+    "defaultTradeFeePct": 0.1,
+    "presetFeePcts": ["0", "0.1", "0.15"],
+    "legalNote": "Theo quy định thuế TNCN tại Việt Nam, thuế chuyển nhượng chứng khoán được CTCK tự động khấu trừ 0.1% trên giá trị chuyển nhượng từng lần, thuế cổ tức tiền mặt là 5.0%."
   },
   "systemAndNetwork": {
     "serverPort": 3001,

@@ -15,6 +15,9 @@ export default function HistoryFilterToolbar({
   tagFilter = '',
   setTagFilter,
   uniqueTags = [],
+  timePreset = 'all',
+  setTimePreset,
+  handleSelectTimePreset,
   startDate = '',
   setStartDate,
   endDate = '',
@@ -208,9 +211,9 @@ export default function HistoryFilterToolbar({
               <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
                 <button
                   type="button"
-                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('all') : (setStartDate(''), setEndDate(''))}
                   className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    !startDate && !endDate
+                    timePreset === 'all' || (!startDate && !endDate && timePreset !== 'custom')
                       ? 'bg-indigo-600 text-white shadow-2xs'
                       : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
                   }`}
@@ -220,13 +223,9 @@ export default function HistoryFilterToolbar({
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    const now = new Date();
-                    setStartDate(`${now.getFullYear()}-01-01`);
-                    setEndDate(now.toISOString().slice(0, 10));
-                  }}
+                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('ytd') : null}
                   className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    startDate === `${new Date().getFullYear()}-01-01`
+                    timePreset === 'ytd'
                       ? 'bg-indigo-600 text-white shadow-2xs'
                       : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
                   }`}
@@ -235,25 +234,23 @@ export default function HistoryFilterToolbar({
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    const now = new Date();
-                    const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-                    setStartDate(oneYearAgo.toISOString().slice(0, 10));
-                    setEndDate(now.toISOString().slice(0, 10));
-                  }}
-                  className="px-2.5 py-1 rounded-lg font-bold text-gray-500 dark:text-slate-400 hover:text-gray-700 transition-colors cursor-pointer"
+                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('1y') : null}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                    timePreset === '1y'
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
+                  }`}
                 >
                   1Y
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    const now = new Date();
-                    const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-                    setStartDate(`${now.getFullYear()}-${monthStr}-01`);
-                    setEndDate(now.toISOString().slice(0, 10));
-                  }}
-                  className="px-2.5 py-1 rounded-lg font-bold text-gray-500 dark:text-slate-400 hover:text-gray-700 transition-colors cursor-pointer"
+                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('mtd') : null}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                    timePreset === 'mtd'
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
+                  }`}
                 >
                   MTD
                 </button>
@@ -330,14 +327,20 @@ export default function HistoryFilterToolbar({
                     <input
                       type="date"
                       value={startDate}
-                      onChange={e => setStartDate(e.target.value)}
+                      onChange={e => {
+                        setStartDate(e.target.value);
+                        if (setTimePreset) setTimePreset('custom');
+                      }}
                       className="input-base !w-1/2 text-[11px] font-semibold"
                     />
                     <span className="text-slate-400">→</span>
                     <input
                       type="date"
                       value={endDate}
-                      onChange={e => setEndDate(e.target.value)}
+                      onChange={e => {
+                        setEndDate(e.target.value);
+                        if (setTimePreset) setTimePreset('custom');
+                      }}
                       className="input-base !w-1/2 text-[11px] font-semibold"
                     />
                   </div>

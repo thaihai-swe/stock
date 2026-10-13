@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { addDividend, deleteDividend } from '../utils/api.js';
 import { fmtMoney, fmtDate, getTodayDate } from '../utils/format.js';
+import { DIVIDEND_CASH_TAX_PCT } from '../utils/constants.js';
 
 export default function DividendManager({
   dividends = [],
@@ -13,7 +14,7 @@ export default function DividendManager({
   const [date, setDate] = useState(getTodayDate());
   const [quantity, setQuantity] = useState('');
   const [amountPerShare, setAmountPerShare] = useState('');
-  const [taxPct, setTaxPct] = useState('5'); // 5% thuế TNCN cổ tức ở VN
+  const [taxPct, setTaxPct] = useState(String(DIVIDEND_CASH_TAX_PCT)); // Thuế TNCN cổ tức theo luật VN
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

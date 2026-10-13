@@ -7,6 +7,13 @@ import HistoryLotInspectorModal from './history/HistoryLotInspectorModal.jsx';
 import HistoryOrdersTable from './history/HistoryOrdersTable.jsx';
 import HistoryPerformanceTab from './history/HistoryPerformanceTab.jsx';
 
+function getLocalDateString(d = new Date()) {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function TransactionHistory({
   data,
   onSuccess,
@@ -44,6 +51,7 @@ export default function TransactionHistory({
   const [textSearch, setTextSearch] = useState('');
   const [symbolFilter, setSymbolFilter] = useState('');
   const [tagFilter, setTagFilter] = useState('');
+  const [timePreset, setTimePreset] = useState('all'); // 'all' | 'ytd' | '1y' | 'mtd' | 'custom'
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortField, setSortField] = useState('date');
@@ -51,6 +59,40 @@ export default function TransactionHistory({
   const [deletingId, setDeletingId] = useState(null);
   const [mobileViewMode, setMobileViewMode] = useState('card'); // 'card' | 'table'
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  // Hàm chọn preset thời gian nhanh (Chuẩn hóa múi giờ địa phương)
+  function handleSelectTimePreset(preset) {
+    const now = new Date();
+    const todayStr = getLocalDateString(now);
+
+    setTimePreset(preset);
+    switch (preset) {
+      case 'ytd': {
+        const start = `${now.getFullYear()}-01-01`;
+        setStartDate(start);
+        setEndDate(todayStr);
+        break;
+      }
+      case '1y': {
+        const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+        setStartDate(getLocalDateString(oneYearAgo));
+        setEndDate(todayStr);
+        break;
+      }
+      case 'mtd': {
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        setStartDate(`${now.getFullYear()}-${monthStr}-01`);
+        setEndDate(todayStr);
+        break;
+      }
+      case 'all':
+      default: {
+        setStartDate('');
+        setEndDate('');
+        break;
+      }
+    }
+  }
 
   // Gộp tất cả giao dịch
   const allTx = useMemo(() => {
@@ -166,11 +208,12 @@ export default function TransactionHistory({
     setTextSearch('');
     setSymbolFilter('');
     setTagFilter('');
+    setTimePreset('all');
     setStartDate('');
     setEndDate('');
   }
 
-  const hasFilterActive = tab !== 'all' || pnlFilter !== 'all' || textSearch || symbolFilter || tagFilter || startDate || endDate;
+  const hasFilterActive = tab !== 'all' || pnlFilter !== 'all' || textSearch || symbolFilter || tagFilter || startDate || endDate || timePreset !== 'all';
   const activeFilterCount = (symbolFilter ? 1 : 0) + (tagFilter ? 1 : 0) + (startDate || endDate ? 1 : 0) + (pnlFilter !== 'all' ? 1 : 0) + (tab !== 'all' ? 1 : 0);
 
   // Nhãn mô tả bộ lọc đang chọn cho Hero Card
@@ -181,12 +224,15 @@ export default function TransactionHistory({
     if (tab === 'sell') parts.push('Lệnh bán');
     if (pnlFilter === 'profit') parts.push('Có lãi');
     if (pnlFilter === 'loss') parts.push('Thua lỗ');
-    if (startDate && endDate) parts.push(`${startDate} → ${endDate}`);
+    if (timePreset === 'ytd') parts.push('Năm nay (YTD)');
+    else if (timePreset === '1y') parts.push('1 Năm gần nhất');
+    else if (timePreset === 'mtd') parts.push('Tháng này (MTD)');
+    else if (startDate && endDate) parts.push(`${startDate} → ${endDate}`);
     else if (startDate) parts.push(`Từ ${startDate}`);
     else if (endDate) parts.push(`Đến ${endDate}`);
     if (tagFilter) parts.push(`#${tagFilter}`);
     return parts.join(' · ');
-  }, [symbolFilter, tab, pnlFilter, startDate, endDate, tagFilter]);
+  }, [symbolFilter, tab, pnlFilter, timePreset, startDate, endDate, tagFilter]);
 
   async function handleDelete(tx) {
     if (!confirm(`Xóa lệnh ${tx.type === 'BUY' ? 'mua' : 'bán'} ${tx.symbol}?`)) return;
@@ -245,6 +291,9 @@ export default function TransactionHistory({
         tagFilter={tagFilter}
         setTagFilter={setTagFilter}
         uniqueTags={uniqueTags}
+        timePreset={timePreset}
+        setTimePreset={setTimePreset}
+        handleSelectTimePreset={handleSelectTimePreset}
         startDate={startDate}
         setStartDate={setStartDate}
         endDate={endDate}
@@ -264,6 +313,10 @@ export default function TransactionHistory({
           data={data}
           marketPrices={marketPrices}
           onSelectSymbol={setSelectedSymbolModal}
+          timePreset={timePreset}
+          handleSelectTimePreset={handleSelectTimePreset}
+          startDate={startDate}
+          endDate={endDate}
         />
       ) : (
         <HistoryOrdersTable

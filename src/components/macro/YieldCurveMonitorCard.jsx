@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 /**
  * YieldCurveMonitorCard.jsx
@@ -34,10 +35,11 @@ export default function YieldCurveMonitorCard({ data }) {
       {/* ── 1. HEADER & TIÊU ĐỀ ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-100 dark:border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               VnBondLab & VN_MACRO_v4
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình định lượng giám sát đường cong lợi suất TPCP 17 dòng VnBondLab" />
             <span className="text-xs text-gray-400">17-Row Yield Curve Monitor</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">

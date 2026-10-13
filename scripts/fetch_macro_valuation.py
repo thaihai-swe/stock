@@ -299,12 +299,36 @@ def fetch_and_save_macro():
         "interbankRate": te_core.get("interbank_rate", fb_interbank),
     })
 
+    # 4g. Tổng hợp AI Macro Insight (Offline CIO heuristic hoặc giữ nguyên bản phân tích LLM đã có)
+    ai_insight = prev_cached_doc.get("aiInsight") if MACRO_FILE.exists() else None
+    if not ai_insight:
+        ai_insight = {
+            "status": "ready",
+            "model": "offline-cio-heuristic",
+            "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "headline": f"Chiến Lược Vĩ Mô: Pha {regime_phase.get('titleVi', '')} — {advisor_result.get('stance', '')}",
+            "strategicTakeaways": [
+                f"Định giá VN-Index P/E {current_pe:.1f}x (Z-Score: {advisor_result.get('zScore', 0):+.2f}), dải định giá {advisor_result.get('bandText', '')}.",
+                f"Tỷ trọng phân bổ khuyến nghị: {advisor_result.get('recommendedEquityPct', 70)}% Cổ phiếu / {advisor_result.get('recommendedCashPct', 30)}% Tiền mặt.",
+                f"Chuỗi truyền dẫn rủi ro: {yield_curve_monitor.get('summary', {}).get('transChainStage', 'N/A')} ({yield_curve_monitor.get('summary', {}).get('assetDecisionVi', '')}).",
+            ],
+            "actionPlan": [
+                "Theo dõi sát động thái can thiệp tỷ giá USD/VND và thanh khoản liên ngân hàng.",
+                "Tập trung gom cổ phiếu thuộc các nhóm ngành lọt vùng Sweet Spot (Định giá rẻ + Vĩ mô ủng hộ).",
+                "Duy trì kỷ luật phân bổ tài sản phòng thủ khi áp lực ngoại biên gia tăng."
+            ],
+            "riskAlerts": [
+                f"Rủi ro vĩ mô tổng hợp: {risk_info.get('riskScore', 0)}/100 ({risk_info.get('riskBucket', '')})."
+            ]
+        }
+
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
             "version": "4.0"
         },
+        "aiInsight": ai_insight,
         "yieldCurveMonitor": yield_curve_monitor,
         "marketIndex": market_index_data,
         "vn30Valuation": vn30_analysis,

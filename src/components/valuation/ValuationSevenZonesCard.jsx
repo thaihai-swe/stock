@@ -1,5 +1,7 @@
 import React from 'react';
 import { formatVND } from '../../utils/format.js';
+import { SEVEN_PRICE_ZONES } from '../../utils/constants.js';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function ValuationSevenZonesCard({
   sevenPriceZones,
@@ -9,15 +11,11 @@ export default function ValuationSevenZonesCard({
 }) {
   if (!sevenPriceZones && !threeLayerDecision) return null;
 
-  const zones = [
-    { id: 'deep_value', label: 'Deep Value', sub: '< 0.75x', color: 'from-purple-600 to-indigo-600', text: 'text-purple-400', bg: 'bg-purple-950/40 border-purple-800' },
-    { id: 'safe_buy', label: 'Mua An Toàn', sub: '0.75 - 0.85x', color: 'from-emerald-600 to-teal-600', text: 'text-emerald-400', bg: 'bg-emerald-950/40 border-emerald-800' },
-    { id: 'accumulate', label: 'Tích Luỹ', sub: '0.85 - 0.95x', color: 'from-teal-600 to-cyan-600', text: 'text-teal-400', bg: 'bg-teal-950/40 border-teal-800' },
-    { id: 'fair_range', label: 'Hợp Lý', sub: '0.95 - 1.10x', color: 'from-blue-600 to-slate-600', text: 'text-blue-400', bg: 'bg-blue-950/40 border-blue-800' },
-    { id: 'above_fair', label: 'Chớm Đắt', sub: '1.10 - 1.20x', color: 'from-amber-600 to-orange-500', text: 'text-amber-400', bg: 'bg-amber-950/40 border-amber-800' },
-    { id: 'expensive', label: 'Đắt', sub: '1.20 - 1.35x', color: 'from-orange-600 to-rose-600', text: 'text-orange-400', bg: 'bg-orange-950/40 border-orange-800' },
-    { id: 'danger', label: 'Nguy Hiểm', sub: '> 1.35x', color: 'from-rose-600 to-red-700', text: 'text-rose-400', bg: 'bg-rose-950/40 border-rose-800' }
-  ];
+  const zones = Array.isArray(SEVEN_PRICE_ZONES)
+    ? SEVEN_PRICE_ZONES
+    : (SEVEN_PRICE_ZONES && typeof SEVEN_PRICE_ZONES === 'object'
+        ? Object.values(SEVEN_PRICE_ZONES)
+        : []);
 
   const currentZone = sevenPriceZones?.currentZone || 'Fair Range';
   const boundaries = sevenPriceZones?.boundaries || {};
@@ -54,10 +52,11 @@ export default function ValuationSevenZonesCard({
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Mô Hình Định Lượng Độc Lập
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình định lượng 7 vùng định giá & khung quyết định 3 tầng" />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               7 Vùng Giá & Khung Ra Quyết Định 3 Tầng
             </span>

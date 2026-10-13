@@ -10,6 +10,7 @@ import {
 } from '../utils/api.js';
 import { fmtMoney, plColor, fmtDate } from '../utils/format.js';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { STOCK_SALE_TAX_PCT, TAX_LEGAL_NOTE } from '../utils/constants.js';
 
 export default function Settings({ data, currentUser, onSuccess, showToast }) {
   const { themeMode, effectiveTheme, isDark, setThemeMode } = useTheme();
@@ -161,8 +162,8 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
     (sum, s) => sum + (s.grossRevenue || (s.quantity * s.price)),
     0
   );
-  // Thuế TNCN tại Việt Nam: 0.1% giá trị chuyển nhượng mỗi lần bán
-  const personalIncomeTax = Math.round(totalGrossRevenue * 0.001);
+  // Thuế TNCN tại Việt Nam theo luật chuyển nhượng chứng khoán
+  const personalIncomeTax = Math.round(totalGrossRevenue * (STOCK_SALE_TAX_PCT / 100));
   const totalRealizedGain = taxOrders.filter(s => s.profitLoss > 0).reduce((sum, s) => sum + s.profitLoss, 0);
   const totalRealizedLoss = taxOrders.filter(s => s.profitLoss < 0).reduce((sum, s) => sum + s.profitLoss, 0);
   const netProfit = totalRealizedGain + totalRealizedLoss;
@@ -249,7 +250,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
               <span>🧾</span> Báo Cáo Thuế TNCN Bán Cổ Phiếu
             </h3>
             <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">
-              Theo quy định thuế TNCN tại Việt Nam (0.1% trên tổng giá trị chuyển nhượng khi bán)
+              Theo quy định thuế TNCN tại Việt Nam ({STOCK_SALE_TAX_PCT}% trên tổng giá trị chuyển nhượng khi bán)
             </p>
           </div>
 
@@ -277,7 +278,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
             </div>
 
             <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-4 border border-amber-100 dark:border-amber-900/40">
-              <p className="text-xs text-amber-700 dark:text-amber-400 uppercase font-medium">Thuế TNCN tạm tính (0.1%)</p>
+              <p className="text-xs text-amber-700 dark:text-amber-400 uppercase font-medium">Thuế TNCN tạm tính ({STOCK_SALE_TAX_PCT}%)</p>
               <p className="text-lg font-bold text-amber-800 dark:text-amber-300 mt-1">{fmtMoney(personalIncomeTax)}đ</p>
               <p className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">Khấu trừ tự động khi bán</p>
             </div>
@@ -300,7 +301,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
           <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 rounded-xl p-3 text-xs text-blue-800 dark:text-blue-300 mt-4 flex items-start gap-2">
             <span className="text-base">💡</span>
             <p>
-              <b>Lưu ý thuế:</b> Thuế thu nhập cá nhân đối với chuyển nhượng chứng khoán được CTCK tự động tính và thu <b>0.1%</b> trên giá chuyển nhượng từng lần, không phụ thuộc vào việc lệnh bán đó có lãi hay lỗ.
+              <b>Lưu ý thuế:</b> {TAX_LEGAL_NOTE}
             </p>
           </div>
         </div>

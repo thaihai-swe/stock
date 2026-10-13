@@ -18,6 +18,20 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
+try:
+    from scripts.lib.config_loader import get_macro_narratives, get_macro_thresholds
+except ImportError:
+    try:
+        from lib.config_loader import get_macro_narratives, get_macro_thresholds
+    except ImportError:
+        def get_macro_thresholds() -> Dict[str, Any]:
+            return {}
+        def get_macro_narratives() -> Dict[str, Any]:
+            return {}
+
+_thresholds = get_macro_thresholds()
+_narratives = get_macro_narratives()
+
 
 def compute_window_stats(df: pd.DataFrame, col: str, label: str) -> Dict[str, Any]:
     """Tính toán bộ chỉ số thống kê & phân vị 5-band cho 1 cột số liệu trong 1 cửa sổ thời gian."""
@@ -108,31 +122,37 @@ def compute_composite_signal(spe: Dict[str, Any], spb: Dict[str, Any]) -> Dict[s
 
     score = round(z_pe_norm * 0.30 + z_pb_norm * 0.30 + pctl_pe * 0.20 + pctl_pb * 0.20, 1)
 
+    signals_map = _narratives.get("compositeSignals", {})
     if score <= 20.0:
-        signal = "MUA MẠNH (DEEP VALUE)"
-        badge = "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40"
-        color = "#22c55e"
-        description = "Định giá thị trường đang ở vùng đáy lịch sử (Percentile < 20%), cơ hội vàng tích lũy cổ phiếu giá trị."
+        sig_data = signals_map.get("DEEP_VALUE", {})
+        signal = sig_data.get("signal", "MUA MẠNH (DEEP VALUE)")
+        badge = sig_data.get("badge", "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40")
+        color = sig_data.get("color", "#22c55e")
+        description = sig_data.get("description", "Định giá thị trường đang ở vùng đáy lịch sử (Percentile < 20%), cơ hội vàng tích lũy cổ phiếu giá trị.")
     elif score <= 40.0:
-        signal = "MUA TÍCH LŨY (VALUE BUY)"
-        badge = "bg-teal-500/20 text-teal-300 border border-teal-400/40"
-        color = "#14b8a6"
-        description = "Định giá thị trường đang ở vùng hấp dẫn dưới trung vị lịch sử, thích hợp giải ngân DCA theo lộ trình."
+        sig_data = signals_map.get("VALUE_BUY", {})
+        signal = sig_data.get("signal", "MUA TÍCH LŨY (VALUE BUY)")
+        badge = sig_data.get("badge", "bg-teal-500/20 text-teal-300 border border-teal-400/40")
+        color = sig_data.get("color", "#14b8a6")
+        description = sig_data.get("description", "Định giá thị trường đang ở vùng hấp dẫn dưới trung vị lịch sử, thích hợp giải ngân DCA theo lộ trình.")
     elif score <= 60.0:
-        signal = "TRUNG LẬP / GIỮ (HOLD)"
-        badge = "bg-blue-500/20 text-blue-300 border border-blue-400/40"
-        color = "#3b82f6"
-        description = "Định giá cân bằng quanh mức trung bình dài hạn, nắm giữ danh mục và chọn lọc cổ phiếu có câu chuyện riêng."
+        sig_data = signals_map.get("HOLD", {})
+        signal = sig_data.get("signal", "TRUNG LẬP / GIỮ (HOLD)")
+        badge = sig_data.get("badge", "bg-blue-500/20 text-blue-300 border border-blue-400/40")
+        color = sig_data.get("color", "#3b82f6")
+        description = sig_data.get("description", "Định giá cân bằng quanh mức trung bình dài hạn, nắm giữ danh mục và chọn lọc cổ phiếu có câu chuyện riêng.")
     elif score <= 80.0:
-        signal = "HẠ TỶ TRỌNG (TRIM / CAUTION)"
-        badge = "bg-amber-500/20 text-amber-300 border border-amber-400/40"
-        color = "#f59e0b"
-        description = "Thị trường bước vào vùng định giá cao hơn trung bình, cân nhắc chốt lời từng phần và nâng tỷ trọng tiền mặt."
+        sig_data = signals_map.get("TRIM", {})
+        signal = sig_data.get("signal", "HẠ TỶ TRỌNG (TRIM / CAUTION)")
+        badge = sig_data.get("badge", "bg-amber-500/20 text-amber-300 border border-amber-400/40")
+        color = sig_data.get("color", "#f59e0b")
+        description = sig_data.get("description", "Thị trường bước vào vùng định giá cao hơn trung bình, cân nhắc chốt lời từng phần và nâng tỷ trọng tiền mặt.")
     else:
-        signal = "PHÒNG THỦ / BÁN (DEFENSIVE)"
-        badge = "bg-rose-500/20 text-rose-300 border border-rose-400/40"
-        color = "#ef4444"
-        description = "Thị trường ở vùng quá nóng (Percentile > 80%), nguy cơ điều chỉnh định giá cao, ưu tiên quản trị rủi ro tối đa."
+        sig_data = signals_map.get("DEFENSIVE", {})
+        signal = sig_data.get("signal", "PHÒNG THỦ / BÁN (DEFENSIVE)")
+        badge = sig_data.get("badge", "bg-rose-500/20 text-rose-300 border border-rose-400/40")
+        color = sig_data.get("color", "#ef4444")
+        description = sig_data.get("description", "Thị trường ở vùng quá nóng (Percentile > 80%), nguy cơ điều chỉnh định giá cao, ưu tiên quản trị rủi ro tối đa.")
 
     return {
         "score": score,
@@ -141,7 +161,6 @@ def compute_composite_signal(spe: Dict[str, Any], spb: Dict[str, Any]) -> Dict[s
         "color": color,
         "description": description
     }
-
 
 def analyze_market_valuation(df: pd.DataFrame, now: Optional[datetime] = None) -> Dict[str, Any]:
     """
@@ -169,25 +188,26 @@ def analyze_market_valuation(df: pd.DataFrame, now: Optional[datetime] = None) -
     five_yr = now - timedelta(days=365 * 5)
     ten_yr = now - timedelta(days=365 * 10)
 
+    win_narratives = _narratives.get("valuationWindows", {})
     windows = {
         "ten_year": {
-            "label": "10 Năm",
-            "desc": "Cửa sổ chuẩn mực vĩ mô (Khuyến nghị)",
+            "label": win_narratives.get("ten_year", {}).get("label", "10 Năm"),
+            "desc": win_narratives.get("ten_year", {}).get("desc", "Cửa sổ chuẩn mực vĩ mô dài hạn (Khuyến nghị)"),
             "df": df_derived[df_derived["trading_date"] >= ten_yr].copy(),
         },
         "five_year": {
-            "label": "5 Năm",
-            "desc": "Chu kỳ kinh tế & tiền tệ gần nhất",
+            "label": win_narratives.get("five_year", {}).get("label", "5 Năm"),
+            "desc": win_narratives.get("five_year", {}).get("desc", "Chu kỳ kinh tế & tiền tệ gần nhất"),
             "df": df_derived[df_derived["trading_date"] >= five_yr].copy(),
         },
         "modern": {
-            "label": "Từ 2007",
-            "desc": "Giai đoạn TTCK gia nhập WTO",
+            "label": win_narratives.get("modern", {}).get("label", "Từ 2007"),
+            "desc": win_narratives.get("modern", {}).get("desc", "Thời kỳ hội nhập WTO"),
             "df": df_derived[df_derived["trading_date"] >= "2007-01-01"].copy(),
         },
         "all_time": {
-            "label": "Toàn Bộ",
-            "desc": "Toàn cảnh 25 năm từ ngày lập sàn",
+            "label": win_narratives.get("all_time", {}).get("label", "Toàn Bộ (25 Năm)"),
+            "desc": win_narratives.get("all_time", {}).get("desc", "Toàn cảnh từ ngày lập sàn HOSE"),
             "df": df_derived.copy(),
         },
     }
@@ -226,16 +246,17 @@ def analyze_market_valuation(df: pd.DataFrame, now: Optional[datetime] = None) -
     cur_date = str(last_row["trading_date"])[:10]
 
     # Kiểm tra cảnh báo cực đoan theo cửa sổ chuẩn 10 năm
+    z_threshold = _thresholds.get("marketValuation", {}).get("zScoreExtreme", 2.0)
     def_win = windows_result.get("ten_year") or windows_result.get("all_time") or {}
     z_pe_def = def_win.get("pe", {}).get("zscore", 0.0) or 0.0
     z_pb_def = def_win.get("pb", {}).get("zscore", 0.0) or 0.0
-    extreme_alert = abs(z_pe_def) > 2.0 or abs(z_pb_def) > 2.0
+    extreme_alert = abs(z_pe_def) > z_threshold or abs(z_pb_def) > z_threshold
     extreme_alert_text = None
     if extreme_alert:
-        if z_pe_def < -2.0:
-            extreme_alert_text = f"Cảnh báo độ lệch chuẩn cực đoan: Z-Score P/E = {z_pe_def:+.2f} (Rẻ hiếm có, vùng hoảng loạn lịch sử |z| > 2)."
-        elif z_pe_def > 2.0:
-            extreme_alert_text = f"Cảnh báo độ lệch chuẩn cực đoan: Z-Score P/E = {z_pe_def:+.2f} (Đắt cực độ, vùng hưng phấn bong bóng |z| > 2)."
+        if z_pe_def < -z_threshold:
+            extreme_alert_text = f"Cảnh báo độ lệch chuẩn cực đoan: Z-Score P/E = {z_pe_def:+.2f} (Rẻ hiếm có, vùng hoảng loạn lịch sử |z| > {z_threshold})."
+        elif z_pe_def > z_threshold:
+            extreme_alert_text = f"Cảnh báo độ lệch chuẩn cực đoan: Z-Score P/E = {z_pe_def:+.2f} (Đắt cực độ, vùng hưng phấn bong bóng |z| > {z_threshold})."
 
     return {
         "current": {

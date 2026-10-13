@@ -606,7 +606,17 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 57871
+    "impliedFcfYieldPrice": 57871,
+    "aiConvergence": {
+      "convergenceHeadline": "Hội tụ định giá MBB: Phân hóa sâu sắc giữa đệm vốn tái đầu tư và tỷ suất sinh lời ROE vượt trội",
+      "divergenceExplanation": "Sự phân kỳ rõ rệt giữa các mô hình bắt nguồn từ bản chất thâm dụng vốn pháp định của ngành ngân hàng: MBB giữ lại phần lớn lợi nhuận để củng cố hệ số an toàn vốn CAR thay vì trả cổ tức tiền mặt lớn, khiến DDM (13.264 đồng) định giá quá thận trọng. Ngược lại, việc áp dụng máy móc FCFF, DCF đa giai đoạn và EV/EBITDA bị triệt tiêu giá trị (trọng số 0) do tiền gửi khách hàng là vốn lưu động kinh doanh chứ không phải nợ tài chính thông thường, đồng thời CapEx ngân hàng nằm ở tài sản công nghệ và trích lập dự phòng thay vì tài sản cố định. Mô hình RIM xuất hiện đột biến ngoại lai (540.238 đồng) do giả định ROE duy trì trên 20% vĩnh viễn mà không suy giảm về chi phí vốn chủ sở hữu. Do đó, điểm hội tụ hợp lý nhất nằm ở giao điểm giữa P/E chuẩn hóa (27.368 đồng) và P/B Gordon (46.994 đồng).",
+      "sensitivityStory": "Thử tải kịch bản rủi ro hệ thống: Nếu chi phí vốn cổ phần (Ke) tăng thêm 1.5% (do lạm phát và lợi suất trái phiếu chính phủ tăng) đồng thời tốc độ tăng trưởng dài hạn (g) giảm 1.0% do hạn mức tín dụng bão hòa, định giá từ mô hình P/B-Gordon và DDM sẽ giảm ngay 21% - 25%. Khi đó, biên an toàn hiện tại từ mức 48.7% sẽ bị co hẹp mạnh xuống còn khoảng 22.5% - 26.0%. Mức đệm này vẫn đủ khả năng bảo vệ nhà đầu tư trước chu kỳ nợ xấu tiềm ẩn nhờ lợi thế chi phí vốn rẻ từ tỷ lệ CASA vượt trội của MBB.",
+      "preferredModelRecommendation": "Khuyến nghị sử dụng Mô hình P/B kết hợp Gordon Growth Model (P/B = [ROE - g] / [Ke - g]) có hiệu chỉnh chất lượng tài sản nợ xấu. Đối với các ngân hàng thương mại quy mô lớn như MBB, giá trị sổ sách (Book Value) là đại diện chuẩn xác nhất cho năng lực sinh lời của tài sản ròng, và mối tương quan P/B - ROE phản ánh trọn vẹn sức mạnh nội tại mà không bị sai lệch bởi cấu trúc dòng tiền tự do như ở các doanh nghiệp sản xuất.",
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -3344,6 +3354,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 0,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của MBB duy trì trạng thái trung tính, phản ánh sự ổn định trong hoạt động kinh doanh cốt lõi và thanh khoản thị trường.",
+      "catalysts": [
+        "Kỳ vọng tăng trưởng sản lượng và mở rộng thị phần trong các quý tới.",
+        "Tiến độ giải ngân các dự án trọng điểm và kế hoạch trả cổ tức tiền mặt."
+      ],
+      "keyRisks": [
+        "Biến động giá nguyên vật liệu đầu vào và sức ép cạnh tranh trong ngành.",
+        "Rủi ro thị trường chung và sự đảo chiều dòng vốn khối ngoại."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "status": "success",
+      "provider": "offline-heuristic-engine",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
   },
   "beneishMScore": {
@@ -3582,6 +3609,40 @@
       "latestCfo": 15570.0,
       "latestCapex": 171.0,
       "constructionInProgress": 1088.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.39 vượt ngưỡng an toàn (-1.78), cảnh báo rủi ro dồn tích (TATA) và đòn bẩy tăng (LVGI) vốn dễ bị nhiễu bởi mô hình phi tài chính áp cho ngân hàng thương mại. Tuy nhiên, dưới góc độ kiểm toán pháp y, việc ghi nhận thu nhập lãi dồn tích (lãi dự thu) và mức độ vốn hóa rủi ro vào tài sản khác cần được khoanh vùng kiểm tra chặt chẽ nhằm loại trừ rủi ro che giấu nợ xấu và trì hoãn trích lập dự phòng.",
+      "dupontEarningsQuality": "Mức ROE hấp dẫn 21.55% thực chất được khuếch đại chủ yếu nhờ đòn bẩy tài chính rất cao (11.05 lần) đặc thù ngành ngân hàng, trong khi hiệu suất sử dụng tài sản rất thấp (vòng quay tài sản 0.05 lần). Chất lượng lợi nhuận phụ thuộc lớn vào việc gánh nặng chi phí vốn/lãi vay (Interest Burden 0.382x) đang bào mòn mạnh biên lợi nhuận trước trích lập dự phòng rủi ro tín dụng.",
+      "auditorChecklist": [
+        "Quy mô và số dư lãi dự thu (lãi và phí phải thu) chưa thu được bằng tiền mặt hiện là bao nhiêu, và ngân hàng đã thực hiện thoái thu lãi dự thu đối với các nhóm nợ cơ cấu lại theo thông tư hỗ trợ như thế nào?",
+        "Với tỷ lệ đòn bẩy tổng tài sản/vốn chủ sở hữu ở mức 11.05 lần, bộ đệm dự phòng bao phủ nợ xấu (LLR) và chất lượng danh mục trái phiếu doanh nghiệp nắm giữ đã được trích lập phản ánh đầy đủ rủi ro tín dụng thực tế hay chưa?"
+      ],
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
+  },
+  "aiDeepDive": {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ",
+    "convictionScore": 90,
+    "thesisHeadline": "Định giá rơi vào vùng chiết khấu sâu (Deep Value) mở ra biên an toàn 48.7% với ROE 21.55% dẫn đầu ngành",
+    "valuationConvergenceAnalysis": "Các mô hình định lượng hội tụ đưa ra vùng giá trị hợp lý (Fair Value) của MBB dao động từ 35.479 đến 41.081 VNĐ/cổ phiếu. Hiện tại, thị giá đang nằm trong vùng 'Deep Value' (dưới mốc Safe Buy 28.010 VNĐ), tạo ra Biên an toàn (Margin of Safety - MoS) lên đến 48,7%. Mức P/E 6.16x và P/B 1.36x phản ánh sự định giá quá thấp so với hiệu quả sinh lời vượt trội (ROE đạt 21.55%, ROA đạt 1.95%), cho thấy sự lệch pha lớn giữa giá thị trường và giá trị nội tại từ mô hình Residual Income (RIM) cũng như chiết khấu dòng tiền.",
+    "trapAssessment": "Điểm bẫy định giá tuyệt đối an toàn ở mức 0.0 (THẤP), loại trừ hoàn toàn nguy cơ 'Value Trap' hay 'Book Trap'. ROE 21.55% duy trì cao vượt trội so với chi phí vốn chủ sở hữu (CoE ước tính 12-13%), khẳng định năng lực tạo ra giá trị kinh tế thặng dư (EVA) thực chất thay vì phá hủy giá trị sổ sách. Đòn bẩy tài chính 11.05x hoàn toàn lành mạnh theo chuẩn mực an toàn vốn ngân hàng, biên lợi nhuận ròng 41.6% cùng tỷ suất cổ tức 4.35% đảm bảo dòng tiền phân phối không bị căng thẳng.",
+    "catalysts": [
+      "Lợi thế chi phí vốn (CoF) nhờ tỷ lệ CASA dẫn đầu toàn ngành và hạn mức tăng trưởng tín dụng vượt trội do NHNN cấp cho các ngân hàng nhận chuyển giao bắt buộc.",
+      "Tăng trưởng thu nhập ngoài lãi (NFI) bứt phá nhờ hệ sinh thái tài chính số toàn diện thu hút quy mô khách hàng bán lẻ vượt mốc 25 triệu tài khoản.",
+      "Sóng tái định giá (Rerating) toàn ngành ngân hàng khi thị trường bất động sản và trái phiếu doanh nghiệp hồi phục, thúc đẩy P/E đảo chiều về mức trung bình lịch sử 8.5x - 9.0x."
+    ],
+    "keyRisks": [
+      "Áp lực nợ xấu tiềm ẩn và chi phí trích lập dự phòng rủi ro tín dụng phát sinh từ danh mục cho vay doanh nghiệp lớn thuộc nhóm năng lượng tái tạo và bất động sản.",
+      "Biên lãi thuần (NIM) chịu sức ép co hẹp nhẹ nếu cạnh tranh lãi suất cho vay đầu ra gia tăng trong bối cảnh tăng trưởng tín dụng toàn hệ thống cần kích cầu."
+    ],
+    "targetPriceHorizon12M": "38.500 VNĐ",
+    "status": "success",
+    "provider": "openai",
+    "model": "super-vip",
+    "updatedAt": "2026-10-13T16:21:30.900791+00:00"
   }
 }

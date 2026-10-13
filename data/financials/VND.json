@@ -605,7 +605,17 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 61064
+    "impliedFcfYieldPrice": 61064,
+    "aiConvergence": {
+      "convergenceHeadline": "Phân kỳ cực đoan giữa mô hình dòng tiền và mô hình vốn chủ: Đặc thù cấu trúc đòn bẩy định chế tài chính",
+      "divergenceExplanation": "Sự chênh lệch sâu sắc giữa nhóm mô hình dòng tiền DCF/FCFF/FCFE (>74.000 - 90.000 đồng) và nhóm định giá tài sản/thu nhập (15.000 - 28.000 đồng) xuất phát từ bản chất ngành chứng khoán. Với VND, nợ vay không phải là cấu trúc vốn tài trợ thuần túy mà là vốn lưu động kinh doanh (nguồn vốn cho vay margin và tự doanh), khiến định nghĩa CapEx và Working Capital truyền thống bị vô hiệu hóa, giải thích lý do nhóm DCF nhận trọng số 0%. Ngược lại, DDM ở mức thấp (7.962 đồng) do VND duy trì chu kỳ tái đầu tư lợi nhuận cao nhằm tăng vốn tự có để mở rộng trần margin thay vì trả cổ tức tiền mặt. Do đó, định giá thực tế tập trung quanh trục P/B Gordon (28.115 đồng), RIM (39.520 đồng) và P/E chuẩn hóa (19.503 đồng).",
+      "sensitivityStory": "Thử tải kịch bản bất lợi: Nếu chi phí vốn chủ sở hữu (Ke) tăng thêm 1.5% do biến động lãi suất điều hành và rủi ro thị trường vốn, đồng thời tốc độ tăng trưởng dài hạn (g) suy giảm 1.0%, giá trị nội tại từ mô hình Residual Income và Gordon P/B sẽ suy giảm từ 15% đến 18.5%. Cú sốc này sẽ thu hẹp biên an toàn 23.0% hiện tại về vùng rủi ro biên chỉ còn 4.5% - 7.0%, kéo mức giá cân bằng của VND về sát giá trị sổ sách cơ sở Book NAV (15.700 - 17.500 đồng), phản ánh mức độ nhạy cảm cao của cổ phiếu chứng khoán đối với chi phí vốn.",
+      "preferredModelRecommendation": "Khuyến nghị ưu tiên mô hình Thu nhập thặng dư (Residual Income Model - RIM) kết hợp với P/B Chuẩn hóa dựa trên ROE (Gordon P/B). Đây là chuẩn mực CFA tối ưu cho định chế tài chính, loại bỏ sai lệch của dòng tiền tự do, nắm bắt trực tiếp biến động giá trị tài sản ròng theo thị trường (Mark-to-Market của danh mục FVTPL/AFS) và phản ánh chính xác năng lực tạo ra tỷ suất sinh lời vượt chi phí vốn chủ sở hữu (ROE - Ke).",
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -2709,6 +2719,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 0,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của VND duy trì trạng thái trung tính, phản ánh sự ổn định trong hoạt động kinh doanh cốt lõi và thanh khoản thị trường.",
+      "catalysts": [
+        "Kỳ vọng tăng trưởng sản lượng và mở rộng thị phần trong các quý tới.",
+        "Tiến độ giải ngân các dự án trọng điểm và kế hoạch trả cổ tức tiền mặt."
+      ],
+      "keyRisks": [
+        "Biến động giá nguyên vật liệu đầu vào và sức ép cạnh tranh trong ngành.",
+        "Rủi ro thị trường chung và sự đảo chiều dòng vốn khối ngoại."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "status": "success",
+      "provider": "offline-heuristic-engine",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
   },
   "beneishMScore": {
@@ -2947,6 +2974,41 @@
       "latestCfo": -783.0,
       "latestCapex": 13.0,
       "constructionInProgress": 0.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Rủi Ro Thao Túng BCTC",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score chạm mức -0.93 (vượt ngưỡng cảnh báo an toàn -1.78), kích hoạt tín hiệu cờ đỏ về rủi ro làm đẹp số liệu BCTC thông qua dồn tích kế toán (TATA) và chất lượng tài sản (AQI) bị biến dạng bởi các khoản đầu tư tài chính. Mặc dù điểm Altman Z = 3.0 thể hiện doanh nghiệp an toàn về mặt thanh khoản ngắn hạn, sự bất đối xứng giữa lợi nhuận kế toán và dòng tiền thực tế cho thấy tính minh bạch của BCTC đang gặp vấn đề nghiêm trọng.",
+      "dupontEarningsQuality": "Mức ROE 16.12% được khuếch đại chủ yếu nhờ biên hoạt động danh nghĩa cao (57.89%) và đòn bẩy tài chính 2.33x, trong khi vòng quay tài sản cực thấp chỉ đạt 0.15 lần cho thấy dòng vốn đang bị ứ đọng lớn tại các tài sản tài chính kém thanh khoản. Chất lượng lợi nhuận thiếu tính bền vững khi phụ thuộc nặng nề vào thu nhập kế toán từ định giá lại tài sản (FVTPL) thay vì tạo ra từ hiệu quả luân chuyển tài sản thực tế.",
+      "auditorChecklist": [
+        "Đề nghị Ban Điều hành công bố chi tiết chất lượng danh mục trái phiếu/FVTPL và việc ghi nhận doanh thu dồn tích (accrued interest) chưa thu tiền thực tế để giải trình cho sự lệch pha của chỉ số M-Score?",
+        "Với vòng quay tài sản chỉ đạt 0.15 lần, Ban Lãnh đạo có biện pháp gì để xử lý rủi ro suy giảm giá trị tài sản (impairment) và kiểm chứng dòng tiền kinh doanh thuần (CFO) đối ứng với khoản lợi nhuận hoạt động 57.89%?"
+      ],
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
+  },
+  "aiDeepDive": {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ",
+    "convictionScore": 85,
+    "thesisHeadline": "Chiết khấu sâu dưới giá trị sổ sách (P/B 0.96x) kèm ROE 16.5%: Cơ hội gom tích lũy đón đầu chu kỳ nâng hạng",
+    "valuationConvergenceAnalysis": "Dữ liệu định lượng từ các mô hình định giá hội tụ xác lập dải giá trị hợp lý (Fair Value) của VND trong khoảng 16.229 - 18.791 VNĐ/cp (trung vị đạt 17.510 VNĐ). Với thị giá đang nằm trong vùng Tích lũy (Accumulate Zone <= 14.521 VNĐ), biên an toàn (MoS) đạt 23.0%, mở ra điểm vào vị thế hấp dẫn. Định lượng định giá P/B hiện chỉ ở mức 0.96x và P/E 7.42x – mức định giá chiết khấu sâu bất thường đối với định chế đầu ngành sở hữu tỷ suất sinh lời ROE đạt 16.48% (vượt trội so với chi phí vốn chủ CoE ước tính 11.5%). Mô hình thu nhập thặng dư (RIM) và P/B-ROE đều chỉ ra thị trường đang định giá thấp giá trị tài sản ròng của VND do phản ứng thái quá với các rủi ro quá khứ, hỗ trợ dư địa tái định giá (re-rating) mạnh mẽ về mức P/B mục tiêu 1.2x - 1.3x.",
+    "trapAssessment": "Trap Score ghi nhận 0.0/7 (Mức THẤP - Không phát hiện bẫy định giá). Bác bỏ Book Trap khi P/B < 1 đi kèm ROE cao 16.48% chứng minh doanh nghiệp tiếp tục tạo lập giá trị kinh tế. Rủi ro Debt Stress không hiện hữu: hệ số D/E duy trì ở mức 1.1x, tỷ lệ đòn bẩy tài chính 2.33x nằm trong ngưỡng an toàn cao của nhóm CTCK, thanh khoản tức thời vượt trội với Cash Ratio đạt 1.4x và Current Ratio 2.05x. Hệ số P/CF âm mang tính đặc thù chu kỳ khi VND gia tăng quy mô giải ngân tài sản tài chính (FVTPL) và dư nợ ký quỹ (Margin), không phản ánh suy thoái dòng tiền hoạt động cốt lõi.",
+    "catalysts": [
+      "Hệ thống KRX vận hành chính thức và triển khai cơ chế Non-prefunding (giao dịch không ký quỹ 100%) thúc đẩy thanh khoản thị trường bùng nổ, gia tăng biên lãi margin và doanh thu môi giới.",
+      "Thị trường TPDN ấm dần giúp giải tỏa áp lực thanh khoản và dự phòng liên quan đến danh mục trái phiếu năng lượng tái tạo, tạo điều kiện hoàn nhập và ghi nhận lợi nhuận tự doanh.",
+      "Sự phục hồi hoàn toàn thị phần môi giới bán lẻ và tiền gửi khách hàng sau khi củng cố toàn diện hạ tầng bảo mật công nghệ."
+    ],
+    "keyRisks": [
+      "Rủi ro tập trung danh mục đầu tư và bảo lãnh phát hành đối với một số tập đoàn năng lượng tái tạo chậm tiến độ dòng tiền.",
+      "Áp lực cạnh tranh phí giao dịch (Zero-Fee) từ các công ty chứng khoán vốn ngoại (Hàn Quốc, Đài Loan) làm xói mòn biên lợi nhuận mảng môi giới.",
+      "Biến động vĩ mô và lãi suất ảnh hưởng tiêu cực đến hiệu quả danh mục FVTPL và chi phí vốn vay ngắn hạn."
+    ],
+    "targetPriceHorizon12M": "17.800 VNĐ",
+    "status": "success",
+    "provider": "openai",
+    "model": "super-vip",
+    "updatedAt": "2026-10-13T16:21:30.900791+00:00"
   }
 }

@@ -12,6 +12,20 @@ Kế thừa tinh hoa từ VN_MACRO_v4.2 / VnBondLab / ref-vn_macro:
 
 from typing import Any, Dict, List, Optional
 
+try:
+    from scripts.lib.config_loader import get_macro_narratives, get_macro_thresholds
+except ImportError:
+    try:
+        from lib.config_loader import get_macro_narratives, get_macro_thresholds
+    except ImportError:
+        def get_macro_thresholds() -> Dict[str, Any]:
+            return {}
+        def get_macro_narratives() -> Dict[str, Any]:
+            return {}
+
+_thresholds = get_macro_thresholds()
+_narratives = get_macro_narratives()
+
 
 def _safe_float(val: Any, default: float = 0.0) -> float:
     """Ép kiểu float an toàn."""
@@ -30,24 +44,27 @@ def compute_yield_curve_monitor(macro_data: Optional[Dict[str, Any]] = None) -> 
     theo chuẩn VnBondLab & VN_MACRO_v4.
     """
     data = macro_data or {}
+    yc_thresh = _thresholds.get("yieldCurve", {})
+    vn_fallback = yc_thresh.get("vnFallback", {})
+    us_fallback = yc_thresh.get("usFallback", {})
 
     # ── 1. DỮ LIỆU ĐẦU VÀO VIỆT NAM (VN) ──
-    vn_intr = _safe_float(data.get("sbvRefinancingRate") or data.get("sbv_refinancing_rate") or data.get("policyRate"), 4.5)
-    vn_inbr = _safe_float(data.get("interbankRate") or data.get("interbank_rate") or data.get("overnightRate"), 6.47)
-    vn_cpi = _safe_float(data.get("cpiYoY") or data.get("cpi_yoy") or data.get("inflationRate"), 5.08)
+    vn_intr = _safe_float(data.get("sbvRefinancingRate") or data.get("sbv_refinancing_rate") or data.get("policyRate"), vn_fallback.get("sbvRefinancing", 4.5))
+    vn_inbr = _safe_float(data.get("interbankRate") or data.get("interbank_rate") or data.get("overnightRate"), vn_fallback.get("interbankOvernight", 6.47))
+    vn_cpi = _safe_float(data.get("cpiYoY") or data.get("cpi_yoy") or data.get("inflationRate"), vn_fallback.get("cpi", 5.08))
 
-    vn_2y = _safe_float(data.get("vn02y") or data.get("vn2yYield") or data.get("vn2y"), 2.45)
-    vn_5y = _safe_float(data.get("vn05y") or data.get("vn5yYield") or data.get("vn5y"), 3.20)
-    vn_10y = _safe_float(data.get("vn10y") or data.get("vn10yYield"), 3.45)
-    usdvnd = _safe_float(data.get("usd") or data.get("usdvnd") or data.get("usdVndRate"), 25881.0)
-    pe_vnindex = _safe_float(data.get("pe") or data.get("peVnindex") or data.get("pe_vnindex"), 13.8)
+    vn_2y = _safe_float(data.get("vn02y") or data.get("vn2yYield") or data.get("vn2y"), vn_fallback.get("vn02y", 2.45))
+    vn_5y = _safe_float(data.get("vn05y") or data.get("vn5yYield") or data.get("vn5y"), vn_fallback.get("vn05y", 3.20))
+    vn_10y = _safe_float(data.get("vn10y") or data.get("vn10yYield"), vn_fallback.get("vn10y", 3.45))
+    usdvnd = _safe_float(data.get("usd") or data.get("usdvnd") or data.get("usdVndRate"), vn_fallback.get("usdvnd", 25881.0))
+    pe_vnindex = _safe_float(data.get("pe") or data.get("peVnindex") or data.get("pe_vnindex"), vn_fallback.get("peVnindex", 13.8))
 
     # ── 2. DỮ LIỆU ĐẦU VÀO HOA KỲ (US) ──
-    us_policy = _safe_float(data.get("usPolicy") or data.get("fedFundsRate") or data.get("fed_funds"), 4.85)
-    us_2y = _safe_float(data.get("us02y") or data.get("us2yYield") or data.get("us2y"), 4.65)
-    us_5y = _safe_float(data.get("us05y") or data.get("us5yYield") or data.get("us5y"), 5.02)
-    us_10y = _safe_float(data.get("us10y") or data.get("us10yYield"), 5.24)
-    us_cpi = _safe_float(data.get("usCpi") or data.get("us_cpi"), 2.9)
+    us_policy = _safe_float(data.get("usPolicy") or data.get("fedFundsRate") or data.get("fed_funds"), us_fallback.get("usPolicy", 4.85))
+    us_2y = _safe_float(data.get("us02y") or data.get("us2yYield") or data.get("us2y"), us_fallback.get("us02y", 4.65))
+    us_5y = _safe_float(data.get("us05y") or data.get("us5yYield") or data.get("us5y"), us_fallback.get("us05y", 5.02))
+    us_10y = _safe_float(data.get("us10y") or data.get("us10yYield"), us_fallback.get("us10y", 5.24))
+    us_cpi = _safe_float(data.get("usCpi") or data.get("us_cpi"), us_fallback.get("usCpi", 2.9))
 
     # ── 3. TOÁN HỌC ĐƯỜNG CONG VIỆT NAM (NELSON-SIEGEL) ──
     vn_level = round((vn_2y + vn_5y + vn_10y) / 3.0, 2)
@@ -57,52 +74,47 @@ def compute_yield_curve_monitor(macro_data: Optional[Dict[str, Any]] = None) -> 
     vn_slope_5y10y = round(vn_10y - vn_5y, 2)
 
     # Trạng thái độ dốc VN
-    if vn_slope <= 0.0:
+    slope_th = yc_thresh.get("slopeThresholds", {})
+    if vn_slope <= slope_th.get("inverted", 0.0):
         vn_slope_state = "INVERTED"
-    elif vn_slope <= 0.40:
+    elif vn_slope <= slope_th.get("flat", 0.40):
         vn_slope_state = "FLAT"
-    elif vn_slope >= 1.20:
+    elif vn_slope >= slope_th.get("steep", 1.20):
         vn_slope_state = "STEEP"
     else:
         vn_slope_state = "NORMAL"
 
     # Trạng thái mức độ lợi suất VN
-    vn_level_state = "HIGH" if vn_level >= 3.80 else "LOW" if vn_level <= 2.60 else "MID"
+    level_th = yc_thresh.get("levelThresholds", {})
+    vn_level_state = "HIGH" if vn_level >= level_th.get("high", 3.80) else "LOW" if vn_level <= level_th.get("low", 2.60) else "MID"
 
     # Phân loại YC Regime VN (YC0 - YC4)
+    yc_regimes = _narratives.get("yieldCurveRegimes", {})
     if vn_level_state == "HIGH" and vn_slope_state in ("FLAT", "INVERTED"):
         vn_yc_code = "YC4"
-        vn_yc_label = "TIGHT_INVERTED"
-        vn_yc_desc = "Thắt chặt & Đảo ngược. Rủi ro thanh khoản cao."
-        vn_yc_sectors = "Tiện ích (UTI), Hàng tiêu dùng (CONS), Tiền mặt"
     elif vn_level_state == "HIGH" and vn_slope_state == "STEEP":
         vn_yc_code = "YC3"
-        vn_yc_label = "LATE_TIGHTENING"
-        vn_yc_desc = "Giai đoạn cuối thắt chặt. Lợi suất cao nhưng đường cong dốc lại."
-        vn_yc_sectors = "Năng lượng (ENE), Tiện ích (UTI), Công nghệ (IT)"
     elif vn_level_state == "LOW" and vn_slope_state == "STEEP":
         vn_yc_code = "YC2"
-        vn_yc_label = "EARLY_EASING"
-        vn_yc_desc = "Nới lỏng sớm. Lãi suất thấp, đường cong dốc mạnh kích thích tín dụng."
-        vn_yc_sectors = "Tài chính (FIN), Công nghiệp (IND), Vật liệu (MAT)"
     elif vn_level_state == "LOW":
         vn_yc_code = "YC1"
-        vn_yc_label = "EASING_MATURE"
-        vn_yc_desc = "Nới lỏng chín muồi. Lợi suất thấp kéo dài, dòng tiền rẻ lan tỏa."
-        vn_yc_sectors = "Tài chính (FIN), Bất động sản (REAL), Bán lẻ tiêu dùng"
     else:
         vn_yc_code = "YC0"
-        vn_yc_label = "NEUTRAL_MIXED"
-        vn_yc_desc = "Trạng thái cân bằng chu kỳ. Đường cong phân hóa."
-        vn_yc_sectors = "Luân chuyển cân bằng (Neutral Rotation)"
+
+    regime_item = yc_regimes.get(vn_yc_code, {})
+    vn_yc_label = regime_item.get("label", vn_yc_code)
+    vn_yc_desc = regime_item.get("desc", "Trạng thái cân bằng chu kỳ.")
+    vn_yc_sectors = regime_item.get("favoredSectors", "Luân chuyển cân bằng")
 
     # Căng thẳng đường cong VN (0 - 100)
+    stress_th = yc_thresh.get("stressScores", {})
     vn_stress_raw = 50.0 + (3.45 - vn_10y) * (-15.0) + (0.50 - vn_slope) * 25.0 + abs(vn_curvature) * 20.0
     vn_curve_stress = round(max(0.0, min(100.0, vn_stress_raw)), 1)
-    vn_stress_label = "HIGH" if vn_curve_stress >= 75.0 else "LOW" if vn_curve_stress <= 35.0 else "MID"
+    vn_stress_label = "HIGH" if vn_curve_stress >= stress_th.get("high", 75.0) else "LOW" if vn_curve_stress <= stress_th.get("low", 35.0) else "MID"
 
     # Trọng tâm biến động VN (Move Focus)
-    if vn_curvature >= 0.35:
+    curv_th = yc_thresh.get("curvatureThresholds", {})
+    if vn_curvature >= curv_th.get("bellyFocus", 0.35):
         vn_move_focus = "BELLY (Phình bụng 5Y)"
     elif abs(vn_slope_2y5y) > abs(vn_slope_5y10y):
         vn_move_focus = "SHORT (Đầu ngắn 2Y)"
@@ -110,8 +122,9 @@ def compute_yield_curve_monitor(macro_data: Optional[Dict[str, Any]] = None) -> 
         vn_move_focus = "LONG (Đầu dài 10Y)"
 
     # Lãi suất thực Ex-Ante (VN)
+    real_rate_th = yc_thresh.get("realRateStance", {})
     vn_real_rate = round(vn_intr - vn_cpi, 2)
-    vn_policy_stance = "THẮT CHẶT" if vn_real_rate >= 1.5 else "NỚI LỎNG" if vn_real_rate <= 0.0 else "TRUNG LẬP"
+    vn_policy_stance = "THẮT CHẶT" if vn_real_rate >= real_rate_th.get("tight", 1.5) else "NỚI LỎNG" if vn_real_rate <= real_rate_th.get("loose", 0.0) else "TRUNG LẬP"
 
     # ── 4. TOÁN HỌC ĐƯỜNG CONG HOA KỲ (US) ──
     us_level = round((us_2y + us_5y + us_10y) / 3.0, 2)
@@ -121,39 +134,40 @@ def compute_yield_curve_monitor(macro_data: Optional[Dict[str, Any]] = None) -> 
     us_slope_5y10y = round(us_10y - us_5y, 2)
 
     # Trạng thái US
-    if us_slope <= 0.0:
+    us_slope_th = yc_thresh.get("usSlopeThresholds", {})
+    if us_slope <= us_slope_th.get("inverted", 0.0):
         us_slope_state = "INVERTED"
-    elif us_slope <= 0.30:
+    elif us_slope <= us_slope_th.get("flat", 0.30):
         us_slope_state = "FLAT"
-    elif us_slope >= 0.80:
+    elif us_slope >= us_slope_th.get("steep", 0.80):
         us_slope_state = "STEEP"
     else:
         us_slope_state = "NORMAL"
 
-    us_level_state = "HIGH" if us_level >= 4.40 else "LOW" if us_level <= 3.40 else "MID"
+    us_level_th = yc_thresh.get("usLevelThresholds", {})
+    us_level_state = "HIGH" if us_level >= us_level_th.get("high", 4.40) else "LOW" if us_level <= us_level_th.get("low", 3.40) else "MID"
 
     if us_level_state == "HIGH" and us_slope_state in ("FLAT", "INVERTED"):
         us_yc_code = "YC4"
-        us_yc_label = "TIGHT_INVERTED"
     elif us_level_state == "HIGH" and us_slope_state == "STEEP":
         us_yc_code = "YC3"
-        us_yc_label = "LATE_TIGHTENING"
     elif us_level_state == "LOW" and us_slope_state == "STEEP":
         us_yc_code = "YC2"
-        us_yc_label = "EARLY_EASING"
     elif us_level_state == "LOW":
         us_yc_code = "YC1"
-        us_yc_label = "EASING_MATURE"
     else:
         us_yc_code = "YC0"
-        us_yc_label = "NEUTRAL_MIXED"
+
+    us_regime_item = yc_regimes.get(us_yc_code, {})
+    us_yc_label = us_regime_item.get("label", us_yc_code)
 
     us_curve_stress = round(max(0.0, min(100.0, 50.0 + (0.30 - us_slope) * 30.0 + abs(us_curvature) * 15.0)), 1)
-    us_stress_label = "HIGH" if us_curve_stress >= 75.0 else "LOW" if us_curve_stress <= 35.0 else "MID"
+    us_stress_label = "HIGH" if us_curve_stress >= stress_th.get("high", 75.0) else "LOW" if us_curve_stress <= stress_th.get("low", 35.0) else "MID"
     us_move_focus = "LINEAR (Tuyến tính)" if abs(us_curvature) <= 0.15 else "BELLY" if us_curvature > 0.20 else "LONG"
 
     us_real_rate = round(us_policy - us_cpi, 2)
-    us_policy_stance = "RESTRICTIVE" if us_policy >= 4.50 else "ACCOMMODATIVE" if us_policy <= 2.50 else "NEUTRAL"
+    us_stance_th = yc_thresh.get("usPolicyStance", {})
+    us_policy_stance = "RESTRICTIVE" if us_policy >= us_stance_th.get("restrictive", 4.50) else "ACCOMMODATIVE" if us_policy <= us_stance_th.get("accommodative", 2.50) else "NEUTRAL"
 
     # ── 5. CHÊNH LỆCH LIÊN THỊ TRƯỜNG & 4 SPREADS ──
     policy_spread = round(vn_intr - us_policy, 2)  # SBV vs Fed
@@ -171,48 +185,58 @@ def compute_yield_curve_monitor(macro_data: Optional[Dict[str, Any]] = None) -> 
 
     # ── 6. CHUỖI TRUYỀN DẪN RỦI RO 3 MẮT XÍCH (TRANSMISSION CHAIN LINKS A/B/C) ──
     # Link A: Áp lực ngoại biên (Tỷ giá & Chênh lệch lãi suất với Fed)
-    link_a_pressure = policy_spread < -0.50 or us_10y >= 4.35
+    link_a_th = yc_thresh.get("transmissionLinkA", {})
+    link_a_pressure = policy_spread < link_a_th.get("policySpread", -0.50) or us_10y >= link_a_th.get("us10yHigh", 4.35)
     link_a_state = "PRESSURE (Áp lực)" if link_a_pressure else "CALM (Êm dịu)"
 
     # Link B: Áp lực thanh khoản liên ngân hàng nội địa
-    link_b_pressure = liq_gap > 0.25 or vn_inbr > vn_intr
+    link_b_th = yc_thresh.get("transmissionLinkB", {})
+    link_b_pressure = liq_gap > link_b_th.get("liqGap", 0.25) or vn_inbr > vn_intr
     link_b_state = "STRESSED (Căng thẳng)" if link_b_pressure else "CALM (Ổn định)"
 
     # Link C: Bất thường đường cong kỳ hạn trong nước
-    link_c_pressure = vn_slope <= 0.0 or vn_curvature >= 0.40 or vn_curve_stress >= 70.0
+    link_c_th = yc_thresh.get("transmissionLinkC", {})
+    link_c_pressure = vn_slope <= link_c_th.get("slope", 0.0) or vn_curvature >= link_c_th.get("curvature", 0.40) or vn_curve_stress >= link_c_th.get("curveStress", 70.0)
     link_c_state = "FLAT/INV (Bụng phình)" if link_c_pressure else "NORMAL (Bình thường)"
 
     # Giai đoạn truyền dẫn
+    trans_stages = _narratives.get("transmissionStages", {})
     if link_a_pressure and link_b_pressure and link_c_pressure:
-        trans_stage = "FULL TRANSMISSION"
-        trans_summary = "Rủi ro vĩ mô lan truyền toàn diện (Khuyến nghị Phòng thủ / Tiền mặt)"
-        trans_badge = "bg-rose-500/20 text-rose-400 border-rose-500/30"
+        stage_item = trans_stages.get("FULL_TRANSMISSION", {})
+        trans_stage = stage_item.get("stage", "FULL TRANSMISSION")
+        trans_summary = stage_item.get("summary", "Rủi ro vĩ mô lan truyền toàn diện (Khuyến nghị Phòng thủ / Tiền mặt)")
+        trans_badge = stage_item.get("badge", "bg-rose-500/20 text-rose-400 border-rose-500/30")
     elif link_a_pressure and link_b_pressure:
-        trans_stage = "LIQUIDITY SQUEEZE"
-        trans_summary = "Áp lực tỷ giá kéo căng thanh khoản liên ngân hàng trong nước"
-        trans_badge = "bg-amber-500/20 text-amber-400 border-amber-500/30"
+        stage_item = trans_stages.get("LIQUIDITY_SQUEEZE", {})
+        trans_stage = stage_item.get("stage", "LIQUIDITY SQUEEZE")
+        trans_summary = stage_item.get("summary", "Áp lực tỷ giá kéo căng thanh khoản liên ngân hàng trong nước")
+        trans_badge = stage_item.get("badge", "bg-amber-500/20 text-amber-400 border-amber-500/30")
     elif link_a_pressure:
-        trans_stage = "EXTERNAL TRAPPED"
-        trans_summary = "Bộ đệm tỷ giá & dự trữ ngoại hối hấp thụ tốt áp lực từ USD"
-        trans_badge = "bg-blue-500/20 text-blue-400 border-blue-500/30"
+        stage_item = trans_stages.get("EXTERNAL_TRAPPED", {})
+        trans_stage = stage_item.get("stage", "EXTERNAL TRAPPED")
+        trans_summary = stage_item.get("summary", "Bộ đệm tỷ giá & dự trữ ngoại hối hấp thụ tốt áp lực từ USD")
+        trans_badge = stage_item.get("badge", "bg-blue-500/20 text-blue-400 border-blue-500/30")
     elif link_b_pressure or link_c_pressure:
-        trans_stage = "LOCAL BOTTLENECK"
-        trans_summary = "Nghẽn thanh khoản ngắn hạn cục bộ, kỳ hạn dài chưa bị ảnh hưởng"
-        trans_badge = "bg-orange-500/20 text-orange-400 border-orange-500/30"
+        stage_item = trans_stages.get("LOCAL_BOTTLENECK", {})
+        trans_stage = stage_item.get("stage", "LOCAL BOTTLENECK")
+        trans_summary = stage_item.get("summary", "Nghẽn thanh khoản ngắn hạn cục bộ, kỳ hạn dài chưa bị ảnh hưởng")
+        trans_badge = stage_item.get("badge", "bg-orange-500/20 text-orange-400 border-orange-500/30")
     else:
-        trans_stage = "BENIGN MACRO"
-        trans_summary = "Môi trường vĩ mô thuận lợi, dòng tiền liên ngân hàng dồi dào"
-        trans_badge = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+        stage_item = trans_stages.get("BENIGN_MACRO", {})
+        trans_stage = stage_item.get("stage", "BENIGN MACRO")
+        trans_summary = stage_item.get("summary", "Môi trường vĩ mô thuận lợi, dòng tiền liên ngân hàng dồi dào")
+        trans_badge = stage_item.get("badge", "bg-emerald-500/20 text-emerald-400 border-emerald-500/30")
 
     # ── 7. KHUYẾN NGHỊ TÀI SẢN ĐỊNH LƯỢNG (EQUITY VS BONDS) ──
     earnings_yield = round((1.0 / pe_vnindex) * 100.0, 2) if pe_vnindex > 0 else 7.25
     equity_risk_premium = round(earnings_yield - vn_10y, 2)
 
-    if equity_risk_premium >= 3.0:
+    erp_th = yc_thresh.get("assetDecisionErp", {})
+    if equity_risk_premium >= erp_th.get("equityFavored", 3.0):
         asset_decision = "EQUITY FAVORED OVER BONDS"
         asset_decision_vi = "Ưu Tiên Cổ Phiếu Vượt Trội Trái Phiếu (ERP cao)"
         asset_badge = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-    elif equity_risk_premium <= 1.0:
+    elif equity_risk_premium <= erp_th.get("bondsFavored", 1.0):
         asset_decision = "BONDS / CASH FAVORED"
         asset_decision_vi = "Ưu Tiên Trái Phiếu / Tiền Mặt Phòng Thủ"
         asset_badge = "bg-rose-500/20 text-rose-400 border-rose-500/30"

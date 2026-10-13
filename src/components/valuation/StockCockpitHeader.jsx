@@ -1,4 +1,4 @@
-import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 // Format tiền VND
 function formatVND(val) {
@@ -189,6 +189,42 @@ export default function StockCockpitHeader({
 
       {/* ── 2. HERO CARD: GIÁ TRỊ HỘI TỤ CONSENSUS & LƯỚI 10 MÔ HÌNH ── */}
       <div className="p-5 sm:p-6 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50/60 dark:from-indigo-900 dark:via-indigo-950 dark:to-slate-900 text-gray-900 dark:text-white rounded-3xl shadow-sm dark:shadow-xl border border-indigo-100 dark:border-indigo-800/40 space-y-4 transition-colors">
+        {/* CFA Equity Research AI Deep-Dive Banner */}
+        {financials?.aiDeepDive && (
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10 border border-indigo-200/80 dark:border-indigo-700/60 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-start gap-2.5">
+              <span className="text-xl">🧠</span>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wide">
+                    CFA Equity Research Copilot
+                  </span>
+                  <IntelligenceBadge
+                    provider={financials.aiDeepDive.provider}
+                  />
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-700/50">
+                    {financials.aiDeepDive.recommendation}
+                  </span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">
+                    Conviction: {financials.aiDeepDive.convictionScore}/100
+                  </span>
+                </div>
+                <p className="text-xs text-gray-800 dark:text-gray-200 font-semibold mt-1">
+                  {financials.aiDeepDive.thesisHeadline}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsReportModalOpen(true)}
+              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0 self-start md:self-auto cursor-pointer transition shadow-xs flex items-center gap-1 active:scale-95"
+            >
+              <span>Xem Luận Điểm CFA</span>
+              <span>➔</span>
+            </button>
+          </div>
+        )}
+
         {/* Hàng trên: Giá Hội Tụ, Thị Giá, Upside, MoS */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-indigo-100 dark:border-indigo-800/60 pb-4">
           <div>
@@ -196,7 +232,7 @@ export default function StockCockpitHeader({
               <span className="text-xs font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-wider block">
                 🎯 Giá Trị Nội Tại Hội Tụ (Consensus Fair Value)
               </span>
-
+              <IntelligenceBadge type="heuristic" tooltip="Đồng thuận 10 mô hình định lượng chiết khấu và định giá so sánh" />
             </div>
             <div className="flex flex-wrap items-baseline gap-3 mt-1">
               <span className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400">
@@ -307,18 +343,18 @@ export default function StockCockpitHeader({
                 <div
                   key={m.id || idx}
                   className={`p-3 rounded-2xl border text-center flex flex-col justify-between transition-all ${isOutlier
-                      ? 'bg-rose-50/80 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40 opacity-70'
-                      : isContributing
-                        ? 'bg-white/95 dark:bg-white/12 border-indigo-200/90 dark:border-indigo-600/40 hover:bg-white dark:hover:bg-white/18 shadow-2xs dark:shadow-none ring-1 ring-indigo-500/15'
-                        : 'bg-white/70 dark:bg-white/5 border-gray-200/70 dark:border-white/10'
+                    ? 'bg-rose-50/80 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40 opacity-70'
+                    : isContributing
+                      ? 'bg-white/95 dark:bg-white/12 border-indigo-200/90 dark:border-indigo-600/40 hover:bg-white dark:hover:bg-white/18 shadow-2xs dark:shadow-none ring-1 ring-indigo-500/15'
+                      : 'bg-white/70 dark:bg-white/5 border-gray-200/70 dark:border-white/10'
                     }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1">
                       <span
                         className={`text-[10px] uppercase truncate ${isContributing
-                            ? 'text-indigo-700 dark:text-indigo-200 font-black'
-                            : 'text-gray-700 dark:text-gray-300 font-bold'
+                          ? 'text-indigo-700 dark:text-indigo-200 font-black'
+                          : 'text-gray-700 dark:text-gray-300 font-bold'
                           }`}
                         title={m.fullName || m.name || cleanName}
                       >
@@ -326,10 +362,10 @@ export default function StockCockpitHeader({
                       </span>
                       <span
                         className={`text-[9px] font-mono px-1.5 py-0.5 rounded transition-all ${isContributing
-                            ? 'font-black bg-indigo-600 text-white dark:bg-indigo-500 shadow-2xs'
-                            : isOutlier
-                              ? 'font-medium bg-rose-100 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400 line-through border border-rose-200/60 dark:border-rose-900/40'
-                              : 'font-medium bg-gray-100/70 text-gray-400 dark:bg-white/5 dark:text-gray-500 opacity-60'
+                          ? 'font-black bg-indigo-600 text-white dark:bg-indigo-500 shadow-2xs'
+                          : isOutlier
+                            ? 'font-medium bg-rose-100 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400 line-through border border-rose-200/60 dark:border-rose-900/40'
+                            : 'font-medium bg-gray-100/70 text-gray-400 dark:bg-white/5 dark:text-gray-500 opacity-60'
                           }`}
                         title={
                           isContributing
@@ -345,10 +381,10 @@ export default function StockCockpitHeader({
 
                     <div
                       className={`text-sm font-black mt-1 ${isOutlier
-                          ? 'line-through text-rose-600 dark:text-rose-300'
-                          : hasVal
-                            ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-500 dark:text-gray-400 font-medium text-xs'
+                        ? 'line-through text-rose-600 dark:text-rose-300'
+                        : hasVal
+                          ? 'text-gray-900 dark:text-white'
+                          : 'text-gray-500 dark:text-gray-400 font-medium text-xs'
                         }`}
                     >
                       {hasVal ? formatVND(targetVal) : m.statusNote || '—'}
@@ -363,8 +399,8 @@ export default function StockCockpitHeader({
                     ) : diff != null ? (
                       <span
                         className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${diff >= 0
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30'
                           }`}
                         title={`Chênh lệch so với thị giá (${formatVND(closePrice)}): ${diff >= 0 ? '+' : ''
                           }${diff}%`}
@@ -461,8 +497,8 @@ export default function StockCockpitHeader({
               <span className="text-[10px] text-gray-400 font-bold block">{cycle.label}</span>
               <span
                 className={`text-xs font-black block mt-0.5 ${(cycle.val || 0) >= 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-rose-600 dark:text-rose-400'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-rose-600 dark:text-rose-400'
                   }`}
               >
                 {cycle.val != null ? `${cycle.val >= 0 ? '+' : ''}${cycle.val}%` : '—'}

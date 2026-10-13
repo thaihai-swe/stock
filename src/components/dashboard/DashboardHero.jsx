@@ -1,4 +1,5 @@
 import { fmtMoney, plColor } from '../../utils/format.js';
+import { RISK_POSTURES } from '../../utils/constants.js';
 
 export default function DashboardHero({
   totalNAV = 0,
@@ -25,10 +26,22 @@ export default function DashboardHero({
 }) {
   // Phong cách quản trị rủi ro phân bổ tài sản
   const getRiskPosture = () => {
-    if (cashPct >= 50) return { label: '🛡️ Phòng thủ cao', bg: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/80 dark:text-blue-200 dark:border-blue-700/50' };
-    if (cashPct >= 20) return { label: '⚖️ Cân bằng tối ưu', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/80 dark:text-emerald-200 dark:border-emerald-700/50' };
-    if (cashPct >= 5) return { label: '🚀 Tấn công chủ động', bg: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/80 dark:text-amber-200 dark:border-amber-700/50' };
-    return { label: '⚡ Full 100% Cổ phiếu', bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-200 dark:border-rose-700/50' };
+    const postures = Array.isArray(RISK_POSTURES)
+      ? RISK_POSTURES
+      : (RISK_POSTURES && typeof RISK_POSTURES === 'object'
+          ? Object.values(RISK_POSTURES)
+          : []);
+
+    for (const p of postures) {
+      if (cashPct >= (p?.minCashPct ?? 0)) {
+        return { label: p?.label ?? '', bg: p?.bg ?? '' };
+      }
+    }
+    const fallback = postures[postures.length - 1];
+    return {
+      label: fallback?.label ?? '⚡ Full 100% Cổ phiếu',
+      bg: fallback?.bg ?? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-200 dark:border-rose-700/50',
+    };
   };
 
   const posture = getRiskPosture();

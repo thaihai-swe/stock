@@ -209,6 +209,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
             sectorRotation={macroData?.sectorRotation}
             vnindexPE={market.currentPE || null}
             regime={regime}
+            sectorTransmission={macroData?.sectorTransmission}
           />
         </div>
       )}

@@ -1,4 +1,6 @@
 import React from 'react';
+import { DIVIDEND_SUSTAINABILITY } from '../../utils/constants';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function DividendSustainabilityCard({ dividendSustainability, symbol }) {
   if (!dividendSustainability) return null;
@@ -19,10 +21,11 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
               Kiểm Toán Dòng Tiền Cổ Tức
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình kiểm toán độ bền vững cổ tức bằng dòng tiền FCF" />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               Bảo Chứng Bằng Dòng Tiền FCF
             </span>
@@ -55,16 +58,20 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
           </span>
           <div className="flex items-baseline gap-1.5 mt-1">
             <span className={`text-xl font-black ${
-              fcfPayoutRatio != null && fcfPayoutRatio <= 60
+              fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutSafeThreshold ?? 60)
                 ? 'text-emerald-600 dark:text-emerald-400'
-                : fcfPayoutRatio != null && fcfPayoutRatio <= 100
+                : fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutMaxThreshold ?? 100)
                 ? 'text-amber-600 dark:text-amber-400'
                 : 'text-rose-600 dark:text-rose-400'
             }`}>
               {fcfPayoutRatio != null ? `${fcfPayoutRatio}%` : '—'}
             </span>
             <span className="text-[10px] text-gray-400">
-              {fcfPayoutRatio != null && fcfPayoutRatio <= 60 ? '(Rất dư dả)' : fcfPayoutRatio != null && fcfPayoutRatio <= 100 ? '(Đủ tài trợ)' : '(Thâm hụt tiền)'}
+              {fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutSafeThreshold ?? 60)
+                ? '(Rất dư dả)'
+                : fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutMaxThreshold ?? 100)
+                ? '(Đủ tài trợ)'
+                : '(Thâm hụt tiền)'}
             </span>
           </div>
           <span className="text-[10px] text-gray-400 block pt-1">
@@ -82,7 +89,7 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
               {payoutRatio != null ? `${payoutRatio}%` : '—'}
             </span>
             <span className="text-[10px] text-gray-400">
-              {payoutRatio != null && payoutRatio <= 70 ? '(Cân bằng)' : '(Chiếm tỷ trọng lớn)'}
+              {payoutRatio != null && payoutRatio <= (DIVIDEND_SUSTAINABILITY.accountingPayoutThreshold ?? 70) ? '(Cân bằng)' : '(Chiếm tỷ trọng lớn)'}
             </span>
           </div>
           <span className="text-[10px] text-gray-400 block pt-1">

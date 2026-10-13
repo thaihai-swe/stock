@@ -6,6 +6,10 @@ export default function HistoryPerformanceTab({
   data = {},
   marketPrices = {},
   onSelectSymbol,
+  timePreset = 'all',
+  handleSelectTimePreset,
+  startDate = '',
+  endDate = '',
 }) {
   const { buyOrders = [], sellOrders = [], dividends = [] } = data;
 
@@ -16,10 +20,10 @@ export default function HistoryPerformanceTab({
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' | 'desc'
   const [mobileViewMode, setMobileViewMode] = useState('card'); // 'card' | 'table'
 
-  // Tính toán toàn bộ chỉ số từ engine
+  // Tính toán toàn bộ chỉ số từ engine theo chu kỳ thời gian
   const performanceData = useMemo(() => {
-    return computeStockPerformance(buyOrders, sellOrders, dividends, marketPrices);
-  }, [buyOrders, sellOrders, dividends, marketPrices]);
+    return computeStockPerformance(buyOrders, sellOrders, dividends, marketPrices, { startDate, endDate });
+  }, [buyOrders, sellOrders, dividends, marketPrices, startDate, endDate]);
 
   const {
     stockList,
@@ -125,7 +129,7 @@ export default function HistoryPerformanceTab({
     );
   }
 
-  if (stockList.length === 0) {
+  if (buyOrders.length === 0 && sellOrders.length === 0) {
     return (
       <div className="py-16 text-center text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
         <span className="text-5xl block mb-3">📊</span>
@@ -253,13 +257,21 @@ export default function HistoryPerformanceTab({
       {/* 2. THANH BỘ LỌC DỮ LIỆU HIỆU SUẤT */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-gray-100 dark:border-slate-800 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-gray-100 dark:border-slate-800">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-extrabold text-gray-800 dark:text-slate-100 text-sm sm:text-base flex items-center gap-2">
               <span>🎯</span> Sổ Hiệu Suất Theo Mã Cổ Phiếu
             </h3>
             <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-bold border border-indigo-100 dark:border-indigo-900/40">
               {stockList.length} mã
             </span>
+            {(startDate || endDate) && (
+              <span className="text-[11px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-2.5 py-0.5 rounded-full font-bold border border-amber-200 dark:border-amber-800/40 flex items-center gap-1">
+                <span>⏱️</span>
+                <span>
+                  {timePreset === 'ytd' ? 'Năm nay (YTD)' : timePreset === '1y' ? '1 Năm gần nhất' : timePreset === 'mtd' ? 'Tháng này (MTD)' : `${startDate} → ${endDate}`}
+                </span>
+              </span>
+            )}
           </div>
 
           {/* Ô Tìm Kiếm */}
@@ -283,9 +295,58 @@ export default function HistoryPerformanceTab({
           </div>
         </div>
 
-        {/* Bộ lọc trạng thái & P&L */}
+        {/* Bộ lọc chu kỳ thời gian, trạng thái & P&L */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs pt-1">
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Presets Chu Kỳ Thời Gian (Toàn thời gian / YTD / 1Y / MTD) */}
+            <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl">
+              <button
+                type="button"
+                onClick={() => handleSelectTimePreset && handleSelectTimePreset('all')}
+                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                  timePreset === 'all' || (!startDate && !endDate && timePreset !== 'custom')
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
+                }`}
+              >
+                <span className="sm:hidden">Tất cả</span>
+                <span className="hidden sm:inline">Toàn thời gian</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectTimePreset && handleSelectTimePreset('ytd')}
+                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                  timePreset === 'ytd'
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
+                }`}
+              >
+                YTD
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectTimePreset && handleSelectTimePreset('1y')}
+                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                  timePreset === '1y'
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
+                }`}
+              >
+                1Y
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectTimePreset && handleSelectTimePreset('mtd')}
+                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                  timePreset === 'mtd'
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
+                }`}
+              >
+                MTD
+              </button>
+            </div>
+
             {/* Lọc Trạng Thái */}
             <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl">
               <button
@@ -381,7 +442,14 @@ export default function HistoryPerformanceTab({
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
         {/* CHẾ ĐỘ THẺ DI ĐỘNG (MOBILE CARD VIEW) */}
         <div className={`p-4 space-y-3 ${mobileViewMode === 'card' ? 'block sm:hidden' : 'hidden'}`}>
-          {sorted.map((s) => {
+          {sorted.length === 0 ? (
+            <div className="py-12 text-center text-gray-400 dark:text-slate-500">
+              <span className="text-3xl block mb-2">🔍</span>
+              <p className="text-xs font-bold text-gray-700 dark:text-slate-300">Không tìm thấy mã cổ phiếu phù hợp</p>
+              <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">Thử thay đổi bộ lọc chu kỳ thời gian hoặc từ khóa tìm kiếm.</p>
+            </div>
+          ) : (
+            sorted.map((s) => {
             const stockColor = getStockColor(s.symbol);
 
             return (
@@ -463,7 +531,7 @@ export default function HistoryPerformanceTab({
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
 
         {/* CHẾ ĐỘ BẢNG MÁY TÍNH (DESKTOP TABLE VIEW) */}
@@ -541,7 +609,16 @@ export default function HistoryPerformanceTab({
             </thead>
 
             <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-              {sorted.map((s) => {
+              {sorted.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="py-12 text-center text-gray-400 dark:text-slate-500 text-xs">
+                    <span className="text-3xl block mb-2">🔍</span>
+                    <p className="font-bold text-gray-700 dark:text-slate-300">Không tìm thấy mã cổ phiếu phù hợp bộ lọc</p>
+                    <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">Thử thay đổi bộ lọc chu kỳ thời gian hoặc từ khóa tìm kiếm.</p>
+                  </td>
+                </tr>
+              ) : (
+                sorted.map((s) => {
                 const stockColor = getStockColor(s.symbol);
 
                 return (
@@ -626,7 +703,7 @@ export default function HistoryPerformanceTab({
                     </td>
                   </tr>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>

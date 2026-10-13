@@ -1,4 +1,5 @@
 import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function IndustrySpecificCard({ industrySpecific, symbol }) {
   if (!industrySpecific || !industrySpecific.metrics) return null;
@@ -20,6 +21,7 @@ export default function IndustrySpecificCard({ industrySpecific, symbol }) {
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Chỉ Số Tài Chính Đặc Thù Ngành Nghề
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Chỉ tiêu tài chính đặc thù phân loại theo chuẩn ngành GICS" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-1">
             {categoryName} ({symbol})
