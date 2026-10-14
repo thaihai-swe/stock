@@ -15,7 +15,7 @@ Toàn bộ hệ thống được phân định rạch ròi theo triết lý **Hy
 | **TẦNG 1: ACID Relational Database** | Sổ lệnh Mua/Bán (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, hàng đợi yêu cầu (`requested_stocks`), cấu hình | `data/stock.db` (Local) / Turso Cloud (Vercel) | **GITIGNORED (100%)** | Realtime khi user thao tác. Sao lưu/khôi phục qua `scripts/db_manager.py`. | Đảm bảo toàn vẹn giao dịch (ACID), bảo mật thông tin cá nhân. |
 | **TẦNG 2: Ephemeral Intraday Cache** | Thị giá khớp lệnh realtime, điểm số VNINDEX & VN30 trong phiên | RAM Node.js + `data/prices_cache.json` | **GITIGNORED (100%)** | Trong phiên (9:00 - 15:00 T2-T6). Cache TTL 1h (`priceService.js`). | Phục vụ realtime UI mà không gây ô nhiễm lịch sử Git. |
 | **TẦNG 3: Daily EOD Snapshot JSON** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE, Snapshot Hàng đợi yêu cầu | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json`, `data/requested_stocks.json`, `data/supported_stocks.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` (`run_pipeline.py --cadence daily`). | Đảm bảo web Vercel có số liệu EOD mới nhất và tự động nạp mã yêu cầu mới. |
-| **TẦNG 4: Weekly Macro & Sector JSON** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS Vietstock, Lịch sử Simply Wall St, Tin tức 30 ngày | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` (`run_pipeline.py --cadence weekly`). | Cung cấp dữ liệu vĩ mô và luân chuyển ngành 1 tuần/lần. |
+| **TẦNG 4: Weekly Macro, Sector & AI Suite** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS, Simply Wall St, Tin tức 30 ngày, AI Portfolio Stress-Tester, AI Stock Suite (Delta 6d) | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json`, `data/portfolio_ai_insights.json`, `data/financials/<MÃ>.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` (`run_pipeline.py --cadence weekly`). | Cung cấp dữ liệu vĩ mô, luân chuyển ngành và toàn bộ nhận định AI 1 tuần/lần. |
 | **TẦNG 5: Quarterly BCTC Repository** | 122+ chỉ tiêu BCTC 8 quý & 5 năm, 54 Ratios, Extended DuPont, DCF 3 kịch bản, Cổ đông | `data/financials/<MÃ>.json`, `data/vnindex_valuation_cache/` | **COMMIT VỀ GIT** | **Quarterly (Mùa BCTC)**: GitHub Actions `quarterly-bctc-sync.yml` (`run_pipeline.py --cadence quarterly`). | Kho tri thức phân tích chuyên sâu doanh nghiệp cho từng mã. |
 
 ### Bộ Điều Phối Dữ Liệu Thống Nhất (`scripts/run_pipeline.py`):
@@ -330,7 +330,7 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 ---
 
 ### PHÂN HỆ 3: CỔ TỨC, CỔ ĐÔNG & BAN LÃNH ĐẠO (CORPORATE PROFILE)
-* **Nguồn cung cấp**: 
+* **Nguồn cung cấp**:
   * *Tầng 1 (`vnstock 4.0` Guest Mode — VCI Official)*: Trích xuất trực tiếp danh sách 60+ cổ đông lớn thật (`Company.shareholders()`) và lịch sử 50+ sự kiện doanh nghiệp, giao dịch nội bộ, chia cổ tức tiền mặt/cổ phiếu (`Company.events()`).
   * *Tầng 2 (Live NLP News Extraction)*: Trích xuất bổ sung các sự kiện cổ tức mới nhất từ feed tin tức thời gian thực của doanh nghiệp qua NLP Event Extractor (`scripts/lib/news_sentiment_engine.py`).
   * *Tầng 3 (Dynamic Annual Milestones)*: Các mốc sự kiện động năm hiện hành (VD: 2026), cam kết không tồn tại ngày cũ 2023–2024.
@@ -1322,20 +1322,29 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
   * **Lưu ý**: Thông tin kỹ thuật `provider` và `model` được bảo toàn nguyên vẹn trong JSON cho mục đích kiểm toán dữ liệu và phân giải fallback, nhưng được loại bỏ 100% khỏi lớp hiển thị UI người dùng.
 
 #### Bản Đồ Phân Phối Thẻ Trí Tuệ Trên Toàn Giao Diện:
-1. **Tab Phân Tích Vĩ Mô (`MacroDashboard.jsx`)**:
+1. **Tab VN-Index (`MarketDashboard.jsx`)**:
+   - `MarketHeroStatusBar.jsx`: *4 KPI VN-Index, Nhiệt Kế Định Giá, Benjamin Graham & Vốn Hóa* -> `H`.
+   - `MacroValuationWindowCard.jsx`: *Định Giá P/E Bands 4 Chu Kỳ & Nhiệt Kế Thị Trường* -> `H`.
+   - `MarketValuationHistoryChart.jsx`: *Lịch Sử Định Giá 25 Năm Vietstock* -> `H`.
+   - `StyleValuationComparison.jsx`: *So Sánh 4 Phân Khúc Vốn Hóa & Chỉ Số Benjamin Graham* -> `H`.
+   - `SectorValuationHeatmap.jsx`: *Bản Đồ Nhiệt & Luân Chuyển 10 Ngành GICS* -> `H`.
+
+2. **Tab Phân Tích Kinh Tế Vĩ Mô (`MacroDashboard.jsx`)**:
+   - `MacroHeroStatusBar.jsx`: *4 KPI Pha Chu Kỳ, Khẩu Vị Thị Trường, Điểm Rủi Ro 4 Tầng & Phân Bổ 4 Lớp Tài Sản* -> `H`.
    - `ExecutiveSummaryCard.jsx`:
      - Tab 1: *Chiến Lược CIO* -> `AI` / `H` động.
      - Tab 2: *Nhịp Đập Tuần* -> `AI` / `H` động.
      - Tab 3: *Tổng Hợp 4 Trụ Cột* -> `H` (Tổng hợp quy chuẩn kinh tế).
-   - `MacroValuationWindowCard.jsx`: *Định Giá P/E Bands 5Y & Nhiệt Kế Thị Trường* -> `H`.
    - `MacroRegimeRadarSection.jsx`: *Ma Trận Kịch Bản, Đồng Hồ Chu Kỳ, Pha Tăng Trưởng & Độ Lệch Pha* -> `H`.
-   - `SectorValuationHeatmap.jsx`: *Bản Đồ Nhiệt & Luân Chuyển 10 Ngành GICS* -> `H`.
+   - `YieldCurveMonitorCard.jsx`: *Đường Cong Lợi Suất 17 Kỳ Hạn & Rủi Ro Đảo Ngược* -> `H`.
+   - `MacroYieldCurveStressBox.jsx`: *Căng Thẳng Thanh Khoản Thị Trường Nợ LSS* -> `H`.
    - `MacroAllocationGoldSection.jsx`: *Phân Bổ Tài Sản Động & Arbitrage Giá Vàng* -> `H`.
-   - `YieldCurveMonitorCard.jsx`: *Đường Cong Lợi Suất & Rủi Ro Đảo Ngược* -> `H`.
    - `ScenarioAllocationMatrix.jsx`: *Ma Trận Phân Bổ Danh Mục 3 Kịch Bản* -> `H`.
+   - `MacroIntermarketGrid.jsx`: *Lưới 6 Chỉ Số Liên Thị Trường* -> `H`.
+   - `MacroTradingEconomicsTable.jsx`: *Thư Viện 95 Chỉ Số Kinh Tế TradingEconomics* -> `H`.
    - `OpportunityCostCard.jsx`: *So Sánh Chi Phí Cơ Hội Lãi Suất Tiết Kiệm* -> `H`.
 
-2. **Tab Định Giá & Phân Tích Chuyên Sâu Cổ Phiếu (`ValuationDashboard.jsx`)**:
+3. **Tab Định Giá & Phân Tích Chuyên Sâu Cổ Phiếu (`ValuationDashboard.jsx`)**:
    - `StockCockpitHeader.jsx`:
      - *CFA Equity Research Copilot* -> `AI` / `H` động.
      - *Consensus Fair Value (Giá trị nội tại hội tụ)* -> `H`.
@@ -1368,4 +1377,54 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
 
 
 
+
+
+
+3. **Tab Tổng Quan Danh Mục (`Dashboard.jsx`)**:
+   - `PortfolioStressTestCard.jsx`: *Đo Lường Sức Khỏe Danh Mục & Chịu Tải Vĩ Mô* -> `AI` / `H` động.
+   - `OpportunityCostCard.jsx`: *So Sánh Chi Phí Cơ Hội Lãi Suất Tiết Kiệm* -> `H`.
+   - `DashboardKpiMatrix.jsx`: *Chỉ Số Hiệu Quả & Rủi Ro Danh Mục (Sharpe, Beta, MaxDD)* -> `H`.
+   - `DashboardHoldingsTable.jsx`: *Sổ Cái Vị Thế Nắm Giữ & P/L Tạm Tính* -> `H`.
+
+---
+
+### PHÂN HỆ 10: BÁO CÁO SỨC KHỎE DANH MỤC & CHỊU TẢI VĨ MÔ (PORTFOLIO AI STRESS-TEST)
+
+* **Vị trí lưu trữ chính thức**: Bảng `portfolio_ai_insights` trong `data/stock.db` (Local) / Turso Cloud (Prod) — **TẦNG 1: ACID DATABASE (100% Phân Quyền Theo `user_id`)**.
+* **Vị trí lưu trữ dự phòng (Fallback)**: `data/portfolio_ai_insights.json` (dành cho tài khoản demo & môi trường serverless).
+* **Chu kỳ & Điều phối**:
+  - **On-Demand**: Người dùng chủ động bấm *"⚡ Làm Mới AI"* trên Dashboard (`POST /api/portfolio/ai-stress-test/refresh`), cập nhật riêng danh mục của `user_id` đó trong 2-3s.
+  - **Batch Job Hàng Tuần**: Sáng Thứ Bảy (10:00 AM) qua `run_pipeline.py --cadence weekly` (quét toàn bộ các user đang nắm giữ cổ phiếu, áp dụng Smart Delta Cache: chỉ sinh lại nếu `updated_at > 6 ngày`).
+  - **0% AI calls khi phát sinh giao dịch**: Thao tác Mua, Bán, Cổ tức, Tiền mặt hoàn toàn không kích hoạt AI để đảm bảo hiệu năng tối đa.
+* **Đặc tả Schema chi tiết (Bảng `portfolio_ai_insights`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Ý Nghĩa Nghiệp Vụ & Nguồn Gốc |
+  | :--- | :--- | :--- |
+  | `user_id` | `TEXT (PK)` | Định danh người dùng (mặc định `'demo'`). Đảm bảo phân tách độc lập 100% dữ liệu giữa các tài khoản. |
+  | `health_score` | `TEXT` | Xếp hạng sức khỏe danh mục: `A+`, `A`, `B+`, `B`, `C+`, `C`, `D`. |
+  | `health_verdict` | `TEXT` | Thông điệp kết luận 1 câu ngắn gọn về độ cân bằng và sức chống chịu của danh mục. |
+  | `portfolio_beta` | `REAL` | Hệ số Beta bình quân gia quyền của danh mục so với VN-Index. |
+  | `cash_weight_pct` | `REAL` | Tỷ trọng đệm tiền mặt bảo vệ trên tổng NAV (%). |
+  | `report_json` | `TEXT` | Chuỗi JSON đầy đủ chứa ma trận 3 tầng độ nhạy vĩ mô (`macroSensitivity`), 3 kịch bản chịu tải cực đoan (`stressTestScenarios`), và khuyến nghị tái cân bằng (`rebalancingRecommendations`). |
+  | `status` | `TEXT` | Trạng thái sinh dữ liệu (`success` / `failed`). |
+  | `updated_at` | `TEXT (ISO)` | Thời điểm sinh báo cáo phân tích. Dùng để kiểm tra Smart Delta Cache (> 6 ngày). |
+
+---
+
+### PHÂN HỆ 11: KIỂM TOÁN AN TOÀN CỔ TỨC & KỶ LUẬT PHÂN BỔ VỐN (AI DIVIDEND AUDIT)
+
+* **Vị trí lưu trữ**: Khối `aiDividendAudit` trong `data/financials/<MÃ>.json` (và bên trong `dividendSustainability`).
+* **Chu kỳ & Điều phối**:
+  - Hàng Tuần (Sáng Thứ Bảy) trong lượt gọi tuần tích hợp 5-trong-1 của cổ phiếu (`generate_ai_insights.py --scope stocks`).
+  - Áp dụng Smart Delta Cache: Bỏ qua nếu dữ liệu AI đã sinh trong vòng 6 ngày.
+* **Đặc tả Schema chi tiết**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Ý Nghĩa Nghiệp Vụ & Nguồn Gốc |
+  | :--- | :--- | :--- |
+  | `safetyRating` | `string` | Đánh giá an toàn: `Vững Chắc (Safe)`, `Cần Theo Dõi (Borderline)`, hoặc `Nguy Cơ Bẫy Cổ Tức (Trap Risk)`. |
+  | `fcfCoverageVerdict` | `string` | Kiểm toán cổ tức tiền mặt có được bảo chứng 100% bằng dòng tiền tự do FCF thực tế hay bằng nợ vay/bán tài sản. |
+  | `trapRiskLevel` | `string` | Mức độ nguy cơ bẫy cổ tức: `Thấp`, `Trung Bình`, `Cao`. |
+  | `capitalAllocationScore` | `number` | Điểm số kỷ luật phân bổ vốn của Ban Lãnh Đạo (thang điểm 0.0 - 10.0). |
+  | `capitalAllocationDiagnosis` | `string` | Đánh giá hiệu quả phân bổ vốn: ROIC so với WACC, cân đối giữa tái đầu tư mở rộng CapEx, trả nợ vay và chia tiền mặt. |
+  | `outlook3Y` | `string` | Dự phóng triển vọng duy trì hoặc cắt giảm cổ tức trong 1-3 năm tới. |
+  | `redFlags` | `array` | Danh sách các cờ cảnh báo rủi ro bẫy cổ tức (mảng rỗng `[]` nếu an toàn). |
+  | `updatedAt` | `string (ISO)` | Thời điểm sinh báo cáo kiểm toán. |
 

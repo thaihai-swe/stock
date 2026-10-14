@@ -4,7 +4,8 @@ import {
   fetchStockFinancials,
   fetchValuationStocks,
   triggerSingleFinancialSync,
-  triggerValuationSync
+  triggerValuationSync,
+  refreshSingleStockAi
 } from '../utils/api.js';
 import { syncUrlRoute } from '../utils/navigation.js';
 
@@ -195,6 +196,37 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     }
   };
 
+  // Làm mới phân tích AI tích hợp cho riêng mã đang chọn
+  const [refreshingAi, setRefreshingAi] = useState(false);
+  const handleRefreshSingleAi = async () => {
+    if (!selectedSymbol || refreshingAi) return;
+    setRefreshingAi(true);
+    setSyncMessage(null);
+    try {
+      const res = await refreshSingleStockAi(selectedSymbol);
+      if (res?.data) {
+        setFinancials(res.data);
+      } else {
+        await loadFinancialsForSymbol(selectedSymbol);
+      }
+      setSyncMessage({
+        type: 'success',
+        text: `Đã làm mới thành công toàn bộ phân tích AI (Thesis, News, Audit, Convergence, Dividend) cho ${selectedSymbol}!`
+      });
+      if (inspectorType === 'financials') {
+        loadRawJson('financials', selectedSymbol);
+      }
+    } catch (err) {
+      setSyncMessage({
+        type: 'error',
+        text: err.message || `Lỗi cập nhật AI cho mã ${selectedSymbol}.`
+      });
+    } finally {
+      setRefreshingAi(false);
+      setTimeout(() => setSyncMessage(null), 8000);
+    }
+  };
+
   // Tra cứu & Định giá mã cổ phiếu tùy ý
   const handleLookupSymbol = async (targetSym) => {
     const sym = (targetSym || inputSymbol).trim().toUpperCase();
@@ -303,6 +335,8 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           syncingSingle={syncingSingle}
           handleLookupSymbol={handleLookupSymbol}
           handleSyncSingleFinancials={handleSyncSingleFinancials}
+          handleRefreshSingleAi={handleRefreshSingleAi}
+          refreshingAi={refreshingAi}
           setIsReportModalOpen={setIsReportModalOpen}
           lastSyncedAt={valuationData._meta?.lastSyncedAt}
         />
@@ -513,12 +547,12 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             />
           )}
 
-          {/* Kiểm Toán Độ Bền Vững Cổ Tức Bằng FCF */}
+          {/* Kiểm Toán Độ Bền Vững Cổ Tức Bằng FCF & Kỷ Luật Phân Bổ Vốn */}
           <DividendSustainabilityCard
-            dividendSustainability={
-              financials?.valuationMultiples?.dividendSustainability ||
-              currentStock?.valuation?.dividendSustainability
-            }
+            dividendSustainability={{
+              ...(financials?.valuationMultiples?.dividendSustainability || currentStock?.valuation?.dividendSustainability || {}),
+              aiDividendAudit: financials?.dividendSustainability?.aiDividendAudit || financials?.aiDividendAudit
+            }}
             symbol={selectedSymbol}
           />
 

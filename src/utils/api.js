@@ -280,3 +280,24 @@ export const fetchMarketValuationHistory = async () => {
   }
   return { _meta: {}, metrics: [], periods: {} };
 };
+
+// Báo Cáo Sức Khỏe Danh Mục & Chịu Tải Vĩ Mô (AI Portfolio Stress-Test)
+export const fetchPortfolioAiStressTest = async () => {
+  return request('/portfolio/ai-stress-test');
+};
+
+export const refreshPortfolioAiStressTest = async () => {
+  invalidateApiCache('/portfolio/ai-stress-test');
+  return request('/portfolio/ai-stress-test/refresh', { method: 'POST' });
+};
+
+// Làm Mới Phân Tích AI Đơn Mã Theo Yêu Cầu (On-Demand Single Stock Refresh)
+export const refreshSingleStockAi = async (symbol) => {
+  if (!symbol) return null;
+  const sym = symbol.trim().toUpperCase();
+  invalidateApiCache(`/valuation/financials/${sym}`);
+  return request(`/valuation/ai-refresh/${sym}`, { method: 'POST' });
+};
+
+
+

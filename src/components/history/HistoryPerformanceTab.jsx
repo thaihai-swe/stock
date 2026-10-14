@@ -295,58 +295,9 @@ export default function HistoryPerformanceTab({
           </div>
         </div>
 
-        {/* Bộ lọc chu kỳ thời gian, trạng thái & P&L */}
+        {/* Bộ lọc trạng thái & P&L */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs pt-1">
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Presets Chu Kỳ Thời Gian (Toàn thời gian / YTD / 1Y / MTD) */}
-            <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl">
-              <button
-                type="button"
-                onClick={() => handleSelectTimePreset && handleSelectTimePreset('all')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                  timePreset === 'all' || (!startDate && !endDate && timePreset !== 'custom')
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
-                }`}
-              >
-                <span className="sm:hidden">Tất cả</span>
-                <span className="hidden sm:inline">Toàn thời gian</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectTimePreset && handleSelectTimePreset('ytd')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                  timePreset === 'ytd'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
-                }`}
-              >
-                YTD
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectTimePreset && handleSelectTimePreset('1y')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                  timePreset === '1y'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
-                }`}
-              >
-                1Y
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectTimePreset && handleSelectTimePreset('mtd')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                  timePreset === 'mtd'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-800'
-                }`}
-              >
-                MTD
-              </button>
-            </div>
-
             {/* Lọc Trạng Thái */}
             <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl">
               <button

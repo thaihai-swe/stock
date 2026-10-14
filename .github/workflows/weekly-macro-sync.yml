@@ -54,7 +54,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/macro_indicators.json data/sector_valuation_cache.json data/market_valuation_history.json data/macro_valuation.json data/financials/ data/ai_insights_cache.json
+          git add data/macro_indicators.json data/sector_valuation_cache.json data/market_valuation_history.json data/macro_valuation.json data/financials/ data/ai_insights_cache.json data/portfolio_ai_insights.json
           if git diff --staged --quiet; then
             echo "ℹ️ Không có thay đổi dữ liệu vĩ mô mới."
           else

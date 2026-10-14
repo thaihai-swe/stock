@@ -8,9 +8,10 @@ Tự động fallback sang Two-Tier Heuristic Engine 0ms nếu không có API Ke
 
 import os
 import json
+import time
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 logger = logging.getLogger(__name__)
 
@@ -176,24 +177,33 @@ class PythonAiService:
                     "responseMimeType": "application/json"
                 }
             }
-            try:
-                resp = requests.post(url, json=payload, timeout=60)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    raw = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                    if raw:
-                        cleaned = raw.strip().replace("```json", "").replace("```", "").strip()
-                        parsed = json.loads(cleaned)
-                        parsed["status"] = "success"
-                        parsed["provider"] = "gemini"
-                        parsed["model"] = cur_model
-                        return parsed
-                else:
-                    last_error = f"Gemini ({cur_model}) HTTP {resp.status_code}: {resp.text[:200]}"
-                    logger.warning(f"⚠️ {cur_model} trả về lỗi HTTP {resp.status_code}. Thử model tiếp theo...")
-            except Exception as e:
-                last_error = f"Gemini ({cur_model}) error: {e}"
-                logger.warning(f"⚠️ Lỗi kết nối {cur_model}: {e}. Thử model tiếp theo...")
+            # Exponential Backoff Retry (up to 3 attempts on HTTP 429)
+            for attempt in range(3):
+                try:
+                    resp = requests.post(url, json=payload, timeout=60)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        raw = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                        if raw:
+                            cleaned = raw.strip().replace("```json", "").replace("```", "").strip()
+                            parsed = json.loads(cleaned)
+                            parsed["status"] = "success"
+                            parsed["provider"] = "gemini"
+                            parsed["model"] = cur_model
+                            return parsed
+                    elif resp.status_code == 429:
+                        wait_s = 2.0 * (2 ** attempt)
+                        logger.warning(f"⚠️ Gemini ({cur_model}) HTTP 429 Rate Limit. Tạm nghỉ {wait_s}s trước khi thử lại lần {attempt + 1}/3...")
+                        time.sleep(wait_s)
+                        continue
+                    else:
+                        last_error = f"Gemini ({cur_model}) HTTP {resp.status_code}: {resp.text[:200]}"
+                        logger.warning(f"⚠️ {cur_model} trả về lỗi HTTP {resp.status_code}. Thử model tiếp theo...")
+                        break
+                except Exception as e:
+                    last_error = f"Gemini ({cur_model}) error: {e}"
+                    logger.warning(f"⚠️ Lỗi kết nối {cur_model}: {e}. Thử model tiếp theo...")
+                    break
 
         raise RuntimeError(last_error or "Tất cả mô hình Gemini đều không phản hồi")
 
@@ -214,41 +224,58 @@ class PythonAiService:
             "max_tokens": self.max_tokens,
             "stream": False,
         }
-        resp = requests.post(url, headers=headers, json=payload, timeout=60)
-        if resp.status_code == 200:
-            content_type = resp.headers.get("content-type", "")
-            raw = ""
-            if "text/event-stream" in content_type or resp.text.strip().startswith("data: "):
-                # Xử lý trường hợp server/proxy trả về Server-Sent Events dù stream=False
-                for line in resp.text.splitlines():
-                    line = line.strip()
-                    if line.startswith("data: ") and line != "data: [DONE]":
-                        try:
-                            chunk = json.loads(line[6:])
-                            delta = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
-                            if delta:
-                                raw += delta
-                        except Exception:
-                            pass
-            else:
-                data = resp.json()
-                raw = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
-            if raw:
-                cleaned = raw.strip()
-                if cleaned.startswith("```json"):
-                    cleaned = cleaned[7:]
-                if cleaned.startswith("```"):
-                    cleaned = cleaned[3:]
-                if cleaned.endswith("```"):
-                    cleaned = cleaned[:-3]
-                cleaned = cleaned.strip()
-                parsed = json.loads(cleaned)
-                parsed["status"] = "success"
-                parsed["provider"] = "openai"
-                parsed["model"] = target_model
-                return parsed
-        raise RuntimeError(f"OpenAI ({target_model}) HTTP {resp.status_code}: {resp.text}")
+        # Exponential Backoff Retry (up to 3 attempts on HTTP 429)
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    content_type = resp.headers.get("content-type", "")
+                    raw = ""
+                    if "text/event-stream" in content_type or resp.text.strip().startswith("data: "):
+                        for line in resp.text.splitlines():
+                            line = line.strip()
+                            if line.startswith("data: ") and line != "data: [DONE]":
+                                try:
+                                    chunk = json.loads(line[6:])
+                                    delta = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                                    if delta:
+                                        raw += delta
+                                except Exception:
+                                    pass
+                    else:
+                        data = resp.json()
+                        raw = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+
+                    if raw:
+                        cleaned = raw.strip()
+                        if cleaned.startswith("```json"):
+                            cleaned = cleaned[7:]
+                        if cleaned.startswith("```"):
+                            cleaned = cleaned[3:]
+                        if cleaned.endswith("```"):
+                            cleaned = cleaned[:-3]
+                        cleaned = cleaned.strip()
+                        parsed = json.loads(cleaned)
+                        parsed["status"] = "success"
+                        parsed["provider"] = "openai"
+                        parsed["model"] = target_model
+                        return parsed
+                elif resp.status_code == 429:
+                    wait_s = 2.0 * (2 ** attempt)
+                    logger.warning(f"⚠️ OpenAI ({target_model}) HTTP 429 Rate Limit. Tạm nghỉ {wait_s}s trước khi thử lại lần {attempt + 1}/{max_retries}...")
+                    time.sleep(wait_s)
+                    continue
+                else:
+                    raise RuntimeError(f"OpenAI ({target_model}) HTTP {resp.status_code}: {resp.text[:200]}")
+            except Exception as e:
+                if attempt < max_retries - 1 and ("429" in str(e) or "rate" in str(e).lower()):
+                    wait_s = 2.0 * (2 ** attempt)
+                    logger.warning(f"⚠️ OpenAI ({target_model}) gặp lỗi tốc độ {e}. Tạm nghỉ {wait_s}s...")
+                    time.sleep(wait_s)
+                    continue
+                raise
 
     # =========================================================================
     # MACRO STRATEGIST BRIEFING
@@ -671,6 +698,386 @@ class PythonAiService:
 
         return self.generate_json(sys_prompt, user_prompt, fallback_fn=fallback, model=model, provider=provider)
 
+    # =========================================================================
+    # 8. AI PORTFOLIO HEALTH & MACRO STRESS-TESTER (TAB DASHBOARD)
+    # =========================================================================
+    def generate_portfolio_stress_test(
+        self,
+        holdings: list,
+        cash_balance: float,
+        macro_data: Dict[str, Any],
+        model: Optional[str] = None,
+        provider: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Đánh giá sức khỏe danh mục, đo độ nhạy vĩ mô và mô phỏng 3 kịch bản chịu tải.
+        Chỉ tốn đúng 1 LLM request duy nhất cho cả danh mục.
+        """
+        holdings = holdings or []
+        cash_balance = float(cash_balance or 0)
+        macro_data = macro_data or {}
+
+        stock_val = sum(float(h.get("marketValue") or h.get("totalCost") or 0) for h in holdings)
+        total_nav = stock_val + cash_balance
+        cash_weight_pct = round((cash_balance / total_nav * 100), 1) if total_nav > 0 else 0.0
+
+        # Ước tính Beta bình quân gia quyền danh mục
+        weighted_beta = 0.0
+        total_stock_weight = 0.0
+        for h in holdings:
+            w = float(h.get("weightPct") or 0)
+            b = float(h.get("beta") or 1.05)
+            weighted_beta += (w / 100.0) * b
+            total_stock_weight += (w / 100.0)
+        portfolio_beta = round(weighted_beta / total_stock_weight, 2) if total_stock_weight > 0 else 1.05
+
+        def fallback():
+            # Heuristic chấm điểm sức khỏe
+            if cash_weight_pct >= 20 and len(holdings) >= 3:
+                score = "A"
+                verdict = "Danh mục có cơ cấu phòng thủ vững chắc với bộ đệm tiền mặt dồi dào, khả năng chịu tải vĩ mô vượt trội."
+            elif cash_weight_pct >= 10:
+                score = "B+"
+                verdict = "Danh mục cân bằng tốt giữa tăng trưởng và an toàn, độ nhạy cảm lãi suất ở mức kiểm soát được."
+            elif cash_weight_pct < 5 and portfolio_beta > 1.2:
+                score = "C"
+                verdict = "Danh mục có đòn bẩy thị trường cao và thiếu bộ đệm tiền mặt, dễ bị tổn thương nếu thị trường điều chỉnh."
+            else:
+                score = "B"
+                verdict = "Danh mục hoạt động ổn định, cần theo dõi thêm tỷ trọng các nhóm ngành chu kỳ cao."
+
+            scenarios = [
+                {
+                    "name": "SBV Tăng Lãi Suất Điều Hành +100bps",
+                    "severity": "Vừa phải",
+                    "estimatedImpactPct": round(-1 * max(2.5, portfolio_beta * 4.5 * (1 - cash_weight_pct / 100.0)), 1),
+                    "description": "Chi phí vốn vay tăng tạo áp lực lên nhóm cổ phiếu chu kỳ cao (Bất động sản, Thép), nhưng nhóm Tiền gửi và Tiện ích giữ giá tốt."
+                },
+                {
+                    "name": "Tỷ Giá USD/VND Vượt 26,000 & SBV Hút Tiền Tín Phiếu",
+                    "severity": "Cao",
+                    "estimatedImpactPct": round(-1 * max(3.5, portfolio_beta * 6.0 * (1 - cash_weight_pct / 100.0)), 1),
+                    "description": "Thanh khoản liên ngân hàng thắt chặt gây áp lực bán hạ margin trên HOSE. Nhóm xuất khẩu và công nghệ chống chịu tốt hơn thị trường chung."
+                },
+                {
+                    "name": "VN-Index Điều Chỉnh Kỹ Thuật -10% Về Ngưỡng Hỗ Trợ",
+                    "severity": "Vừa phải",
+                    "estimatedImpactPct": round(-1 * (10.0 * portfolio_beta * (1 - cash_weight_pct / 100.0)), 1),
+                    "description": f"Với tỷ lệ đệm tiền mặt {cash_weight_pct}%, danh mục chịu mức sụt giảm thấp hơn biên độ điều chỉnh chung của chỉ số VN-Index."
+                }
+            ]
+
+            return {
+                "healthScore": score,
+                "healthVerdict": verdict,
+                "summary": f"Danh mục gồm {len(holdings)} mã cổ phiếu với tỷ trọng cổ phiếu {100 - cash_weight_pct:.1f}% và tiền mặt {cash_weight_pct:.1f}%. Hệ số Beta danh mục đạt {portfolio_beta}.",
+                "portfolioBeta": portfolio_beta,
+                "cashWeightPct": cash_weight_pct,
+                "macroSensitivity": {
+                    "interestRateRisk": "Trung bình (Có tiền mặt đệm và các mã kinh doanh cốt lõi ổn định)",
+                    "fxRisk": "Thấp (Doanh nghiệp trong danh mục không chịu áp lực nợ ngoại tệ USD lớn)",
+                    "cyclicalRisk": "Trung bình (Tỷ trọng nhóm ngành tài chính & chu kỳ ở mức kiểm soát)"
+                },
+                "stressTestScenarios": scenarios,
+                "rebalancingRecommendations": [
+                    "Duy trì tỷ lệ tiền mặt phòng thủ tối thiểu 15-20% để sẵn sàng giải ngân khi thị trường có nhịp rung lắc kỹ thuật.",
+                    "Hạn chế mua đuổi các mã cổ phiếu có hệ số P/E vượt quá +1.5 độ lệch chuẩn lịch sử.",
+                    "Ưu tiên tích lũy các doanh nghiệp chia cổ tức tiền mặt đều đặn nhằm tạo dòng tiền thặng dư tự nhiên."
+                ],
+                "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            }
+
+        if not holdings:
+            fb = fallback()
+            fb["status"] = "success"
+            fb["provider"] = "offline-heuristic-engine"
+            return fb
+
+        payload = {
+            "holdings": [
+                {
+                    "symbol": h.get("symbol"),
+                    "shares": h.get("holdingQty") or h.get("shares") or 0,
+                    "avgCost": h.get("avgCost") or 0,
+                    "currentPrice": h.get("currentPrice") or 0,
+                    "marketValue": h.get("marketValue") or 0,
+                    "weightPct": h.get("weightPct") or 0,
+                    "pnlPct": h.get("unrealizedPLPct") or h.get("pnlPct") or 0,
+                    "beta": h.get("beta") or 1.05
+                }
+                for h in holdings
+            ],
+            "cashBalanceVND": cash_balance,
+            "totalNavVND": total_nav,
+            "cashWeightPct": cash_weight_pct,
+            "portfolioBeta": portfolio_beta,
+            "macroContext": {
+                "regime": macro_data.get("regime", {}),
+                "riskScore": macro_data.get("riskAssessment", {}).get("riskScore", 35),
+                "marketPE": macro_data.get("marketIndex", {}).get("currentPE", 13.8),
+                "usdVnd": macro_data.get("macro", {}).get("usdVnd"),
+                "bondYield10Y": macro_data.get("macro", {}).get("bondYield10Y")
+            }
+        }
+
+        sys_prompt = (
+            "Bạn là Giám Đốc Quản Trị Rủi Ro & Danh Mục (Chief Risk Officer - CRO) am hiểu sâu sắc TTCK Việt Nam.\n"
+            "Dựa trên cơ cấu danh mục nắm giữ thực tế, tỷ trọng vốn, tỷ lệ tiền mặt và bối cảnh vĩ mô hiện tại, "
+            "hãy đánh giá sức khỏe danh mục, chẩn đoán độ nhạy vĩ mô và mô phỏng 3 kịch bản chịu tải (Stress-Test).\n"
+            "Chỉ trả về JSON thuần (không kèm markdown) theo cấu trúc sau:\n"
+            "{\n"
+            '  "healthScore": "A+ | A | B+ | B | C+ | C | D",\n'
+            '  "healthVerdict": "Nhận định ngắn gọn 1 câu về độ cân bằng và sức chịu tải của danh mục",\n'
+            '  "summary": "Đoạn văn 2-3 câu phân tích cấu trúc tài sản (cổ phiếu vs tiền mặt, mức độ tập trung ngành, beta danh mục)",\n'
+            '  "portfolioBeta": 1.15,\n'
+            '  "cashWeightPct": 25.0,\n'
+            '  "macroSensitivity": {\n'
+            '    "interestRateRisk": "Mức độ rủi ro lãi suất (Thấp/Trung bình/Cao kèm lý do cụ thể)",\n'
+            '    "fxRisk": "Mức độ rủi ro tỷ giá USD/VND (Thấp/Trung bình/Cao kèm lý do)",\n'
+            '    "cyclicalRisk": "Mức độ rủi ro chu kỳ kinh tế (Thấp/Trung bình/Cao kèm lý do)"\n'
+            '  },\n'
+            '  "stressTestScenarios": [\n'
+            '    {\n'
+            '      "name": "SBV Tăng Lãi Suất Điều Hành +100bps",\n'
+            '      "severity": "Nhẹ | Vừa phải | Cao",\n'
+            '      "estimatedImpactPct": -4.2,\n'
+            '      "description": "Giải thích tác động cụ thể lên các mã trong danh mục"\n'
+            '    },\n'
+            '    {\n'
+            '      "name": "Tỷ Giá USD/VND Vượt 26,000 & SBV Hút Tiền Tín Phiếu",\n'
+            '      "severity": "Cao",\n'
+            '      "estimatedImpactPct": -6.5,\n'
+            '      "description": "Giải thích tác động cụ thể"\n'
+            '    },\n'
+            '    {\n'
+            '      "name": "VN-Index Điều Chỉnh Kỹ Thuật -10%",\n'
+            '      "severity": "Vừa phải",\n'
+            '      "estimatedImpactPct": -7.8,\n'
+            '      "description": "Giải thích tác động cụ thể dựa trên tỷ trọng tiền mặt và beta"\n'
+            '    }\n'
+            '  ],\n'
+            '  "rebalancingRecommendations": [\n'
+            '    "Khuyến nghị tái cân bằng 1...",\n'
+            '    "Khuyến nghị tái cân bằng 2...",\n'
+            '    "Khuyến nghị tái cân bằng 3..."\n'
+            '  ]\n'
+            "}"
+        )
+        user_prompt = f"Bảng số liệu danh mục và bối cảnh vĩ mô:\n{json.dumps(payload, ensure_ascii=False, indent=2)}"
+
+        res = self.generate_json(sys_prompt, user_prompt, fallback_fn=fallback, model=model, provider=provider)
+        res["updatedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        return res
+
+    # =========================================================================
+    # 9. CONSOLIDATED STOCK INTELLIGENCE & DIVIDEND AUDITOR (1 CALL / MÃ)
+    # =========================================================================
+    def generate_stock_comprehensive_intel(
+        self,
+        symbol: str,
+        fin_data: Dict[str, Any],
+        val_eval: Optional[Dict[str, Any]] = None,
+        news_data: Optional[Dict[str, Any]] = None,
+        forensic_data: Optional[Dict[str, Any]] = None,
+        dupont_data: Optional[Dict[str, Any]] = None,
+        dividend_data: Optional[Dict[str, Any]] = None,
+        model: Optional[str] = None,
+        provider: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Gom 5 phân tích chuyên sâu của cổ phiếu vào ĐÚNG 1 LLM Request:
+        1. CFA Thesis Deep Dive
+        2. Semantic News NLP & Catalysts
+        3. Forensic Auditing & Beneish M-Score
+        4. Valuation 10-Model Convergence & MoS
+        5. AI Dividend Safety & Capital Allocation Auditor (MỚI)
+        ==> Giảm 75% API calls, triệt tiêu nguy cơ Throttling (Rate Limit 429).
+        """
+        fin_data = fin_data or {}
+        val_eval = val_eval or fin_data.get("valuationMultiples") or fin_data.get("valuation", {})
+        news_data = news_data or fin_data.get("newsDigest", {})
+        forensic_data = forensic_data or {
+            "beneishMScore": fin_data.get("beneishMScore", {}),
+            "altmanZ": fin_data.get("healthScore", {}).get("altmanZ", {}),
+            "forensicAnalysis": fin_data.get("forensicAnalysis", {})
+        }
+        dupont_data = dupont_data or fin_data.get("extendedDupont", {})
+        dividend_data = dividend_data or fin_data.get("dividendSustainability", {})
+
+        # Dữ liệu phục vụ kiểm toán cổ tức & phân bổ vốn
+        fcf_ratio = dividend_data.get("fcfPayoutRatio")
+        payout_ratio = dividend_data.get("payoutRatio")
+        div_score = dividend_data.get("score")
+        div_status = dividend_data.get("status", "Chưa đủ số liệu")
+
+        def fallback():
+            # Fallback 1: Deep Dive
+            cur_price = val_eval.get("currentPrice", 0)
+            fair_price = val_eval.get("fairPrice", 0)
+            mos = val_eval.get("marginOfSafety", 0)
+            rec = "MUA GOM TÍCH LŨY" if mos > 15 else ("THEO DÕI NẮM GIỮ" if mos > -10 else "CÂN NHẮC CHỐT LỜI")
+
+            deep_dive = {
+                "thesisHeadline": f"Luận Điểm Đầu Tư {symbol}: Định Giá Hợp Lý, Biên An Toàn {mos:.1f}%",
+                "cfaSummary": f"{symbol} ghi nhận thị giá {cur_price:,.0f} đ so với giá trị nội tại hội tụ {fair_price:,.0f} đ. Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
+                "coreCatalysts": [
+                    "Duy trì tăng trưởng doanh thu cốt lõi và mở rộng quy mô thị phần.",
+                    "Biên lợi nhuận gộp cải thiện nhờ tối ưu hóa chi phí vận hành."
+                ],
+                "investmentRisks": [
+                    "Biến động chu kỳ ngành và sức ép cạnh tranh thị trường.",
+                    "Rủi ro chi phí vốn vay và thanh khoản chung."
+                ],
+                "recommendation": rec,
+                "targetHorizon": "12 - 24 Tháng"
+            }
+
+            # Fallback 2: News
+            news_nlp = {
+                "overallSentiment": "Tích Cực" if mos > 0 else "Trung Tính",
+                "sentimentScore": 60 if mos > 0 else 10,
+                "executiveSummary": f"Dòng chảy thông tin báo chí 30 ngày qua của {symbol} duy trì sự ổn định, tập trung vào kết quả kinh doanh và hoạt động vận hành.",
+                "catalysts": ["Tiến độ các dự án trọng điểm và kế hoạch chi trả cổ tức."],
+                "keyRisks": ["Biến động giá nguyên vật liệu và sức mua thị trường."],
+                "catalystTimeline": "Trung hạn (3-6 tháng)"
+            }
+
+            # Fallback 3: Forensic
+            m_val = forensic_data.get("beneishMScore", {}).get("mScore", -2.5) if isinstance(forensic_data, dict) else -2.5
+            forensic = {
+                "auditVerdict": "Cần Lưu Ý Kế Toán" if (m_val and m_val > -1.78) else "Sạch Sẽ & Minh Bạch",
+                "forensicDiagnosis": f"Hệ thống kế toán pháp y ghi nhận Beneish M-Score đạt {m_val:.2f}. Báo cáo tài chính phản ánh đúng chuẩn mực, không có dấu hiệu thao túng trọng yếu.",
+                "dupontEarningsQuality": "Chất lượng lợi nhuận ổn định, cơ cấu ROE được hỗ trợ bởi hiệu quả kinh doanh cốt lõi thay vì lạm dụng đòn bẩy tài chính quá mức.",
+                "auditorChecklist": [
+                    "Theo dõi kỳ thu tiền bình quân và trích lập dự phòng phải thu.",
+                    "Kiểm tra tiến độ tài sản dở dang dài hạn."
+                ]
+            }
+
+            # Fallback 4: Convergence
+            convergence = {
+                "convergenceHeadline": f"Hội Tụ Định Giá {symbol}: Giá Trị Hợp Lý {fair_price:,.0f} đ",
+                "divergenceExplanation": "Các mô hình định giá chiết khấu dòng tiền (DCF, FCFE) và bội số thị trường (P/E, P/B) có sự phân hóa phản ánh chu kỳ tái đầu tư vốn CapEx của doanh nghiệp.",
+                "sensitivityStory": "Khi chi phí vốn WACC biến động ±1.5%, giá trị nội tại dao động trong biên độ an toàn, bảo vệ vị thế nhà đầu tư.",
+                "preferredModelRecommendation": "Ưu tiên mô hình P/E trung vị chu kỳ kết hợp DCF 3 kịch bản."
+            }
+
+            # Fallback 5: Dividend Audit (MỚI)
+            is_div_safe = fcf_ratio is not None and fcf_ratio <= 75
+            is_div_trap = fcf_ratio is not None and fcf_ratio > 100
+            div_rating = "Vững Chắc (Safe)" if is_div_safe else ("Nguy Cơ Bẫy Cổ Tức (Trap Risk)" if is_div_trap else "Cần Theo Dõi (Borderline)")
+
+            dividend_audit = {
+                "safetyRating": div_rating,
+                "fcfCoverageVerdict": (
+                    f"Cổ tức tiền mặt được bảo chứng an toàn bởi dòng tiền tự do FCF thặng dư sau chi phí đầu tư CapEx (FCF Payout Ratio: {fcf_ratio}%)."
+                    if fcf_ratio is not None else
+                    "Chính sách cổ tức tiền mặt duy trì đều đặn dựa trên nền tảng lợi nhuận kinh doanh ổn định."
+                ),
+                "trapRiskLevel": "Thấp" if is_div_safe else ("Cao" if is_div_trap else "Trung Bình"),
+                "capitalAllocationScore": 8.0 if is_div_safe else (4.5 if is_div_trap else 6.5),
+                "capitalAllocationDiagnosis": (
+                    "Ban lãnh đạo thực hiện chính sách phân bổ vốn cân bằng: tái đầu tư mở rộng năng lực sản xuất với ROIC cao trong khi vẫn duy trì cổ tức tiền mặt kỷ luật cho cổ đông."
+                    if is_div_safe else
+                    "Cần lưu ý tốc độ giải ngân CapEx và tỷ lệ nợ vay để đảm bảo không làm loãng dòng tiền trả cổ tức trong tương lai."
+                ),
+                "outlook3Y": "Khả năng duy trì hoặc tăng nhẹ mức chi trả cổ tức tiền mặt trong 1-3 năm tới là khả thi nhờ dòng tiền hoạt động ổn định.",
+                "redFlags": ["Cổ tức tiền mặt vượt dòng tiền FCF thặng dư"] if is_div_trap else []
+            }
+
+            return {
+                "aiDeepDive": deep_dive,
+                "aiNewsAnalysis": news_nlp,
+                "aiAuditComment": forensic,
+                "aiConvergence": convergence,
+                "aiDividendAudit": dividend_audit,
+                "status": "success",
+                "provider": "offline-heuristic-engine",
+                "model": "Quantitative Deterministic Heuristic v4.0"
+            }
+
+        # Tạo payload cô đọng gửi 1 prompt
+        stock_context = {
+            "symbol": symbol,
+            "valuationSummary": {
+                "currentPrice": val_eval.get("currentPrice"),
+                "fairPrice": val_eval.get("fairPrice"),
+                "marginOfSafety": val_eval.get("marginOfSafety"),
+                "pe": val_eval.get("pe"),
+                "pb": val_eval.get("pb"),
+                "models": val_eval.get("models", {})
+            },
+            "forensicAudit": {
+                "mScore": forensic_data.get("beneishMScore", {}).get("mScore"),
+                "isManipulator": forensic_data.get("beneishMScore", {}).get("isManipulator"),
+                "altmanZ": forensic_data.get("altmanZ", {}).get("zScore"),
+                "extendedDupont": dupont_data
+            },
+            "dividendSustainability": {
+                "fcfPayoutRatio": fcf_ratio,
+                "accountingPayoutRatio": payout_ratio,
+                "score": div_score,
+                "status": div_status
+            },
+            "recentNews": [
+                {"title": a.get("title", ""), "date": a.get("date", "")}
+                for a in (news_data.get("articles", [])[:10] if isinstance(news_data, dict) else [])
+            ]
+        }
+
+        sys_prompt = (
+            f"Bạn là Trưởng Bộ Phận Nghiên Cứu Cổ Phiếu & Kiểm Toán Pháp Y (Head of Equity Research & Forensic Audit - CFA) am hiểu sâu sắc TTCK Việt Nam.\n"
+            f"Hãy phân tích toàn diện mã cổ phiếu {symbol} dựa trên số liệu định lượng, kế toán pháp y, độ an toàn cổ tức và tin tức báo chí.\n"
+            "QUY TẮC BẮT BUỘC:\n"
+            "- Trả về DUY NHẤT một JSON object (không bọc markdown) chứa đầy đủ 5 phân hệ sau:\n"
+            "{\n"
+            '  "aiDeepDive": {\n'
+            '    "thesisHeadline": "Tiêu đề luận điểm đầu tư CFA ngắn gọn, sắc bén",\n'
+            '    "cfaSummary": "Đoạn văn 2-3 câu tổng hợp luận điểm định giá và vị thế doanh nghiệp",\n'
+            '    "coreCatalysts": ["2 động lực tăng trưởng then chốt"],\n'
+            '    "investmentRisks": ["2 rủi ro đầu tư trọng yếu"],\n'
+            '    "recommendation": "MUA GOM TÍCH LŨY | THEO DÕI NẮM GIỮ | CÂN NHẮC CHỐT LỜI",\n'
+            '    "targetHorizon": "12 - 24 Tháng"\n'
+            '  },\n'
+            '  "aiNewsAnalysis": {\n'
+            '    "overallSentiment": "Tích Cực | Trung Tính | Thận Trọng",\n'
+            '    "sentimentScore": 70,\n'
+            '    "executiveSummary": "Đoạn văn 2 câu tổng hợp dòng chảy thông tin 30 ngày qua",\n'
+            '    "catalysts": ["Động lực kinh doanh từ tin tức"],\n'
+            '    "keyRisks": ["Rủi ro từ tin tức"],\n'
+            '    "catalystTimeline": "Trung hạn (3-6 tháng)"\n'
+            '  },\n'
+            '  "aiAuditComment": {\n'
+            '    "auditVerdict": "Sạch Sẽ & Minh Bạch | Cần Lưu Ý Kế Toán | Rủi Ro Thao Túng BCTC",\n'
+            '    "forensicDiagnosis": "Đoạn văn 2 câu phân tích Beneish M-Score và chất lượng BCTC",\n'
+            '    "dupontEarningsQuality": "Đánh giá chất lượng ROE: từ tăng trưởng thật hay đòn bẩy nợ",\n'
+            '    "auditorChecklist": ["2 câu hỏi kiểm toán then chốt tại ĐHCĐ"]\n'
+            '  },\n'
+            '  "aiConvergence": {\n'
+            '    "convergenceHeadline": "Tiêu đề luận giải hội tụ định giá",\n'
+            '    "divergenceExplanation": "Giải thích tại sao các mô hình có độ chênh lệch (DCF vs P/E vs P/B)",\n'
+            '    "sensitivityStory": "Thử tải độ nhạy khi chi phí vốn WACC tăng 1.5%",\n'
+            '    "preferredModelRecommendation": "Mô hình định giá tin cậy nhất cho doanh nghiệp"\n'
+            '  },\n'
+            '  "aiDividendAudit": {\n'
+            '    "safetyRating": "Vững Chắc (Safe) | Cần Theo Dõi (Borderline) | Nguy Cơ Bẫy Cổ Tức (Trap Risk)",\n'
+            '    "fcfCoverageVerdict": "Đánh giá chi tiết cổ tức tiền mặt có được bảo chứng bằng dòng tiền tự do FCF thực tế hay không",\n'
+            '    "trapRiskLevel": "Thấp | Trung Bình | Cao",\n'
+            '    "capitalAllocationScore": 8.5,\n'
+            '    "capitalAllocationDiagnosis": "Kiểm toán kỷ luật phân bổ vốn của Ban Lãnh Đạo (tái đầu tư mở rộng vs trả nợ vay vs chia cổ tức tiền mặt)",\n'
+            '    "outlook3Y": "Dự phóng triển vọng duy trì hoặc cắt giảm cổ tức trong 1-3 năm tới",\n'
+            '    "redFlags": ["Cờ cảnh báo nếu có, hoặc mảng rỗng [] nếu an toàn"]\n'
+            '  }\n'
+            "}"
+        )
+        user_prompt = f"Số liệu tài chính, định giá và kiểm toán của {symbol}:\n{json.dumps(stock_context, ensure_ascii=False, indent=2)}"
+
+        res = self.generate_json(sys_prompt, user_prompt, fallback_fn=fallback, model=model, provider=provider)
+        return res
+
 
 # Singleton
 ai_service = PythonAiService()
+
+
+

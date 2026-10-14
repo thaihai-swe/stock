@@ -183,6 +183,12 @@ def run_weekly_pipeline(symbols: List[str]):
     # 7. Sinh Nhịp Đập Thị Trường Cuối Tuần (AI Weekly Market Pulse)
     execute_step("2.7 Sinh Nhịp Đập Thị Trường Cuối Tuần (AI Weekly Market Pulse)", "generate_ai_insights.py", ["--scope", "weekly_market"])
 
+    # 8. Đánh Giá Sức Khỏe Danh Mục & Chịu Tải Vĩ Mô (All Users - Weekly Delta)
+    execute_step("2.8 Đánh Giá Sức Khỏe Danh Mục & Chịu Tải Vĩ Mô (All Users - Weekly Delta)", "generate_ai_insights.py", ["--scope", "portfolio", "--user-id", "all"])
+
+    # 9. Bộ Phân Tích Cổ Phiếu Tích Hợp (AI Stock Suite - Weekly Smart Delta)
+    execute_step("2.9 Bộ Phân Tích Cổ Phiếu Tích Hợp (AI Stock Suite - Weekly Delta)", "generate_ai_insights.py", ["--scope", "stocks", "--symbols", sym_arg])
+
 
 def run_quarterly_pipeline(symbols: List[str], backfill_deep: bool = False):
     """Chu kỳ Hằng Quý (Mùa BCTC): 122+ chỉ tiêu BCTC 8Q/5Y, 54 Ratios, DuPont, DCF."""

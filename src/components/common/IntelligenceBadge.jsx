@@ -44,6 +44,8 @@ export function getIntelligenceSource(item) {
 /**
  * Component hiển thị nhãn nhận diện Trí Tuệ Nhân Tạo (AI) hoặc Mô Hình Định Lượng Quy Tắc (H)
  * @param {Object} props
+ * @param {Object} [props.source] Đối tượng nguồn dữ liệu (report, aiInsight, aiDeepDive...) tự động trích xuất thông tin
+ * @param {Object} [props.item] Bí danh cho source
  * @param {'ai' | 'heuristic' | 'h'} [props.type] Loại nhãn cưỡng bức
  * @param {string} [props.provider] Tự động nhận diện qua provider (openai, gemini, offline-heuristic-engine, v.v.)
  * @param {string} [props.tooltip] Nội dung tooltip tùy chỉnh khi rê chuột
@@ -51,17 +53,26 @@ export function getIntelligenceSource(item) {
  * @param {string} [props.className] Class tùy biến bổ sung
  */
 export default function IntelligenceBadge({
+  source,
+  item,
   type,
   provider,
   tooltip,
   size = 'sm',
   className = ''
 }) {
+  const target = source || item;
+  const intel = target ? getIntelligenceSource(target) : null;
+
   // Xác định loại nhãn
   let resolvedType = 'heuristic';
+  let finalTooltip = tooltip;
 
   if (type) {
     resolvedType = (type === 'ai' || type === 'AI') ? 'ai' : 'heuristic';
+  } else if (intel) {
+    resolvedType = intel.type;
+    if (!finalTooltip) finalTooltip = intel.tooltip;
   } else if (provider) {
     const p = provider.toLowerCase();
     if (p === 'openai' || p === 'gemini' || p === 'anthropic' || p === 'deepseek') {
@@ -74,7 +85,6 @@ export default function IntelligenceBadge({
   const isAi = resolvedType === 'ai';
 
   // Xây dựng tooltip mặc định nếu không truyền vào
-  let finalTooltip = tooltip;
   if (!finalTooltip) {
     if (isAi) {
       finalTooltip = 'Trí tuệ nhân tạo (AI Copilot)';

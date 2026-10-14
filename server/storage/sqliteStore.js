@@ -118,7 +118,6 @@ export async function getAllData(userId = 'demo') {
   const watchlist = watchRes.rows.map(mapWatchlist);
 
   let settings = {};
-  let goal = null;
 
   for (const row of setRes.rows) {
     if (row.key === 'settings') {
@@ -127,8 +126,6 @@ export async function getAllData(userId = 'demo') {
         const { maxAllocationPct, ...rest } = parsed;
         settings = rest;
       }
-    } else if (row.key === 'goal') {
-      goal = safeJsonParse(row.value, null);
     }
   }
 
@@ -140,7 +137,6 @@ export async function getAllData(userId = 'demo') {
     dividends,
     watchlist,
     settings,
-    goal,
     portfolio,
   };
 }
@@ -459,14 +455,6 @@ export async function getCashBalance(userId = 'demo') {
   }
   return 0;
 }
-export async function updateGoal(goal, userId = 'demo') {
-  await initDatabase();
-  await db.execute({
-    sql: `INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('goal', ?, ?);`,
-    args: [JSON.stringify(goal), userId],
-  });
-  return goal;
-}
 
 // 7. Khôi phục toàn bộ dữ liệu từ Backup JSON
 export async function restoreAllData(fullJson, userId = 'demo') {
@@ -589,12 +577,6 @@ export async function restoreAllData(fullJson, userId = 'demo') {
       });
     }
   }
-  if (fullJson.goal) {
-    statements.push({
-      sql: `INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('goal', ?, ?);`,
-      args: [JSON.stringify(fullJson.goal), userId],
-    });
-  }
 
   await db.batch(statements, 'write');
   return true;
@@ -634,7 +616,6 @@ export async function cloneDemoDataForUser(targetUserId) {
     dividends: clonedDividends,
     watchlist: clonedWatchlist,
     settings: demoData.settings,
-    goal: demoData.goal,
   }, targetUserId);
 
   return true;
@@ -653,9 +634,57 @@ export async function clearUserData(userId) {
     { sql: 'DELETE FROM dividends WHERE user_id = ?;', args: [userId] },
     { sql: 'DELETE FROM watchlist WHERE user_id = ?;', args: [userId] },
     { sql: 'DELETE FROM app_settings WHERE user_id = ?;', args: [userId] },
+    { sql: 'DELETE FROM portfolio_ai_insights WHERE user_id = ?;', args: [userId] },
   ];
 
   await db.batch(statements, 'write');
+  return true;
+}
+
+// 10. Quản lý AI Portfolio Stress-Test theo người dùng
+export async function getPortfolioAiInsight(userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: 'SELECT * FROM portfolio_ai_insights WHERE user_id = ? LIMIT 1;',
+    args: [userId]
+  });
+  if (res.rows && res.rows.length > 0) {
+    const row = res.rows[0];
+    try {
+      const parsed = JSON.parse(row.report_json);
+      return {
+        ...parsed,
+        userId: row.user_id,
+        updatedAt: row.updated_at,
+        healthScore: row.health_score || parsed.healthScore,
+        healthVerdict: row.health_verdict || parsed.healthVerdict,
+        portfolioBeta: row.portfolio_beta != null ? row.portfolio_beta : parsed.portfolioBeta,
+        cashWeightPct: row.cash_weight_pct != null ? row.cash_weight_pct : parsed.cashWeightPct,
+        status: row.status || parsed.status || 'success'
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
+export async function savePortfolioAiInsight(userId = 'demo', report = {}) {
+  await initDatabase();
+  const reportJson = typeof report === 'string' ? report : JSON.stringify(report);
+  const healthScore = report.healthScore || 'B+';
+  const healthVerdict = report.healthVerdict || '';
+  const portfolioBeta = report.portfolioBeta != null ? report.portfolioBeta : 1.0;
+  const cashWeightPct = report.cashWeightPct != null ? report.cashWeightPct : 0.0;
+  const status = report.status || 'success';
+  const updatedAt = report.updatedAt || new Date().toISOString();
+
+  await db.execute({
+    sql: `INSERT OR REPLACE INTO portfolio_ai_insights 
+          (user_id, health_score, health_verdict, portfolio_beta, cash_weight_pct, report_json, status, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+    args: [userId, healthScore, healthVerdict, portfolioBeta, cashWeightPct, reportJson, status, updatedAt]
+  });
   return true;
 }
 

@@ -1,3 +1,5 @@
+import TimeHorizonFilter from '../common/TimeHorizonFilter.jsx';
+
 export default function HistoryFilterToolbar({
   subTab = 'orders',
   setSubTab,
@@ -207,54 +209,20 @@ export default function HistoryFilterToolbar({
                 </button>
               </div>
 
-              {/* Presets Chu Kỳ Thời Gian (YTD / 1Y / MTD) */}
-              <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('all') : (setStartDate(''), setEndDate(''))}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    timePreset === 'all' || (!startDate && !endDate && timePreset !== 'custom')
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
-                  }`}
-                >
-                  <span className="sm:hidden">Tất cả</span>
-                  <span className="hidden sm:inline">Toàn thời gian</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('ytd') : null}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    timePreset === 'ytd'
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
-                  }`}
-                >
-                  YTD
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('1y') : null}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    timePreset === '1y'
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
-                  }`}
-                >
-                  1Y
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectTimePreset ? handleSelectTimePreset('mtd') : null}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    timePreset === 'mtd'
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'
-                  }`}
-                >
-                  MTD
-                </button>
-              </div>
+              {/* Presets Chu Kỳ Thời Gian & Khoảng Ngày Dùng Chung */}
+              <TimeHorizonFilter
+                preset={timePreset}
+                startDate={startDate}
+                endDate={endDate}
+                onChange={({ preset, startDate: s, endDate: e }) => {
+                  if (setTimePreset) setTimePreset(preset);
+                  if (setStartDate) setStartDate(s);
+                  if (setEndDate) setEndDate(e);
+                }}
+                customLabel="Khoảng Ngày Khớp Lệnh:"
+                showCustomToggle={true}
+                allowExpand={true}
+              />
             </div>
 
             {/* Nút đặt lại bộ lọc */}
@@ -269,10 +237,10 @@ export default function HistoryFilterToolbar({
             )}
           </div>
 
-          {/* HÀNG 4: DRAWER BỘ LỌC NÂNG CAO (MÃ CP, THẺ TAG, TỪ NGÀY -> ĐẾN NGÀY) */}
+          {/* HÀNG 4: DRAWER BỘ LỌC NÂNG CAO (MÃ CP, THẺ TAG) */}
           {showAdvancedFilters && (
             <div className="card-nested p-3.5 space-y-3 animate-in fade-in duration-200">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 {/* Lọc theo mã cổ phiếu */}
                 <div>
                   <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
@@ -316,34 +284,6 @@ export default function HistoryFilterToolbar({
                       <option key={tag} value={tag}>#{tag}</option>
                     ))}
                   </select>
-                </div>
-
-                {/* Khoảng ngày tùy chỉnh */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
-                    Khoảng Ngày Khớp Lệnh:
-                  </label>
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={e => {
-                        setStartDate(e.target.value);
-                        if (setTimePreset) setTimePreset('custom');
-                      }}
-                      className="input-base !w-1/2 text-[11px] font-semibold"
-                    />
-                    <span className="text-slate-400">→</span>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={e => {
-                        setEndDate(e.target.value);
-                        if (setTimePreset) setTimePreset('custom');
-                      }}
-                      className="input-base !w-1/2 text-[11px] font-semibold"
-                    />
-                  </div>
                 </div>
               </div>
             </div>

@@ -15,6 +15,7 @@ import { parseUrlRoute, syncUrlRoute } from './utils/navigation.js';
 
 // Nạp lười (Code Splitting) các Tab nặng để tối ưu dung lượng Bundle ban đầu
 const ValuationDashboard = lazy(() => import('./components/ValuationDashboard.jsx'));
+const MarketDashboard = lazy(() => import('./components/MarketDashboard.jsx'));
 const MacroDashboard = lazy(() => import('./components/MacroDashboard.jsx'));
 const TransactionHistory = lazy(() => import('./components/TransactionHistory.jsx'));
 const TradeOrderView = lazy(() => import('./components/TradeOrderView.jsx'));
@@ -28,6 +29,7 @@ const LoginModal = lazy(() => import('./components/LoginModal.jsx'));
 const prefetchTab = (tabId) => {
   switch (tabId) {
     case 'valuation': import('./components/ValuationDashboard.jsx'); break;
+    case 'market': import('./components/MarketDashboard.jsx'); break;
     case 'macro': import('./components/MacroDashboard.jsx'); break;
     case 'history': import('./components/TransactionHistory.jsx'); break;
     case 'trade': import('./components/TradeOrderView.jsx'); break;
@@ -46,8 +48,9 @@ const TABS = [
   { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋', group: 'portfolio' },
 
   // Cụm 2: Định Giá & Phân Tích Chuyên Sâu
-  { id: 'valuation', label: '🏢 Định Giá Cổ Phiếu', shortLabel: 'Định Giá', icon: '🏢', group: 'research' },
-  { id: 'macro', label: '🌐 Vĩ Mô & VN-Index', shortLabel: 'Vĩ Mô', icon: '🌐', group: 'research' },
+  { id: 'valuation', label: '🏢 Định Giá', shortLabel: 'Định Giá', icon: '🏢', group: 'research' },
+  { id: 'market', label: '🏛️ VN-Index', shortLabel: 'Thị Trường', icon: '🏛️', group: 'research' },
+  { id: 'macro', label: '🌐 Vĩ Mô', shortLabel: 'Vĩ Mô', icon: '🌐', group: 'research' },
   { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜', group: 'research' },
   { id: 'strategy', label: '🎯 Chiến lược', shortLabel: 'Chiến lược', icon: '🎯', group: 'research' },
 
@@ -69,7 +72,8 @@ const TAB_GROUPS = [
     groupTitle: 'Định Giá & Phân Tích Chuyên Sâu',
     items: [
       { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: '10 mô hình định lượng (Graham, DCF, RIM, NAV...), 7 Vùng giá & BCTC 122+ chỉ tiêu' },
-      { id: 'macro', label: 'Vĩ Mô & VN-Index', icon: '🌐', desc: 'Regime chu kỳ, nhiệt kế định giá & 10 nhóm ngành' },
+      { id: 'market', label: 'VN-Index', icon: '🏛️', desc: 'Chỉ số trực tuyến, P/E chu kỳ, 4 phong cách vốn hóa & 10 nhóm ngành' },
+      { id: 'macro', label: 'Vĩ Mô', icon: '🌐', desc: 'Regime chu kỳ 5 pha, đường cong lợi suất, phân bổ tài sản & 95 chỉ số' },
       { id: 'dca', label: 'Kế Hoạch DCA', icon: '🪜', desc: 'Mô phỏng & lộ trình mua gom đa tầng' },
       { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách & kỷ luật' },
     ]
@@ -184,7 +188,6 @@ export default function App({ hasGoogleClientId = false }) {
     portfolio: [],
     dividends: [],
     watchlist: [],
-    goal: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -597,6 +600,13 @@ export default function App({ hasGoogleClientId = false }) {
               />
             )}
             <Suspense fallback={<TabSkeleton />}>
+              {tab === 'market' && (
+                <MarketDashboard
+                  refreshKey={refreshKey}
+                  onSwitchTab={switchTab}
+                  showToast={showToast}
+                />
+              )}
               {tab === 'macro' && (
                 <MacroDashboard
                   refreshKey={refreshKey}
@@ -756,14 +766,14 @@ export default function App({ hasGoogleClientId = false }) {
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['trade', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab)
+            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['trade', 'market', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab)
               ? 'text-indigo-600 font-bold'
               : 'text-gray-400 hover:text-gray-600 font-medium'
               }`}
           >
             <span className="text-xl leading-none">☰</span>
             <span className="text-[10px] mt-1 tracking-tight">Menu</span>
-            {['trade', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab) && (
+            {['trade', 'market', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab) && (
               <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-0.5" />
             )}
           </button>

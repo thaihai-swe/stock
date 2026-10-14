@@ -183,6 +183,20 @@ export async function initDatabase() {
     // bỏ qua nếu index đã tồn tại
   }
 
+  // 6c. Tạo bảng portfolio_ai_insights (Phân tích sức khỏe danh mục AI theo người dùng)
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS portfolio_ai_insights (
+      user_id TEXT PRIMARY KEY,
+      health_score TEXT,
+      health_verdict TEXT,
+      portfolio_beta REAL,
+      cash_weight_pct REAL,
+      report_json TEXT NOT NULL,
+      status TEXT DEFAULT 'success',
+      updated_at TEXT NOT NULL
+    );
+  `);
+
   // 7. Migration an toàn: Bổ sung cột user_id vào các database đã có sẵn dữ liệu
   await addColumnSafe('buy_orders', 'user_id TEXT DEFAULT "demo"');
   await addColumnSafe('sell_orders', 'user_id TEXT DEFAULT "demo"');
@@ -331,17 +345,11 @@ async function autoMigrateFromJson() {
         }
       }
 
-      // Import settings & goal
+      // Import settings
       if (data.settings) {
         await db.execute({
           sql: `INSERT OR REPLACE INTO app_settings (key, value) VALUES ('settings', ?);`,
           args: [JSON.stringify(data.settings)],
-        });
-      }
-      if (data.goal) {
-        await db.execute({
-          sql: `INSERT OR REPLACE INTO app_settings (key, value) VALUES ('goal', ?);`,
-          args: [JSON.stringify(data.goal)],
         });
       }
 

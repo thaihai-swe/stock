@@ -58,6 +58,7 @@ except ImportError:
 DATA_DIR = ROOT_DIR / "data"
 MACRO_FILE = DATA_DIR / "macro_valuation.json"
 INDICATORS_FILE = DATA_DIR / "macro_indicators.json"
+AI_CACHE_FILE = DATA_DIR / "ai_insights_cache.json"
 
 
 def fetch_and_save_macro():
@@ -299,8 +300,19 @@ def fetch_and_save_macro():
         "interbankRate": te_core.get("interbank_rate", fb_interbank),
     })
 
-    # 4g. Tổng hợp AI Macro Insight (Offline CIO heuristic hoặc giữ nguyên bản phân tích LLM đã có)
+    # 4g. Tổng hợp AI Macro Insight (Bảo lưu aiInsight, weeklyPulse, sectorTransmission hoặc nạp từ ai_insights_cache.json)
+    ai_cache_data = {}
+    if AI_CACHE_FILE.exists():
+        try:
+            with open(AI_CACHE_FILE, "r", encoding="utf-8") as f:
+                ai_cache_data = json.load(f)
+        except Exception:
+            ai_cache_data = {}
+
     ai_insight = prev_cached_doc.get("aiInsight") if MACRO_FILE.exists() else None
+    if not ai_insight and ai_cache_data.get("aiInsight"):
+        ai_insight = ai_cache_data.get("aiInsight")
+
     if not ai_insight:
         ai_insight = {
             "status": "ready",
@@ -322,6 +334,16 @@ def fetch_and_save_macro():
             ]
         }
 
+    # Bảo lưu weeklyPulse: Ưu tiên tài liệu hiện có, fallback sang ai_insights_cache.json
+    weekly_pulse = prev_cached_doc.get("weeklyPulse") if MACRO_FILE.exists() else None
+    if not weekly_pulse and ai_cache_data.get("weeklyPulse"):
+        weekly_pulse = ai_cache_data.get("weeklyPulse")
+
+    # Bảo lưu sectorTransmission: Dẫn truyền vĩ mô vào ngành
+    sector_transmission = prev_cached_doc.get("sectorTransmission") if MACRO_FILE.exists() else None
+    if not sector_transmission and ai_cache_data.get("sectorTransmission"):
+        sector_transmission = ai_cache_data.get("sectorTransmission")
+
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -329,6 +351,7 @@ def fetch_and_save_macro():
             "version": "4.0"
         },
         "aiInsight": ai_insight,
+        "weeklyPulse": weekly_pulse,
         "yieldCurveMonitor": yield_curve_monitor,
         "marketIndex": market_index_data,
         "vn30Valuation": vn30_analysis,
@@ -402,6 +425,9 @@ def fetch_and_save_macro():
 
     if val_data:
         macro_doc["marketValuationHistory"] = val_data
+
+    if sector_transmission:
+        macro_doc["sectorTransmission"] = sector_transmission
 
     with open(MACRO_FILE, "w", encoding="utf-8") as f:
         json.dump(macro_doc, f, ensure_ascii=False, indent=2)

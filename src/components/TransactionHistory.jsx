@@ -6,13 +6,7 @@ import HistoryHeroHeader from './history/HistoryHeroHeader.jsx';
 import HistoryLotInspectorModal from './history/HistoryLotInspectorModal.jsx';
 import HistoryOrdersTable from './history/HistoryOrdersTable.jsx';
 import HistoryPerformanceTab from './history/HistoryPerformanceTab.jsx';
-
-function getLocalDateString(d = new Date()) {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
+import { calculateDateRange } from './common/TimeHorizonFilter.jsx';
 
 export default function TransactionHistory({
   data,
@@ -41,7 +35,7 @@ export default function TransactionHistory({
         .then(res => {
           if (res?.prices) setMarketPrices(res.prices);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [data.portfolio]);
 
@@ -60,38 +54,12 @@ export default function TransactionHistory({
   const [mobileViewMode, setMobileViewMode] = useState('card'); // 'card' | 'table'
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  // Hàm chọn preset thời gian nhanh (Chuẩn hóa múi giờ địa phương)
+  // Hàm chọn preset thời gian nhanh (Chuẩn hóa múi giờ địa phương GMT+7)
   function handleSelectTimePreset(preset) {
-    const now = new Date();
-    const todayStr = getLocalDateString(now);
-
-    setTimePreset(preset);
-    switch (preset) {
-      case 'ytd': {
-        const start = `${now.getFullYear()}-01-01`;
-        setStartDate(start);
-        setEndDate(todayStr);
-        break;
-      }
-      case '1y': {
-        const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        setStartDate(getLocalDateString(oneYearAgo));
-        setEndDate(todayStr);
-        break;
-      }
-      case 'mtd': {
-        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-        setStartDate(`${now.getFullYear()}-${monthStr}-01`);
-        setEndDate(todayStr);
-        break;
-      }
-      case 'all':
-      default: {
-        setStartDate('');
-        setEndDate('');
-        break;
-      }
-    }
+    const res = calculateDateRange(preset, startDate, endDate);
+    setTimePreset(res.preset);
+    setStartDate(res.startDate);
+    setEndDate(res.endDate);
   }
 
   // Gộp tất cả giao dịch
@@ -224,9 +192,9 @@ export default function TransactionHistory({
     if (tab === 'sell') parts.push('Lệnh bán');
     if (pnlFilter === 'profit') parts.push('Có lãi');
     if (pnlFilter === 'loss') parts.push('Thua lỗ');
-    if (timePreset === 'ytd') parts.push('Năm nay (YTD)');
-    else if (timePreset === '1y') parts.push('1 Năm gần nhất');
-    else if (timePreset === 'mtd') parts.push('Tháng này (MTD)');
+    if (timePreset === 'ytd') parts.push('YTD');
+    else if (timePreset === '1y') parts.push('1Y');
+    else if (timePreset === 'mtd') parts.push('MTD');
     else if (startDate && endDate) parts.push(`${startDate} → ${endDate}`);
     else if (startDate) parts.push(`Từ ${startDate}`);
     else if (endDate) parts.push(`Đến ${endDate}`);

@@ -1,7 +1,6 @@
 import express from 'express';
 import {
   getAllData,
-  updateGoal,
   updateCashBalance,
   getCashBalance,
   restoreAllData,
@@ -30,24 +29,6 @@ router.post(['/cash-balance', '/settings/cash-balance'], async (req, res) => {
     const userId = req.user?.id || 'demo';
     await updateCashBalance(val, userId);
     res.json({ cashBalance: val });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Cập nhật mục tiêu
-router.post('/goal', async (req, res) => {
-  const { targetAmount, year, description } = req.body;
-  try {
-    const userId = req.user?.id || 'demo';
-    const goal = {
-      targetAmount: parseFloat(targetAmount) || 0,
-      year: parseInt(year) || new Date().getFullYear(),
-      description: description || '',
-      updatedAt: getTodayString(),
-    };
-    await updateGoal(goal, userId);
-    res.json(goal);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

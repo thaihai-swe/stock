@@ -47,12 +47,18 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
               <IntelligenceBadge type="heuristic" tooltip="Báo cáo vĩ mô Heuristic quy tắc (macro_advisor.py)" />
             )}
             <span className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-[10px] font-bold border border-purple-200/50">
-              {activeTab === 'weekly_pulse' ? 'Weekly Market Wrap' : 'CIO Macro Copilot'}
+              {activeTab === 'weekly_pulse' ? 'Weekly Market Wrap' : activeTab === 'traditional' ? 'Rule-based & AI Synthesis' : 'CIO Macro Copilot'}
             </span>
           </div>
           <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mt-1 flex items-center gap-2">
-            <span>{activeTab === 'weekly_pulse' ? '📅' : '🤖'}</span>
-            <span>{activeTab === 'weekly_pulse' ? 'Bản Tin Nhịp Đập Thị Trường Cuối Tuần' : 'Báo Cáo Chiến Lược CIO & Động Lực Vĩ Mô'}</span>
+            <span>{activeTab === 'weekly_pulse' ? '📅' : activeTab === 'traditional' ? '📋' : '🤖'}</span>
+            <span>
+              {activeTab === 'weekly_pulse'
+                ? 'Bản Tin Nhịp Đập Thị Trường Cuối Tuần'
+                : activeTab === 'traditional'
+                ? 'Báo Cáo Điều Hành Tổng Hợp Quy Chuẩn'
+                : 'Báo Cáo Chiến Lược CIO & Động Lực Vĩ Mô'}
+            </span>
           </h3>
         </div>
 
@@ -93,8 +99,8 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
                     : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
                 }`}
               >
-                <span>📋 Tổng Hợp</span>
-                <IntelligenceBadge size="xs" type="heuristic" tooltip="Báo cáo Heuristic quy tắc" />
+                <span>📋 Tổng Hợp Quy Chuẩn</span>
+                <IntelligenceBadge size="xs" type="heuristic" tooltip="Báo cáo định lượng Heuristic quy chuẩn tài chính (macro_advisor.py) nhằm kiểm chứng chéo độc lập với AI" />
               </button>
             )}
           </div>
@@ -336,9 +342,25 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
         </div>
       )}
 
-      {/* ── 3. VIEW 2: BÁO CÁO ĐIỀU HÀNH TRUYỀN THỐNG (KEY RISKS & CATALYSTS) ── */}
+      {/* ── 3. VIEW 2: BÁO CÁO ĐIỀU HÀNH TỔNG HỢP (AI EXECUTIVE SYNTHESIS & HEURISTIC BREAKDOWN) ── */}
       {activeTab === 'traditional' && (
         <div className="space-y-6">
+          {/* AI Executive Synthesis Banner (Trích xuất tóm tắt AI để đối chiếu song song) */}
+          {aiInsight?.executiveSummary && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-transparent border border-purple-200/80 dark:border-purple-800/80 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-black uppercase tracking-wider text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                  <span className="text-sm">🤖</span>
+                  <span>Tóm Tắt Tổng Hợp Điều Hành (AI Executive Synthesis)</span>
+                </div>
+                <IntelligenceBadge size="xs" provider={aiInsight?.provider} />
+              </div>
+              <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
+                {aiInsight.executiveSummary}
+              </p>
+            </div>
+          )}
+
           {keyTakeaways.length > 0 && (
             <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/5 border border-indigo-200/80 dark:border-indigo-800/80 space-y-2.5">
               <div className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">

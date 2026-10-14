@@ -23,6 +23,8 @@ export default function StockCockpitHeader({
   syncingSingle,
   handleLookupSymbol,
   handleSyncSingleFinancials,
+  handleRefreshSingleAi,
+  refreshingAi,
   setIsReportModalOpen,
   lastSyncedAt,
 }) {
@@ -184,6 +186,20 @@ export default function StockCockpitHeader({
           >
             <span className={syncingSingle ? 'inline-block animate-spin' : ''}>🔄</span>
           </button>
+
+          {/* Nút Làm Mới AI Cổ Phiếu Tức Thời */}
+          {handleRefreshSingleAi && (
+            <button
+              type="button"
+              onClick={handleRefreshSingleAi}
+              disabled={refreshingAi}
+              className="px-2.5 py-2 bg-gradient-to-r from-amber-500/10 to-indigo-500/10 hover:from-amber-500/20 hover:to-indigo-500/20 border border-amber-200 dark:border-indigo-800 rounded-xl text-amber-700 dark:text-amber-300 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-50 active:scale-95"
+              title={`Làm mới phân tích AI tích hợp (Thesis, News, Audit, Convergence, Dividend) cho ${selectedSymbol}`}
+            >
+              <span className={refreshingAi ? 'inline-block animate-spin' : ''}>⚡</span>
+              <span className="hidden xl:inline">{refreshingAi ? 'Đang chạy AI...' : 'Làm Mới AI'}</span>
+            </button>
+          )}
         </div>
       </div>
 

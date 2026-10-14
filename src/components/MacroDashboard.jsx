@@ -1,17 +1,10 @@
 import { useState, useEffect } from 'react';
 import { fetchValuationMacro, fetchMacroIndicators, triggerValuationSync } from '../utils/api.js';
 
-// Các component phân hệ vĩ mô chuyên trách
-import MarketIndexLiveChart from './macro/MarketIndexLiveChart.jsx';
-import MarketValuationHistoryChart from './macro/MarketValuationHistoryChart.jsx';
-import StyleValuationComparison from './macro/StyleValuationComparison.jsx';
+// Các component phân hệ kinh tế vĩ mô chuyên trách
 import YieldCurveMonitorCard from './macro/YieldCurveMonitorCard.jsx';
-import SectorValuationHeatmap from './macro/SectorValuationHeatmap.jsx';
-
-// Các component vừa được module hóa và tối ưu responsive
 import MacroHeroStatusBar from './macro/MacroHeroStatusBar.jsx';
 import MacroSubTabNav from './macro/MacroSubTabNav.jsx';
-import MacroValuationWindowCard from './macro/MacroValuationWindowCard.jsx';
 import MacroYieldCurveStressBox from './macro/MacroYieldCurveStressBox.jsx';
 import MacroIntermarketGrid from './macro/MacroIntermarketGrid.jsx';
 import MacroRegimeRadarSection from './macro/MacroRegimeRadarSection.jsx';
@@ -23,8 +16,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
   const [indicatorsData, setIndicatorsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'regime' | 'yield_curve' | 'sectors' | 'allocation' | 'indicators'
-  const [valuationWindow, setValuationWindow] = useState('ten_year'); // 'five_year' | 'ten_year' | 'modern' | 'all_time'
+  const [activeTab, setActiveTab] = useState('regime'); // 'regime' | 'yield_curve' | 'allocation' | 'indicators'
 
   const loadAllMacroData = async () => {
     setLoading(true);
@@ -99,17 +91,17 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
         <div className="space-y-1 relative z-10">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-              Hệ Thống Trí Tuệ Vĩ Mô & Thị Trường
+              Hệ Thống Trí Tuệ Vĩ Mô & Chu Kỳ Kinh Tế
             </span>
             <span className="text-[11px] text-gray-500 dark:text-gray-400">
               Cập nhật: {macroData?._meta?.updatedAt ? new Date(macroData._meta.updatedAt).toLocaleDateString('vi-VN') : 'Mới nhất'}
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight flex items-center gap-2 sm:gap-3 text-gray-900 dark:text-white">
-            <span>🌐</span> Toàn Cảnh Kinh Tế Vĩ Mô & Chu Kỳ Thị Trường
+            <span>🌐</span> Kinh Tế Vĩ Mô & Chu Kỳ Kinh Doanh
           </h1>
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
-            Nhận diện 5 pha chu kỳ kinh tế, đo lường điểm rủi ro vĩ mô, ma trận xoay vòng 10 nhóm ngành GICS và dữ liệu 95 chỉ số TradingEconomics.
+            Nhận diện 5 pha chu kỳ kinh tế, đo lường điểm rủi ro vĩ mô 4 tầng, giám sát đường cong lợi suất TPCP, phân bổ 4 lớp tài sản & thư viện 95 chỉ số TradingEconomics.
           </p>
         </div>
 
@@ -119,7 +111,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
             onClick={handleSync}
             disabled={syncing}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-white/10 dark:hover:bg-white/20 dark:text-white active:scale-95 text-xs font-bold transition border border-indigo-500 dark:border-white/20 shadow-xs cursor-pointer disabled:opacity-50"
-            title="Kích hoạt Python thu thập lợi suất TPCP, tỷ giá, vàng SJC/PNJ, P/E VN-Index và 10 ngành GICS (~15-25 giây)"
+            title="Kích hoạt Python thu thập lợi suất TPCP, tỷ giá, vàng SJC/PNJ, lãi suất SBV và chỉ số vĩ mô (~15-25 giây)"
           >
             <span className={syncing ? 'animate-spin' : ''}>🔄</span>
             <span>{syncing ? 'Đang chạy Python (~20s)...' : 'Đồng Bộ Vĩ Mô (Python)'}</span>
@@ -127,7 +119,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
         </div>
       </div>
 
-      {/* ── 2. HERO STATUS BAR: 4 KPI CARDS (RESPONSIVE 2x2 TRÊN MOBILE) ── */}
+      {/* ── 2. HERO STATUS BAR: 4 KPI CARDS VĨ MÔ ── */}
       <MacroHeroStatusBar
         regime={regime}
         macroClock={macroClock}
@@ -139,44 +131,12 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
         assetAlloc={assetAlloc}
       />
 
-      {/* ── 3. THANH ĐIỀU HƯỚNG 6 PHÂN HỆ VĨ MÔ ── */}
+      {/* ── 3. THANH ĐIỀU HƯỚNG 4 PHÂN HỆ VĨ MÔ ── */}
       <MacroSubTabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* ── 4. NỘI DUNG TỪNG PHÂN HỆ ── */}
 
-      {/* PHÂN HỆ 1: ĐỊNH GIÁ VN-INDEX & TÀI SẢN THỰC */}
-      {activeTab === 'overview' && (
-        <div className="space-y-6">
-          {/* Biểu đồ chỉ số trực tuyến & intraday DNSE */}
-          <MarketIndexLiveChart />
-
-          {/* Nhiệt kế định giá VN-Index 4 chu kỳ */}
-          <MacroValuationWindowCard
-            market={market}
-            valuationWindow={valuationWindow}
-            onValuationWindowChange={setValuationWindow}
-            assetAlloc={assetAlloc}
-          />
-
-          {/* Lịch sử định giá 25 năm Vietstock */}
-          <MarketValuationHistoryChart />
-
-          {/* So sánh định giá 4 phong cách vốn hóa (VN30, Diamond, Midcap vs VN-Index) */}
-          <StyleValuationComparison
-            styleIndices={macroData?.styleIndices}
-            vnindexPE={market.currentPE || null}
-            vnindexPB={market.currentPB || null}
-          />
-
-          {/* Tóm tắt căng thẳng thị trường nợ & LSS */}
-          <MacroYieldCurveStressBox yieldCurve={yieldCurve} macro={macro} />
-
-          {/* Lưới 6 chỉ số liên thị trường */}
-          <MacroIntermarketGrid macro={macro} />
-        </div>
-      )}
-
-      {/* PHÂN HỆ 2: CHU KỲ 5 PHA & RADAR DẪN DẮT */}
+      {/* PHÂN HỆ 1: CHU KỲ 5 PHA & RADAR DẪN DẮT */}
       {activeTab === 'regime' && (
         <MacroRegimeRadarSection
           macroData={macroData}
@@ -193,40 +153,30 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
         />
       )}
 
-      {/* PHÂN HỆ 3: ĐƯỜNG CONG LỢI SUẤT 17 DÒNG */}
+      {/* PHÂN HỆ 2: ĐƯỜNG CONG LỢI SUẤT 17 DÒNG & THỊ TRƯỜNG NỢ */}
       {activeTab === 'yield_curve' && (
         <div className="space-y-6">
+          <MacroYieldCurveStressBox yieldCurve={yieldCurve} macro={macro} />
           <YieldCurveMonitorCard data={macroData} />
         </div>
       )}
 
-      {/* PHÂN HỆ 4: BẢN ĐỒ NHIỆT 10 NHÓM NGÀNH GICS */}
-      {activeTab === 'sectors' && (
+      {/* PHÂN HỆ 3: PHÂN BỔ 4 TÀI SẢN & GIÁ VÀNG */}
+      {activeTab === 'allocation' && (
         <div className="space-y-6">
-          <SectorValuationHeatmap
-            dualMatrix={macroData?.dualMatrix}
-            sectorValuations={macroData?.sectorValuations}
-            sectorRotation={macroData?.sectorRotation}
-            vnindexPE={market.currentPE || null}
+          <MacroAllocationGoldSection
+            macroData={macroData}
+            assetAlloc={assetAlloc}
+            goldAdv={goldAdv}
+            macro={macro}
+            risk={risk}
             regime={regime}
-            sectorTransmission={macroData?.sectorTransmission}
           />
+          <MacroIntermarketGrid macro={macro} />
         </div>
       )}
 
-      {/* PHÂN HỆ 5: PHÂN BỔ 4 TÀI SẢN & GIÁ VÀNG */}
-      {activeTab === 'allocation' && (
-        <MacroAllocationGoldSection
-          macroData={macroData}
-          assetAlloc={assetAlloc}
-          goldAdv={goldAdv}
-          macro={macro}
-          risk={risk}
-          regime={regime}
-        />
-      )}
-
-      {/* PHÂN HỆ 6: THƯ VIỆN 95 CHỈ SỐ TRADINGECONOMICS */}
+      {/* PHÂN HỆ 4: THƯ VIỆN 95 CHỈ SỐ TRADINGECONOMICS */}
       {activeTab === 'indicators' && (
         <MacroTradingEconomicsTable indicatorsData={indicatorsData} />
       )}
