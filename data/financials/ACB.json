@@ -2,7 +2,7 @@
   "_meta": {
     "symbol": "ACB",
     "companyName": "Asia Commercial Joint Stock Bank",
-    "updatedAt": "2026-10-14T16:27:44Z",
+    "updatedAt": "2026-10-15T06:51:26Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
@@ -608,11 +608,13 @@
     },
     "impliedFcfYieldPrice": null,
     "aiConvergence": {
-      "convergenceHeadline": "Hội tụ định giá quanh phương pháp P/B - Residual Income",
-      "divergenceExplanation": "Mô hình DCF thuần túy tạo độ lệch lớn do dòng tiền hoạt động của định chế tài chính bị chi phối bởi chu chuyển tiền gửi và giải ngân cho vay; do đó, mô hình P/B kết hợp Thu nhập thặng dư (Residual Income) phản ánh chính xác nhất năng lực tạo giá trị nội tại từ vốn chủ sở hữu sạch của ACB.",
-      "sensitivityStory": "Khi thử nghiệm chi phí vốn vốn chủ (Cost of Equity) tăng 1.5% do biến động vĩ mô, giá trị hợp lý của ACB giảm nhẹ khoảng 8.2%, tuy nhiên mức biên an toàn vẫn giữ vững trên 16%, chứng minh khả năng phòng thủ vững chắc trước rủi ro lãi suất.",
-      "preferredModelRecommendation": "Mô hình P/B kết hợp Thu nhập thặng dư (Residual Income) dựa trên ROE mục tiêu 17-18%",
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "convergenceHeadline": "Hội Tụ Định Giá ACB: Giá Trị Hợp Lý 0 đ",
+      "divergenceExplanation": "Các mô hình định giá chiết khấu dòng tiền (DCF, FCFE) và bội số thị trường (P/E, P/B) có sự phân hóa phản ánh chu kỳ tái đầu tư vốn CapEx của doanh nghiệp.",
+      "sensitivityStory": "Khi chi phí vốn WACC biến động ±1.5%, giá trị nội tại dao động trong biên độ an toàn, bảo vệ vị thế nhà đầu tư.",
+      "preferredModelRecommendation": "Ưu tiên mô hình P/E trung vị chu kỳ kết hợp DCF 3 kịch bản.",
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "financialRatios": {
@@ -674,6 +676,15 @@
   },
   "corporateEvents": [
     {
+      "date": "2026-07-06",
+      "type": "Cổ tức tiền mặt",
+      "content": "Cổ đông ngân hàng nhận nghìn tỷ cổ tức bằng tiền mặt",
+      "ratio": "10%",
+      "value": 548,
+      "source": "Báo Tiền Phong",
+      "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQamJNUDd1d2VsSGhTVWt1d00xNW9VYXFpVUNRbkQ1TlNRaUZOZk1GZmNON0ctRHNsOTVnaGJTMjVJVnQ1cnQ1U1kxb1NpdUhCeEdJZW1MZjZJLU5QVzNxS3FPa2Nsc2FHVF8zcVVITjh5dzdDN0x5MHEzc096M0FwbE5BTTJiVWFETERuZXJvWG9iRlE?oc=5"
+    },
+    {
       "date": "2026-06-22",
       "type": "Cổ tức cổ phiếu",
       "content": "ACB đã thanh toán cổ tức 2025 bằng cổ phiếu, tăng vốn lên 58.044 tỷ đồng",
@@ -717,24 +728,6 @@
       "value": 548,
       "source": "VnEconomy",
       "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNeEFabDg1VnlIeHh6RGNRT3J3OUhlWmRGbzUzUVVaWE9zY1BtYlN6VXM4bWtpdjVLWVdyN25uQ3cxRkZPMGNvdVhIZlgyd1lCQllqSm9wMHVuSklOV1FzeFNiS3YwcmVNY1FMTW1nZ2lIdkRCMVVaZ2pKMF9ia0FUU3F0MUQ?oc=5"
-    },
-    {
-      "date": "2026-04-15",
-      "type": "Cổ tức cổ phiếu",
-      "content": "ACB sẽ phát hành hơn 667 triệu cổ phiếu trả cổ tức",
-      "ratio": "10%",
-      "value": null,
-      "source": "An ninh Tiền tệ",
-      "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxORGxobFN6dWYwMVppMGlLTVRjUGgweEJnZzZ1ZVlJSVE0OS11LW9GY0JTdWdoRFlhYVp2TFZDbVF6OFlyZW9rR0pMcnkzSGpYNXp4bWhFUEY1UFZHTi1KUUZKWGhXcWJpTkZ2ekp2dnd4Z0RZcnZza0tQY3RKV2VTNlVFWU1TWUVOSWpYVHNqVkZLdzZ4Z0VmTzlYbWJvdVF4T1E?oc=5"
-    },
-    {
-      "date": "2026-04-10",
-      "type": "Đại hội cổ đông",
-      "content": "ACB đón lượng cổ đông kỷ lục đến dự Đại hội",
-      "ratio": "—",
-      "value": null,
-      "source": "CafeF",
-      "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQbEJvVl8ycUhQcjZLNE9PenlRQjdKcG95a3EzaTNfQ1Fpc0sxdWoxWHhsbjBkSnFpbHBBdTJMajB4X1REMUNZTW9oa1NwNnhBZ09EcWF2RXpYS3N5NzEyVUU4czBHQmtSZ2E4VDB0TmQ5ajhGV2FlX3VMMHJZRXBLZkw5NDlRWG56SlFB?oc=5"
     }
   ],
   "shareholders": [
@@ -1693,34 +1686,6 @@
       },
       {
         "id": "news-ACB-3",
-        "title": "Lãi lớn tại Việt Nam, một ngân hàng nước ngoài có lợi nhuận tích lũy nhiều hơn HDBank, ACB và SHB, tỷ lệ nợ xấu thấp hơn Vietcombank",
-        "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-10-02.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-02",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxPUFFNdlhSTTNkN1ptYUxyTFhJYXJiNlB5ZFg4enJJeVVscE5xYThrSmJxTE5pTFBJYTBMVzZGNElnU0hYNHZyckpPX0tuanpySk1xeVo4Z3pyNWs2MGpaWFZBWDdpNWhIbW9tdnJjUUlxTEp0Sk1HUTMyZzE2enlGMjliVFVQUTY0Y2NSNVk0R1NJWkhKdTd0S2tkWWdadEEtNE16dmpqN1pVamN6SFVWbXVMdFczcDBGVVBGMURrU1ByR3AyT0doY1FWU3kweGljc0d3RU5VY2I3Q1k2X3BUc241aXJNcGlJZ0lNWkczWXIzc2daajg5X0gwXzFpQQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-4",
-        "title": "Học cùng lãnh đạo doanh nghiệp từ 20 quốc gia, Chủ tịch ACB Trần Hùng Huy nhận ra thứ còn quan trọng hơn cả lợi nhuận",
-        "summary": "Bản tin phân tích về ACB từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-26.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-26",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxPZHppSkx3VmdmWnliZjRnTmtFUmlScnRMdExYc0U2Um5kWmk2cGN0aXlnVHNoLXg5SEJEMkwwLWdKUkE1ZEJfLXVCTE5pdWlGQlJjT0U3d01PN0VmNjRYR0RlWko5cDlqZmFrTGl4R3Z1VW9aZ1J4UTNlZ2Z2VmlVM283Sk5tX0NIM2xXaUJGNGNXZ3R3cGR2Mmh2eGhGcDRZb0lSc2taaDV3TDhDZnlhamdvaWRuMGtUb1g1aFZXbVlKa0ZUZmZZUHVIVTFKbk53amg0NFVkV1MyMTE3Wkx4WXZIamFlYVE?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-5",
         "title": "Lợi nhuận 10.700 tỷ đồng và nghịch lý trong bảng cân đối của ACB",
         "summary": "Bản tin phân tích về ACB từ nguồn VIETTIMES. Cập nhật ngày 2026-09-25.",
         "category": "biz",
@@ -1734,7 +1699,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-6",
+        "id": "news-ACB-4",
         "title": "Chủ tịch ACB Trần Hùng Huy nói về thứ doanh nghiệp phải bỏ lại khi AI thay đổi cuộc chơi",
         "summary": "Bản tin phân tích về ACB từ nguồn Laodong.vn. Cập nhật ngày 2026-09-25.",
         "category": "disclosure",
@@ -1748,35 +1713,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-7",
-        "title": "ACB được giới tài chính đánh giá cao nhất về hoạt động IR trong nhóm Financial Large Cap",
-        "summary": "Bản tin phân tích về ACB từ nguồn Fili.vn. Cập nhật ngày 2026-09-25.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-25",
-        "source": "Fili.vn",
-        "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPelJTc0FhVlNrTm85cG9EeDYzTTBHTFBCLWE5T3VNQzk2UW01YkNoTjJEbjcwSUFKSXVnbC1vMzZodzBJX1NQNlZQQ1BaV2FZR2RTVE5FZFBjSU5EakZ3ODBfck91QkNKOWNBaGd0bHNKLWJPRU80QzZVOHVXUEhDSDRZWWpZM2dRakZpQ3BUMEtZeWFuT0VCWjlTSnVLUjlReFdlTjBSX2p3UDZGRjVJU0cwR0JhWFprMTJlbklhY0tRNGRhM2tv?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-8",
-        "title": "ACB được vinh danh trên bảng xếp hạng uy tín của Forbes toàn cầu và Forbes Việt Nam",
-        "summary": "Bản tin phân tích về ACB từ nguồn Nhadautu.vn. Cập nhật ngày 2026-09-19.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-09-19",
-        "source": "Nhadautu.vn",
-        "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOQnVONGNzTF93TGlPUUZDLUpDaDA3NlB6NWNJak5peXVMUldDWEs4cXdUSG9tUmo4VWZqcnVHWGRwVkl2emR2S2V4d1hZelBSa1AtMVd0NzNVVktieWJCUFBETGprRmlwWnRpeUtmdHZBY2laNmR5d0xMWHlsVHh1NmliUkx4UTluSUNndGN3OFhBc0c2T3RtTlB1ekNvdG5Da1JBVlRRT2R5TWZoZ0JTTmhVNFJuSU0?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-9",
+        "id": "news-ACB-5",
         "title": "ACB đóng góp 5.800 tỷ đồng vào ngân sách Nhà nước, Top 3 Khối ngân hàng tư nhân",
         "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-08-25.",
         "category": "biz",
@@ -1790,7 +1727,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-10",
+        "id": "news-ACB-6",
         "title": "Cổ phiếu ACB còn bao nhiêu dư địa? - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về ACB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-22.",
         "category": "biz",
@@ -1804,7 +1741,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-11",
+        "id": "news-ACB-7",
         "title": "Khuyến nghị cổ phiếu ACB, BSR, PVD mới nhất từ SSI, MBS, BSC",
         "summary": "Bản tin phân tích về ACB từ nguồn Bnews.vn. Cập nhật ngày 2026-08-20.",
         "category": "analyst",
@@ -1818,21 +1755,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-12",
-        "title": "Tổng Giám đốc ACB ‘đóng vai’ hộ kinh doanh, kể câu chuyện chuyển đổi số",
-        "summary": "Bản tin phân tích về ACB từ nguồn Thanh Niên. Cập nhật ngày 2026-08-19.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-08-19",
-        "source": "Thanh Niên",
-        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPcVBwZXp2RHI1YmZLSkNvNzNZMHpqYUEwRmdjeHJvLUQ2RE03dGpmNDlwcDFfbmF5bk5lWE1KYWhBOWJJU1QwQ252emZuaWJxN1pCdkRoX2JHUXJuYWxxSV95aTMtamZaMUJaOHUzb1FWRDNGa3BwQ3pLVU9rMklkMVZoT3dka1R5WjRoNF9DaG1DMnBxODBaZi1nc20xbmRUdjNLVzRVZV9NZVF5aFlSdnln?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-13",
+        "id": "news-ACB-8",
         "title": "Một số cổ phiếu cần quan tâm 14/8: Cơ hội tiềm năng với ACB và MSN",
         "summary": "Bản tin phân tích về ACB từ nguồn VOV.VN. Cập nhật ngày 2026-08-14.",
         "category": "biz",
@@ -1846,7 +1769,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-14",
+        "id": "news-ACB-9",
         "title": "54 quỹ cùng mua cổ phiếu ACB trong tháng 6 - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về ACB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-07-29.",
         "category": "analyst",
@@ -1860,7 +1783,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-15",
+        "id": "news-ACB-10",
         "title": "Lực đẩy từ bán lẻ và SME, lợi nhuận nửa đầu 2026 của ACB đạt hơn 10,700 tỷ đồng",
         "summary": "Bản tin phân tích về ACB từ nguồn Fili.vn. Cập nhật ngày 2026-07-29.",
         "category": "biz",
@@ -1874,21 +1797,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-16",
-        "title": "ACB: Giá cổ phiếu Ngân hàng Á Châu hôm nay",
-        "summary": "Bản tin phân tích về ACB từ nguồn 24HMoney. Cập nhật ngày 2026-07-28.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-07-28",
-        "source": "24HMoney",
-        "link": "https://news.google.com/rss/articles/CBMiQ0FVX3lxTE04OWNzckl5RXdsSGxTTjlGWlJSaXlLRFNjTG0tU3lrWGE3X0FPb2dPNWt4OEJFVXF3SEVzVXBBaG1VbjA?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-17",
+        "id": "news-ACB-11",
         "title": "ACB tăng trưởng tín dụng 8,6% trong 6 tháng đầu năm",
         "summary": "Bản tin phân tích về ACB từ nguồn Báo Khánh Hòa. Cập nhật ngày 2026-07-26.",
         "category": "biz",
@@ -1902,7 +1811,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-ACB-18",
+        "id": "news-ACB-12",
         "title": "ACB tăng mạnh dự phòng, lợi nhuận quý 2 giảm gần 12% so với năm trước",
         "summary": "Bản tin phân tích về ACB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-07-26.",
         "category": "biz",
@@ -1916,7 +1825,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-19",
+        "id": "news-ACB-13",
         "title": "ACB gia cố ‘tấm đệm’ dự phòng, lợi nhuận quý II giảm 12%",
         "summary": "Bản tin phân tích về ACB từ nguồn Nhadautu.vn. Cập nhật ngày 2026-07-24.",
         "category": "biz",
@@ -1930,7 +1839,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-20",
+        "id": "news-ACB-14",
         "title": "Lợi nhuận quý II của ACB giảm 12%, dự phòng rủi ro tăng gấp hơn 2 lần",
         "summary": "Bản tin phân tích về ACB từ nguồn Báo Dân Việt. Cập nhật ngày 2026-07-24.",
         "category": "biz",
@@ -1944,35 +1853,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-21",
-        "title": "Tăng trưởng lợi nhuận cốt lõi, ACB chuẩn bị nguồn lực cho chiến lược 5 năm tới",
-        "summary": "Bản tin phân tích về ACB từ nguồn Fili.vn. Cập nhật ngày 2026-07-24.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-07-24",
-        "source": "Fili.vn",
-        "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOYjlUUkVhNHM3dVctYnZaOUF2b1FMbVEzdG9nVlJuQkgzYUZ0Tk02NldpQXlnRVRaRHE2Um91WldzUnoybkM0Q2lOV0o1R2tTR1NydHRfVUNtTEoya2hSZHhNb1NGaXZzZVlNTlN5ZU9mUDhLWVBIMDRZNHIzaVRrUTBnbUpVdG9FelFSdGJuNWlvT0syVV9kZUNsR0lyN3AybnlhSHRGQWE5aEJzd3NuNVlRTlpoM2lo?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
-        "id": "news-ACB-22",
-        "title": "Bức tranh lợi nhuận ACB nửa đầu năm 2026: Động lực cốt lõi và áp lực từ chiến lược trích lập dự phòng",
-        "summary": "Bản tin phân tích về ACB từ nguồn Báo Đại biểu Nhân dân. Cập nhật ngày 2026-07-23.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-07-23",
-        "source": "Báo Đại biểu Nhân dân",
-        "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNOUJjeWVOSGx5VkM1ckY0M0RLZFVRTUtDRWktOEJ4UXlzRk5LcDFKbWZadU04ekY4OUY3RlR6ay1acWNUcDRTS0ZraXFhbXR5QnkwcUxCOEFiOTE4Y29CVjZFVFJVOExqdndaM2EtYlExWDRJM2xNemZ5VE5obU0wQUNqOFFBd1JPbUdDZ2VBVWRuNlp3bWxuWEE1Z25kcTNFTTRNV3hNVzlzZVhLSGU5d29uZGJsd094d3BUV291d2ZiLThtOXQ5Z2NxOV9OMkNNdnducU9uTQ?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-ACB-23",
+        "id": "news-ACB-15",
         "title": "Khách hàng rút 8.500 tỷ đồng khỏi ACB, lợi nhuận quý 2 lao dốc 12%",
         "summary": "Bản tin phân tích về ACB từ nguồn Báo Nông nghiệp và Môi trường. Cập nhật ngày 2026-07-23.",
         "category": "biz",
@@ -1986,7 +1867,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-24",
+        "id": "news-ACB-16",
+        "title": "Bức tranh lợi nhuận ACB nửa đầu năm 2026: Động lực cốt lõi và áp lực từ chiến lược trích lập dự phòng",
+        "summary": "Bản tin phân tích về ACB từ nguồn Báo Đại biểu Nhân dân. Cập nhật ngày 2026-07-23.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-23",
+        "source": "Báo Đại biểu Nhân dân",
+        "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNOUJjeWVOSGx5VkM1ckY0M0RLZFVRTUtDRWktOEJ4UXlzRk5LcDFKbWZadU04ekY4OUY3RlR6ay1acWNUcDRTS0ZraXFhbXR5QnkwcUxCOEFiOTE4Y29CVjZFVFJVOExqdndaM2EtYlExWDRJM2xNemZ5VE5obU0wQUNqOFFBd1JPbUdDZ2VBVWRuNlp3bWxuWEE1Z25kcTNFTTRNV3hNVzlzZVhLSGU5d29uZGJsd094d3BUV291d2ZiLThtOXQ5Z2NxOV9OMkNNdnducU9uTQ?oc=5",
+        "sentiment": "bearish",
+        "sentimentValue": -1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-17",
         "title": "ACB lãi 10.700 tỷ sau nửa năm, trả thu nhập nhân viên 40 triệu/tháng",
         "summary": "Bản tin phân tích về ACB từ nguồn Znews. Cập nhật ngày 2026-07-23.",
         "category": "biz",
@@ -2000,7 +1895,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-25",
+        "id": "news-ACB-18",
         "title": "Thu nhập lãi vẫn tăng mạnh, điều gì khiến “ông lớn” ACB hụt hơi trong quý 2?",
         "summary": "Bản tin phân tích về ACB từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-07-23.",
         "category": "biz",
@@ -2014,21 +1909,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-26",
-        "title": "Động lực nào giúp ACB đạt lợi nhuận hơn 10.700 tỷ đồng sau nửa năm?",
-        "summary": "Bản tin phân tích về ACB từ nguồn VIETTIMES. Cập nhật ngày 2026-07-22.",
+        "id": "news-ACB-19",
+        "title": "ACB đạt lợi nhuận hơn 10.700 tỷ đồng trong 6 tháng đầu năm 2026, bán lẻ và SME hồi phục tích cực",
+        "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-07-22.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-07-22",
-        "source": "VIETTIMES",
-        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxONXI2dGZjZWQ5QUJpSThmbW94dGgtc0l0Q3dqeE82b1RReTFwYkVGaFBjYkNYZkNXaE9fRldUVFM0YzY3SkFFZV8za2JoTlh1aU53V3dlbEJyWU9pMTRfdlR3OGl4VURxYURlMnoyLXNzaEhqWWR6M3NIcFRabmZTSm1fV2VkcjZxMWZTNjJMOUtoWVhrTUFQa2liRFFPVWkzZFlPRQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNVjllbmI1RGk3SFRFS3pHdEl2LTYwVkZwR0N2YVZTWmVFWXRKcTBlcFVXZDRkMVpNam5EaFlscEFTbGJ1XzN6TlA3LXJTWkt2MzE0VE1QQjlyUjMzVElvcGxOQ3lJcVFtdXNQSkUyZlZEdHFpdjZKb1lmdC1ucVc4TkRsNVNBZlNkdmpWeUQzUHkxM0JJMDRyRVMwNlpaX2dVeGthY21tNlFmWkRWT0ppdFJYR2pUZl9EdDJnV1RfTDQzMko2LXE3YzkzVGxELTg?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-ACB-27",
+        "id": "news-ACB-20",
         "title": "ACB lãi hơn 10.700 tỷ đồng trong 6 tháng, nợ xấu giữ ở mức 1%",
         "summary": "Bản tin phân tích về ACB từ nguồn Nhịp sống kinh doanh. Cập nhật ngày 2026-07-22.",
         "category": "biz",
@@ -2042,7 +1937,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-28",
+        "id": "news-ACB-21",
+        "title": "Động lực nào giúp ACB đạt lợi nhuận hơn 10.700 tỷ đồng sau nửa năm?",
+        "summary": "Bản tin phân tích về ACB từ nguồn VIETTIMES. Cập nhật ngày 2026-07-22.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-22",
+        "source": "VIETTIMES",
+        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxONXI2dGZjZWQ5QUJpSThmbW94dGgtc0l0Q3dqeE82b1RReTFwYkVGaFBjYkNYZkNXaE9fRldUVFM0YzY3SkFFZV8za2JoTlh1aU53V3dlbEJyWU9pMTRfdlR3OGl4VURxYURlMnoyLXNzaEhqWWR6M3NIcFRabmZTSm1fV2VkcjZxMWZTNjJMOUtoWVhrTUFQa2liRFFPVWkzZFlPRQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-22",
         "title": "ACB lãi lớn hơn 10.700 tỷ, hoạt động cho vay bán lẻ và doanh nghiệp nhỏ và vừa bứt tốc",
         "summary": "Bản tin phân tích về ACB từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-07-22.",
         "category": "biz",
@@ -2056,7 +1965,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-29",
+        "id": "news-ACB-23",
+        "title": "ACB lãi hơn 10.700 tỷ đồng trong nửa đầu năm nhờ NIM cải thiện, tín dụng tăng vượt bình quân ngành",
+        "summary": "Bản tin phân tích về ACB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-07-22.",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2026-07-22",
+        "source": "Thời báo Tài chính Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPazVfZE1aWFB1MGM5UE5IQi1RblF0OEpGd3BJVHJRSmIzVnpZY1JqckJON2ZMV0lQQVF3WGxpaDE2Y2xneExSNmxuTndKU0RBUkNxOFBkTGh6Ri1HNThBZDBEUldTVVF5Mk1UWFNNblJIV1dZRUs4azdGNW9FcTN3eHh1NkdiSTZmc0JxdzhNZ0NJX2xGQWFsNHFkalRoamt6MlpoMFJqVlg1cTZNakRnd2xTZ0dOZzZDTjRDXzhhS3h4V2JESG4zVmk1encyMDNGRU1GV3BxRjBITUE?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-24",
         "title": "ACB đạt hơn 10.700 tỷ đồng lợi nhuận trước thuế trong 6 tháng",
         "summary": "Bản tin phân tích về ACB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-21.",
         "category": "biz",
@@ -2070,7 +1993,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-30",
+        "id": "news-ACB-25",
+        "title": "Cổ đông ngân hàng nhận nghìn tỷ cổ tức bằng tiền mặt",
+        "summary": "Bản tin phân tích về ACB từ nguồn Báo Tiền Phong. Cập nhật ngày 2026-07-06.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-07-06",
+        "source": "Báo Tiền Phong",
+        "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQamJNUDd1d2VsSGhTVWt1d00xNW9VYXFpVUNRbkQ1TlNRaUZOZk1GZmNON0ctRHNsOTVnaGJTMjVJVnQ1cnQ1U1kxb1NpdUhCeEdJZW1MZjZJLU5QVzNxS3FPa2Nsc2FHVF8zcVVITjh5dzdDN0x5MHEzc096M0FwbE5BTTJiVWFETERuZXJvWG9iRlE?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-ACB-26",
         "title": "Diễn biến gây chú ý của cổ phiếu ACB",
         "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-06-22.",
         "category": "biz",
@@ -2084,7 +2021,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-31",
+        "id": "news-ACB-27",
         "title": "ACB đã thanh toán cổ tức 2025 bằng cổ phiếu, tăng vốn lên 58.044 tỷ đồng",
         "summary": "Bản tin phân tích về ACB từ nguồn VnEconomy. Cập nhật ngày 2026-06-22.",
         "category": "disclosure",
@@ -2098,7 +2035,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-32",
+        "id": "news-ACB-28",
         "title": "Sau 12 ngày tăng tốc gom cổ phiếu, một nhóm cổ đông nắm gần 10% cổ phần ACB, giá trị gần 13.000 tỷ đồng",
         "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-06-20.",
         "category": "biz",
@@ -2112,7 +2049,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-33",
+        "id": "news-ACB-29",
         "title": "Nhóm Âu Lạc gom thêm cổ phiếu ACB, nâng sở hữu sát mốc 10%",
         "summary": "Bản tin phân tích về ACB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-06-19.",
         "category": "biz",
@@ -2126,7 +2063,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-34",
+        "id": "news-ACB-30",
         "title": "\"Thế chân vạc\" đang chi phối bức tranh sở hữu tại Ngân hàng ACB",
         "summary": "Bản tin phân tích về ACB từ nguồn Tạp chí Doanh nghiệp và Hội nhập. Cập nhật ngày 2026-06-18.",
         "category": "biz",
@@ -2140,7 +2077,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-35",
+        "id": "news-ACB-31",
         "title": "Nhóm đang gom lượng lớn cổ phiếu ACB có tiềm lực 'khủng' cỡ nào?",
         "summary": "Bản tin phân tích về ACB từ nguồn Tuổi Trẻ. Cập nhật ngày 2026-06-12.",
         "category": "biz",
@@ -2154,7 +2091,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-36",
+        "id": "news-ACB-32",
         "title": "Cổ phiếu ACB bùng nổ thanh khoản trong ngày VN-Index mất mốc 1.800 điểm",
         "summary": "Bản tin phân tích về ACB từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-06-12.",
         "category": "biz",
@@ -2168,7 +2105,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-37",
+        "id": "news-ACB-33",
         "title": "Nhóm cổ đông Âu Lạc chi hơn 1.400 tỷ đồng gom cổ phiếu ACB trước thềm chốt quyền chia cổ tức",
         "summary": "Bản tin phân tích về ACB từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-06-12.",
         "category": "disclosure",
@@ -2182,7 +2119,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-38",
+        "id": "news-ACB-34",
         "title": "Cổ đông lớn của ACB tiếp tục tăng sở hữu lên 8,09%",
         "summary": "Bản tin phân tích về ACB từ nguồn VnEconomy. Cập nhật ngày 2026-06-11.",
         "category": "disclosure",
@@ -2196,7 +2133,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-39",
+        "id": "news-ACB-35",
         "title": "Nữ đại gia ngành giáo dục gom thêm 102 triệu cổ phiếu ACB chỉ trong 2 tháng, nắm giữ danh mục trị giá gần 10.000 tỷ đồng",
         "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-06-10.",
         "category": "sector",
@@ -2210,7 +2147,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-40",
+        "id": "news-ACB-36",
         "title": "Ngân hàng ACB chốt quyền chia cổ tức, cổ phiếu lên cao nhất 7 tháng",
         "summary": "Bản tin phân tích về ACB từ nguồn Nhadautu.vn. Cập nhật ngày 2026-06-05.",
         "category": "disclosure",
@@ -2224,7 +2161,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-41",
+        "id": "news-ACB-37",
         "title": "ACB chốt ngày thanh toán cổ tức bằng tiền và cổ phiếu",
         "summary": "Bản tin phân tích về ACB từ nguồn VnEconomy. Cập nhật ngày 2026-06-04.",
         "category": "disclosure",
@@ -2238,7 +2175,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-42",
+        "id": "news-ACB-38",
         "title": "ACB chốt quyền nhận cổ tức 20% bằng tiền mặt và cổ phiếu",
         "summary": "Bản tin phân tích về ACB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-06-04.",
         "category": "disclosure",
@@ -2252,7 +2189,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-43",
+        "id": "news-ACB-39",
         "title": "ACB chốt quyền chia cổ tức năm 2025 bằng tiền và cổ phiếu",
         "summary": "Bản tin phân tích về ACB từ nguồn Vietstock. Cập nhật ngày 2026-06-04.",
         "category": "disclosure",
@@ -2266,7 +2203,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-44",
+        "id": "news-ACB-40",
         "title": "ACB chốt ngày trả cổ tức tiền mặt 7%, phát hành gần 668 triệu cổ phiếu thưởng cho cổ đông",
         "summary": "Bản tin phân tích về ACB từ nguồn thuonghieucongluan.com.vn. Cập nhật ngày 2026-06-04.",
         "category": "disclosure",
@@ -2280,7 +2217,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-45",
+        "id": "news-ACB-41",
         "title": "Cổ phiếu ACB 'bật' xanh giữa biển lửa",
         "summary": "Bản tin phân tích về ACB từ nguồn VietnamFinance. Cập nhật ngày 2026-06-02.",
         "category": "biz",
@@ -2294,21 +2231,35 @@
         "weight": 1.0
       },
       {
-        "id": "news-ACB-46",
-        "title": "Quỹ quản lý gần 89 tỷ USD đang nắm hơn 76 triệu cổ phiếu ACB là ai?",
-        "summary": "Bản tin phân tích về ACB từ nguồn Nhadautu.vn. Cập nhật ngày 2026-05-27.",
+        "id": "news-ACB-42",
+        "title": "Dòng tiền lớn đẩy thanh khoản và kéo giá cổ phiếu ACB",
+        "summary": "Bản tin phân tích về ACB từ nguồn Báo Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-05-28.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-05-27",
-        "source": "Nhadautu.vn",
-        "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPMjJfVGU5SHVHOFRhVjdrNC1iRzJXSjVyWFlHM3pkOUNOcXZKQWpxUDZzNzIwdUpydERvWUl3bjFfTmQtbjFfS0hxTkhBZmQtOFhHcFVuTGxubWw1R2tvMlZGLXNJT3prNmY3OGR0SHU3ZG42VzJ5MXRTckdtSUgtcXBZVkgxM3pnNUlZbUpOUENmZjY5ZnkzUXppTXVkZzZ1?oc=5",
+        "date": "2026-05-28",
+        "source": "Báo Diễn đàn Doanh nghiệp",
+        "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxOOVJwaXVpRmd2OEZsYnp2a3pPanV3MkxQaUxUVXZXTHFOWlVienZGdEdWUWxNNVJVeHI3MmViLUMwaksxN3I1QmFDWV9uYVNfa0dVdW80dTFrd09RNU45VjVsRWxNOVMzZ1BSdlQzR19rZktYQWE3QWRVZ2pGNVZUQUMyZkZMMXE3NFh2VWxPYnNUcVNKNXlpV082Z2JmZw?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-ACB-47",
+        "id": "news-ACB-43",
+        "title": "ACB báo lãi quý 1 tăng 17%, mảng chứng khoán kinh doanh bứt tốc",
+        "summary": "Bản tin phân tích về ACB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-29.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-04-29",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOTlhxRXhsZmZMUms0RGpUcHZrQkFYdVBHYzJmVmVoSGZMRTMwMXY4NVhmYTRIU0JuS1Z6Zk1PQTF4ckJwM252WGJxUU5ERC1laEdrM2kzT29UdUx0NTdiRDZYMTVBQ2tlUFRZYjNZcFJVUmVRVm51dXRLVzJMWXY3R20tMGp0NGZZSUxSQVRBTFd1c2tpbXlfOFZIMA?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-44",
         "title": "Các nhà băng “chốt” kế hoạch lợi nhuận, chia cổ tức thế nào qua mùa họp cổ đông?",
         "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-04-27.",
         "category": "biz",
@@ -2322,7 +2273,63 @@
         "weight": 2.0
       },
       {
+        "id": "news-ACB-45",
+        "title": "ACB lãi quý I/2026 hơn 5.300 tỷ đồng, dư nợ tín dụng vượt 700 nghìn tỷ đồng",
+        "summary": "Bản tin phân tích về ACB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-04-25.",
+        "category": "macro",
+        "categoryLabel": "Vĩ Mô & Chính Sách",
+        "date": "2026-04-25",
+        "source": "Thời báo Tài chính Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOU0FzZEJ6c01mMVdaRmNtMjQ2Zm80bG1aM25fR1FhTHJjZkd4N04zV01ENmJiQ0pYM1RpZkR2OTBxV21iUjR3bmIwWm90WWdQNmoxTVVhZDJvTTdVTm1VLWNpRHNKUzhhc0YwbE1TelNzVTU2Zi1hNFZJRUt5RVZOR3RQY1pfRUtELTduckVSQlI4cURLM0FYWFZWaDZDQTBaNDBWcmZJRllYdUFNOHNmRk0wQ3Awc0N6WkE?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-46",
+        "title": "ACB lãi 5.400 tỷ đồng trong quý I/2026",
+        "summary": "Bản tin phân tích về ACB từ nguồn VnExpress. Cập nhật ngày 2026-04-23.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-04-23",
+        "source": "VnExpress",
+        "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE05bkJNbWFhZ2dvM2lkd3pvd0R5M2N1SmxDLWRwY0xuOGNCWUhfdW80V3BfZEg1VENxcURpcFpIdXMxblhQazVWdmpJYUJHTWhuaXYxVUFvMDhZR1hmTjVUcnJzaGpKbDlFLVBUR196a3VOV25UV3V3QU91LXpkZw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-47",
+        "title": "Phân hóa lợi nhuận ngân hàng quý I",
+        "summary": "Bản tin phân tích về ACB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-04-23.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-04-23",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPM0IyNm5veGg3ckEtbVhRNFNVQ2dxNGlSX1Q5M21tTVFvUFVIUkhfZW5tMDVJSVpxaXJCNW9QRHc1U3RpMzZkR1VpQnlENnpuUWJoTGRHQnVXZXkya1FzUDNYVEVXcHVjWGZuaWphR2x2U09UVm1yb3ZWaXhrUmQyNUJSTXNPd3FQcWpFNtIBiAFBVV95cUxQNG9TNzNIMXFxTnNzdFR1d0tGWFpxQnJfdXJQVzdRRUdnOS1vQkhjaTBOQWVVUkhBb2U0RzM0eUV1cjI5TVpldkEzOVBoRUZ2NlBLX0F2d1hBLUZuZXoyRFJVUzUxQlNjc3Rxa1hNLWRhVEYwU0xXZDhueDNfZmZydEtReFk5amFa?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
         "id": "news-ACB-48",
+        "title": "VNCSI định giá cổ phiếu ACB đạt 33 . 000 Đồng trong bối cảnh thị trường 2026 - Báo Sức khỏe & Đời sống",
+        "summary": "Bản tin phân tích về ACB từ nguồn Báo Sức khỏe & Đời sống. Cập nhật ngày 2026-04-22.",
+        "category": "analyst",
+        "categoryLabel": "Phân Tích CTCK",
+        "date": "2026-04-22",
+        "source": "Báo Sức khỏe & Đời sống",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQWXpBUFdCQ3RSZ19ibWlFWV9NOVU3bEloWWh2aFZYQmtMeTVUbERRMW1oaThjTHBKZUNJWjlaazVEVXpkUVJKcVM0aG1PdVFBaUhsM25jQzIyT3BnZUwycHFRZFNxdnZPSHcyeEhGcHFXYWlnM1dUVUp2VDlxdkhKeWlZeEhZeldNUkptS3dtVXJ2a3lyUnpYSExGb1dPaVNnMkdJ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-ACB-49",
         "title": "Một vòng cổ tức ngân hàng",
         "summary": "Bản tin phân tích về ACB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-04-20.",
         "category": "disclosure",
@@ -2336,53 +2343,40 @@
         "weight": 2.0
       },
       {
-        "id": "news-ACB-49",
-        "title": "ACB sẽ phát hành hơn 667 triệu cổ phiếu trả cổ tức",
-        "summary": "Bản tin phân tích về ACB từ nguồn An ninh Tiền tệ. Cập nhật ngày 2026-04-15.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-04-15",
-        "source": "An ninh Tiền tệ",
-        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxORGxobFN6dWYwMVppMGlLTVRjUGgweEJnZzZ1ZVlJSVE0OS11LW9GY0JTdWdoRFlhYVp2TFZDbVF6OFlyZW9rR0pMcnkzSGpYNXp4bWhFUEY1UFZHTi1KUUZKWGhXcWJpTkZ2ekp2dnd4Z0RZcnZza0tQY3RKV2VTNlVFWU1TWUVOSWpYVHNqVkZLdzZ4Z0VmTzlYbWJvdVF4T1E?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
         "id": "news-ACB-50",
-        "title": "ACB đón lượng cổ đông kỷ lục đến dự Đại hội",
-        "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-04-10.",
+        "title": "Cập nhật KQKD quý 1/2026 của MB, VPBank, ACB,...: Một ngân hàng lãi trước thuế 9.500 tỷ đồng",
+        "summary": "Bản tin phân tích về ACB từ nguồn CafeF. Cập nhật ngày 2026-04-18.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-10",
+        "date": "2026-04-18",
         "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQbEJvVl8ycUhQcjZLNE9PenlRQjdKcG95a3EzaTNfQ1Fpc0sxdWoxWHhsbjBkSnFpbHBBdTJMajB4X1REMUNZTW9oa1NwNnhBZ09EcWF2RXpYS3N5NzEyVUU4czBHQmtSZ2E4VDB0TmQ5ajhGV2FlX3VMMHJZRXBLZkw5NDlRWG56SlFB?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxONkh4VzlPTkxBajA3ZUh2anY5azc4cURLQmViVFdrelhHckg2SXFGalRPUU14Xy1aRW51UFpDNGRtUXA5cGc5ME1ybjlOZ0JtWmoyejVJRnJkc1o2RldzNjlkeHBXRmtLTE94Rmc4NTVZUks4S3dFSE81dGhJNE1KVHdtbl9ycXZuaEpmU1NSb2pvRGJSTm8xc0ZJb1VVdTN6aXNtanBYTlZKLWlBSVB1UVQzX21GWVFQNk1iWHVDbVlBZw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Rất cao",
         "weight": 2.0
       }
     ],
     "sentiment": {
-      "score": 37.5,
+      "score": 40.2,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 18,
-      "neutralCount": 28,
+      "bullishCount": 20,
+      "neutralCount": 26,
       "bearishCount": 4,
       "totalCount": 50,
       "categoryScores": {
-        "biz": 28.2,
-        "disclosure": 61.9,
+        "biz": 23.3,
+        "disclosure": 75.0,
         "analyst": 0.0,
-        "sector": 0.0
+        "sector": 50.0,
+        "macro": 100.0
       }
     },
     "tldr": {
       "title": "ACB 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về ACB nghiêng rõ rệt về chiều hướng tích cực với 18/50 tin tức mang gam màu tươi sáng (36.0%). Tâm điểm chú ý xoay quanh: 'Cổ phiếu của tỷ phú Nguyễn Thị Phương Thảo lập đỉnh lịch sử, vốn hóa vượt Sacombank, ACB và LPBank'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về ACB nghiêng rõ rệt về chiều hướng tích cực với 20/50 tin tức mang gam màu tươi sáng (40.0%). Tâm điểm chú ý xoay quanh: 'Cổ phiếu của tỷ phú Nguyễn Thị Phương Thảo lập đỉnh lịch sử, vốn hóa vượt Sacombank, ACB và LPBank'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2391,12 +2385,12 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "36.0%",
+          "value": "40.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+37.5",
+          "value": "+40.2",
           "type": "positive"
         },
         {
@@ -2408,18 +2402,18 @@
     },
     "aiNewsAnalysis": {
       "overallSentiment": "Tích Cực",
-      "sentimentScore": 75,
-      "executiveSummary": "Dòng thông tin thị trường ghi nhận sự tín nhiệm cao dành cho ACB nhờ khả năng duy trì chất lượng tài sản vượt trội và thanh khoản dồi dào trong bối cảnh toàn ngành thanh lọc nợ xấu. Ngân hàng tiếp tục được cấp hạn mức tín dụng tích cực từ NHNN và đẩy mạnh chiến lược số hóa tệp khách hàng bán lẻ.",
+      "sentimentScore": 60,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của ACB duy trì sự ổn định, tập trung vào kết quả kinh doanh và hoạt động vận hành.",
       "catalysts": [
-        "Duy trì vị thế nhóm ngân hàng được cấp room tín dụng cao nhờ hệ số an toàn vốn (CAR) theo chuẩn Basel III đạt trên 12%",
-        "Chuyển đổi số toàn diện hỗ trợ tăng trưởng số lượng khách hàng mới và cải thiện năng suất lao động"
+        "Tiến độ các dự án trọng điểm và kế hoạch chi trả cổ tức."
       ],
       "keyRisks": [
-        "Doanh thu ngoài lãi từ mảng phân phối bảo hiểm (bancassurance) chững lại do các quy định pháp lý siết chặt",
-        "Biến động thanh khoản liên ngân hàng có thể tác động ngắn hạn lên chi phí vốn đầu vào"
+        "Biến động giá nguyên vật liệu và sức mua thị trường."
       ],
       "catalystTimeline": "Trung hạn (3-6 tháng)",
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "beneishMScore": {
@@ -2660,51 +2654,59 @@
       "constructionInProgress": 0.0
     },
     "aiAuditComment": {
-      "auditVerdict": "Sạch Sẽ & Minh Bạch",
-      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.69 kỹ thuật nằm trên ngưỡng -1.78 chủ yếu do công thức gốc của Beneish thiết kế cho khối sản xuất/thương mại, gây méo mó khi áp dụng vào cấu trúc tài sản nợ - có của ngân hàng. Kiểm toán pháp y xác nhận ACB có chính sách phân loại nợ và trích lập dự phòng minh bạch bậc nhất hệ thống, không phát hiện dấu hiệu gian lận hay che giấu tài sản xấu ngoại bảng.",
-      "dupontEarningsQuality": "Chất lượng ROE 17.29% phản ánh thực chất hiệu quả hoạt động cốt lõi; đòn bẩy tài chính 10.75x là hoàn toàn bình thường và an toàn theo thông lệ các ngân hàng thương mại tuân thủ Basel II/III.",
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Hệ thống kế toán pháp y ghi nhận Beneish M-Score đạt -1.69. Báo cáo tài chính phản ánh đúng chuẩn mực, không có dấu hiệu thao túng trọng yếu.",
+      "dupontEarningsQuality": "Chất lượng lợi nhuận ổn định, cơ cấu ROE được hỗ trợ bởi hiệu quả kinh doanh cốt lõi thay vì lạm dụng đòn bẩy tài chính quá mức.",
       "auditorChecklist": [
-        "Kế hoạch xử lý và tiến độ thu hồi đối với nhóm nợ cần chú ý (nhóm 2) để duy trì tỷ lệ bao phủ nợ xấu (LLR) an toàn?",
-        "Định hướng cân đối giữa việc duy trì tỷ lệ an toàn vốn (CAR) trên 12% và kế hoạch chia cổ tức bằng tiền mặt trong các năm tới?"
+        "Theo dõi kỳ thu tiền bình quân và trích lập dự phòng phải thu.",
+        "Kiểm tra tiến độ tài sản dở dang dài hạn."
       ],
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "aiDeepDive": {
-    "thesisHeadline": "Thành trì quản trị rủi ro ngành ngân hàng: Biên an toàn 24.2% mở ra cơ hội tích lũy dài hạn",
-    "cfaSummary": "ACB khẳng định vị thế dẫn đầu phân khúc bán lẻ và SME với bảng cân đối kế toán lành mạnh, không vướng rủi ro trái phiếu doanh nghiệp chậm trả và tỷ lệ nợ xấu luôn nằm trong nhóm thấp nhất toàn ngành. Với ROE duy trì ổn định ở mức 17.29% cùng biên an toàn định giá 24.2%, cổ phiếu là điểm đến hấp dẫn cho dòng tiền tìm kiếm tăng trưởng bền vững và khả năng sinh lời chất lượng cao.",
+    "thesisHeadline": "Luận Điểm Đầu Tư ACB: Định Giá Hợp Lý, Biên An Toàn 24.2%",
+    "cfaSummary": "ACB ghi nhận thị giá 0 đ so với giá trị nội tại hội tụ 0 đ. Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
     "coreCatalysts": [
-      "Tăng trưởng tín dụng SME và bán lẻ phục hồi vững chắc khi sức mua và thị trường bất động sản dân cư ấm dần",
-      "Tối ưu chi phí vốn nhờ phục hồi tỷ lệ CASA và bộ đệm dự phòng rủi ro dồi dào giúp giảm áp lực trích lập"
+      "Duy trì tăng trưởng doanh thu cốt lõi và mở rộng quy mô thị phần.",
+      "Biên lợi nhuận gộp cải thiện nhờ tối ưu hóa chi phí vận hành."
     ],
     "investmentRisks": [
-      "Biên lãi ròng (NIM) đối mặt áp lực cạnh tranh gay gắt khi mặt bằng lãi suất cho vay tiếp tục duy trì ở mức thấp",
-      "Tốc độ hồi phục kinh tế chậm hơn kỳ vọng có thể gia tăng áp lực hình thành nợ xấu mới tại danh mục khách hàng cá nhân"
+      "Biến động chu kỳ ngành và sức ép cạnh tranh thị trường.",
+      "Rủi ro chi phí vốn vay và thanh khoản chung."
     ],
     "recommendation": "MUA GOM TÍCH LŨY",
     "targetHorizon": "12 - 24 Tháng",
-    "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+    "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+    "provider": "offline-heuristic-engine",
+    "model": "Quantitative Deterministic Heuristic v4.0"
   },
   "dividendSustainability": {
     "aiDividendAudit": {
-      "safetyRating": "Vững Chắc (Safe)",
-      "fcfCoverageVerdict": "Đối với ngành ngân hàng, khả năng chi trả cổ tức được bảo chứng bằng thặng dư vốn và lợi nhuận ròng thực tế thay vì FCF doanh nghiệp thông thường; tỷ lệ CAR vượt chuẩn Basel III của ACB đảm bảo an toàn tuyệt đối cho dòng tiền chi trả cổ tức.",
-      "trapRiskLevel": "Thấp",
-      "capitalAllocationScore": 9.0,
-      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn tối ưu: ACB kết hợp hài hòa giữa chi trả cổ tức tiền mặt (10-15%) nhằm tối đa hóa dòng tiền cho cổ đông và trả cổ tức bằng cổ phiếu (15%) để gia tăng vốn điều lệ, hỗ trợ mở rộng tài sản sinh lời mà không làm loãng chất lượng sinh lời.",
-      "outlook3Y": "Dự phóng ACB duy trì ổn định chính sách cổ tức hỗn hợp (tiền mặt và cổ phiếu) trong 1-3 năm tới nhờ nền tảng lợi nhuận tăng trưởng bền vững trên 12-15%/năm.",
+      "safetyRating": "Cần Theo Dõi (Borderline)",
+      "fcfCoverageVerdict": "Chính sách cổ tức tiền mặt duy trì đều đặn dựa trên nền tảng lợi nhuận kinh doanh ổn định.",
+      "trapRiskLevel": "Trung Bình",
+      "capitalAllocationScore": 6.5,
+      "capitalAllocationDiagnosis": "Cần lưu ý tốc độ giải ngân CapEx và tỷ lệ nợ vay để đảm bảo không làm loãng dòng tiền trả cổ tức trong tương lai.",
+      "outlook3Y": "Khả năng duy trì hoặc tăng nhẹ mức chi trả cổ tức tiền mặt trong 1-3 năm tới là khả thi nhờ dòng tiền hoạt động ổn định.",
       "redFlags": [],
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "aiDividendAudit": {
-    "safetyRating": "Vững Chắc (Safe)",
-    "fcfCoverageVerdict": "Đối với ngành ngân hàng, khả năng chi trả cổ tức được bảo chứng bằng thặng dư vốn và lợi nhuận ròng thực tế thay vì FCF doanh nghiệp thông thường; tỷ lệ CAR vượt chuẩn Basel III của ACB đảm bảo an toàn tuyệt đối cho dòng tiền chi trả cổ tức.",
-    "trapRiskLevel": "Thấp",
-    "capitalAllocationScore": 9.0,
-    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn tối ưu: ACB kết hợp hài hòa giữa chi trả cổ tức tiền mặt (10-15%) nhằm tối đa hóa dòng tiền cho cổ đông và trả cổ tức bằng cổ phiếu (15%) để gia tăng vốn điều lệ, hỗ trợ mở rộng tài sản sinh lời mà không làm loãng chất lượng sinh lời.",
-    "outlook3Y": "Dự phóng ACB duy trì ổn định chính sách cổ tức hỗn hợp (tiền mặt và cổ phiếu) trong 1-3 năm tới nhờ nền tảng lợi nhuận tăng trưởng bền vững trên 12-15%/năm.",
+    "safetyRating": "Cần Theo Dõi (Borderline)",
+    "fcfCoverageVerdict": "Chính sách cổ tức tiền mặt duy trì đều đặn dựa trên nền tảng lợi nhuận kinh doanh ổn định.",
+    "trapRiskLevel": "Trung Bình",
+    "capitalAllocationScore": 6.5,
+    "capitalAllocationDiagnosis": "Cần lưu ý tốc độ giải ngân CapEx và tỷ lệ nợ vay để đảm bảo không làm loãng dòng tiền trả cổ tức trong tương lai.",
+    "outlook3Y": "Khả năng duy trì hoặc tăng nhẹ mức chi trả cổ tức tiền mặt trong 1-3 năm tới là khả thi nhờ dòng tiền hoạt động ổn định.",
     "redFlags": [],
-    "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+    "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+    "provider": "offline-heuristic-engine",
+    "model": "Quantitative Deterministic Heuristic v4.0"
   }
 }

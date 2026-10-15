@@ -2,7 +2,7 @@
   "_meta": {
     "symbol": "MBB",
     "companyName": "Military Commercial Joint Stock Bank",
-    "updatedAt": "2026-10-14T16:27:39Z",
+    "updatedAt": "2026-10-15T06:51:20Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
@@ -608,11 +608,13 @@
     },
     "impliedFcfYieldPrice": 108135,
     "aiConvergence": {
-      "convergenceHeadline": "Hội Tụ Định Giá Dựa Trên P/B Mục Tiêu Và Thu Nhập Thặng Dư (Residual Income)",
-      "divergenceExplanation": "Mô hình DCF thuần túy thường kém tin cậy đối với ngân hàng do dòng tiền tự do FCF gắn chặt với quy mô tài sản sinh lãi và nghĩa vụ thanh khoản thay vì Capex thông thường. Khoảng chênh lệch định giá phản ánh việc thị trường chiết khấu rủi ro nợ xấu bất động sản, trong khi phương pháp P/B và Residual Income định giá chính xác hơn năng lực tạo ROE 22% bền vững của ngân hàng.",
-      "sensitivityStory": "Khi thử tải chi phí vốn chủ sở hữu (Ke) tăng thêm 1.5% (từ 12.5% lên 14.0%), giá trị nội tại theo mô hình P/B giảm khoảng 12%, tuy nhiên biên an toàn 46.8% hiện tại vẫn bảo vệ vững chắc vị thế giải ngân dài hạn.",
-      "preferredModelRecommendation": "Phương pháp P/B tương quan ROE kết hợp Mô hình Thu Nhập Thặng Dư (Residual Income Model - RIM).",
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "convergenceHeadline": "Hội Tụ Định Giá MBB: Giá Trị Hợp Lý 0 đ",
+      "divergenceExplanation": "Các mô hình định giá chiết khấu dòng tiền (DCF, FCFE) và bội số thị trường (P/E, P/B) có sự phân hóa phản ánh chu kỳ tái đầu tư vốn CapEx của doanh nghiệp.",
+      "sensitivityStory": "Khi chi phí vốn WACC biến động ±1.5%, giá trị nội tại dao động trong biên độ an toàn, bảo vệ vị thế nhà đầu tư.",
+      "preferredModelRecommendation": "Ưu tiên mô hình P/E trung vị chu kỳ kết hợp DCF 3 kịch bản.",
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "financialRatios": {
@@ -699,15 +701,6 @@
       "value": null,
       "source": "Thời báo Tài chính Việt Nam",
       "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQTjhCczBOQVJTVnRIb2RuTEw5UzhaUnhMdlUyT1hVWnlocVU2Zkc3bHNONEExRFlNaVNZLWVfYm5rb2RjdTNjeU9JZ2c5ZkpFQXB1Z2ozRTlmZzJfVVJ2emxQQi1lZzhYd1ZJSUtSRTAzYXhnZXVzX1VLd1REZl9CWlRQXzFicU5fV0ljVlZRTWJ6TEFtQnNuMXhXN0taVGIzOWFBOENOaG1sWHFxbmNTRktwS2ZnLVk1dnJmYUJONzJBLXk0eHc?oc=5"
-    },
-    {
-      "date": "2026-09-23",
-      "type": "Phát hành / Tăng vốn",
-      "content": "Đợt tăng vốn hiếm thấy trong ngành ngân hàng: HDBank, MB, VPBank, Techcombank đồng loạt triển khai kế hoạch lớn",
-      "ratio": "—",
-      "value": null,
-      "source": "CafeF",
-      "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOdy1WbU5Pb3M1dm4yWTFxajZZb2RGY1RHWkE0U1VHZ0MxeWNXWWlVd0JUVVp5eDN5enpuazk4OFRFcV82VkQ3c2diaERCeWtxZkc3b0RTNGZfalVTcTU0bEo5N1VLUHNYOWxXcEtVY09UeUhYclJtaGZyWG1FSHpnczVreGV6RjQ2Z1N4dlJSalJQWHVkLTBJeVplN215bW1zQUVwZ2JQUXpYTEE4OWt4OG41SVlVRFBFX0FLMG4xOFBzRTZvR1g1dEdDSkRfaE9meU5ZWjgwNi0xbkkyU2tnVg?oc=5"
     },
     {
       "date": "2026-09-22",
@@ -809,13 +802,13 @@
       "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQaG1yRXFzUW90WEFUWFdmc2Q3ZTZTZlZrc1pJRVJ2VW02alB4c1hWUExDblJZYjdaZVlZS3dTSEJ6U2NqV2ZmYlc1LVZUSGpsc2tBTTNpVTFQQ0RpYWRkSmRQUWJaYklTbXA4ZmtzY1NaOGdta3MybEh5MGNqR1BSaVRfblJqVnM4WGpXdHlyamNZWnVtX0xkblRHeE1CWWNTaFpuRDZuWlh4ZjVPV0x3cm1iSkdqd3RzQnIxZ3BBdWxXZ0lSaTBYTG1n?oc=5"
     },
     {
-      "date": "2026-07-01",
+      "date": "2026-07-02",
       "type": "Cổ tức tiền mặt",
-      "content": "MB chi hơn 8.000 tỷ đồng trả cổ tức tiền mặt 10%, chốt quyền ngày 10/7",
+      "content": "MB chốt ngày trả cổ tức tiền mặt 10%, cổ đông sắp nhận hơn 8.000 tỷ đồng - Vietnam+ (VietnamPlus)",
       "ratio": "10%",
       "value": 833,
-      "source": "Thời báo Tài chính Việt Nam",
-      "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOS0cxUmNpRDZ5VUptZjBCczAxdGNiNGxVbzhqMXJyS2FhbUJkMlV1WmF5azlLb3RwSzdSb3VvWGdMUVg4QkFBd2Q3MmpWN3NtUnV3NjVjeFNoZDdBX0ZELUF5MVAtcGh2WU4wSjJPeEhtSDRHRl96VGxNQ0VZbVhpVFc1SzQzQTg5NVlTam9QLWllSTFDVUxFMFc2UV9USHAyTzhfNHNsNzRpSmozUGlTRWlB?oc=5"
+      "source": "Vietnam+ (VietnamPlus)",
+      "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNQVdYMzFCRnpEbURENnJuMWtnV2xZR1NscjRPbVIxcUUxUTZtbXJCakh5V3RBZTUxc0F4M3lkUV9JQldqQ3RlMklsSlF5WkVPQlVhWFlKUW05TXc5b3dmZmg3eWxVYlpIUk9vMlNOcElxZzNMVHNhZy1qakQ1bi1HTVpqbk9ZU1JyQlVPNF9UdU1oOGdPc1FlcjdsUmx3VGVqMHlYbE1QTXlfaXVhbHBmWjNn?oc=5"
     },
     {
       "date": "2026-06-30",
@@ -1980,20 +1973,6 @@
       },
       {
         "id": "news-MBB-18",
-        "title": "Đợt tăng vốn hiếm thấy trong ngành ngân hàng: HDBank, MB, VPBank, Techcombank đồng loạt triển khai kế hoạch lớn",
-        "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-09-23.",
-        "category": "sector",
-        "categoryLabel": "Ngành & Dự Án",
-        "date": "2026-09-23",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOdy1WbU5Pb3M1dm4yWTFxajZZb2RGY1RHWkE0U1VHZ0MxeWNXWWlVd0JUVVp5eDN5enpuazk4OFRFcV82VkQ3c2diaERCeWtxZkc3b0RTNGZfalVTcTU0bEo5N1VLUHNYOWxXcEtVY09UeUhYclJtaGZyWG1FSHpnczVreGV6RjQ2Z1N4dlJSalJQWHVkLTBJeVplN215bW1zQUVwZ2JQUXpYTEE4OWt4OG41SVlVRFBFX0FLMG4xOFBzRTZvR1g1dEdDSkRfaE9meU5ZWjgwNi0xbkkyU2tnVg?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
-        "id": "news-MBB-19",
         "title": "MBB tiếp tục chào bán 12 triệu cổ phiếu cho nhân sự cấp cao",
         "summary": "Bản tin phân tích về MBB từ nguồn VnEconomy. Cập nhật ngày 2026-09-22.",
         "category": "biz",
@@ -2007,7 +1986,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-20",
+        "id": "news-MBB-19",
         "title": "MBB còn dư địa bứt phá?",
         "summary": "Bản tin phân tích về MBB từ nguồn diendandoanhnghiep.vn. Cập nhật ngày 2026-08-31.",
         "category": "biz",
@@ -2021,7 +2000,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-21",
+        "id": "news-MBB-20",
         "title": "Viettel chi gần 1.200 tỷ đồng mua cổ phiếu MBB, vốn điều lệ MB sắp vượt mốc 100.000 tỷ đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-21.",
         "category": "analyst",
@@ -2035,7 +2014,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-22",
+        "id": "news-MBB-21",
         "title": "Viettel sắp chi hơn 1.000 tỷ đồng mua cổ phiếu một ngân hàng",
         "summary": "Bản tin phân tích về MBB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-21.",
         "category": "analyst",
@@ -2049,7 +2028,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-23",
+        "id": "news-MBB-22",
         "title": "Cổ đông MB được mua cổ phiếu phát hành thêm với giá 10.000 đồng - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-18.",
         "category": "disclosure",
@@ -2063,7 +2042,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-24",
+        "id": "news-MBB-23",
         "title": "Cổ đông ngân hàng nhận cổ tức khủng",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Tiền Phong. Cập nhật ngày 2026-08-17.",
         "category": "disclosure",
@@ -2077,7 +2056,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-25",
+        "id": "news-MBB-24",
         "title": "MBBank (MBB) sắp chào bán cổ phiếu và trả cổ tức cho cổ đông",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-08-12.",
         "category": "disclosure",
@@ -2085,6 +2064,20 @@
         "date": "2026-08-12",
         "source": "Báo Pháp Luật Việt Nam",
         "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNTFd1WVM0ZUVYdW4wdS11eno5Y0ZmdG0yc3NZUXFMUzJjMlJqbWJ4VWxXQVRUVHNOR2hMUGFtVFEwMkVNV2xkWk1yUnFPZWtWUkVGNkpYNElnSklJZEJibC1DYm5LWkdMbDgtNFNBRklUOUtBeUZ1OE54Yjd4dGxZMmxsazNyTFVRZkM4Rm9YYzZlMUhUYThiRXV6M08?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-MBB-25",
+        "title": "Cổ tức 35% của Phân bón Bình Điền nổi bật trong 6 doanh nghiệp phân phối lợi nhuận - Tạp chí Kinh tế",
+        "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-11.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-08-11",
+        "source": "Tạp chí Kinh tế - Tài chính Online",
+        "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPTlc2bmVyZmJwWXZDTFhDeHA0Tmw5R2l2M2luQUJsZWRZTWhnVlpjTEtRLTcybndCRmxETGNVQ0tDU0J4ZWdhUlRnVmMxVWlZZ0pKRThEaUttTmFvZkZxbHFfVnlKaE1ET2szMjhNZnJva01wRGRHTkVNai15bDhOdGR1dlM2YkdxLVkyLTg3TjQtZkhQaDZDbVNOQUZjUUpFTlZOUlV3MnlWb2ZqZUwyT3FOdEtWM1FWaGZTY1AwTmNnSm8?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Rất cao",
@@ -2414,13 +2407,13 @@
       },
       {
         "id": "news-MBB-49",
-        "title": "MB chi hơn 8.000 tỷ đồng trả cổ tức tiền mặt 10%, chốt quyền ngày 10/7",
-        "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-07-01.",
+        "title": "MB chốt ngày trả cổ tức tiền mặt 10%, cổ đông sắp nhận hơn 8.000 tỷ đồng - Vietnam+ (VietnamPlus)",
+        "summary": "Bản tin phân tích về MBB từ nguồn Vietnam+ (VietnamPlus). Cập nhật ngày 2026-07-02.",
         "category": "disclosure",
         "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-07-01",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOS0cxUmNpRDZ5VUptZjBCczAxdGNiNGxVbzhqMXJyS2FhbUJkMlV1WmF5azlLb3RwSzdSb3VvWGdMUVg4QkFBd2Q3MmpWN3NtUnV3NjVjeFNoZDdBX0ZELUF5MVAtcGh2WU4wSjJPeEhtSDRHRl96VGxNQ0VZbVhpVFc1SzQzQTg5NVlTam9QLWllSTFDVUxFMFc2UV9USHAyTzhfNHNsNzRpSmozUGlTRWlB?oc=5",
+        "date": "2026-07-02",
+        "source": "Vietnam+ (VietnamPlus)",
+        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNQVdYMzFCRnpEbURENnJuMWtnV2xZR1NscjRPbVIxcUUxUTZtbXJCakh5V3RBZTUxc0F4M3lkUV9JQldqQ3RlMklsSlF5WkVPQlVhWFlKUW05TXc5b3dmZmg3eWxVYlpIUk9vMlNOcElxZzNMVHNhZy1qakQ1bi1HTVpqbk9ZU1JyQlVPNF9UdU1oOGdPc1FlcjdsUmx3VGVqMHlYbE1QTXlfaXVhbHBmWjNn?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
         "impact": "Rất cao",
@@ -2442,24 +2435,23 @@
       }
     ],
     "sentiment": {
-      "score": 45.3,
+      "score": 42.8,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 22,
-      "neutralCount": 26,
+      "bullishCount": 21,
+      "neutralCount": 27,
       "bearishCount": 2,
       "totalCount": 50,
       "categoryScores": {
-        "biz": 39.0,
+        "biz": 36.5,
         "analyst": 54.5,
-        "disclosure": 45.3,
-        "sector": 100.0
+        "disclosure": 45.3
       }
     },
     "tldr": {
       "title": "MBB 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về MBB nghiêng rõ rệt về chiều hướng tích cực với 22/50 tin tức mang gam màu tươi sáng (44.0%). Tâm điểm chú ý xoay quanh: 'FPT ngắt chuỗi giảm điểm, khối ngoại gom mạnh cổ phiếu MBB'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về MBB nghiêng rõ rệt về chiều hướng tích cực với 21/50 tin tức mang gam màu tươi sáng (42.0%). Tâm điểm chú ý xoay quanh: 'FPT ngắt chuỗi giảm điểm, khối ngoại gom mạnh cổ phiếu MBB'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2468,12 +2460,12 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "44.0%",
+          "value": "42.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+45.3",
+          "value": "+42.8",
           "type": "positive"
         },
         {
@@ -2485,18 +2477,18 @@
     },
     "aiNewsAnalysis": {
       "overallSentiment": "Tích Cực",
-      "sentimentScore": 75,
-      "executiveSummary": "Dòng chảy thông tin gần đây củng cố kỳ vọng MBB tiếp tục là ngân hàng được cấp hạn mức tăng trưởng tín dụng cao nhất ngành và đi đầu hoàn tất đề án chuyển giao bắt buộc tổ chức tín dụng yếu kém. Rủi ro từ thị trường trái phiếu doanh nghiệp và các dự án bất động sản lớn đang từng bước hạ nhiệt nhờ các cơ chế tái cơ cấu nợ của Ngân hàng Nhà nước.",
+      "sentimentScore": 60,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của MBB duy trì sự ổn định, tập trung vào kết quả kinh doanh và hoạt động vận hành.",
       "catalysts": [
-        "Được NHNN ưu tiên room tín dụng cao vượt bậc nhờ sức khỏe tài chính và tham gia tái cơ cấu hệ thống",
-        "Tiến trình chuyển giao OceanBank mở ra cơ hội nới trần sở hữu khối ngoại hoặc ưu đãi hạn ngạch tăng trưởng"
+        "Tiến độ các dự án trọng điểm và kế hoạch chi trả cổ tức."
       ],
       "keyRisks": [
-        "Nghị định và chính sách tái cơ cấu hết hiệu lực có thể làm tăng áp lực trích lập nợ xấu thực tế",
-        "Cạnh tranh gay gắt về lãi suất cho vay đầu ra ảnh hưởng đến đà phục hồi NIM toàn ngành"
+        "Biến động giá nguyên vật liệu và sức mua thị trường."
       ],
       "catalystTimeline": "Trung hạn (3-6 tháng)",
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "beneishMScore": {
@@ -2738,50 +2730,58 @@
     },
     "aiAuditComment": {
       "auditVerdict": "Cần Lưu Ý Kế Toán",
-      "forensicDiagnosis": "Chỉ số Beneish M-Score đạt -1.64 vượt ngưỡng cảnh báo kỹ thuật (-1.78), tuy nhiên mô hình gốc được thiết kế cho doanh nghiệp phi tài chính nên bị sai lệch tự nhiên khi áp dụng cho bảng cân đối ngân hàng thương mại. Mặc dù vậy, kiểm toán pháp y lưu ý cần giám sát chặt chẽ khoản mục lãi dự thu và việc phân loại nợ cơ cấu để tránh rủi ro ghi nhận lợi nhuận chưa thu tiền thực.",
-      "dupontEarningsQuality": "ROE 22.04% phản ánh hiệu quả hoạt động cốt lõi rất cao kết hợp đòn bẩy tài chính 11.6x - mức đòn bẩy hoàn toàn lành mạnh và nằm trong chuẩn mực an toàn vốn Basel II đối với khối ngân hàng thương mại.",
+      "forensicDiagnosis": "Hệ thống kế toán pháp y ghi nhận Beneish M-Score đạt -1.64. Báo cáo tài chính phản ánh đúng chuẩn mực, không có dấu hiệu thao túng trọng yếu.",
+      "dupontEarningsQuality": "Chất lượng lợi nhuận ổn định, cơ cấu ROE được hỗ trợ bởi hiệu quả kinh doanh cốt lõi thay vì lạm dụng đòn bẩy tài chính quá mức.",
       "auditorChecklist": [
-        "Tỷ lệ thu hồi nợ thực tế đối với các khoản nợ nhóm 2 và nợ tái cơ cấu theo Thông tư 02 của các nhóm khách hàng lớn hiện đạt bao nhiêu %?",
-        "Kế hoạch phân bổ chi phí dự phòng rủi ro và hỗ trợ tài chính cho ngân hàng nhận chuyển giao bắt buộc ảnh hưởng thế nào đến CAR trong 2 năm tới?"
+        "Theo dõi kỳ thu tiền bình quân và trích lập dự phòng phải thu.",
+        "Kiểm tra tiến độ tài sản dở dang dài hạn."
       ],
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "aiDeepDive": {
-    "thesisHeadline": "Lợi Thế CASA Dẫn Đầu Đi Kèm Biên An Toàn Cao Khẳng Định Cơ Hội Tích Lũy Chiến Lược",
-    "cfaSummary": "MBB sở hữu năng lực sinh lời vượt trội với ROE đạt 22.04% nhờ tối ưu hóa chi phí vốn từ tỷ lệ CASA thuộc top đầu hệ thống và sự bảo trợ vững chắc từ hệ sinh thái Quân đội. Với mức biên an toàn định giá lên đến 46.8%, hầu hết các lo ngại liên quan đến rủi ro trích lập dự phòng nợ xấu nhóm khách hàng lớn đã được phản ánh đầy đủ vào thị giá.",
+    "thesisHeadline": "Luận Điểm Đầu Tư MBB: Định Giá Hợp Lý, Biên An Toàn 46.8%",
+    "cfaSummary": "MBB ghi nhận thị giá 0 đ so với giá trị nội tại hội tụ 0 đ. Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
     "coreCatalysts": [
-      "Tăng trưởng tín dụng duy trì ở mức cao vượt trội toàn ngành (>20%) nhờ lợi thế nhận chuyển giao bắt buộc OceanBank và định hướng cho vay bán lẻ - SME.",
-      "Tỷ lệ CASA bền vững (~38-40%) giúp bảo vệ biên lãi thuần (NIM) trước biến động chi phí vốn và áp lực cạnh tranh huy động."
+      "Duy trì tăng trưởng doanh thu cốt lõi và mở rộng quy mô thị phần.",
+      "Biên lợi nhuận gộp cải thiện nhờ tối ưu hóa chi phí vận hành."
     ],
     "investmentRisks": [
-      "Áp lực nợ tiềm ẩn và rủi ro trích lập dự phòng từ các khách hàng lớn thuộc lĩnh vực năng lượng tái tạo và bất động sản (Novaland, Trung Nam).",
-      "Gánh nặng chi phí vận hành và quản trị rủi ro phát sinh trong giai đoạn đầu tái cơ cấu ngân hàng 0 đồng tiếp nhận."
+      "Biến động chu kỳ ngành và sức ép cạnh tranh thị trường.",
+      "Rủi ro chi phí vốn vay và thanh khoản chung."
     ],
     "recommendation": "MUA GOM TÍCH LŨY",
     "targetHorizon": "12 - 24 Tháng",
-    "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+    "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+    "provider": "offline-heuristic-engine",
+    "model": "Quantitative Deterministic Heuristic v4.0"
   },
   "dividendSustainability": {
     "aiDividendAudit": {
-      "safetyRating": "Vững Chắc (Safe)",
-      "fcfCoverageVerdict": "Đối với định chế ngân hàng, khả năng chi trả cổ tức được bảo chứng bởi hệ số an toàn vốn CAR duy trì trên 11.5% và lợi nhuận sau thuế giữ lại lũy kế vững chắc, cho phép MBB duy trì chính sách cổ tức tiền mặt đều đặn mà không tổn hại thanh khoản.",
-      "trapRiskLevel": "Thấp",
-      "capitalAllocationScore": 8.5,
-      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn mẫu mực: MBB cân đối hài hòa giữa việc tái tích lũy vốn tự có để mở rộng quy mô tín dụng 18-20%/năm và đảm bảo quyền lợi cổ đông bằng cổ tức tiền mặt ổn định (5-10%) kết hợp cổ phiếu thưởng định kỳ (10-15%).",
-      "outlook3Y": "Duy trì chính sách chi trả cổ tức kép ổn định (tiền mặt từ 500 - 1.000 VNĐ/cp và phần còn lại bằng cổ phiếu để tăng vốn điều lệ) trong giai đoạn 2024-2026.",
+      "safetyRating": "Cần Theo Dõi (Borderline)",
+      "fcfCoverageVerdict": "Chính sách cổ tức tiền mặt duy trì đều đặn dựa trên nền tảng lợi nhuận kinh doanh ổn định.",
+      "trapRiskLevel": "Trung Bình",
+      "capitalAllocationScore": 6.5,
+      "capitalAllocationDiagnosis": "Cần lưu ý tốc độ giải ngân CapEx và tỷ lệ nợ vay để đảm bảo không làm loãng dòng tiền trả cổ tức trong tương lai.",
+      "outlook3Y": "Khả năng duy trì hoặc tăng nhẹ mức chi trả cổ tức tiền mặt trong 1-3 năm tới là khả thi nhờ dòng tiền hoạt động ổn định.",
       "redFlags": [],
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+      "provider": "offline-heuristic-engine",
+      "model": "Quantitative Deterministic Heuristic v4.0"
     }
   },
   "aiDividendAudit": {
-    "safetyRating": "Vững Chắc (Safe)",
-    "fcfCoverageVerdict": "Đối với định chế ngân hàng, khả năng chi trả cổ tức được bảo chứng bởi hệ số an toàn vốn CAR duy trì trên 11.5% và lợi nhuận sau thuế giữ lại lũy kế vững chắc, cho phép MBB duy trì chính sách cổ tức tiền mặt đều đặn mà không tổn hại thanh khoản.",
-    "trapRiskLevel": "Thấp",
-    "capitalAllocationScore": 8.5,
-    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn mẫu mực: MBB cân đối hài hòa giữa việc tái tích lũy vốn tự có để mở rộng quy mô tín dụng 18-20%/năm và đảm bảo quyền lợi cổ đông bằng cổ tức tiền mặt ổn định (5-10%) kết hợp cổ phiếu thưởng định kỳ (10-15%).",
-    "outlook3Y": "Duy trì chính sách chi trả cổ tức kép ổn định (tiền mặt từ 500 - 1.000 VNĐ/cp và phần còn lại bằng cổ phiếu để tăng vốn điều lệ) trong giai đoạn 2024-2026.",
+    "safetyRating": "Cần Theo Dõi (Borderline)",
+    "fcfCoverageVerdict": "Chính sách cổ tức tiền mặt duy trì đều đặn dựa trên nền tảng lợi nhuận kinh doanh ổn định.",
+    "trapRiskLevel": "Trung Bình",
+    "capitalAllocationScore": 6.5,
+    "capitalAllocationDiagnosis": "Cần lưu ý tốc độ giải ngân CapEx và tỷ lệ nợ vay để đảm bảo không làm loãng dòng tiền trả cổ tức trong tương lai.",
+    "outlook3Y": "Khả năng duy trì hoặc tăng nhẹ mức chi trả cổ tức tiền mặt trong 1-3 năm tới là khả thi nhờ dòng tiền hoạt động ổn định.",
     "redFlags": [],
-    "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+    "updatedAt": "2026-10-15T06:51:28.284177+00:00",
+    "provider": "offline-heuristic-engine",
+    "model": "Quantitative Deterministic Heuristic v4.0"
   }
 }
