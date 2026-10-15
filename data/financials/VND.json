@@ -605,7 +605,16 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 61064
+    "impliedFcfYieldPrice": 61064,
+    "aiConvergence": {
+      "convergenceHeadline": "Hội tụ định giá hướng về mô hình P/B và Thu nhập thặng dư (Residual Income) trong chu kỳ tái cấu trúc",
+      "divergenceExplanation": "Mô hình DCF thường thiếu tính chuẩn xác đối với định chế tài chính do dòng tiền hoạt động biến động mạnh theo quy mô giải ngân margin và danh mục FVTPL. Trong khi đó, định giá P/E bị nhiễu bởi chu kỳ lợi nhuận tự doanh, khiến định giá P/B phản ánh sát thực hơn giá trị tài sản ròng hữu hình sau khi đã chiết khấu rủi ro tín dụng.",
+      "sensitivityStory": "Khi chi phí vốn WACC tăng thêm 1.5% (do phần bù rủi ro thị trường và rủi ro an ninh hệ thống tăng), định giá nội tại của VND sẽ giảm xấp xỉ 13.5%, kéo biên an toàn từ 22.4% xuống còn khoảng 8.9%, nhưng vẫn duy trì vùng giá mua an toàn ở biên dưới định giá.",
+      "preferredModelRecommendation": "Mô hình P/B kết hợp Residual Income (Thu nhập thặng dư) là thước đo tin cậy nhất cho VND nhằm phản ánh chuẩn xác năng lực tạo giá trị trên vốn chủ sở hữu.",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -2432,6 +2441,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 65,
+      "executiveSummary": "Dòng chảy thông tin ghi nhận sự ổn định trở lại sau khi VND khắc phục hoàn toàn sự cố an ninh mạng và khôi phục hoạt động giao dịch thông suốt. Thị trường hiện đang dồn sự chú ý vào kế hoạch phát hành tăng vốn điều lệ và tiến độ xử lý các nghĩa vụ liên quan đến trái phiếu doanh nghiệp.",
+      "catalysts": [
+        "Kế hoạch triển khai chào bán cổ phiếu tăng vốn điều lệ giúp mở rộng hạn mức cho vay margin và nâng cao tỷ lệ an toàn tài chính.",
+        "Triển vọng thanh khoản toàn thị trường cải thiện tạo đòn bẩy tăng trưởng cho mảng môi giới và kinh doanh nguồn vốn."
+      ],
+      "keyRisks": [
+        "Tâm lý thận trọng của nhà đầu tư cá nhân sau sự cố gián đoạn hệ thống và áp lực cạnh tranh thị phần môi giới cơ sở.",
+        "Rủi ro chậm thanh toán lãi/gốc từ các dự án năng lượng của các tổ chức phát hành trái phiếu lớn trong danh mục."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -2670,6 +2696,67 @@
       "latestCfo": -783.0,
       "latestCapex": 13.0,
       "constructionInProgress": 0.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -0.93 (vượt ngưỡng an toàn -1.78), phản ánh mức độ biến động dồn tích cao chủ yếu do đặc thù định giá lại tài sản tài chính FVTPL/AFS và ghi nhận chênh lệch giá trị hợp lý. Mặc dù đây là đặc tính ngành chứng khoán, nhà đầu tư cần thận trọng với chất lượng lợi nhuận kế toán phát sinh từ lãi chưa thực hiện.",
+      "dupontEarningsQuality": "ROE đạt 16.12% có chất lượng tương đối tích cực khi đòn bẩy tài chính ở mức 2.33x (nằm trong ngưỡng an toàn so với trần quy định 5.0x), biên hoạt động (EBIT margin) ghi nhận mức rất cao nhờ doanh thu hoạt động tài chính; tuy nhiên, vòng quay tài sản chậm (0.07x) cho thấy nguồn vốn còn bị giam giữ đáng kể ở các tài sản tài chính kém thanh khoản.",
+      "auditorChecklist": [
+        "Chi tiết tiến độ thanh toán nợ gốc, lãi và biện pháp xử lý tài sản bảo đảm đối với các khoản đầu tư trái phiếu doanh nghiệp chưa niêm yết là gì?",
+        "Chi phí và các biện pháp kiểm soát rủi ro an ninh mạng, bảo mật công nghệ thông tin đã được trích lập và đầu tư như thế nào để đảm bảo tính liên tục trong kinh doanh?"
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
+  },
+  "aiDeepDive": {
+    "thesisHeadline": "Vị thế CTCK bán lẻ hàng đầu: Biên an toàn 22.4% cân bằng giữa triển vọng thanh khoản và rủi ro tài sản tồn đọng",
+    "cfaSummary": "VND sở hữu vị thế vững chắc trong top đầu thị phần môi giới bán lẻ và năng lực vốn mạnh với ROE đạt 16.12%, được hỗ trợ bởi biên hoạt động vượt trội. Với biên an toàn hiện tại ở mức 22.4% và đòn bẩy tài chính lành mạnh (2.33x), cổ phiếu mở ra cơ hội giải ngân hấp dẫn khi thị trường bước vào chu kỳ nới lỏng tiền tệ và nâng hạng, dù rủi ro danh mục tài sản tài chính vẫn cần giám sát chặt chẽ.",
+    "coreCatalysts": [
+      "Thanh khoản thị trường chứng khoán phục hồi mạnh mẽ cùng kỳ vọng vận hành hệ thống KRX thúc đẩy tăng trưởng doanh thu môi giới và cho vay ký quỹ (margin).",
+      "Tiến trình tái cơ cấu và thu hồi dòng tiền từ các lô trái phiếu doanh nghiệp lớn giúp giảm bớt áp lực trích lập dự phòng, giải phóng nguồn vốn tự doanh."
+    ],
+    "investmentRisks": [
+      "Rủi ro tập trung tín dụng vào danh mục trái phiếu năng lượng tái tạo (nhóm Trung Nam) có thể gây áp lực lên thanh khoản và chất lượng tài sản.",
+      "Cạnh tranh gay gắt về chính sách miễn phí giao dịch (Zero-fee) từ các công ty chứng khoán vốn ngoại (FDI) đe dọa thị phần bán lẻ cốt lõi."
+    ],
+    "recommendation": "MUA GOM TÍCH LŨY",
+    "targetHorizon": "12 - 24 Tháng",
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
+  },
+  "dividendSustainability": {
+    "aiDividendAudit": {
+      "safetyRating": "Cần Theo Dõi (Borderline)",
+      "fcfCoverageVerdict": "Dòng tiền tự do FCF của doanh nghiệp thường xuyên âm hoặc biến động lớn do liên tục phân bổ vốn vào mở rộng danh mục cho vay margin và tự doanh; cổ tức tiền mặt không được bảo chứng trực tiếp bằng FCF hoạt động mà phụ thuộc vào điều kiện thanh khoản ngắn hạn và chiến lược tăng vốn.",
+      "trapRiskLevel": "Trung Bình",
+      "capitalAllocationScore": 6.5,
+      "capitalAllocationDiagnosis": "Ban Lãnh Đạo duy trì kỷ luật phân bổ vốn thiên về việc giữ lại lợi nhuận và phát hành thêm cổ phiếu để mở rộng quy mô vốn điều lệ nhằm đáp ứng các chỉ tiêu an toàn vốn CAR và mở rộng room cho vay, thay vì ưu tiên dòng tiền trả cổ tức mặt.",
+      "outlook3Y": "Dự phóng trong 1-3 năm tới, VND sẽ tiếp tục ưu tiên chi trả cổ tức bằng cổ phiếu (tỷ lệ 10% - 15%) để giữ lại nguồn lực mở rộng kinh doanh, tỷ lệ cổ tức tiền mặt sẽ duy trì ở mức thấp hoặc không đáng kể.",
+      "redFlags": [
+        "M-Score -0.93 cảnh báo độ biến động lớn từ các khoản mục dồn tích và lãi chưa thực hiện trên danh mục FVTPL.",
+        "Áp lực duy trì vốn chủ sở hữu để phục vụ mở rộng đòn bẩy kinh doanh hạn chế khả năng chi trả cổ tức tiền mặt bền vững."
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
+  },
+  "aiDividendAudit": {
+    "safetyRating": "Cần Theo Dõi (Borderline)",
+    "fcfCoverageVerdict": "Dòng tiền tự do FCF của doanh nghiệp thường xuyên âm hoặc biến động lớn do liên tục phân bổ vốn vào mở rộng danh mục cho vay margin và tự doanh; cổ tức tiền mặt không được bảo chứng trực tiếp bằng FCF hoạt động mà phụ thuộc vào điều kiện thanh khoản ngắn hạn và chiến lược tăng vốn.",
+    "trapRiskLevel": "Trung Bình",
+    "capitalAllocationScore": 6.5,
+    "capitalAllocationDiagnosis": "Ban Lãnh Đạo duy trì kỷ luật phân bổ vốn thiên về việc giữ lại lợi nhuận và phát hành thêm cổ phiếu để mở rộng quy mô vốn điều lệ nhằm đáp ứng các chỉ tiêu an toàn vốn CAR và mở rộng room cho vay, thay vì ưu tiên dòng tiền trả cổ tức mặt.",
+    "outlook3Y": "Dự phóng trong 1-3 năm tới, VND sẽ tiếp tục ưu tiên chi trả cổ tức bằng cổ phiếu (tỷ lệ 10% - 15%) để giữ lại nguồn lực mở rộng kinh doanh, tỷ lệ cổ tức tiền mặt sẽ duy trì ở mức thấp hoặc không đáng kể.",
+    "redFlags": [
+      "M-Score -0.93 cảnh báo độ biến động lớn từ các khoản mục dồn tích và lãi chưa thực hiện trên danh mục FVTPL.",
+      "Áp lực duy trì vốn chủ sở hữu để phục vụ mở rộng đòn bẩy kinh doanh hạn chế khả năng chi trả cổ tức tiền mặt bền vững."
+    ],
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   }
 }
