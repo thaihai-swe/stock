@@ -40,6 +40,7 @@ import ClassicInvestmentPhilosophiesCard from './valuation/ClassicInvestmentPhil
 import QualityOfEarningsCard from './valuation/QualityOfEarningsCard.jsx';
 import SmartStatementNotesCard from './valuation/SmartStatementNotesCard.jsx';
 import AiExecutiveSummaryCard from './valuation/AiExecutiveSummaryCard.jsx';
+import OrderFlowDynamicsCard from './valuation/OrderFlowDynamicsCard.jsx';
 
 // Định nghĩa 4 Không Gian Phân Tích Chuyên Sâu
 const WORKSPACES = [
@@ -68,8 +69,8 @@ const WORKSPACES = [
     id: 'market-dynamics',
     label: '4. Vận Động Thị Trường & Tâm Lý',
     icon: '📈',
-    badge: 'Thị Trường',
-    desc: 'Tech Score, Wyckoff POC, Rủi Ro Biến Động & Tin Tức 30 Ngày'
+    badge: '5 Công Cụ',
+    desc: 'Tech Score, Cán Cân Lệnh Cá Mập (Order Flow & CVD), Wyckoff POC, Rủi Ro Biến Động & Tin Tức 30 Ngày'
   }
 ];
 
@@ -626,6 +627,14 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
               currentPrice={currentStock?.close}
             />
           )}
+
+          {/* Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & Dòng Tiền Chủ Động (Aggressive Order Flow & CVD) */}
+          <OrderFlowDynamicsCard
+            orderFlow={financials?.orderFlow}
+            financials={financials}
+            symbol={selectedSymbol}
+            currentPrice={currentStock?.close}
+          />
 
           {/* Đo Lường Rủi Ro Biến Động Thị Giá */}
           {financials?.riskMetrics && (

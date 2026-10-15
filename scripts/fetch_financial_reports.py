@@ -865,6 +865,17 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
         stock_item=stock_item
     )
 
+    # 8.5. Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & Dòng Tiền Chủ Động (Aggressive Order Flow & CVD)
+    try:
+        from .lib.order_flow_engine import compute_full_order_flow_package
+        doc["orderFlow"] = compute_full_order_flow_package(
+            symbol=symbol,
+            stock_item=stock_item,
+            existing_financials=doc
+        )
+    except Exception as e:
+        pass
+
     # 9. Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (News Digest & Live Events)
     news_doc = build_news_digest_doc(symbol)
     doc["newsDigest"] = news_doc
@@ -1123,6 +1134,7 @@ def main():
     parser.add_argument("--symbols", type=str, default="", help="Danh sách mã cổ phiếu (phân tách bởi dấu phẩy, ví dụ: HPG,PNJ,DXG)")
     parser.add_argument("--backfill-deep", action="store_true", help="Kích hoạt cào lịch sử sâu từ CafeF để bổ sung các năm/quý quá khứ xa")
     parser.add_argument("--recalculate-only", action="store_true", help="Tính lại toàn bộ 10 mô hình định giá, TTM và ratios từ file BCTC địa phương mà không gọi mạng")
+    parser.add_argument("--order-flow-only", action="store_true", help="Chỉ cập nhật nhanh cán cân lệnh và CVD trong phiên cho mã chỉ định")
     args = parser.parse_args()
 
     symbols = []
@@ -1134,6 +1146,19 @@ def main():
         existing_syms = [p.stem.upper() for p in FINANCIALS_DIR.glob("*.json")]
         combined = list(dict.fromkeys(loaded + existing_syms))
         symbols = combined if combined else ["HPG", "PNJ", "DXG", "MBB", "VND", "FPT", "VCB", "VHM"]
+
+    if args.order_flow_only:
+        from .lib.order_flow_engine import compute_full_order_flow_package
+        fund_map = safe_read_json(CACHE_FILE, fallback={})
+        for sym_upper in symbols:
+            out_path = FINANCIALS_DIR / f"{sym_upper}.json"
+            existing_doc = safe_read_json(out_path, fallback={})
+            stock_item = fund_map.get(sym_upper, {})
+            flow_pkg = compute_full_order_flow_package(sym_upper, stock_item=stock_item, existing_financials=existing_doc)
+            existing_doc["orderFlow"] = flow_pkg
+            atomic_write_json(out_path, existing_doc, indent=2)
+            print(f"✅ Đã cập nhật dòng lệnh Order Flow cho {sym_upper}: WDI {flow_pkg.get('summary', {}).get('whaleDominanceIndex')}/100")
+        return
 
     fetch_and_save_financials(symbols, backfill_deep=args.backfill_deep, recalculate_only=args.recalculate_only)
 

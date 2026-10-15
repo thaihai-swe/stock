@@ -307,6 +307,24 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
   5. **Archetype Phân Loại Tính Cách Cổ Phiếu**:
      - `TREND_FOLLOWING` (Bám xu hướng), `ACCUMULATION_BREAKOUT` (Tích lũy bùng nổ), `RANGE_BOUND_CYCLICAL` (Dao động hộp), `TRAP_PRONE` (Biến động cao / Dễ bẫy giá). Tuân thủ nguyên tắc `neutral_descriptive_non_advice`.
 
+#### Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & Dòng Tiền Chủ Động (Aggressive Order Flow & CVD Dynamics):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `orderFlow`.
+* **Nguồn Dữ Liệu Thực Tế**:
+  - Chuỗi nến 1-phút trong phiên từ DNSE Chart API (`resolution=1`).
+  - Sổ lệnh khớp tick thật thời gian thực từ VCI `Quote.intraday()`.
+  - Nến ngày EOD 10-15 phiên từ DNSE / Yahoo Finance.
+* **Cơ Chế Incremental Snapshot Caching**: Lưu 9 ngày lịch sử cũ cố định vào JSON, chỉ cập nhật nến ngày hôm nay để tiết kiệm 90% request mạng và phản hồi 0ms.
+* **Cấu Hình Tập Trung**: 3 Tầng Quy Mô Lệnh được quản lý tại `data/default-constant-value.json` (`orderFlow.orderSizeTiers`):
+  1. `whale`: Cá Mập / Tổ Chức ($\ge 500$ triệu VNĐ hoặc $\ge 25,000$ cp)
+  2. `medium`: Tay To / Sói Biển ($100 - 500$ triệu VNĐ)
+  3. `retail`: Nhỏ Lẻ / Cừu Non ($< 100$ triệu VNĐ)
+* **2 Khung Thời Gian Phân Tích**:
+  - `intraday`: Nến 1m, BVC Delta, CVD trong phiên, phân rã 3 nhóm, bảng Top 15 Lệnh Khủng.
+  - `multiDay`: Chuỗi CVD 10 phiên, tổng vốn Cá mập mua/bán 10 ngày (tỷ VNĐ), phân kỳ tích lũy/phân phối.
+* **Chỉ Số Định Lượng**:
+  - `whaleDominanceIndex`: Thang điểm 0 - 100 đo mức độ áp đảo của dòng tiền Cá Mập.
+  - `divergenceSignal`: `BULLISH_ABSORPTION` (Hấp thụ mua ngầm), `BEARISH_DISTRIBUTION` (Phân phối kéo xả), `MARKUP_EXPANSION` (Đồng thuận đẩy giá).
+
 #### Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (Corporate News Digest & Sentiment):
 * **Key trong JSON**: `data/financials/<MÃ>.json` trong object `newsDigest`.
 * **Nguồn cung cấp sống**: Google News RSS đa truy vấn (Cổ tức & ĐHĐCĐ, KQKD & Lợi nhuận, Cổ phiếu & Thị trường) kết hợp `curl_cffi` (Chrome 120 TLS fingerprint impersonation) lấy tin tức tài chính thời gian thực từ CafeF, VnEconomy, Vietstock, Báo Tuổi Trẻ, Đầu Tư Chứng Khoán.

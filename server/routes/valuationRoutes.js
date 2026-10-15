@@ -347,6 +347,66 @@ router.get('/valuation/financials/:symbol', async (req, res) => {
 });
 
 /**
+ * 3.1. GET /api/valuation/order-flow/:symbol
+ * Lấy dữ liệu phân tích Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & CVD (1D & 10D)
+ */
+router.get('/valuation/order-flow/:symbol', (req, res) => {
+  const sym = (req.params.symbol || '').trim().toUpperCase();
+  if (!sym) return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
+
+  const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
+  const finData = readJsonCached(filePath, { fallback: null });
+  if (finData && finData.orderFlow) {
+    return res.json({ success: true, data: finData.orderFlow });
+  }
+
+  return res.status(404).json({
+    error: `Chưa có dữ liệu dòng lệnh cho mã ${sym}`,
+    symbol: sym
+  });
+});
+
+/**
+ * 3.2. POST /api/valuation/order-flow/:symbol/refresh
+ * Làm mới nhanh cán cân lệnh và CVD trong phiên cho mã chỉ định
+ */
+router.post('/valuation/order-flow/:symbol/refresh', asyncHandler(async (req, res) => {
+  const sym = (req.params.symbol || '').trim().toUpperCase();
+  if (!sym) return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
+
+  const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
+
+  if (!isPythonAvailable()) {
+    const finData = readJsonCached(filePath, { fallback: null });
+    if (finData?.orderFlow) {
+      return res.json({ success: true, data: finData.orderFlow });
+    }
+    return res.status(404).json({ error: `Chưa có dữ liệu dòng lệnh cho mã ${sym}` });
+  }
+
+  const { success, stderr } = await runPythonScript('scripts/fetch_financial_reports.py', [
+    '--symbols', sym,
+    '--order-flow-only'
+  ]);
+
+  if (!success) {
+    console.warn(`Lỗi chạy order-flow-only cho ${sym}:`, stderr);
+  }
+
+  invalidateJsonCache(filePath);
+  const finData = readJsonCached(filePath, { fallback: null });
+  if (finData && finData.orderFlow) {
+    return res.json({
+      success: true,
+      message: `Đã làm mới dòng lệnh khớp cho ${sym}!`,
+      data: finData.orderFlow
+    });
+  }
+
+  return res.status(500).json({ error: `Không thể cập nhật dòng lệnh cho mã ${sym}` });
+}));
+
+/**
  * 4. GET /api/valuation/raw-json/:type
  * Lấy nội dung file JSON thô để hiển thị trên Raw JSON Inspector
  */

@@ -216,6 +216,9 @@ export const fetchStockFinancials = (symbol) => request(`/valuation/financials/$
 export const fetchRawJson         = (type, symbol = '') => request(`/valuation/raw-json/${type}?symbol=${encodeURIComponent(symbol)}`);
 export const triggerValuationSync = () => request('/valuation/sync', { method: 'POST' });
 export const triggerSingleFinancialSync = (symbol) => request(`/valuation/sync-single/${encodeURIComponent(symbol)}`, { method: 'POST' });
+export const fetchStockOrderFlow = (symbol) => request(`/valuation/order-flow/${encodeURIComponent(symbol)}`);
+export const refreshStockOrderFlow = (symbol) => request(`/valuation/order-flow/${encodeURIComponent(symbol)}/refresh`, { method: 'POST' });
+
 
 // DNSE OHLC Realtime & Historical Market Index (với fallback trực tiếp tới DNSE API)
 export const fetchDnseOhlc = async ({ symbol = 'VNINDEX', resolution = '1D', from = '', to = '' } = {}) => {
