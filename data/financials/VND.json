@@ -2,7 +2,7 @@
   "_meta": {
     "symbol": "VND",
     "companyName": "VNDirect Securities Corp.",
-    "updatedAt": "2026-10-15T16:03:05Z",
+    "updatedAt": "2026-10-15T16:10:05Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
@@ -605,16 +605,7 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 61064,
-    "aiConvergence": {
-      "convergenceHeadline": "Xung Đột Giữa Định Giá P/B Sổ Sách Và Biến Động Chất Lượng Tài Sản Tự Doanh",
-      "divergenceExplanation": "Mô hình P/B cho thấy mức chiết khấu hấp dẫn nhờ quy mô vốn chủ sở hữu lớn, nhưng mô hình P/E và DCF phản ánh độ biến động cao do lợi nhuận phụ thuộc mật thiết vào hoạt động tự doanh và dòng tiền hoạt động (FCF) thiếu tính dự báo của định chế tài chính.",
-      "sensitivityStory": "Khi chi phí vốn chủ sở hữu tăng thêm 1.5% do phần bù rủi ro tín dụng trái phiếu, định giá hợp lý của VND bị chiết khấu từ 15% đến 18%, thu hẹp đáng kể biên an toàn hiện hữu.",
-      "preferredModelRecommendation": "Mô hình P/B kết hợp Thu nhập thặng dư (Residual Income Model) có chiết khấu tài sản rủi ro cao.",
-      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
-      "provider": "openai",
-      "model": "super-vip"
-    }
+    "impliedFcfYieldPrice": 61064
   },
   "financialRatios": {
     "valuation": {
@@ -2441,21 +2432,6 @@
           "type": "positive"
         }
       ]
-    },
-    "aiNewsAnalysis": {
-      "overallSentiment": "Thận Trọng",
-      "sentimentScore": 48,
-      "executiveSummary": "Tâm lý thị trường đối với VND vẫn duy trì sự dè dặt sau các biến cố an ninh hệ thống và áp lực đáo hạn trái phiếu doanh nghiệp của các đối tác lớn. Mặc dù thanh khoản thị trường chung cải thiện, nhà đầu tư tổ chức vẫn ưu tiên quan sát tiến độ thu hồi công nợ và an toàn vốn của doanh nghiệp.",
-      "catalysts": [
-        "Kế hoạch chào bán tăng vốn điều lệ nhằm nâng cao hạn mức cho vay margin và năng lực bảo lãnh phát hành."
-      ],
-      "keyRisks": [
-        "Khả năng hấp thụ nợ suy giảm tại các dự án năng lượng tái tạo liên quan đến danh mục ủy thác/đầu tư của VND."
-      ],
-      "catalystTimeline": "Trung hạn (3-6 tháng)",
-      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
-      "provider": "openai",
-      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -2694,69 +2670,6 @@
       "latestCfo": -783.0,
       "latestCapex": 13.0,
       "constructionInProgress": 0.0
-    },
-    "aiAuditComment": {
-      "auditVerdict": "Cần Lưu Ý Kế Toán",
-      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -0.93 (vượt xa ngưỡng an toàn -1.78), phát tín hiệu cảnh báo rủi ro cao về dồn tích kế toán và ghi nhận lãi ảo qua định giá lại tài sản tài chính. Mặc dù đặc thù ngành chứng khoán làm sai lệch một số hệ số kế toán phi tài chính, mức chênh lệch lớn giữa lợi nhuận sổ sách và dòng tiền thực thu đòi hỏi sự thận trọng đặc biệt.",
-      "dupontEarningsQuality": "ROE 16.12% được duy trì chủ yếu nhờ biên hoạt động danh nghĩa đạt 121.57% (phản ánh hạch toán lãi tài sản tài chính FVTPL) kết hợp đòn bẩy tài chính 2.33x; trong khi vòng quay tài sản rất thấp (0.07x) cho thấy hiệu quả chuyển đổi tài sản thành doanh thu thực tế chưa cao.",
-      "auditorChecklist": [
-        "Chính sách trích lập dự phòng và cơ sở xác định giá trị hợp lý (Level 2/Level 3) đối với các khoản đầu tư trái phiếu chưa niêm yết?",
-        "Tiến độ dòng tiền thu hồi thực tế từ các khoản phải thu dịch vụ tài chính và lãi dự thu trái phiếu đến hạn?"
-      ],
-      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
-      "provider": "openai",
-      "model": "super-vip"
     }
-  },
-  "aiDeepDive": {
-    "thesisHeadline": "Áp Lực Tái Cơ Cấu Danh Mục Trái Phiếu Đè Nặng Triển Vọng Tái Định Giá",
-    "cfaSummary": "VND sở hữu nền tảng vốn chủ sở hữu lớn và hệ thống khách hàng bán lẻ rộng, tuy nhiên chất lượng tài sản chịu rủi ro tập trung cao từ danh mục trái phiếu năng lượng tái tạo và sự suy giảm thị phần môi giới. Với biên an toàn ước tính 22.4%, cổ phiếu phù hợp cho vị thế theo dõi cơ cấu lại nợ hơn là giải ngân tăng tỷ trọng nhanh trong ngắn hạn.",
-    "coreCatalysts": [
-      "Hệ thống KRX vận hành chính thức thúc đẩy thanh khoản thị trường và mở rộng dư địa cho vay ký quỹ (margin).",
-      "Tiến trình tái cơ cấu và thu hồi nợ gốc/lãi từ các tổ chức phát hành trái phiếu trọng yếu (nhóm Trung Nam) giúp giải tỏa chi phí dự phòng."
-    ],
-    "investmentRisks": [
-      "Rủi ro trích lập dự phòng giảm giá tài sản tài chính (FVTPL/AFS) đối với các lô trái phiếu doanh nghiệp chưa niêm yết.",
-      "Cạnh tranh gay gắt về phí giao dịch (zero-fee) và chi phí vốn từ các CTCK ngoại làm xói mòn thị phần môi giới."
-    ],
-    "recommendation": "THEO DÕI NẮM GIỮ",
-    "targetHorizon": "12 - 24 Tháng",
-    "updatedAt": "2026-10-15T16:05:54.289047+00:00",
-    "provider": "openai",
-    "model": "super-vip"
-  },
-  "dividendSustainability": {
-    "aiDividendAudit": {
-      "safetyRating": "Nguy Cơ Bẫy Cổ Tức (Trap Risk)",
-      "fcfCoverageVerdict": "Doanh nghiệp chứng khoán đặc thù có dòng tiền FCF biến động mạnh theo chu kỳ mở rộng dư nợ margin và danh mục tự doanh; cổ tức tiền mặt không được bảo chứng vững chắc bởi dòng tiền tự do thuần túy.",
-      "trapRiskLevel": "Cao",
-      "capitalAllocationScore": 5.0,
-      "capitalAllocationDiagnosis": "Ban Lãnh Đạo duy trì chiến lược ưu tiên giữ lại lợi nhuận và liên tục tăng vốn thông qua cổ tức bằng cổ phiếu/phát hành quyền mua để phục vụ quy mô bảng cân đối kế toán, hạn chế tối đa việc chi trả tiền mặt.",
-      "outlook3Y": "Xác suất chi trả cổ tức tiền mặt ở mức thấp; VND sẽ tiếp tục ưu tiên cổ tức bằng cổ phiếu nhằm bổ sung vốn tự có và bảo đảm tỷ lệ an toàn tài chính.",
-      "redFlags": [
-        "Beneish M-Score (-0.93) nằm sâu trong vùng cảnh báo thao túng/thổi phồng lợi nhuận dồn tích.",
-        "Tập trung tín dụng lớn vào trái phiếu doanh nghiệp lĩnh vực năng lượng có dòng tiền trả nợ chậm.",
-        "Lịch sử chi trả cổ tức tiền mặt gián đoạn, phụ thuộc lớn vào nhu cầu tái tài trợ vốn."
-      ],
-      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
-      "provider": "openai",
-      "model": "super-vip"
-    }
-  },
-  "aiDividendAudit": {
-    "safetyRating": "Nguy Cơ Bẫy Cổ Tức (Trap Risk)",
-    "fcfCoverageVerdict": "Doanh nghiệp chứng khoán đặc thù có dòng tiền FCF biến động mạnh theo chu kỳ mở rộng dư nợ margin và danh mục tự doanh; cổ tức tiền mặt không được bảo chứng vững chắc bởi dòng tiền tự do thuần túy.",
-    "trapRiskLevel": "Cao",
-    "capitalAllocationScore": 5.0,
-    "capitalAllocationDiagnosis": "Ban Lãnh Đạo duy trì chiến lược ưu tiên giữ lại lợi nhuận và liên tục tăng vốn thông qua cổ tức bằng cổ phiếu/phát hành quyền mua để phục vụ quy mô bảng cân đối kế toán, hạn chế tối đa việc chi trả tiền mặt.",
-    "outlook3Y": "Xác suất chi trả cổ tức tiền mặt ở mức thấp; VND sẽ tiếp tục ưu tiên cổ tức bằng cổ phiếu nhằm bổ sung vốn tự có và bảo đảm tỷ lệ an toàn tài chính.",
-    "redFlags": [
-      "Beneish M-Score (-0.93) nằm sâu trong vùng cảnh báo thao túng/thổi phồng lợi nhuận dồn tích.",
-      "Tập trung tín dụng lớn vào trái phiếu doanh nghiệp lĩnh vực năng lượng có dòng tiền trả nợ chậm.",
-      "Lịch sử chi trả cổ tức tiền mặt gián đoạn, phụ thuộc lớn vào nhu cầu tái tài trợ vốn."
-    ],
-    "updatedAt": "2026-10-15T16:05:54.289047+00:00",
-    "provider": "openai",
-    "model": "super-vip"
   }
 }
