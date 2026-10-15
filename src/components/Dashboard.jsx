@@ -8,6 +8,7 @@ import DashboardHoldingsTable from './dashboard/DashboardHoldingsTable.jsx';
 import DashboardKpiMatrix from './dashboard/DashboardKpiMatrix.jsx';
 import DashboardRecentSales from './dashboard/DashboardRecentSales.jsx';
 import PortfolioStressTestCard from './dashboard/PortfolioStressTestCard.jsx';
+import SmartProfitProtectionAdvisor from './dashboard/SmartProfitProtectionAdvisor.jsx';
 import OpportunityCostCard from './OpportunityCostCard.jsx';
 import TimeHorizonFilter, { calculateDateRange } from './common/TimeHorizonFilter.jsx';
 import Modal from './common/Modal.jsx';
@@ -612,7 +613,16 @@ export default function Dashboard({
         onNavigateDca={onNavigateDca}
       />
 
-      {/* 🌟 5b. ĐO LƯỜNG SỨC KHỎE DANH MỤC & CHỊU TẢI VĨ MÔ (AI PORTFOLIO STRESS-TEST) */}
+      {/* 🌟 5b. CỐ VẤN KHÓA LỢI NHUẬN LINH HOẠT & THƯỚC ĐO R:R (SMART TRAILING STOP ADVISOR) */}
+      <SmartProfitProtectionAdvisor
+        portfolio={displayedPortfolio}
+        marketPrices={pricesData?.prices || {}}
+        fundamentalsMap={fundamentalsMap}
+        watchlist={watchlist}
+        onSelectSymbolModal={setSelectedSymbolModal}
+      />
+
+      {/* 🌟 5c. ĐO LƯỜNG SỨC KHỎE DANH MỤC & CHỊU TẢI VĨ MÔ (AI PORTFOLIO STRESS-TEST) */}
       <PortfolioStressTestCard
         holdings={displayedPortfolio}
         cashBalance={data?.cashBalance || 0}

@@ -1472,3 +1472,54 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
   | `redFlags` | `array` | Danh sách các cờ cảnh báo rủi ro bẫy cổ tức (mảng rỗng `[]` nếu an toàn). |
   | `updatedAt` | `string (ISO)` | Thời điểm sinh báo cáo kiểm toán. |
 
+---
+
+### PHÂN HỆ 12: CỐ VẤN KHÓA LỢI NHUẬN LINH HOẠT (SMART TRAILING STOP) & THƯỚC ĐO TỶ LỆ THƯỞNG / RỦI RO (R:R)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`riskRewardConfig`).
+  - Runtime Module: `src/utils/riskRewardAdvisor.js` (Re-exported qua `src/utils/constants.js`).
+  - Giao diện trực quan: `src/components/dashboard/SmartProfitProtectionAdvisor.jsx`, `DashboardHoldingsTable.jsx`, `SellForm.jsx`, `StockCockpitHeader.jsx`.
+* **Mục đích**: Bảo toàn tối đa thành quả lợi nhuận của nhà đầu tư, loại bỏ tâm lý "chốt non" hoặc "gồng lãi thành lỗ" bằng cơ chế Khóa Lãi 5 Bậc Thang thích ứng theo Beta, đồng thời đo lường định lượng tỷ lệ Thưởng / Rủi Ro (R:R) giữa Tiềm năng tăng giá (Consensus Fair Value) và Mức rủi ro sụt giảm (Trailing Stop).
+* **Đặc tả Schema chi tiết (`riskRewardConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `defaultInitialStopLossPct` | `number` | `7.0%` | Mức cắt lỗ kỷ luật ban đầu tính từ giá vốn khi vị thế chưa sinh lời đáng kể (Pha 0). |
+  | `breakevenTriggerPct` | `number` | `6.0%` | Ngưỡng kích hoạt Pha 1: Khi P/L $\ge +6\%$, Trailing Stop tự động dời lên Giá Hòa Vốn (Free Trade - rủi ro mất vốn về 0). |
+  | `tier1ProfitTriggerPct` | `number` | `15.0%` | Ngưỡng kích hoạt Pha 2 (Khóa Lãi Bậc 1): Khi P/L $\ge +15\%$. |
+  | `tier1LockMinPct` | `number` | `8.0%` | Mức lợi nhuận tối thiểu bảo toàn chắc chắn trong Pha 2 ($+8\%$ đến $+10\%$). |
+  | `tier2ProfitTriggerPct` | `number` | `25.0%` | Ngưỡng kích hoạt Pha 3 (Khóa Lãi Bậc 2): Khi P/L $\ge +25\%$. |
+  | `tier2LockMinPct` | `number` | `18.0%` | Mức lợi nhuận tối thiểu bảo toàn chắc chắn trong Pha 3 ($+18\%$ đến $+22\%$). |
+  | `superProfitTriggerPct` | `number` | `40.0%` | Ngưỡng kích hoạt Pha 4 (Nước Rút Siêu Lãi): Khi P/L $\ge +40\%$. |
+  | `superProfitBufferPct` | `number` | `5.0%` | Biên độ siết sát đỉnh cao nhất trong Pha 4 ($\text{Peak} \times (1 - 5\%)$). |
+  | `defaultTrailingBufferPct` | `number` | `6.0%` | Biên độ Trailing Stop chuẩn cho cổ phiếu có $\beta = 1.0$. |
+  | `betaSensitivity` | `number` | `3.0` | Độ nhạy điều chỉnh biên độ thở theo Beta: $\text{Buffer} = 6.0\% + (\beta - 1.0) \times 3.0\%$. |
+  | `minBufferPct` / `maxBufferPct` | `number` | `4.5%` / `10.0%` | Giới hạn kẹp biên thở thích ứng tối thiểu và tối đa cho mọi cổ phiếu. |
+  | `warningDistancePct` | `number` | `3.0%` | Khoảng cách cảnh báo đèn vàng khi thị giá tiệm cận Trailing Stop $\le 3\%$. |
+  | `rrRatings` | `array` | 4 bậc | Phân loại ma trận R:R: `EXCELLENT` ($\ge 3:1$ - Kèo Vàng), `GOOD` ($\ge 2:1$), `FAIR` ($\ge 1.5:1$), `POOR` ($< 1.5:1$ - Bất Lợi). |
+  | `protectionTiers` | `array` | 5 bậc | Danh mục 5 pha bảo vệ: `INITIAL` (0), `BREAKEVEN` (1), `TIER1_LOCK` (2), `TIER2_LOCK` (3), `SUPER_PROFIT` (4). |
+
+---
+
+### PHÂN HỆ 12.2: LƯỚI CHỐT LỜI KHOA HỌC 3 TẦNG (SCIENTIFIC 3-TIER TAKE-PROFIT GRID)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`takeProfitGridConfig`).
+  - Runtime Module: `src/utils/riskRewardAdvisor.js` (Hàm `calculateTakeProfitGrid`).
+  - Giao diện trực quan: `src/components/dashboard/SmartProfitProtectionAdvisor.jsx`, `src/components/valuation/StockCockpitHeader.jsx`.
+* **Mục đích**: Loại bỏ triệt để tâm lý "bán non mất hàng" hoặc "gồng lãi thành lỗ" bằng kế hoạch chia nhỏ vị thế thu hoạch lợi nhuận khoa học 3 tầng (30% - 40% - 30%) phối hợp nhịp nhàng với mốc Chặn Lãi (Trailing Stop).
+* **Đặc tả Schema chi tiết (`takeProfitGridConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `tier1RatioPct` | `number` | `30.0%` | Tỷ trọng khối lượng khuyến nghị chốt lời ở Tầng 1 (Thu hồi vốn gốc). |
+  | `tier1MinProfitPct` | `number` | `15.0%` | Ngưỡng lãi tối thiểu để kích hoạt Tầng 1 (+15% từ giá vốn). |
+  | `tier1FairValueDiscountPct`| `number` | `12.0%` | Chiết khấu so với Fair Value để xác định cận dưới Tầng 1 ($\text{FairValue} \times 0.88$). |
+  | `tier2RatioPct` | `number` | `40.0%` | Tỷ trọng khối lượng khuyến nghị chốt lời ở Tầng 2 (Hiện thực hóa theo định giá cơ bản). |
+  | `tier2FairValueRatio` | `number` | `1.0` | Tỷ lệ định giá của Tầng 2 ($100\%$ Consensus Fair Value). |
+  | `tier3RatioPct` | `number` | `30.0%` | Tỷ trọng khối lượng giữ lại ở Tầng 3 (Thả trôi bắt trọn siêu sóng / Trend Runner). |
+  | `tier3BubblePremiumPct`| `number` | `20.0%` | Mức thặng dư quá nhiệt của Tầng 3 ($\text{FairValue} \times 1.20$). Điểm bán của 30% này theo Trailing Stop. |
+  | `defaultFallbackGainPct` | `number` | `25.0%` | Mức tăng giả định mặc định nếu cổ phiếu chưa có dữ liệu định giá Consensus (+25%). |
+  | `tiers` | `array` | 3 tầng | Mảng định nghĩa siêu dữ liệu cho 3 tầng: `tier` (1,2,3), `name`, `label`, `description`, `defaultSellPct`, `badge`. |
+
+
+

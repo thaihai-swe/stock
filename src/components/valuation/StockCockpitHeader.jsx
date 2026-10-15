@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 import StockSymbolInput from '../common/StockSymbolInput.jsx';
 import { TIMEFRAME_PRESETS } from '../../utils/constants.js';
+import { calculateRiskRewardRatio, calculateTakeProfitGrid } from '../../utils/riskRewardAdvisor.js';
 
 // Format tiền VND
 function formatVND(val) {
@@ -95,6 +97,29 @@ export default function StockCockpitHeader({
         financials.valuationMultiples.models10.length > 0
         ? financials.valuationMultiples.models10
         : null;
+
+  const rrAnalysis = useMemo(() => {
+    const target = consensusFair && consensusFair > 0
+      ? consensusFair
+      : (currentStock.valuation?.sevenPriceZones?.boundaries?.expensive || (closePrice ? closePrice * 1.25 : 1));
+    const stop = currentStock.valuation?.sevenPriceZones?.boundaries?.safeBuy
+      || (closePrice ? closePrice * 0.93 : 1);
+    return calculateRiskRewardRatio({
+      marketPrice: closePrice || 0,
+      targetPrice: target,
+      stopPrice: stop,
+      entryPrice: closePrice || 0,
+    });
+  }, [closePrice, consensusFair, currentStock.valuation?.sevenPriceZones]);
+
+  const takeProfitGrid = useMemo(() => {
+    return calculateTakeProfitGrid({
+      avgCost: closePrice || 0,
+      marketPrice: closePrice || 0,
+      totalQty: 1000,
+      fairValue: consensusFair,
+    });
+  }, [closePrice, consensusFair]);
 
   return (
     <div className="space-y-4">
@@ -334,6 +359,26 @@ export default function StockCockpitHeader({
                   {valRatingText}
                 </span>
               </div>
+            </div>
+
+            {/* Thước Đo Tỷ Lệ Thưởng / Rủi Ro (R:R) */}
+            <div className="border-l border-indigo-100 dark:border-indigo-800/80 pl-4 sm:pl-6">
+              <span className="text-[11px] text-gray-500 dark:text-gray-300 font-medium block">
+                Tỷ Lệ Thưởng/Rủi Ro (R:R)
+              </span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className={`text-xl font-black font-mono ${rrAnalysis.color}`}>
+                  {rrAnalysis.ratioString}
+                </span>
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black border ${rrAnalysis.bg} ${rrAnalysis.color} ${rrAnalysis.border}`} title={rrAnalysis.ratingDesc}>
+                  {rrAnalysis.ratingLabel}
+                </span>
+              </div>
+              {takeProfitGrid && (
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 block mt-0.5" title={`Lưới 3 Tầng: T1 (+15%): ${formatVND(takeProfitGrid.tiers[0].targetPrice)} | T2 (Fair Value): ${formatVND(takeProfitGrid.tiers[1].targetPrice)} | T3 (Siêu Sóng): ${formatVND(takeProfitGrid.tiers[2].targetPrice)}`}>
+                  🎯 T1: {formatVND(takeProfitGrid.tiers[0].targetPrice)} · T2: {formatVND(takeProfitGrid.tiers[1].targetPrice)}
+                </span>
+              )}
             </div>
           </div>
         </div>

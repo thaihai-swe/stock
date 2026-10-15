@@ -1,4 +1,5 @@
 import { fmtMoney, getAllocationTier, getStockColor, plBg, plColor } from '../../utils/format.js';
+import { calculateSmartTrailingStop } from '../../utils/riskRewardAdvisor.js';
 
 export default function DashboardHoldingsTable({
   portfolio = [],
@@ -174,6 +175,9 @@ export default function DashboardHoldingsTable({
                 : 0;
               const stockColor = getStockColor(p.symbol, portfolio);
               const allocTier = getAllocationTier(allocationPct);
+              const trailingInfo = marketPrice
+                ? calculateSmartTrailingStop({ avgCost: p.avgCost, marketPrice, breakEvenPrice: p.breakEvenPrice })
+                : null;
 
               return (
                 <div
@@ -245,13 +249,23 @@ export default function DashboardHoldingsTable({
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-xs text-gray-400 font-semibold">Lãi / Lỗ tạm tính:</span>
                     {marketPrice ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className={`text-base font-black ${plColor(unrealizedPL)}`}>
-                          {unrealizedPL >= 0 ? '+' : ''}{fmtMoney(unrealizedPL)}đ
-                        </span>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${plBg(unrealizedPL)}`}>
-                          {unrealizedPL >= 0 ? '▲ +' : '▼ '}{unrealizedPLPct}%
-                        </span>
+                      <div className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <span className={`text-base font-black ${plColor(unrealizedPL)}`}>
+                            {unrealizedPL >= 0 ? '+' : ''}{fmtMoney(unrealizedPL)}đ
+                          </span>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${plBg(unrealizedPL)}`}>
+                            {unrealizedPL >= 0 ? '▲ +' : '▼ '}{unrealizedPLPct}%
+                          </span>
+                        </div>
+                        {trailingInfo && (
+                          <div className="mt-1 flex items-center justify-end gap-1 text-[10px]" title={trailingInfo.tierRationale}>
+                            <span className="text-slate-400">Stop:</span>
+                            <span className={`font-mono font-bold px-1.5 py-0.2 rounded border ${trailingInfo.badgeBg}`}>
+                              🛡️ {fmtMoney(trailingInfo.trailingStopPrice)}đ
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <span className="text-xs text-gray-400">—</span>
@@ -333,6 +347,9 @@ export default function DashboardHoldingsTable({
                     : 0;
                   const stockColor = getStockColor(p.symbol, portfolio);
                   const allocTier = getAllocationTier(allocationPct);
+                  const trailingInfo = marketPrice
+                    ? calculateSmartTrailingStop({ avgCost: p.avgCost, marketPrice, breakEvenPrice: p.breakEvenPrice })
+                    : null;
 
                   return (
                     <tr
@@ -412,6 +429,14 @@ export default function DashboardHoldingsTable({
                             <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full inline-block mt-0.5 ${plBg(unrealizedPL)}`}>
                               {unrealizedPL >= 0 ? '▲ +' : '▼ '}{unrealizedPLPct}%
                             </span>
+                            {trailingInfo && (
+                              <div className="mt-1" title={trailingInfo.tierRationale}>
+                                <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.2 rounded border ${trailingInfo.badgeBg}`}>
+                                  <span>🛡️</span>
+                                  <span>{fmtMoney(trailingInfo.trailingStopPrice)}đ</span>
+                                </span>
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <span className="text-gray-400">—</span>

@@ -177,3 +177,6 @@ export const TAX_LEGAL_NOTE = TAX_CONFIG.legalNote || 'Theo quy định thuế T
 // 6. Phân hệ Khung Thời Gian (Timeframes, Horizons & Periods)
 export * from './timeframe.js';
 
+// 7. Phân hệ Cố Vấn Khóa Lợi Nhuận & Thước Đo R:R (Smart Trailing Stop & Risk-Reward)
+export * from './riskRewardAdvisor.js';
+

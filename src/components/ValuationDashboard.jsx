@@ -38,6 +38,7 @@ import FullResearchReportModal from './valuation/FullResearchReportModal.jsx';
 import InteractiveValuationSandboxCard from './valuation/InteractiveValuationSandboxCard.jsx';
 import ClassicInvestmentPhilosophiesCard from './valuation/ClassicInvestmentPhilosophiesCard.jsx';
 import QualityOfEarningsCard from './valuation/QualityOfEarningsCard.jsx';
+import SmartStatementNotesCard from './valuation/SmartStatementNotesCard.jsx';
 
 // Định nghĩa 4 Không Gian Phân Tích Chuyên Sâu
 const WORKSPACES = [
@@ -53,7 +54,7 @@ const WORKSPACES = [
     label: '2. Báo Cáo Tài Chính & Chỉ Số',
     icon: '📊',
     badge: 'VAS / TT200',
-    desc: '3 BCTC (Chuỗi Quý / Năm / TTM), 54 Tỷ Số Ratios, Extended DuPont & Ngành'
+    desc: '3 BCTC, Sổ Tay Thuyết Minh BCTC, 54 Tỷ Số Ratios, Extended DuPont & Ngành'
   },
   {
     id: 'forensics-health',
@@ -442,6 +443,13 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
                 handleSyncSingleFinancials={handleSyncSingleFinancials}
                 syncingSingle={syncingSingle}
                 selectedSymbol={selectedSymbol}
+              />
+
+              {/* Sổ Tay Đính Kèm Thuyết Minh BCTC Theo Từng Mã (Smart Statement Notes) */}
+              <SmartStatementNotesCard
+                financials={financials}
+                stockItem={currentStock}
+                symbol={selectedSymbol}
               />
 
               {/* Bộ 54 Chỉ Số Tài Chính Toàn Diện (Ratios) */}
