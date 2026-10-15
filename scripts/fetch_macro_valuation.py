@@ -20,6 +20,7 @@ if str(CURRENT_DIR) not in sys.path:
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from lib.io_helper import atomic_write_json, safe_read_json
 from lib.macro_advisor import compute_pe_bands_and_zscore
 from lib.yield_curve_monitor import compute_yield_curve_monitor
 from lib.macro_regime import (
@@ -79,15 +80,8 @@ def fetch_and_save_macro():
     te_core = te_data.get("macroCore", {})
 
     # 2b. Nạp cache vĩ mô thực tế trước đó để làm fallback an toàn thay vì dùng số tĩnh
-    cached_macro = {}
-    try:
-        cache_file = DATA_DIR / "macro_valuation.json"
-        if cache_file.exists():
-            with open(cache_file, "r", encoding="utf-8") as f:
-                cdata = json.load(f)
-                cached_macro = cdata.get("macro", {})
-    except Exception:
-        pass
+    cache_file = DATA_DIR / "macro_valuation.json"
+    cached_macro = safe_read_json(cache_file, fallback={}).get("macro", {})
 
     vn10y = macro_live.get("vn10yYield") or cached_macro.get("vn10yYield") or te_core.get("vn10y")
     sbv_refinancing = macro_live.get("sbvRefinancingRate") or cached_macro.get("sbvRefinancingRate") or te_core.get("sbv_refinancing_rate")
@@ -151,16 +145,9 @@ def fetch_and_save_macro():
         print(f"⚠️ Không thể trích xuất định giá VN-Index / VN30 từ Vietstock: {e}")
 
     # Xác định giá trị hiện tại và thống kê mặc định (ưu tiên cửa sổ 10 Năm)
-    prev_m = {}
-    prev_vn30 = {}
-    if MACRO_FILE.exists():
-        try:
-            with open(MACRO_FILE, "r", encoding="utf-8") as f:
-                prev_cached_doc = json.load(f)
-                prev_m = prev_cached_doc.get("marketIndex", {})
-                prev_vn30 = prev_cached_doc.get("vn30", {})
-        except Exception:
-            pass
+    prev_cached_doc = safe_read_json(MACRO_FILE, fallback={})
+    prev_m = prev_cached_doc.get("marketIndex", {})
+    prev_vn30 = prev_cached_doc.get("vn30", {})
 
     if vnindex_analysis and "current" in vnindex_analysis and vnindex_analysis["current"].get("pe") is not None:
         current_pe = vnindex_analysis["current"]["pe"]
@@ -301,15 +288,9 @@ def fetch_and_save_macro():
     })
 
     # 4g. Tổng hợp AI Macro Insight (Bảo lưu aiInsight, weeklyPulse, sectorTransmission hoặc nạp từ ai_insights_cache.json)
-    ai_cache_data = {}
-    if AI_CACHE_FILE.exists():
-        try:
-            with open(AI_CACHE_FILE, "r", encoding="utf-8") as f:
-                ai_cache_data = json.load(f)
-        except Exception:
-            ai_cache_data = {}
+    ai_cache_data = safe_read_json(AI_CACHE_FILE, fallback={})
 
-    ai_insight = prev_cached_doc.get("aiInsight") if MACRO_FILE.exists() else None
+    ai_insight = prev_cached_doc.get("aiInsight")
     if not ai_insight and ai_cache_data.get("aiInsight"):
         ai_insight = ai_cache_data.get("aiInsight")
 
@@ -335,39 +316,18 @@ def fetch_and_save_macro():
         }
 
     # Bảo lưu weeklyPulse: Ưu tiên tài liệu hiện có, fallback sang ai_insights_cache.json
-    weekly_pulse = prev_cached_doc.get("weeklyPulse") if MACRO_FILE.exists() else None
-    if not weekly_pulse and ai_cache_data.get("weeklyPulse"):
-        weekly_pulse = ai_cache_data.get("weeklyPulse")
+    weekly_pulse = prev_cached_doc.get("weeklyPulse") or ai_cache_data.get("weeklyPulse")
 
     # Bảo lưu sectorTransmission: Dẫn truyền vĩ mô vào ngành
-    sector_transmission = prev_cached_doc.get("sectorTransmission") if MACRO_FILE.exists() else None
-    if not sector_transmission and ai_cache_data.get("sectorTransmission"):
-        sector_transmission = ai_cache_data.get("sectorTransmission")
+    sector_transmission = prev_cached_doc.get("sectorTransmission") or ai_cache_data.get("sectorTransmission")
 
     # Bảo lưu các phân hệ AI vĩ mô mở rộng (Scenarios, Clock Dynamics, Yield Curve, Multi-Asset, Style, Tail Risks)
-    ai_scenarios = prev_cached_doc.get("aiScenarios") if MACRO_FILE.exists() else None
-    if not ai_scenarios and ai_cache_data.get("aiScenarios"):
-        ai_scenarios = ai_cache_data.get("aiScenarios")
-
-    ai_clock_dynamics = prev_cached_doc.get("aiClockDynamics") if MACRO_FILE.exists() else None
-    if not ai_clock_dynamics and ai_cache_data.get("aiClockDynamics"):
-        ai_clock_dynamics = ai_cache_data.get("aiClockDynamics")
-
-    ai_yield_curve_diag = prev_cached_doc.get("aiYieldCurveDiagnosis") if MACRO_FILE.exists() else None
-    if not ai_yield_curve_diag and ai_cache_data.get("aiYieldCurveDiagnosis"):
-        ai_yield_curve_diag = ai_cache_data.get("aiYieldCurveDiagnosis")
-
-    ai_multi_asset = prev_cached_doc.get("aiMultiAssetStrategy") if MACRO_FILE.exists() else None
-    if not ai_multi_asset and ai_cache_data.get("aiMultiAssetStrategy"):
-        ai_multi_asset = ai_cache_data.get("aiMultiAssetStrategy")
-
-    ai_style_rotation = prev_cached_doc.get("aiStyleRotation") if MACRO_FILE.exists() else None
-    if not ai_style_rotation and ai_cache_data.get("aiStyleRotation"):
-        ai_style_rotation = ai_cache_data.get("aiStyleRotation")
-
-    ai_tail_risk = prev_cached_doc.get("aiTailRiskAnalysis") if MACRO_FILE.exists() else None
-    if not ai_tail_risk and ai_cache_data.get("aiTailRiskAnalysis"):
-        ai_tail_risk = ai_cache_data.get("aiTailRiskAnalysis")
+    ai_scenarios = prev_cached_doc.get("aiScenarios") or ai_cache_data.get("aiScenarios")
+    ai_clock_dynamics = prev_cached_doc.get("aiClockDynamics") or ai_cache_data.get("aiClockDynamics")
+    ai_yield_curve_diag = prev_cached_doc.get("aiYieldCurveDiagnosis") or ai_cache_data.get("aiYieldCurveDiagnosis")
+    ai_multi_asset = prev_cached_doc.get("aiMultiAssetStrategy") or ai_cache_data.get("aiMultiAssetStrategy")
+    ai_style_rotation = prev_cached_doc.get("aiStyleRotation") or ai_cache_data.get("aiStyleRotation")
+    ai_tail_risk = prev_cached_doc.get("aiTailRiskAnalysis") or ai_cache_data.get("aiTailRiskAnalysis")
 
     macro_doc = {
         "_meta": {
@@ -441,12 +401,7 @@ def fetch_and_save_macro():
     except Exception as e:
         print(f"⚠️ Không thể cập nhật lịch sử định giá thị trường: {e}")
         history_file = DATA_DIR / "market_valuation_history.json"
-        if history_file.exists():
-            try:
-                with open(history_file, "r", encoding="utf-8") as f:
-                    val_data = json.load(f)
-            except Exception:
-                pass
+        val_data = safe_read_json(history_file, fallback=None)
 
     if val_data:
         macro_doc["marketValuationHistory"] = val_data
@@ -467,8 +422,7 @@ def fetch_and_save_macro():
     if ai_tail_risk:
         macro_doc["aiTailRiskAnalysis"] = ai_tail_risk
 
-    with open(MACRO_FILE, "w", encoding="utf-8") as f:
-        json.dump(macro_doc, f, ensure_ascii=False, indent=2)
+    atomic_write_json(MACRO_FILE, macro_doc, indent=2)
 
     print(f"✅ Đã ghi nhận định giá VN-Index P/E: {current_pe}x (Z-Score: {advisor_result['zScore']})")
     print(f"📊 Pha chu kỳ vĩ mô: {regime_phase['titleVi']} ({regime_phase['phase']})")

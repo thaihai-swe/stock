@@ -2,147 +2,129 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import {
   getAllData,
+  getBuyOrders,
   addBuyOrder,
   deleteBuyOrder,
   executeSellOrder,
   deleteSellOrder,
 } from '../storage/sqliteStore.js';
 import { matchSellOrder, getTodayString } from '../services/matchingService.js';
+import {
+  sanitizeSymbol,
+  validatePositiveNumber,
+  validatePercentage,
+  sanitizeDate,
+} from '../middleware/validate.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 const router = express.Router();
 
 // GET tất cả dữ liệu + portfolio tính sẵn
-router.get('/data', async (req, res) => {
-  try {
-    const data = await getAllData(req.user?.id || 'demo');
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get('/data', asyncHandler(async (req, res) => {
+  const data = await getAllData(req.user?.id || 'demo');
+  return res.json(data);
+}));
 
 // POST lệnh mua
-router.post('/buy', async (req, res) => {
+router.post('/buy', asyncHandler(async (req, res) => {
   const { symbol, quantity, price, note, date, feePct, tags } = req.body;
-  if (!symbol || !quantity || !price) {
-    return res.status(400).json({ error: 'Thiếu thông tin bắt buộc (mã CP, số lượng, giá).' });
-  }
-  if (parseFloat(price) <= 0 || parseInt(quantity) <= 0) {
-    return res.status(400).json({ error: 'Số lượng và giá phải lớn hơn 0.' });
-  }
+  const sym = sanitizeSymbol(symbol);
+  const qty = validatePositiveNumber(quantity, 'số lượng', { min: 0, max: 10_000_000, integer: true });
+  const prc = validatePositiveNumber(price, 'giá', { min: 0, max: 2_000_000 });
+  const feePercent = validatePercentage(feePct, 'tỷ lệ phí', { min: 0, max: 10, defaultVal: 0 });
+  const orderDate = sanitizeDate(date, getTodayString());
 
-  try {
-    const qty = parseInt(quantity);
-    const prc = parseFloat(price);
-    const feePercent = feePct !== undefined && feePct !== '' ? parseFloat(feePct) : 0;
-    const gross = qty * prc;
-    const fee = gross * (feePercent / 100);
-    const totalCost = gross + fee;
-    const costPerShare = totalCost / qty;
-    const userId = req.user?.id || 'demo';
+  const gross = qty * prc;
+  const fee = gross * (feePercent / 100);
+  const totalCost = gross + fee;
+  const costPerShare = totalCost / qty;
+  const userId = req.user?.id || 'demo';
 
-    const order = {
-      id: uuidv4(),
-      symbol: symbol.trim().toUpperCase(),
-      quantity: qty,
-      price: prc,
-      feePct: feePercent,
-      fee: Math.round(fee),
-      totalCost: Math.round(totalCost),
-      costPerShare: Math.round(costPerShare * 100) / 100,
-      remainingQty: qty,
-      date: date ? String(date).slice(0, 10) : getTodayString(),
-      note: note || '',
-      tags: Array.isArray(tags) ? tags : [],
-      userId,
-    };
+  const order = {
+    id: uuidv4(),
+    symbol: sym,
+    quantity: qty,
+    price: prc,
+    feePct: feePercent,
+    fee: Math.round(fee),
+    totalCost: Math.round(totalCost),
+    costPerShare: Math.round(costPerShare * 100) / 100,
+    remainingQty: qty,
+    date: orderDate,
+    note: note ? String(note).slice(0, 500) : '',
+    tags: Array.isArray(tags) ? tags.map(t => String(t).slice(0, 50)) : [],
+    userId,
+  };
 
-    await addBuyOrder(order, userId);
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+  await addBuyOrder(order, userId);
+  return res.json(order);
+}));
 
 // POST lệnh bán (có tính lãi/lỗ tự động và trừ các lô mua theo matchMethod)
-router.post('/sell', async (req, res) => {
+router.post('/sell', asyncHandler(async (req, res) => {
   const { symbol, quantity, price, note, date, feePct, tags, matchMethod = 'lowest' } = req.body;
-  if (!symbol || !quantity || !price) {
-    return res.status(400).json({ error: 'Thiếu thông tin bắt buộc (mã CP, số lượng, giá).' });
-  }
-  if (parseFloat(price) <= 0 || parseInt(quantity) <= 0) {
-    return res.status(400).json({ error: 'Số lượng và giá phải lớn hơn 0.' });
-  }
+  const sym = sanitizeSymbol(symbol);
+  const qty = validatePositiveNumber(quantity, 'số lượng', { min: 0, max: 10_000_000, integer: true });
+  const prc = validatePositiveNumber(price, 'giá', { min: 0, max: 2_000_000 });
+  const feePercent = validatePercentage(feePct, 'tỷ lệ phí', { min: 0, max: 10, defaultVal: 0.1 });
+  const sellDate = sanitizeDate(date, getTodayString());
 
-  try {
-    const userId = req.user?.id || 'demo';
-    const data = await getAllData(userId);
-    const sym = symbol.trim().toUpperCase();
-    const qty = parseInt(quantity);
-    const prc = parseFloat(price);
-    const feePercent = feePct !== undefined && feePct !== '' ? parseFloat(feePct) : 0.1;
+  const userId = req.user?.id || 'demo';
+  // Tối ưu hóa: Chỉ lấy các lô mua của người dùng thay vì tải toàn bộ database 5 bảng
+  const buyOrders = await getBuyOrders(userId);
 
-    const {
-      matchedLots,
-      totalCost,
-      grossRevenue,
-      netPrice,
-      fee,
-      totalRevenue,
-      netRevenue,
-      profitLoss,
-      profitLossPct,
-    } = matchSellOrder(sym, qty, prc, data.buyOrders, feePercent, matchMethod);
+  const {
+    matchedLots,
+    totalCost,
+    grossRevenue,
+    netPrice,
+    fee,
+    totalRevenue,
+    netRevenue,
+    profitLoss,
+    profitLossPct,
+  } = matchSellOrder(sym, qty, prc, buyOrders, feePercent, matchMethod);
 
-    const sellOrder = {
-      id: uuidv4(),
-      symbol: sym,
-      quantity: qty,
-      price: prc,
-      netPrice: netPrice || prc,
-      feePct: feePercent,
-      fee,
-      grossRevenue,
-      netRevenue: netRevenue || totalRevenue,
-      totalRevenue: netRevenue || totalRevenue,
-      date: date ? String(date).slice(0, 10) : getTodayString(),
-      matchedLots,
-      totalCost,
-      profitLoss,
-      profitLossPct,
-      matchMethod,
-      note: note || '',
-      tags: Array.isArray(tags) ? tags : [],
-      userId,
-    };
+  const sellOrder = {
+    id: uuidv4(),
+    symbol: sym,
+    quantity: qty,
+    price: prc,
+    feePct: feePercent,
+    fee,
+    taxPct: 0.1, // Thuế bán CK quy định 0.1% ở VN
+    tax: Math.round(grossRevenue * 0.001),
+    grossRevenue,
+    netRevenue,
+    totalRevenue,
+    netPrice,
+    totalCost,
+    profitLoss,
+    profitLossPct,
+    matchedLots,
+    matchMethod,
+    date: sellDate,
+    note: note ? String(note).slice(0, 500) : '',
+    tags: Array.isArray(tags) ? tags.map(t => String(t).slice(0, 50)) : [],
+    userId,
+  };
 
-    await executeSellOrder(sellOrder, matchedLots, userId);
-    res.json(sellOrder);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+  await executeSellOrder(sellOrder, matchedLots, userId);
+  return res.json(sellOrder);
+}));
 
 // DELETE lệnh mua (chỉ xóa nếu chưa dùng trong giao dịch bán)
-router.delete('/buy/:id', async (req, res) => {
-  try {
-    const userId = req.user?.id || 'demo';
-    await deleteBuyOrder(req.params.id, userId);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+router.delete('/buy/:id', asyncHandler(async (req, res) => {
+  const userId = req.user?.id || 'demo';
+  await deleteBuyOrder(req.params.id, userId);
+  return res.json({ success: true });
+}));
 
 // DELETE lệnh bán (hoàn lại số lượng cho các lô mua tương ứng)
-router.delete('/sell/:id', async (req, res) => {
-  try {
-    const userId = req.user?.id || 'demo';
-    await deleteSellOrder(req.params.id, userId);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+router.delete('/sell/:id', asyncHandler(async (req, res) => {
+  const userId = req.user?.id || 'demo';
+  await deleteSellOrder(req.params.id, userId);
+  return res.json({ success: true });
+}));
 
 export default router;

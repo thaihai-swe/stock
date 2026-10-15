@@ -96,7 +96,19 @@ async function request(path, options = {}) {
       } catch {
         data = {};
       }
-      if (!res.ok) throw new Error(data.error || `Lỗi máy chủ (${res.status} ${res.statusText})`);
+      if (!res.ok) {
+        const error = new Error(data.error || `Lỗi máy chủ (${res.status} ${res.statusText})`);
+        error.status = res.status;
+        error.isAuth = res.status === 401;
+        if (res.status === 401 && typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('auth:expired', {
+              detail: { message: data.error || 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.' }
+            })
+          );
+        }
+        throw error;
+      }
 
       // 3. Lưu vào Cache nếu là GET thành công
       if (isGet) {
@@ -186,7 +198,8 @@ export const fetchFundamentals = (symbols = [], force = false) =>
   request(`/fundamentals?symbols=${encodeURIComponent(symbols.join(','))}&force=${force ? 'true' : 'false'}`);
 export const fetchSupportedStocks = () => request('/fundamentals/supported-stocks');
 export const updateSupportedStocks = (body) => request('/fundamentals/supported-stocks', { method: 'POST', body: JSON.stringify(body) });
-export const triggerFundamentalsSync = () => request('/fundamentals/sync', { method: 'POST' });
+export const triggerFundamentalsSync = (cadence = 'all') =>
+  request('/fundamentals/sync', { method: 'POST', body: JSON.stringify({ cadence }) });
 
 // Quản lý số dư tiền mặt & thị trường
 export const fetchCashBalance  = ()       => request('/cash-balance');
@@ -204,6 +217,9 @@ export const fetchStockFinancials = (symbol) => request(`/valuation/financials/$
 export const fetchRawJson         = (type, symbol = '') => request(`/valuation/raw-json/${type}?symbol=${encodeURIComponent(symbol)}`);
 export const triggerValuationSync = () => request('/valuation/sync', { method: 'POST' });
 export const triggerSingleFinancialSync = (symbol) => request(`/valuation/sync-single/${encodeURIComponent(symbol)}`, { method: 'POST' });
+export const fetchStockOrderFlow = (symbol) => request(`/valuation/order-flow/${encodeURIComponent(symbol)}`);
+export const refreshStockOrderFlow = (symbol) => request(`/valuation/order-flow/${encodeURIComponent(symbol)}/refresh`, { method: 'POST' });
+
 
 // DNSE OHLC Realtime & Historical Market Index (với fallback trực tiếp tới DNSE API)
 export const fetchDnseOhlc = async ({ symbol = 'VNINDEX', resolution = '1D', from = '', to = '' } = {}) => {
@@ -298,6 +314,7 @@ export const refreshSingleStockAi = async (symbol) => {
   invalidateApiCache(`/valuation/financials/${sym}`);
   return request(`/valuation/ai-refresh/${sym}`, { method: 'POST' });
 };
+
 
 
 

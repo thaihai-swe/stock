@@ -1,5 +1,11 @@
+import { useMemo, useState, useEffect } from 'react';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 import StockSymbolInput from '../common/StockSymbolInput.jsx';
+import { TIMEFRAME_PRESETS } from '../../utils/constants.js';
+import { calculateRiskRewardRatio, calculateTakeProfitGrid } from '../../utils/riskRewardAdvisor.js';
+
+// Danh sách mã cổ phiếu trụ & thanh khoản cao phổ biến
+const POPULAR_TICKERS = ['HPG', 'MBB', 'FPT', 'VNM', 'MWG', 'TCB', 'SSI', 'VHM', 'STB', 'DGC'];
 
 // Format tiền VND
 function formatVND(val) {
@@ -95,146 +101,234 @@ export default function StockCockpitHeader({
         ? financials.valuationMultiples.models10
         : null;
 
+  const rrAnalysis = useMemo(() => {
+    const target = consensusFair && consensusFair > 0
+      ? consensusFair
+      : (currentStock.valuation?.sevenPriceZones?.boundaries?.expensive || (closePrice ? closePrice * 1.25 : 1));
+    const stop = currentStock.valuation?.sevenPriceZones?.boundaries?.safeBuy
+      || (closePrice ? closePrice * 0.93 : 1);
+    return calculateRiskRewardRatio({
+      marketPrice: closePrice || 0,
+      targetPrice: target,
+      stopPrice: stop,
+      entryPrice: closePrice || 0,
+    });
+  }, [closePrice, consensusFair, currentStock.valuation?.sevenPriceZones]);
+
+  const takeProfitGrid = useMemo(() => {
+    return calculateTakeProfitGrid({
+      avgCost: closePrice || 0,
+      marketPrice: closePrice || 0,
+      totalQty: 1000,
+      fairValue: consensusFair,
+    });
+  }, [closePrice, consensusFair]);
+
+  // Quản lý sao chép snapshot & danh sách mã gần đây
+  const [copiedSnapshot, setCopiedSnapshot] = useState(false);
+  const [recentTickers, setRecentTickers] = useState([]);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('stock_recent_symbols') || '[]');
+      if (Array.isArray(stored)) {
+        setRecentTickers(stored.filter((s) => s && s !== selectedSymbol).slice(0, 5));
+      }
+      if (selectedSymbol) {
+        const next = [
+          selectedSymbol,
+          ...(Array.isArray(stored) ? stored.filter((s) => s !== selectedSymbol) : []),
+        ].slice(0, 8);
+        localStorage.setItem('stock_recent_symbols', JSON.stringify(next));
+      }
+    } catch {
+      // Bỏ qua lỗi parse localStorage
+    }
+  }, [selectedSymbol]);
+
+  const handleCopySnapshot = () => {
+    const isUp = (currentStock.change || 0) >= 0;
+    const lines = [
+      `🎯 **BÁO CÁO ĐỊNH GIÁ & THẨM ĐỊNH NHANH: ${selectedSymbol} — ${currentStock.description || ''}**`,
+      `- **Thị giá**: ${formatVND(closePrice)} (${isUp ? '+' : ''}${currentStock.change || 0}%) | Sàn: ${currentStock.exchange || 'HOSE'} | Ngành: ${currentStock.sector || 'Khác'}`,
+      `- **Giá trị nội tại hội tụ**: ${formatVND(consensusFair)} (Hội tụ 10 mô hình & Lọc ngoại lai ±60%)`,
+      `- **Tiềm năng Upside**: ${upsideValue != null ? `${upsideValue >= 0 ? '+' : ''}${upsideValue}%` : '—'}`,
+      `- **Biên an toàn (MoS)**: ${mosValue != null ? `${mosValue >= 0 ? '+' : ''}${mosValue}%` : '—'} — ${valRatingText}`,
+      `- **Tỷ lệ Thưởng/Rủi ro (R:R)**: ${rrAnalysis?.ratioString || '—'} (${rrAnalysis?.ratingLabel || ''}) | T1: ${formatVND(takeProfitGrid?.tiers?.[0]?.targetPrice)} · T2: ${formatVND(takeProfitGrid?.tiers?.[1]?.targetPrice)}`,
+      `- **Độ phân tán mô hình**: ${consensusDetails?.dispersion != null ? `${consensusDetails.dispersion}%` : '—'} (${consensusDetails?.validCount || 10}/10 mô hình hợp lệ)`,
+      models10 && models10.length > 0
+        ? `- **Chi tiết mô hình**: ${models10.filter((m) => (m.value || m.targetPrice) > 0 && !m.isOutlier).map((m) => `${(m.cleanName || m.name || '').replace(/^\d+\.\s*/, '')}: ${formatVND(m.value || m.targetPrice)}`).join(' · ')}`
+        : '',
+      `*Nguồn: Stock Portfolio Manager & Enterprise Valuation Engine*`
+    ].filter(Boolean).join('\n');
+
+    navigator.clipboard.writeText(lines);
+    setCopiedSnapshot(true);
+    setTimeout(() => setCopiedSnapshot(false), 2000);
+  };
+
   return (
     <div className="space-y-4">
       {/* ── 1. THANH ĐIỀU KHIỂN & TRA CỨU CỔ PHIẾU ── */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-700/60 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Thông tin mã & Ngành nghề */}
-        <div className="flex items-center gap-3">
-          <span className="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center font-black text-xl shadow-2xs">
-            {selectedSymbol}
-          </span>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
-                {currentStock.description || selectedSymbol}
-              </h1>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
-                {currentStock.exchange || 'HOSE'}
-              </span>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
-                {currentStock.sector || 'Khác'}
-              </span>
-            </div>
-            <p className="text-xs text-gray-400 mt-0.5">
-              {currentStock.industry ? `Ngành: ${currentStock.industry}` : ''}
-              {lastSyncedAt && (
-                <span className="ml-2 pl-2 border-l border-gray-200 dark:border-gray-700 text-[11px] text-gray-400">
-                  Cập nhật: {new Date(lastSyncedAt).toLocaleTimeString('vi-VN')}
+      <div className="bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-5 border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-3.5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Thông tin mã & Ngành nghề */}
+          <div className="flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center font-black text-xl shadow-2xs shrink-0">
+              {selectedSymbol}
+            </span>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
+                  {currentStock.description || selectedSymbol}
+                </h1>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                  {currentStock.exchange || 'HOSE'}
                 </span>
-              )}
-            </p>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
+                  {currentStock.sector || 'Khác'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {currentStock.industry ? `Ngành: ${currentStock.industry}` : ''}
+                {lastSyncedAt && (
+                  <span className="ml-2 pl-2 border-l border-gray-200 dark:border-gray-700 text-[11px] text-gray-400">
+                    Cập nhật: {new Date(lastSyncedAt).toLocaleTimeString('vi-VN')}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Khung tìm kiếm & Thao tác hành động */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleLookupSymbol();
+              }}
+              className="flex items-center gap-1.5 flex-1 sm:flex-initial"
+            >
+              <div className="w-full sm:w-52">
+                <StockSymbolInput
+                  value={inputSymbol}
+                  onChange={setInputSymbol}
+                  onSubmit={handleLookupSymbol}
+                  placeholder="Tra mã (VNM, MBB, SSI...)"
+                  size="sm"
+                  colorTheme="indigo"
+                  disabled={lookingUp}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!inputSymbol.trim() || lookingUp}
+                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center gap-1 whitespace-nowrap active:scale-95"
+              >
+                <span className={lookingUp ? 'animate-spin' : ''}>🔍</span>
+                <span className="hidden sm:inline">{lookingUp ? 'Đang nạp...' : 'Tra Cứu'}</span>
+              </button>
+            </form>
+
+            {/* Nút Sao Chép Snapshot Markdown */}
+            <button
+              type="button"
+              onClick={handleCopySnapshot}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs border active:scale-95 ${
+                copiedSnapshot
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700'
+                  : 'bg-gray-50 hover:bg-gray-100 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-slate-600'
+              }`}
+              title="Sao chép tóm tắt định giá ngắn gọn định dạng Markdown"
+            >
+              <span>{copiedSnapshot ? '✅' : '📋'}</span>
+              <span className="hidden md:inline">{copiedSnapshot ? 'Đã Sao Chép!' : 'Sao Chép'}</span>
+            </button>
+
+            {/* Nút Master Dossier 10 Chương */}
+            <button
+              type="button"
+              onClick={() => setIsReportModalOpen(true)}
+              className="px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 active:scale-95"
+              title="Mở Báo Cáo Phân Tích Toàn Diện Master Dossier (10 Chương Nghiên Cứu)"
+            >
+              <span>📑</span>
+              <span className="hidden md:inline">Hồ Sơ Master Dossier</span>
+            </button>
+
+            {/* Nút Refresh BCTC */}
+            <button
+              type="button"
+              onClick={handleSyncSingleFinancials}
+              disabled={syncingSingle}
+              className="p-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 text-xs transition cursor-pointer shadow-2xs disabled:opacity-50 active:scale-95"
+              title={`Tải lại BCTC và Định giá cho ${selectedSymbol} (~3-5s)`}
+            >
+              <span className={syncingSingle ? 'inline-block animate-spin' : ''}>🔄</span>
+            </button>
+
+            {/* Nút Làm Mới AI Cổ Phiếu Tức Thời */}
+            {handleRefreshSingleAi && (
+              <button
+                type="button"
+                onClick={handleRefreshSingleAi}
+                disabled={refreshingAi}
+                className="px-2.5 py-2 bg-gradient-to-r from-amber-500/10 to-indigo-500/10 hover:from-amber-500/20 hover:to-indigo-500/20 border border-amber-200 dark:border-indigo-800 rounded-xl text-amber-700 dark:text-amber-300 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-50 active:scale-95"
+                title={`Làm mới phân tích AI tích hợp (Thesis, News, Audit, Convergence, Dividend) cho ${selectedSymbol}`}
+              >
+                <span className={refreshingAi ? 'inline-block animate-spin' : ''}>⚡</span>
+                <span className="hidden xl:inline">{refreshingAi ? 'Đang chạy AI...' : 'Làm Mới AI'}</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Khung tìm kiếm & Thao tác hành động */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleLookupSymbol();
-            }}
-            className="flex items-center gap-1.5 flex-1 sm:flex-initial"
-          >
-            <div className="w-full sm:w-56">
-              <StockSymbolInput
-                value={inputSymbol}
-                onChange={setInputSymbol}
-                onSubmit={handleLookupSymbol}
-                placeholder="Tra mã (VNM, MBB, SSI...)"
-                size="sm"
-                colorTheme="indigo"
-                disabled={lookingUp}
-              />
-            </div>
+        {/* Dải Mã Gợi Ý Nhanh & Lịch Sử Tra Cứu (Quick Ticker Ribbon) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2 border-t border-gray-100 dark:border-gray-700/60">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+            <span>⚡</span>
+            <span>Chuyển Nhanh:</span>
+          </span>
 
+          {/* Các mã vừa xem gần đây */}
+          {recentTickers.map((sym) => (
             <button
-              type="submit"
-              disabled={!inputSymbol.trim() || lookingUp}
-              className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center gap-1 whitespace-nowrap active:scale-95"
-            >
-              <span className={lookingUp ? 'animate-spin' : ''}>🔍</span>
-              <span className="hidden sm:inline">{lookingUp ? 'Đang nạp...' : 'Tra Cứu'}</span>
-            </button>
-          </form>
-
-          {/* Nút Master Dossier 10 Chương */}
-          <button
-            type="button"
-            onClick={() => setIsReportModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 active:scale-95"
-            title="Mở Báo Cáo Phân Tích Toàn Diện Master Dossier (10 Chương Nghiên Cứu)"
-          >
-            <span>📑</span>
-            <span className="hidden md:inline">Hồ Sơ Master Dossier</span>
-          </button>
-
-          {/* Nút Refresh BCTC */}
-          <button
-            type="button"
-            onClick={handleSyncSingleFinancials}
-            disabled={syncingSingle}
-            className="p-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 text-xs transition cursor-pointer shadow-2xs disabled:opacity-50 active:scale-95"
-            title={`Tải lại BCTC và Định giá cho ${selectedSymbol} (~3-5s)`}
-          >
-            <span className={syncingSingle ? 'inline-block animate-spin' : ''}>🔄</span>
-          </button>
-
-          {/* Nút Làm Mới AI Cổ Phiếu Tức Thời */}
-          {handleRefreshSingleAi && (
-            <button
+              key={`recent-${sym}`}
               type="button"
-              onClick={handleRefreshSingleAi}
-              disabled={refreshingAi}
-              className="px-2.5 py-2 bg-gradient-to-r from-amber-500/10 to-indigo-500/10 hover:from-amber-500/20 hover:to-indigo-500/20 border border-amber-200 dark:border-indigo-800 rounded-xl text-amber-700 dark:text-amber-300 text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-50 active:scale-95"
-              title={`Làm mới phân tích AI tích hợp (Thesis, News, Audit, Convergence, Dividend) cho ${selectedSymbol}`}
+              onClick={() => handleLookupSymbol(sym)}
+              className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-50/70 hover:bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition cursor-pointer shrink-0"
+              title={`Mã vừa xem: ${sym}`}
             >
-              <span className={refreshingAi ? 'inline-block animate-spin' : ''}>⚡</span>
-              <span className="hidden xl:inline">{refreshingAi ? 'Đang chạy AI...' : 'Làm Mới AI'}</span>
+              🕒 {sym}
             </button>
-          )}
+          ))}
+
+          {/* Các mã VN30 phổ biến */}
+          {POPULAR_TICKERS.map((sym) => {
+            const isCurrent = sym === selectedSymbol;
+            return (
+              <button
+                key={`pop-${sym}`}
+                type="button"
+                onClick={() => !isCurrent && handleLookupSymbol(sym)}
+                disabled={isCurrent}
+                className={`px-2.5 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                  isCurrent
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700/60 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200/70 dark:border-gray-600/50'
+                }`}
+                title={`Tra cứu định giá ${sym}`}
+              >
+                {sym}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* ── 2. HERO CARD: GIÁ TRỊ HỘI TỤ CONSENSUS & LƯỚI 10 MÔ HÌNH ── */}
       <div className="p-5 sm:p-6 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50/60 dark:from-indigo-900 dark:via-indigo-950 dark:to-slate-900 text-gray-900 dark:text-white rounded-3xl shadow-sm dark:shadow-xl border border-indigo-100 dark:border-indigo-800/40 space-y-4 transition-colors">
-        {/* CFA Equity Research AI Deep-Dive Banner */}
-        {financials?.aiDeepDive && (
-          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10 border border-indigo-200/80 dark:border-indigo-700/60 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-start gap-2.5">
-              <span className="text-xl">🧠</span>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wide">
-                    CFA Equity Research Copilot
-                  </span>
-                  <IntelligenceBadge
-                    type={financials?.aiDeepDive?.thesisHeadline ? 'ai' : 'heuristic'}
-                    provider={financials?.aiDeepDive?.provider}
-                  />
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-700/50">
-                    {financials.aiDeepDive.recommendation}
-                  </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">
-                    Conviction: {financials.aiDeepDive.convictionScore}/100
-                  </span>
-                </div>
-                <p className="text-xs text-gray-800 dark:text-gray-200 font-semibold mt-1">
-                  {financials.aiDeepDive.thesisHeadline}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsReportModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0 self-start md:self-auto cursor-pointer transition shadow-xs flex items-center gap-1 active:scale-95"
-            >
-              <span>Xem Luận Điểm CFA</span>
-              <span>➔</span>
-            </button>
-          </div>
-        )}
-
         {/* Hàng trên: Giá Hội Tụ, Thị Giá, Upside, MoS */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-indigo-100 dark:border-indigo-800/60 pb-4">
           <div>
@@ -333,6 +427,26 @@ export default function StockCockpitHeader({
                   {valRatingText}
                 </span>
               </div>
+            </div>
+
+            {/* Thước Đo Tỷ Lệ Thưởng / Rủi Ro (R:R) */}
+            <div className="border-l border-indigo-100 dark:border-indigo-800/80 pl-4 sm:pl-6">
+              <span className="text-[11px] text-gray-500 dark:text-gray-300 font-medium block">
+                Tỷ Lệ Thưởng/Rủi Ro (R:R)
+              </span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className={`text-xl font-black font-mono ${rrAnalysis.color}`}>
+                  {rrAnalysis.ratioString}
+                </span>
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black border ${rrAnalysis.bg} ${rrAnalysis.color} ${rrAnalysis.border}`} title={rrAnalysis.ratingDesc}>
+                  {rrAnalysis.ratingLabel}
+                </span>
+              </div>
+              {takeProfitGrid && (
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 block mt-0.5" title={`Lưới 3 Tầng: T1 (+15%): ${formatVND(takeProfitGrid.tiers[0].targetPrice)} | T2 (Fair Value): ${formatVND(takeProfitGrid.tiers[1].targetPrice)} | T3 (Siêu Sóng): ${formatVND(takeProfitGrid.tiers[2].targetPrice)}`}>
+                  🎯 T1: {formatVND(takeProfitGrid.tiers[0].targetPrice)} · T2: {formatVND(takeProfitGrid.tiers[1].targetPrice)}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -489,32 +603,28 @@ export default function StockCockpitHeader({
           </div>
         )}
 
-        {/* 7 Chu Kỳ Hiệu Suất Giá */}
+        {/* 7 Chu Kỳ Hiệu Suất Giá Thống Nhất */}
         <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700/60">
-          {[
-            { label: '1 Tuần', val: currentStock.performance?.w1 },
-            { label: '1 Tháng', val: currentStock.performance?.m1 },
-            { label: '3 Tháng', val: currentStock.performance?.m3 },
-            { label: '6 Tháng', val: currentStock.performance?.m6 },
-            { label: 'Đầu năm', val: currentStock.performance?.ytd },
-            { label: '1 Năm', val: currentStock.performance?.y1 },
-            { label: '5 Năm', val: currentStock.performance?.y5 },
-          ].map((cycle, i) => (
-            <div
-              key={i}
-              className="p-2 rounded-xl bg-gray-50/80 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700 text-center"
-            >
-              <span className="text-[10px] text-gray-400 font-bold block">{cycle.label}</span>
-              <span
-                className={`text-xs font-black block mt-0.5 ${(cycle.val || 0) >= 0
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-rose-600 dark:text-rose-400'
-                  }`}
+          {TIMEFRAME_PRESETS.STOCK_PERFORMANCE.map((tf) => {
+            const val = currentStock.performance?.[tf.perfKey];
+            return (
+              <div
+                key={tf.id}
+                className="p-2 rounded-xl bg-gray-50/80 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700 text-center"
+                title={`${tf.label}: ${tf.desc || ''}`}
               >
-                {cycle.val != null ? `${cycle.val >= 0 ? '+' : ''}${cycle.val}%` : '—'}
-              </span>
-            </div>
-          ))}
+                <span className="text-[10px] text-gray-400 font-bold block">{tf.label}</span>
+                <span
+                  className={`text-xs font-black block mt-0.5 ${(val || 0) >= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                >
+                  {val != null ? `${val >= 0 ? '+' : ''}${val}%` : '—'}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

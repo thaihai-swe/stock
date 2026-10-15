@@ -24,6 +24,7 @@ CURRENT_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CURRENT_DIR.parent
 sys.path.insert(0, str(CURRENT_DIR))
 
+from lib.io_helper import atomic_write_json, safe_read_json, load_project_env
 from lib.financial_taxonomy import normalize_field_name
 from lib.rate_limiter import MultiSourceRateLimiter
 from lib.valuation_engine import (
@@ -97,20 +98,13 @@ SUPPORTED_FILE = DATA_DIR / "supported_stocks.json"
 
 def get_current_vn10y_yield() -> float:
     macro_cache_file = DATA_DIR / "macro_valuation.json"
-    if macro_cache_file.exists():
-        try:
-            with open(macro_cache_file, "r", encoding="utf-8") as f:
-                m_data = json.load(f)
-                val = float(
-                    m_data.get("macro", {}).get("vn10yYield") or
-                    m_data.get("yieldCurveAnalysis", {}).get("vn10y") or
-                    4.47
-                )
-                if val > 0:
-                    return val
-        except Exception:
-            pass
-    return 4.47
+    m_data = safe_read_json(macro_cache_file, fallback={})
+    val = float(
+        m_data.get("macro", {}).get("vn10yYield") or
+        m_data.get("yieldCurveAnalysis", {}).get("vn10y") or
+        4.47
+    )
+    return val if val > 0 else 4.47
 
 limiter = MultiSourceRateLimiter()
 
@@ -871,6 +865,17 @@ def enrich_financial_doc(doc: Dict[str, Any], symbol: str, stock_item: Dict[str,
         stock_item=stock_item
     )
 
+    # 8.5. Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & Dòng Tiền Chủ Động (Aggressive Order Flow & CVD)
+    try:
+        from .lib.order_flow_engine import compute_full_order_flow_package
+        doc["orderFlow"] = compute_full_order_flow_package(
+            symbol=symbol,
+            stock_item=stock_item,
+            existing_financials=doc
+        )
+    except Exception as e:
+        pass
+
     # 9. Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (News Digest & Live Events)
     news_doc = build_news_digest_doc(symbol)
     doc["newsDigest"] = news_doc
@@ -1041,13 +1046,7 @@ def fetch_and_save_financials(symbols: List[str], backfill_deep: bool = False, r
         out_path = FINANCIALS_DIR / f"{sym_upper}.json"
 
         # Đọc dữ liệu lịch sử đã lưu trước đó để thực hiện hợp nhất tích lũy
-        existing_doc = {}
-        if out_path.exists():
-            try:
-                with open(out_path, "r", encoding="utf-8") as f_in:
-                    existing_doc = json.load(f_in)
-            except Exception:
-                existing_doc = {}
+        existing_doc = safe_read_json(out_path, fallback={})
 
         if recalculate_only:
             if existing_doc and existing_doc.get("quarterly") and len(existing_doc["quarterly"]) > 0:
@@ -1058,8 +1057,7 @@ def fetch_and_save_financials(symbols: List[str], backfill_deep: bool = False, r
                     "source": existing_doc.get("_meta", {}).get("source", "Yahoo Finance & vnstock Guest Mode"),
                     "status": existing_doc.get("_meta", {}).get("status", "AUDITED_REAL_DATA")
                 })
-                with open(out_path, "w", encoding="utf-8") as f:
-                    json.dump(fin_doc, f, ensure_ascii=False, indent=2)
+                atomic_write_json(out_path, fin_doc, indent=2)
                 print(f"   💾 Đã làm mới chỉ số & 10 mô hình định giá: {out_path.name}")
             else:
                 print(f"   ⚠️ Không tìm thấy BCTC cũ để tính lại cho {sym_upper}")
@@ -1106,8 +1104,7 @@ def fetch_and_save_financials(symbols: List[str], backfill_deep: bool = False, r
             print(f"   ✅ [BCTC KIỂM TOÁN THẬT] Thu thập thành công ({src_name}) cho {sym_upper}")
             print(f"      📦 Tích lũy chuỗi lịch sử hợp nhất: {n_q} Quý & {n_y} Năm kiểm toán")
             fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item, real_statements=merged_res)
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(fin_doc, f, ensure_ascii=False, indent=2)
+            atomic_write_json(out_path, fin_doc, indent=2)
             print(f"   💾 Đã cập nhật BCTC tích lũy: {out_path.name}")
             continue
 
@@ -1120,16 +1117,14 @@ def fetch_and_save_financials(symbols: List[str], backfill_deep: bool = False, r
                 "source": existing_doc.get("_meta", {}).get("source", "Yahoo Finance & vnstock Guest Mode"),
                 "status": existing_doc.get("_meta", {}).get("status", "AUDITED_REAL_DATA")
             })
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(fin_doc, f, ensure_ascii=False, indent=2)
+            atomic_write_json(out_path, fin_doc, indent=2)
             print(f"   💾 Đã bảo toàn và làm mới định giá: {out_path.name}")
             continue
 
         is_etf = sym_upper.startswith("E1") or sym_upper.startswith("FU") or "ETF" in sym_upper
         print(f"   ℹ️ [TẦNG 5] {sym_upper} chưa có BCTC kiểm toán trên sàn niêm yết (hoặc ETF). Gắn nhãn chuẩn xác, không sinh số giả.")
         fin_doc = build_statement_from_cache_or_defaults(sym_upper, stock_item, real_statements=None)
-        with open(out_path, "w", encoding="utf-8") as f:
-            json.dump(fin_doc, f, ensure_ascii=False, indent=2)
+        atomic_write_json(out_path, fin_doc, indent=2)
         print(f"   💾 Đã ghi nhận hồ sơ: {out_path.name}")
 
     print(f"\n✅ Hoàn tất thu thập BCTC toàn diện. Thư mục: {FINANCIALS_DIR}")
@@ -1139,23 +1134,31 @@ def main():
     parser.add_argument("--symbols", type=str, default="", help="Danh sách mã cổ phiếu (phân tách bởi dấu phẩy, ví dụ: HPG,PNJ,DXG)")
     parser.add_argument("--backfill-deep", action="store_true", help="Kích hoạt cào lịch sử sâu từ CafeF để bổ sung các năm/quý quá khứ xa")
     parser.add_argument("--recalculate-only", action="store_true", help="Tính lại toàn bộ 10 mô hình định giá, TTM và ratios từ file BCTC địa phương mà không gọi mạng")
+    parser.add_argument("--order-flow-only", action="store_true", help="Chỉ cập nhật nhanh cán cân lệnh và CVD trong phiên cho mã chỉ định")
     args = parser.parse_args()
 
     symbols = []
     if args.symbols:
         symbols = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
     else:
-        loaded = []
-        if SUPPORTED_FILE.exists():
-            try:
-                with open(SUPPORTED_FILE, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    loaded = data.get("symbols", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
-            except Exception:
-                pass
+        data = safe_read_json(SUPPORTED_FILE, fallback={})
+        loaded = data.get("symbols", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
         existing_syms = [p.stem.upper() for p in FINANCIALS_DIR.glob("*.json")]
         combined = list(dict.fromkeys(loaded + existing_syms))
         symbols = combined if combined else ["HPG", "PNJ", "DXG", "MBB", "VND", "FPT", "VCB", "VHM"]
+
+    if args.order_flow_only:
+        from .lib.order_flow_engine import compute_full_order_flow_package
+        fund_map = safe_read_json(CACHE_FILE, fallback={})
+        for sym_upper in symbols:
+            out_path = FINANCIALS_DIR / f"{sym_upper}.json"
+            existing_doc = safe_read_json(out_path, fallback={})
+            stock_item = fund_map.get(sym_upper, {})
+            flow_pkg = compute_full_order_flow_package(sym_upper, stock_item=stock_item, existing_financials=existing_doc)
+            existing_doc["orderFlow"] = flow_pkg
+            atomic_write_json(out_path, existing_doc, indent=2)
+            print(f"✅ Đã cập nhật dòng lệnh Order Flow cho {sym_upper}: WDI {flow_pkg.get('summary', {}).get('whaleDominanceIndex')}/100")
+        return
 
     fetch_and_save_financials(symbols, backfill_deep=args.backfill_deep, recalculate_only=args.recalculate_only)
 

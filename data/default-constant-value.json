@@ -957,6 +957,180 @@
     "presetFeePcts": ["0", "0.1", "0.15"],
     "legalNote": "Theo quy định thuế TNCN tại Việt Nam, thuế chuyển nhượng chứng khoán được CTCK tự động khấu trừ 0.1% trên giá trị chuyển nhượng từng lần, thuế cổ tức tiền mặt là 5.0%."
   },
+  "timeframeConfig": {
+    "defaultTimeframe": "ALL",
+    "definitions": {
+      "1D": { "id": "1D", "label": "1 Ngày", "shortLabel": "1D", "days": 1, "dnseResolution": "1" },
+      "1W": { "id": "1W", "label": "1 Tuần", "shortLabel": "1W", "days": 7, "dnseResolution": "1D", "perfKey": "w1" },
+      "1M": { "id": "1M", "label": "1 Tháng", "shortLabel": "1M", "days": 30, "dnseResolution": "1D", "perfKey": "m1" },
+      "3M": { "id": "3M", "label": "3 Tháng", "shortLabel": "3M", "days": 90, "dnseResolution": "1D", "perfKey": "m3" },
+      "6M": { "id": "6M", "label": "6 Tháng", "shortLabel": "6M", "days": 180, "dnseResolution": "1D", "perfKey": "m6" },
+      "MTD": { "id": "MTD", "label": "Tháng Này (MTD)", "shortLabel": "MTD", "days": null, "dnseResolution": "1D" },
+      "YTD": { "id": "YTD", "label": "Từ Đầu Năm (YTD)", "shortLabel": "YTD", "days": null, "dnseResolution": "1D", "perfKey": "ytd" },
+      "1Y": { "id": "1Y", "label": "1 Năm", "shortLabel": "1Y", "days": 365, "dnseResolution": "1D", "perfKey": "y1" },
+      "3Y": { "id": "3Y", "label": "3 Năm", "shortLabel": "3Y", "days": 1095, "dnseResolution": "1W" },
+      "5Y": { "id": "5Y", "label": "5 Năm", "shortLabel": "5Y", "days": 1825, "dnseResolution": "1W", "perfKey": "y5" },
+      "10Y": { "id": "10Y", "label": "10 Năm", "shortLabel": "10Y", "days": 3650, "dnseResolution": "1M" },
+      "ALL": { "id": "ALL", "label": "Toàn Thời Gian", "shortLabel": "Tất Cả", "days": null, "dnseResolution": "1D" },
+      "CUSTOM": { "id": "CUSTOM", "label": "Tùy Chỉnh", "shortLabel": "Tùy Chọn", "days": null, "dnseResolution": "1D" }
+    },
+    "presets": {
+      "benchmark": ["1M", "3M", "6M", "YTD", "1Y", "ALL"],
+      "portfolio": ["ALL", "YTD", "1Y", "MTD"],
+      "portfolioExtended": ["ALL", "YTD", "1Y", "6M", "3M", "1M", "MTD"],
+      "marketChart": ["1D", "1M", "6M", "1Y"],
+      "valuationHistory": ["1Y", "3Y", "5Y", "10Y"],
+      "stockPerformance": ["1W", "1M", "3M", "6M", "YTD", "1Y", "5Y"]
+    }
+  },
+  "riskRewardConfig": {
+    "defaultInitialStopLossPct": 7.0,
+    "breakevenTriggerPct": 6.0,
+    "tier1ProfitTriggerPct": 15.0,
+    "tier1LockMinPct": 8.0,
+    "superProfitTriggerPct": 30.0,
+    "warningDistancePct": 2.5,
+    "rrRatings": [
+      { "minRatio": 3.0, "rating": "EXCELLENT", "label": "🌟 Kèo Vàng (R:R ≥ 3:1)", "desc": "Tiềm năng thưởng vượt trội rủi ro, ưu tiên giải ngân hoặc gồng lãi", "color": "text-emerald-600 dark:text-emerald-400", "bg": "bg-emerald-50 dark:bg-emerald-950/60", "border": "border-emerald-200 dark:border-emerald-800/50" },
+      { "minRatio": 2.0, "rating": "GOOD", "label": "🟢 Khả Quan (R:R ≥ 2:1)", "desc": "Tỷ lệ chuẩn mực cho quản trị danh mục chuyên nghiệp", "color": "text-blue-600 dark:text-blue-400", "bg": "bg-blue-50 dark:bg-blue-950/60", "border": "border-blue-200 dark:border-blue-800/50" },
+      { "minRatio": 1.5, "rating": "FAIR", "label": "🟡 Cân Nhắc (R:R ≥ 1.5:1)", "desc": "Biên an toàn mỏng, chỉ nên thăm dò tỷ trọng nhỏ hoặc siết chặt stop-loss", "color": "text-amber-600 dark:text-amber-400", "bg": "bg-amber-50 dark:bg-amber-950/60", "border": "border-amber-200 dark:border-amber-800/50" },
+      { "minRatio": 0.0, "rating": "POOR", "label": "🔴 Bất Lợi (R:R < 1.5:1)", "desc": "Rủi ro giảm giá lớn hơn tiềm năng sinh lời, không nên vào lệnh mới", "color": "text-rose-600 dark:text-rose-400", "bg": "bg-rose-50 dark:bg-rose-950/60", "border": "border-rose-200 dark:border-rose-800/50" }
+    ],
+    "protectionTiers": [
+      { "tier": 0, "id": "INITIAL", "label": "Khởi Động", "desc": "Bảo toàn vốn ban đầu (-7% từ giá vốn)", "badge": "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300" },
+      { "tier": 1, "id": "BREAKEVEN", "label": "Hòa Vốn", "desc": "Khóa an toàn Breakeven (Free Trade - Rủi ro về 0)", "badge": "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300" },
+      { "tier": 2, "id": "TIER1_LOCK", "label": "Khóa Lãi Bậc 1", "desc": "Bảo toàn tối thiểu +8% đến +10% lợi nhuận", "badge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300" },
+      { "tier": 3, "id": "TIER2_LOCK", "label": "Khóa Lãi Bậc 2", "desc": "Bảo toàn tối thiểu +18% đến +22% lợi nhuận", "badge": "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300" },
+      { "tier": 4, "id": "SUPER_PROFIT", "label": "Nước Rút Siêu Lãi", "desc": "Siết trailing stop sát đỉnh (Peak - 5%)", "badge": "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300" }
+    ]
+  },
+  "takeProfitGridConfig": {
+    "tier1RatioPct": 30.0,
+    "tier1MinProfitPct": 15.0,
+    "tier1FairValueDiscountPct": 12.0,
+    "tier2RatioPct": 40.0,
+    "tier2FairValueRatio": 1.0,
+    "tier3RatioPct": 30.0,
+    "tier3BubblePremiumPct": 20.0,
+    "defaultFallbackGainPct": 25.0,
+    "tiers": [
+      {
+        "tier": 1,
+        "name": "Tầng 1",
+        "label": "Thu Hồi Vốn & Khóa Lãi Đệm",
+        "description": "Bán một phần lô đầu để bảo toàn vốn gốc, đưa vị thế vào trạng thái tâm lý thảnh thơi",
+        "defaultSellPct": 30,
+        "badge": "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+      },
+      {
+        "tier": 2,
+        "name": "Tầng 2",
+        "label": "Chốt Lời Theo Định Giá Hợp Lý",
+        "description": "Chốt phần lớn thành quả khi thị giá chạm đúng Giá Trị Hợp Lý (Consensus Fair Value)",
+        "defaultSellPct": 40,
+        "badge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+      },
+      {
+        "tier": 3,
+        "name": "Tầng 3",
+        "label": "Thả Trôi Bắt Trọn Siêu Sóng",
+        "description": "Giữ phần còn lại gồng lãi theo Trailing Stop (không bán non, chỉ bán khi gãy mốc dừng)",
+        "defaultSellPct": 30,
+        "badge": "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+      }
+    ]
+  },
+  "sbvOmoRadarConfig": {
+    "interbankStressThreshold": 6.0,
+    "interbankComfortThreshold": 3.0,
+    "interbankSpreadWarning": 1.5,
+    "usdVndInterventionThreshold": 25500,
+    "stressScoreWeights": {
+      "interbankRate": 0.40,
+      "interbankSpread": 0.30,
+      "usdVndPressure": 0.20,
+      "m2Growth": 0.10
+    },
+    "postures": {
+      "FLUSH": {
+        "maxScore": 35,
+        "label": "Dồi Dào",
+        "description": "Thanh khoản liên ngân hàng dồi dào, tiền rẻ hỗ trợ mạnh mẽ thị trường chứng khoán",
+        "badge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+        "equityGuidance": "Môi trường tiền tệ lý tưởng để nắm giữ tỷ trọng cổ phiếu cao (70-90%)."
+      },
+      "NEUTRAL": {
+        "maxScore": 65,
+        "label": "Cân Bằng",
+        "description": "Thanh khoản ở mức ổn định, SBV điều tiết nhịp nhàng, thị trường phân hóa theo kết quả kinh doanh",
+        "badge": "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+        "equityGuidance": "Duy trì tỷ trọng cân bằng (50-70%), tập trung chọn lọc cổ phiếu cơ bản tốt."
+      },
+      "TIGHTENING": {
+        "maxScore": 100,
+        "label": "Căng Thẳng",
+        "description": "Thanh khoản liên ngân hàng thắt chặt, SBV có xu hướng hút ròng để kiềm chế tỷ giá, cảnh báo rủi ro rung lắc",
+        "badge": "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800",
+        "equityGuidance": "Hạn chế dùng Margin, nâng tỷ trọng tiền mặt (30-50%), phòng thủ danh mục."
+      }
+    }
+  },
+  "inflationReturnConfig": {
+    "defaultBenchmarkSavingsRate": 5.5,
+    "defaultAnnualCpi": 5.08,
+    "realReturnBrackets": [
+      { "minRealReturn": 10.0, "rating": "OUTPERFORM", "label": "Đại Thắng Lạm Phát (> +10%)", "color": "text-emerald-600 dark:text-emerald-400", "badge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" },
+      { "minRealReturn": 3.0, "rating": "BEAT_INFLATION", "label": "Vượt Trội Lạm Phát (+3% đến +10%)", "color": "text-blue-600 dark:text-blue-400", "badge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300" },
+      { "minRealReturn": 0.0, "rating": "PRESERVED", "label": "Bảo Toàn Sức Mua (0% đến +3%)", "color": "text-amber-600 dark:text-amber-400", "badge": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" },
+      { "minRealReturn": -999.0, "rating": "EROSION", "label": "Bị Lạm Phát Bào Mòn (< 0%)", "color": "text-rose-600 dark:text-rose-400", "badge": "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300" }
+    ]
+  },
+  "orderFlow": {
+    "orderSizeTiers": [
+      {
+        "id": "whale",
+        "name": "Cá Mập / Tổ Chức",
+        "shortName": "Cá Mập",
+        "icon": "🐋",
+        "minValueVnd": 500000000,
+        "minShares": 25000,
+        "description": "Lệnh giao dịch quy mô lớn từ 500 triệu VNĐ trở lên hoặc trên 25,000 cổ phiếu",
+        "badgeClass": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+        "barColor": "#10b981"
+      },
+      {
+        "id": "medium",
+        "name": "Tay To / Sói Biển",
+        "shortName": "Tay To",
+        "icon": "🐬",
+        "minValueVnd": 100000000,
+        "maxValueVnd": 500000000,
+        "minShares": 5000,
+        "maxShares": 25000,
+        "description": "Lệnh giao dịch trung bình từ 100 triệu đến 500 triệu VNĐ (5,000 - 25,000 cổ phiếu)",
+        "badgeClass": "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
+        "barColor": "#6366f1"
+      },
+      {
+        "id": "retail",
+        "name": "Nhỏ Lẻ / Cừu Non",
+        "shortName": "Nhỏ Lẻ",
+        "icon": "🦐",
+        "minValueVnd": 0,
+        "maxValueVnd": 100000000,
+        "maxShares": 5000,
+        "description": "Lệnh giao dịch nhỏ lẻ dưới 100 triệu VNĐ (dưới 5,000 cổ phiếu)",
+        "badgeClass": "bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700",
+        "barColor": "#94a3b8"
+      }
+    ],
+    "thresholds": {
+      "whaleDominanceHigh": 70,
+      "whaleDominanceLow": 40,
+      "bullishAbsorptionThreshold": 0.15,
+      "bearishDistributionThreshold": -0.15
+    }
+  },
   "systemAndNetwork": {
     "serverPort": 3001,
     "inSessionTtlMs": 3600000,

@@ -5,6 +5,7 @@ Module quản lý Hàng đợi Mã Cổ Phiếu Được Yêu Cầu (Requested S
 - Lưu trữ đúng 5 trường: symbol, requested_at, status, synced_at, error_message.
 - Rà soát tự động các mã PENDING chưa có trong data/financials/.
 - Đánh dấu SYNCED và tự động bổ sung vào data/supported_stocks.json sau khi hoàn tất.
+- Tái sử dụng Universal db_client và atomic_write_json (DRY & Zero Race Condition).
 """
 
 import os
@@ -22,145 +23,18 @@ SUPPORTED_FILE = DATA_DIR / "supported_stocks.json"
 REQUESTED_FILE = DATA_DIR / "requested_stocks.json"
 LOCAL_DB_FILE = DATA_DIR / "stock.db"
 
-
-class TursoHttpClient:
-    """
-    Client kết nối tới Turso Cloud SQLite qua HTTP Pipeline API v2 (sử dụng requests).
-    Hoạt động 100% bằng thư viện requests chuẩn, không yêu cầu cài đặt binary C-extension.
-    """
-    def __init__(self, database_url: str, auth_token: str, timeout: int = 15):
-        self.database_url = database_url.strip()
-        self.auth_token = auth_token.strip()
-        self.timeout = timeout
-
-        clean_url = self.database_url
-        if clean_url.startswith("libsql://"):
-            clean_url = "https://" + clean_url[len("libsql://"):]
-        elif not clean_url.startswith("http://") and not clean_url.startswith("https://"):
-            clean_url = "https://" + clean_url
-        self.base_url = clean_url.rstrip("/")
-        self.pipeline_url = f"{self.base_url}/v2/pipeline"
-
-    @classmethod
-    def from_env(cls) -> Optional["TursoHttpClient"]:
-        url = os.environ.get("TURSO_DATABASE_URL", "").strip()
-        token = os.environ.get("TURSO_AUTH_TOKEN", "").strip()
-        if url and token:
-            return cls(url, token)
-        return None
-
-    def execute(self, sql: str, params: Optional[list] = None) -> List[List[Any]]:
-        import requests
-
-        args = []
-        if params:
-            for p in params:
-                args.append(self._to_arg(p))
-
-        stmt = {"sql": sql}
-        if args:
-            stmt["args"] = args
-
-        payload = {
-            "requests": [
-                {"type": "execute", "stmt": stmt},
-                {"type": "close"}
-            ]
-        }
-
-        headers = {
-            "Authorization": f"Bearer {self.auth_token}",
-            "Content-Type": "application/json"
-        }
-
-        resp = requests.post(self.pipeline_url, json=payload, headers=headers, timeout=self.timeout)
-        resp.raise_for_status()
-        data = resp.json()
-
-        results = data.get("results", [])
-        if not results:
-            return []
-
-        first_res = results[0]
-        if first_res.get("type") == "error":
-            err = first_res.get("error", {})
-            raise RuntimeError(f"Turso SQL Error [{err.get('code')}]: {err.get('message')}")
-
-        res_exec = first_res.get("response", {}).get("result", {})
-        raw_rows = res_exec.get("rows", [])
-
-        parsed_rows = []
-        for r in raw_rows:
-            parsed_rows.append([self._from_col(c) for c in r])
-
-        return parsed_rows
-
-    def _to_arg(self, val: Any) -> dict:
-        if val is None:
-            return {"type": "null"}
-        elif isinstance(val, bool):
-            return {"type": "integer", "value": "1" if val else "0"}
-        elif isinstance(val, int):
-            return {"type": "integer", "value": str(val)}
-        elif isinstance(val, float):
-            return {"type": "float", "value": float(val)}
-        else:
-            return {"type": "text", "value": str(val)}
-
-    def _from_col(self, col: Any) -> Any:
-        if not isinstance(col, dict):
-            return col
-        ctype = col.get("type")
-        if ctype == "null":
-            return None
-        val = col.get("value")
-        if ctype == "integer" and val is not None:
-            try:
-                return int(val)
-            except Exception:
-                return val
-        elif ctype == "float" and val is not None:
-            try:
-                return float(val)
-            except Exception:
-                return val
-        return val
+# Tái sử dụng Universal db_client và TursoHttpClient từ lib.db_client
+try:
+    from lib.db_client import TursoHttpClient, db_client
+    from lib.io_helper import atomic_write_json, safe_read_json
+except Exception:
+    from scripts.lib.db_client import TursoHttpClient, db_client
+    from scripts.lib.io_helper import atomic_write_json, safe_read_json
 
 
 def execute_db_query(sql: str, params: Optional[list] = None, is_write: bool = False) -> List[List[Any]]:
-    """
-    Thực thi câu lệnh SQL với cơ chế ưu tiên:
-    1. Ưu tiên gọi Turso Cloud DB qua HTTP API v2 (nếu có TURSO_DATABASE_URL và TURSO_AUTH_TOKEN).
-    2. Fallback sang SQLite cục bộ data/stock.db nếu Turso không được cấu hình hoặc gặp sự cố.
-    """
-    # 1. Thử Turso HTTP Client
-    turso_client = TursoHttpClient.from_env()
-    if turso_client:
-        try:
-            return turso_client.execute(sql, params)
-        except Exception as e:
-            print(f"⚠️ [RequestedStocks] Lỗi Turso HTTP API: {e}")
-
-    # 2. Fallback sang Local SQLite
-    if LOCAL_DB_FILE.exists():
-        try:
-            conn = sqlite3.connect(str(LOCAL_DB_FILE))
-            cur = conn.cursor()
-            if params:
-                cur.execute(sql, params)
-            else:
-                cur.execute(sql)
-            if is_write:
-                conn.commit()
-                rows = []
-            else:
-                rows = [list(r) for r in cur.fetchall()]
-            conn.close()
-            return rows
-        except Exception as e:
-            print(f"⚠️ [RequestedStocks] Lỗi SQLite local: {e}")
-
-    return []
+    """Thực thi câu lệnh SQL thông qua singleton db_client thống nhất (Turso Cloud / Local SQLite)."""
+    return db_client.execute_query(sql, params, is_write=is_write)
 
 
 def init_requested_stocks_table():
@@ -194,21 +68,17 @@ def get_pending_requested_symbols() -> List[str]:
 
     # 2. Đọc từ file JSON snapshot
     if REQUESTED_FILE.exists():
-        try:
-            with open(REQUESTED_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict):
-                    for sym, item in data.items():
-                        if isinstance(item, dict) and item.get("status") == "PENDING":
-                            pending.add(sym.strip().upper())
-                elif isinstance(data, list):
-                    for item in data:
-                        if isinstance(item, dict) and item.get("status") == "PENDING":
-                            sym = item.get("symbol")
-                            if sym:
-                                pending.add(sym.strip().upper())
-        except Exception:
-            pass
+        data = safe_read_json(REQUESTED_FILE, fallback={})
+        if isinstance(data, dict):
+            for sym, item in data.items():
+                if isinstance(item, dict) and item.get("status") == "PENDING":
+                    pending.add(sym.strip().upper())
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, dict) and item.get("status") == "PENDING":
+                    sym = item.get("symbol")
+                    if sym:
+                        pending.add(sym.strip().upper())
 
     return sorted(list(pending))
 
@@ -229,9 +99,7 @@ def filter_missing_financials(symbols: List[str]) -> List[str]:
             continue
 
         try:
-            with open(fin_path, "r", encoding="utf-8") as f:
-                doc = json.load(f)
-            # Kiểm tra xem file đã có chuỗi Quý thực tế chưa
+            doc = safe_read_json(fin_path, fallback={})
             q_list = doc.get("quarterly", [])
             meta_status = doc.get("_meta", {}).get("status", "")
             if not q_list and meta_status == "NO_AUDITED_DATA":
@@ -255,15 +123,9 @@ def mark_symbol_synced(symbol: str):
     """
     execute_db_query(sql_update, [sym, now_iso, now_iso], is_write=True)
 
-    # 2. Cập nhật file JSON snapshot
+    # 2. Cập nhật file JSON snapshot nguyên tử
     try:
-        data = {}
-        if REQUESTED_FILE.exists():
-            try:
-                with open(REQUESTED_FILE, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-            except Exception:
-                data = {}
+        data = safe_read_json(REQUESTED_FILE, fallback={})
         if not isinstance(data, dict):
             data = {}
 
@@ -274,9 +136,7 @@ def mark_symbol_synced(symbol: str):
             "synced_at": now_iso,
             "error_message": None
         }
-
-        with open(REQUESTED_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        atomic_write_json(REQUESTED_FILE, data)
     except Exception as e:
         print(f"⚠️ [RequestedStocks] Không thể cập nhật file JSON cho {sym}: {e}")
 
@@ -298,13 +158,7 @@ def mark_symbol_failed(symbol: str, error_message: str):
     execute_db_query(sql_failed, [sym, now_iso, error_message], is_write=True)
 
     try:
-        data = {}
-        if REQUESTED_FILE.exists():
-            try:
-                with open(REQUESTED_FILE, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-            except Exception:
-                data = {}
+        data = safe_read_json(REQUESTED_FILE, fallback={})
         if isinstance(data, dict):
             data[sym] = {
                 "symbol": sym,
@@ -313,8 +167,7 @@ def mark_symbol_failed(symbol: str, error_message: str):
                 "synced_at": None,
                 "error_message": error_message
             }
-            with open(REQUESTED_FILE, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+            atomic_write_json(REQUESTED_FILE, data)
     except Exception:
         pass
 
@@ -333,13 +186,7 @@ def add_requested_symbol(symbol: str) -> bool:
     execute_db_query(sql_insert, [sym, now_iso], is_write=True)
 
     try:
-        data = {}
-        if REQUESTED_FILE.exists():
-            try:
-                with open(REQUESTED_FILE, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-            except Exception:
-                data = {}
+        data = safe_read_json(REQUESTED_FILE, fallback={})
         if not isinstance(data, dict):
             data = {}
 
@@ -351,8 +198,7 @@ def add_requested_symbol(symbol: str) -> bool:
                 "synced_at": None,
                 "error_message": None
             }
-            with open(REQUESTED_FILE, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+            atomic_write_json(REQUESTED_FILE, data)
     except Exception:
         pass
 
@@ -362,7 +208,7 @@ def add_requested_symbol(symbol: str) -> bool:
 def add_to_supported_stocks(symbol: str) -> bool:
     """
     Tự động bổ sung mã cổ phiếu vào data/supported_stocks.json nếu chưa có.
-    Bảo toàn định dạng JSON chuẩn.
+    Bảo toàn định dạng JSON chuẩn qua atomic_write_json.
     """
     sym = symbol.strip().upper()
     if not sym:
@@ -371,20 +217,18 @@ def add_to_supported_stocks(symbol: str) -> bool:
     current_symbols = []
     if SUPPORTED_FILE.exists():
         try:
-            with open(SUPPORTED_FILE, "r", encoding="utf-8") as f:
-                content = json.load(f)
-                if isinstance(content, dict):
-                    current_symbols = content.get("symbols", [])
-                elif isinstance(content, list):
-                    current_symbols = content
+            content = safe_read_json(SUPPORTED_FILE, fallback={})
+            if isinstance(content, dict):
+                current_symbols = content.get("symbols", [])
+            elif isinstance(content, list):
+                current_symbols = content
         except Exception:
             current_symbols = []
 
     if sym not in current_symbols:
         current_symbols.append(sym)
         try:
-            with open(SUPPORTED_FILE, "w", encoding="utf-8") as f:
-                json.dump({"symbols": current_symbols}, f, ensure_ascii=False, indent=2)
+            atomic_write_json(SUPPORTED_FILE, {"symbols": current_symbols})
             print(f"   🎉 [AUTO-ENROLL] Đã tự động bổ sung mã {sym} vào danh sách theo dõi {SUPPORTED_FILE.name}!")
             return True
         except Exception as e:

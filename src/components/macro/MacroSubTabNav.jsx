@@ -5,26 +5,26 @@ export default function MacroSubTabNav({ activeTab = 'regime', onTabChange }) {
     {
       id: 'regime',
       icon: '🌀',
-      label: 'Chu Kỳ 5 Pha & Radar',
-      fullTitle: 'Chu Kỳ 5 Pha & Radar Tín Hiệu Dẫn Dắt',
+      label: 'Chu Kỳ 5 Pha & Clock',
+      fullTitle: 'Chu Kỳ 5 Pha, Macro Clock & Tín Hiệu Sớm Dẫn Dắt',
     },
     {
-      id: 'yield_curve',
-      icon: '📉',
-      label: 'Đường Cong Lợi Suất',
-      fullTitle: 'Đường Cong Lợi Suất 17 Dòng TPCP (VN vs US)',
+      id: 'liquidity',
+      icon: '⚡',
+      label: 'Thanh Khoản SBV & TPCP',
+      fullTitle: 'Radar Bơm/Hút Tiền SBV & Đường Cong Lợi Suất 17 Kỳ Hạn (VnBondLab)',
     },
     {
       id: 'allocation',
       icon: '⚖️',
-      label: 'Phân Bổ & Giá Vàng',
-      fullTitle: 'Phân Bổ 4 Tài Sản, Giá Vàng SJC/PNJ & Liên Thị Trường',
+      label: 'Kịch Bản & Phân Bổ Đa TS',
+      fullTitle: 'Ma Trận 3 Kịch Bản, Phân Bổ 4 Lớp Tài Sản & Giá Vàng SJC/PNJ',
     },
     {
       id: 'indicators',
       icon: '📑',
       label: '95 Chỉ Số Vĩ Mô',
-      fullTitle: '95 Chỉ Số Kinh Tế TradingEconomics',
+      fullTitle: 'Kho 95 Chỉ Số Kinh Tế TradingEconomics 10 Nhóm',
     },
   ];
 

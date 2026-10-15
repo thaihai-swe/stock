@@ -7,6 +7,7 @@ import HistoryLotInspectorModal from './history/HistoryLotInspectorModal.jsx';
 import HistoryOrdersTable from './history/HistoryOrdersTable.jsx';
 import HistoryPerformanceTab from './history/HistoryPerformanceTab.jsx';
 import { calculateDateRange } from './common/TimeHorizonFilter.jsx';
+import { getTimeframeLabel, TIMEFRAME_IDS } from '../utils/constants.js';
 import { useToast } from '../context/ToastContext.jsx';
 
 export default function TransactionHistory({
@@ -46,7 +47,7 @@ export default function TransactionHistory({
   const [textSearch, setTextSearch] = useState('');
   const [symbolFilter, setSymbolFilter] = useState('');
   const [tagFilter, setTagFilter] = useState('');
-  const [timePreset, setTimePreset] = useState('all'); // 'all' | 'ytd' | '1y' | 'mtd' | 'custom'
+  const [timePreset, setTimePreset] = useState(TIMEFRAME_IDS.ALL);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortField, setSortField] = useState('date');
@@ -177,13 +178,13 @@ export default function TransactionHistory({
     setTextSearch('');
     setSymbolFilter('');
     setTagFilter('');
-    setTimePreset('all');
+    setTimePreset(TIMEFRAME_IDS.ALL);
     setStartDate('');
     setEndDate('');
   }
 
-  const hasFilterActive = tab !== 'all' || pnlFilter !== 'all' || textSearch || symbolFilter || tagFilter || startDate || endDate || timePreset !== 'all';
-  const activeFilterCount = (symbolFilter ? 1 : 0) + (tagFilter ? 1 : 0) + (startDate || endDate ? 1 : 0) + (pnlFilter !== 'all' ? 1 : 0) + (tab !== 'all' ? 1 : 0);
+  const hasFilterActive = tab !== 'all' || pnlFilter !== 'all' || textSearch || symbolFilter || tagFilter || startDate || endDate || timePreset !== TIMEFRAME_IDS.ALL;
+  const activeFilterCount = (symbolFilter ? 1 : 0) + (tagFilter ? 1 : 0) + (startDate || endDate || timePreset !== TIMEFRAME_IDS.ALL ? 1 : 0) + (pnlFilter !== 'all' ? 1 : 0) + (tab !== 'all' ? 1 : 0);
 
   // Nhãn mô tả bộ lọc đang chọn cho Hero Card
   const filterLabel = useMemo(() => {
@@ -193,12 +194,9 @@ export default function TransactionHistory({
     if (tab === 'sell') parts.push('Lệnh bán');
     if (pnlFilter === 'profit') parts.push('Có lãi');
     if (pnlFilter === 'loss') parts.push('Thua lỗ');
-    if (timePreset === 'ytd') parts.push('YTD');
-    else if (timePreset === '1y') parts.push('1Y');
-    else if (timePreset === 'mtd') parts.push('MTD');
-    else if (startDate && endDate) parts.push(`${startDate} → ${endDate}`);
-    else if (startDate) parts.push(`Từ ${startDate}`);
-    else if (endDate) parts.push(`Đến ${endDate}`);
+    if (timePreset !== TIMEFRAME_IDS.ALL || startDate || endDate) {
+      parts.push(getTimeframeLabel(timePreset, startDate, endDate));
+    }
     if (tagFilter) parts.push(`#${tagFilter}`);
     return parts.join(' · ');
   }, [symbolFilter, tab, pnlFilter, timePreset, startDate, endDate, tagFilter]);

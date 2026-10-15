@@ -154,6 +154,10 @@ def run_daily_pipeline(symbols: List[str]):
     # 3. Cập nhật 60 nến ngày DNSE & Market Profile / POC / Wyckoff
     execute_step("1.3 Cập Nhật 60 Nến Ngày DNSE & Market Profile", "fetch_financial_reports.py", ["--symbols", sym_arg])
 
+    # 4. Xử lý hàng đợi làm mới AI danh mục từ Online/Vercel (Pending Queue)
+    execute_step("1.4 Xử Lý Hàng Đợi Làm Mới Portfolio AI (Pending Queue)", "generate_ai_insights.py", ["--scope", "portfolio", "--user-id", "pending"])
+
+
 
 def run_weekly_pipeline(symbols: List[str]):
     """Chu kỳ Hằng Tuần (Sáng Thứ Bảy 10:00): Vĩ mô TradingEconomics, 10 Ngành GICS, Simply Wall St."""

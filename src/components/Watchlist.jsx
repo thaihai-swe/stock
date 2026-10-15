@@ -298,7 +298,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                       ? 'bg-emerald-50/50 dark:bg-emerald-950/25 border-emerald-300 dark:border-emerald-700/70 shadow-sm shadow-emerald-500/10'
                       : isSellReached
                         ? 'bg-purple-50/50 dark:bg-purple-950/25 border-purple-300 dark:border-purple-700/70 shadow-sm shadow-purple-500/10'
-                        : 'bg-gray-50/80 dark:bg-slate-850/80 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200/80 dark:border-slate-800'
+                        : 'bg-gray-50/80 dark:bg-slate-800/80 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200/80 dark:border-slate-800'
                       }`}
                   >
                     {/* Header Thẻ: Mã CP & Giá thị trường */}

@@ -23,7 +23,23 @@ export default function OpportunityCostCard({ buyOrders = [], totalCumulativePL 
   });
 
   const [inputVal, setInputVal] = useState(bankRate.toString());
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('collapse_opportunity_cost') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('collapse_opportunity_cost', String(next));
+      } catch (e) {}
+      return next;
+    });
+  };
 
   const handleSelectRate = (rate) => {
     const num = parseFloat(rate);
@@ -134,11 +150,11 @@ export default function OpportunityCostCard({ buyOrders = [], totalCumulativePL 
 
           <button
             type="button"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1.5 rounded-lg text-xs hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer"
+            onClick={toggleCollapse}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors cursor-pointer"
             title={isCollapsed ? 'Mở rộng phân tích' : 'Thu gọn'}
           >
-            {isCollapsed ? '▼' : '▲'}
+            <span>{isCollapsed ? 'Mở Rộng ▼' : 'Thu Gọn ▲'}</span>
           </button>
         </div>
       </div>

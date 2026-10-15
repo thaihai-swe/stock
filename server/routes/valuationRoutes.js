@@ -1,7 +1,6 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import { execFile } from 'child_process';
 import {
   ROOT_DIR,
   DATA_DIR,
@@ -11,18 +10,21 @@ import {
   MACRO_NARRATIVES,
   AI_MACRO_CONFIG,
   AI_INSIGHTS_CACHE_FILE,
+  FINANCIALS_DIR,
+  PORTFOLIO_AI_FILE,
+  MACRO_INDICATORS_FILE,
+  MARKET_HISTORY_FILE,
+  FUNDAMENTALS_CACHE_FILE as FUNDAMENTALS_FILE,
+  MACRO_VALUATION_FILE as MACRO_FILE,
 } from '../config/constants.js';
 import { db } from '../storage/db.js';
-import { getPortfolioAiInsight } from '../storage/sqliteStore.js';
+import { getPortfolioAiInsight, savePortfolioAiInsight } from '../storage/sqliteStore.js';
+import { readJsonCached, invalidateJsonCache } from '../utils/cachedFileReader.js';
+import { isPythonAvailable, runPythonScript } from '../utils/pythonRunner.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 const router = express.Router();
 
-const FUNDAMENTALS_FILE = path.join(DATA_DIR, 'fundamentals_cache.json');
-const MACRO_FILE = path.join(DATA_DIR, 'macro_valuation.json');
-const MACRO_INDICATORS_FILE = path.join(DATA_DIR, 'macro_indicators.json');
-const MARKET_HISTORY_FILE = path.join(DATA_DIR, 'market_valuation_history.json');
-const FINANCIALS_DIR = path.join(DATA_DIR, 'financials');
-const PORTFOLIO_AI_FILE = path.join(DATA_DIR, 'portfolio_ai_insights.json');
 
 // In-memory cache cho DNSE OHLC proxy (TTL 1 giờ)
 const dnseCache = new Map();
@@ -50,14 +52,7 @@ export async function queueRequestedStock(symbol) {
 
   // 2. Đồng bộ file snapshot data/requested_stocks.json
   try {
-    let requestsMap = {};
-    if (fs.existsSync(REQUESTED_STOCKS_FILE)) {
-      try {
-        requestsMap = JSON.parse(fs.readFileSync(REQUESTED_STOCKS_FILE, 'utf-8'));
-      } catch {
-        requestsMap = {};
-      }
-    }
+    const requestsMap = { ...(readJsonCached(REQUESTED_STOCKS_FILE, { fallback: {} }) || {}) };
     if (!requestsMap[sym]) {
       requestsMap[sym] = {
         symbol: sym,
@@ -67,10 +62,12 @@ export async function queueRequestedStock(symbol) {
         error_message: null
       };
       fs.writeFileSync(REQUESTED_STOCKS_FILE, JSON.stringify(requestsMap, null, 2), 'utf-8');
+      invalidateJsonCache(REQUESTED_STOCKS_FILE);
     }
   } catch (err) {
     // bỏ qua lỗi file nếu đang trên môi trường read-only
   }
+
 
   return {
     symbol: sym,
@@ -81,21 +78,15 @@ export async function queueRequestedStock(symbol) {
   };
 }
 
-// Ưu tiên sử dụng môi trường ảo uv (.venv/bin/python) nếu tồn tại
-const VENV_PYTHON = path.join(ROOT_DIR, '.venv', 'bin', 'python');
-const PYTHON_CMD = fs.existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
 
 /**
  * 1. GET /api/valuation/stocks
- * Lấy toàn bộ dữ liệu định giá (Graham, DDM, DuPont, Tech Score) từ Local JSON
+ * Lấy toàn bộ dữ liệu định giá (Graham, DDM, DuPont, Tech Score) từ Local JSON có đệm RAM
  */
 router.get('/valuation/stocks', (req, res) => {
   try {
-    if (fs.existsSync(FUNDAMENTALS_FILE)) {
-      const raw = fs.readFileSync(FUNDAMENTALS_FILE, 'utf-8');
-      return res.json(JSON.parse(raw));
-    }
-    return res.json({});
+    const data = readJsonCached(FUNDAMENTALS_FILE, { fallback: {} });
+    return res.json(data);
   } catch (error) {
     console.error('Lỗi đọc fundamentals_cache.json:', error);
     return res.status(500).json({ error: error.message });
@@ -104,49 +95,26 @@ router.get('/valuation/stocks', (req, res) => {
 
 /**
  * 2. GET /api/valuation/macro
- * Lấy nhiệt kế định giá VN-Index, P/E Bands, Z-Score và khuyến nghị phân bổ tiền mặt
+ * Lấy nhiệt kế định giá VN-Index, P/E Bands, Z-Score và khuyến nghị phân bổ tiền mặt có đệm RAM
  */
 router.get('/valuation/macro', (req, res) => {
   try {
-    if (fs.existsSync(MACRO_FILE)) {
-      const raw = fs.readFileSync(MACRO_FILE, 'utf-8');
-      const macroData = JSON.parse(raw);
+    const rawMacro = readJsonCached(MACRO_FILE, { fallback: null });
+    if (rawMacro) {
+      const macroData = { ...rawMacro };
 
-      // Tầng phòng thủ Zero-Downtime AI Cache: Nạp weeklyPulse & sectorTransmission từ ai_insights_cache.json nếu macro_valuation.json chưa có
-      if (fs.existsSync(AI_INSIGHTS_CACHE_FILE)) {
-        try {
-          const aiRaw = fs.readFileSync(AI_INSIGHTS_CACHE_FILE, 'utf-8');
-          const aiCache = JSON.parse(aiRaw);
-          if (!macroData.weeklyPulse && aiCache.weeklyPulse) {
-            macroData.weeklyPulse = aiCache.weeklyPulse;
-          }
-          if (!macroData.sectorTransmission && aiCache.sectorTransmission) {
-            macroData.sectorTransmission = aiCache.sectorTransmission;
-          }
-          if (!macroData.aiInsight && aiCache.aiInsight) {
-            macroData.aiInsight = aiCache.aiInsight;
-          }
-          if (!macroData.aiScenarios && aiCache.aiScenarios) {
-            macroData.aiScenarios = aiCache.aiScenarios;
-          }
-          if (!macroData.aiClockDynamics && aiCache.aiClockDynamics) {
-            macroData.aiClockDynamics = aiCache.aiClockDynamics;
-          }
-          if (!macroData.aiYieldCurveDiagnosis && aiCache.aiYieldCurveDiagnosis) {
-            macroData.aiYieldCurveDiagnosis = aiCache.aiYieldCurveDiagnosis;
-          }
-          if (!macroData.aiMultiAssetStrategy && aiCache.aiMultiAssetStrategy) {
-            macroData.aiMultiAssetStrategy = aiCache.aiMultiAssetStrategy;
-          }
-          if (!macroData.aiStyleRotation && aiCache.aiStyleRotation) {
-            macroData.aiStyleRotation = aiCache.aiStyleRotation;
-          }
-          if (!macroData.aiTailRiskAnalysis && aiCache.aiTailRiskAnalysis) {
-            macroData.aiTailRiskAnalysis = aiCache.aiTailRiskAnalysis;
-          }
-        } catch (e) {
-          console.warn('⚠️ Lỗi nạp fallback AI cache:', e.message);
-        }
+      // Tầng phòng thủ Zero-Downtime AI Cache: Nạp fallback từ ai_insights_cache.json nếu macro_valuation.json chưa có
+      const aiCache = readJsonCached(AI_INSIGHTS_CACHE_FILE, { fallback: {} });
+      if (aiCache && typeof aiCache === 'object') {
+        if (!macroData.weeklyPulse && aiCache.weeklyPulse) macroData.weeklyPulse = aiCache.weeklyPulse;
+        if (!macroData.sectorTransmission && aiCache.sectorTransmission) macroData.sectorTransmission = aiCache.sectorTransmission;
+        if (!macroData.aiInsight && aiCache.aiInsight) macroData.aiInsight = aiCache.aiInsight;
+        if (!macroData.aiScenarios && aiCache.aiScenarios) macroData.aiScenarios = aiCache.aiScenarios;
+        if (!macroData.aiClockDynamics && aiCache.aiClockDynamics) macroData.aiClockDynamics = aiCache.aiClockDynamics;
+        if (!macroData.aiYieldCurveDiagnosis && aiCache.aiYieldCurveDiagnosis) macroData.aiYieldCurveDiagnosis = aiCache.aiYieldCurveDiagnosis;
+        if (!macroData.aiMultiAssetStrategy && aiCache.aiMultiAssetStrategy) macroData.aiMultiAssetStrategy = aiCache.aiMultiAssetStrategy;
+        if (!macroData.aiStyleRotation && aiCache.aiStyleRotation) macroData.aiStyleRotation = aiCache.aiStyleRotation;
+        if (!macroData.aiTailRiskAnalysis && aiCache.aiTailRiskAnalysis) macroData.aiTailRiskAnalysis = aiCache.aiTailRiskAnalysis;
       }
 
       return res.json(macroData);
@@ -197,36 +165,23 @@ router.get('/valuation/macro/config', (req, res) => {
  * 2a-2. POST /api/valuation/macro/ai-analysis
  * Trả về báo cáo chiến lược CIO sinh bởi Python Background Pipeline (0ms, 0 API cost).
  */
-router.post('/valuation/macro/ai-analysis', async (req, res) => {
-  try {
-    let macroData = {};
-    if (fs.existsSync(MACRO_FILE)) {
-      try {
-        macroData = JSON.parse(fs.readFileSync(MACRO_FILE, 'utf-8'));
-      } catch {}
-    }
-    return res.json(macroData.aiInsight || {
-      headline: 'Chiến Lược Phân Bổ CIO Toàn Diện',
-      summary: 'Dữ liệu phân tích vĩ mô được đồng bộ tự động từ Python Background Pipeline.',
-      bullets: [],
-    });
-  } catch (error) {
-    console.error('Lỗi thực thi AI Macro Analysis:', error);
-    return res.status(500).json({ error: error.message });
-  }
-});
+router.post('/valuation/macro/ai-analysis', asyncHandler(async (req, res) => {
+  const macroData = readJsonCached(MACRO_FILE, { fallback: {} });
+  return res.json(macroData.aiInsight || {
+    headline: 'Chiến Lược Phân Bổ CIO Toàn Diện',
+    summary: 'Dữ liệu phân tích vĩ mô được đồng bộ tự động từ Python Background Pipeline.',
+    bullets: [],
+  });
+}));
 
 /**
  * 2b. GET /api/valuation/macro-indicators
- * Lấy toàn bộ 10 danh mục chỉ số vĩ mô TradingEconomics từ Local JSON
+ * Lấy toàn bộ 10 danh mục chỉ số vĩ mô TradingEconomics từ Local JSON có đệm RAM
  */
 router.get('/valuation/macro-indicators', (req, res) => {
   try {
-    if (fs.existsSync(MACRO_INDICATORS_FILE)) {
-      const raw = fs.readFileSync(MACRO_INDICATORS_FILE, 'utf-8');
-      return res.json(JSON.parse(raw));
-    }
-    return res.json({ categories: {}, macroCore: {} });
+    const data = readJsonCached(MACRO_INDICATORS_FILE, { fallback: { categories: {}, macroCore: {} } });
+    return res.json(data);
   } catch (error) {
     console.error('Lỗi đọc macro_indicators.json:', error);
     return res.status(500).json({ error: error.message });
@@ -347,15 +302,12 @@ router.get('/valuation/dnse-ohlc', async (req, res) => {
 
 /**
  * 2d. GET /api/valuation/market-history
- * Lấy chuỗi lịch sử định giá thị trường đa chu kỳ (Google Sheets Simply Wall St)
+ * Lấy chuỗi lịch sử định giá thị trường đa chu kỳ (Google Sheets Simply Wall St) có đệm RAM
  */
 router.get('/valuation/market-history', (req, res) => {
   try {
-    if (fs.existsSync(MARKET_HISTORY_FILE)) {
-      const raw = fs.readFileSync(MARKET_HISTORY_FILE, 'utf-8');
-      return res.json(JSON.parse(raw));
-    }
-    return res.json({ _meta: {}, metrics: [], periods: {} });
+    const data = readJsonCached(MARKET_HISTORY_FILE, { fallback: { _meta: {}, metrics: [], periods: {} } });
+    return res.json(data);
   } catch (error) {
     console.error('Lỗi đọc market_valuation_history.json:', error);
     return res.status(500).json({ error: error.message });
@@ -364,7 +316,7 @@ router.get('/valuation/market-history', (req, res) => {
 
 /**
  * 3. GET /api/valuation/financials/:symbol
- * Lấy báo cáo tài chính 8 quý và 5 năm chi tiết của từng mã cổ phiếu (Income, Balance, Cash Flow)
+ * Lấy báo cáo tài chính 8 quý và 5 năm chi tiết của từng mã cổ phiếu (Income, Balance, Cash Flow) có đệm RAM
  */
 router.get('/valuation/financials/:symbol', async (req, res) => {
   const sym = (req.params.symbol || '').trim().toUpperCase();
@@ -374,9 +326,9 @@ router.get('/valuation/financials/:symbol', async (req, res) => {
 
   const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
   try {
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, 'utf-8');
-      return res.json(JSON.parse(raw));
+    const cachedData = readJsonCached(filePath, { fallback: null });
+    if (cachedData) {
+      return res.json(cachedData);
     }
 
     // Tự động đưa mã vào hàng đợi requested_stocks nếu chưa có trong kho
@@ -393,6 +345,66 @@ router.get('/valuation/financials/:symbol', async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
+/**
+ * 3.1. GET /api/valuation/order-flow/:symbol
+ * Lấy dữ liệu phân tích Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & CVD (1D & 10D)
+ */
+router.get('/valuation/order-flow/:symbol', (req, res) => {
+  const sym = (req.params.symbol || '').trim().toUpperCase();
+  if (!sym) return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
+
+  const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
+  const finData = readJsonCached(filePath, { fallback: null });
+  if (finData && finData.orderFlow) {
+    return res.json({ success: true, data: finData.orderFlow });
+  }
+
+  return res.status(404).json({
+    error: `Chưa có dữ liệu dòng lệnh cho mã ${sym}`,
+    symbol: sym
+  });
+});
+
+/**
+ * 3.2. POST /api/valuation/order-flow/:symbol/refresh
+ * Làm mới nhanh cán cân lệnh và CVD trong phiên cho mã chỉ định
+ */
+router.post('/valuation/order-flow/:symbol/refresh', asyncHandler(async (req, res) => {
+  const sym = (req.params.symbol || '').trim().toUpperCase();
+  if (!sym) return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
+
+  const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
+
+  if (!isPythonAvailable()) {
+    const finData = readJsonCached(filePath, { fallback: null });
+    if (finData?.orderFlow) {
+      return res.json({ success: true, data: finData.orderFlow });
+    }
+    return res.status(404).json({ error: `Chưa có dữ liệu dòng lệnh cho mã ${sym}` });
+  }
+
+  const { success, stderr } = await runPythonScript('scripts/fetch_financial_reports.py', [
+    '--symbols', sym,
+    '--order-flow-only'
+  ]);
+
+  if (!success) {
+    console.warn(`Lỗi chạy order-flow-only cho ${sym}:`, stderr);
+  }
+
+  invalidateJsonCache(filePath);
+  const finData = readJsonCached(filePath, { fallback: null });
+  if (finData && finData.orderFlow) {
+    return res.json({
+      success: true,
+      message: `Đã làm mới dòng lệnh khớp cho ${sym}!`,
+      data: finData.orderFlow
+    });
+  }
+
+  return res.status(500).json({ error: `Không thể cập nhật dòng lệnh cho mã ${sym}` });
+}));
 
 /**
  * 4. GET /api/valuation/raw-json/:type
@@ -452,26 +464,10 @@ router.get('/valuation/raw-json/:type', (req, res) => {
  * 5. POST /api/valuation/sync
  * Kích hoạt đồng bộ toàn bộ pipeline: TradingView + BCTC + Vĩ Mô VN-Index
  */
-router.post('/valuation/sync', (req, res) => {
-  const getLatestFundamentals = () => {
-    let latestData = {};
-    if (fs.existsSync(FUNDAMENTALS_FILE)) {
-      try {
-        latestData = JSON.parse(fs.readFileSync(FUNDAMENTALS_FILE, 'utf-8'));
-      } catch (e) {
-        // ignore
-      }
-    }
-    return latestData;
-  };
+router.post('/valuation/sync', asyncHandler(async (req, res) => {
+  const getLatestFundamentals = () => readJsonCached(FUNDAMENTALS_FILE, { fallback: {} });
 
-  const isServerlessOrNoPython = Boolean(
-    process.env.VERCEL ||
-    process.env.NOW_REGION ||
-    !fs.existsSync(VENV_PYTHON)
-  );
-
-  if (isServerlessOrNoPython) {
+  if (!isPythonAvailable()) {
     const latestData = getLatestFundamentals();
     return res.json({
       success: true,
@@ -481,35 +477,32 @@ router.post('/valuation/sync', (req, res) => {
     });
   }
 
-  const scriptPath = path.join(ROOT_DIR, 'scripts', 'run_full_pipeline.py');
+  const { success, stdout, stderr } = await runPythonScript('scripts/run_full_pipeline.py');
+  const latestData = getLatestFundamentals();
 
-  execFile(PYTHON_CMD, [scriptPath], (error, stdout, stderr) => {
-    const latestData = getLatestFundamentals();
-
-    if (error) {
-      console.warn('Python sync execution note:', stderr || error.message);
-      return res.json({
-        success: true,
-        message: 'Hệ thống đang hoạt động trên dữ liệu đồng bộ định kỳ mới nhất. Để cập nhật dữ liệu thị trường mới, vui lòng thông báo cho người quản lý.',
-        data: latestData,
-        note: 'Đã nạp bộ nhớ cache cục bộ'
-      });
-    }
-
+  if (!success) {
+    console.warn('Python sync execution note:', stderr);
     return res.json({
       success: true,
-      message: 'Đã hoàn tất đồng bộ toàn bộ pipeline định giá, BCTC và vĩ mô!',
-      output: stdout,
-      data: latestData
+      message: 'Hệ thống đang hoạt động trên dữ liệu đồng bộ định kỳ mới nhất. Để cập nhật dữ liệu thị trường mới, vui lòng thông báo cho người quản lý.',
+      data: latestData,
+      note: 'Đã nạp bộ nhớ cache cục bộ'
     });
+  }
+
+  return res.json({
+    success: true,
+    message: 'Đã hoàn tất đồng bộ toàn bộ pipeline định giá, BCTC và vĩ mô!',
+    output: stdout,
+    data: latestData
   });
-});
+}));
 
 /**
  * 6. POST /api/valuation/sync-single/:symbol
  * Kích hoạt cập nhật BCTC riêng cho một mã cổ phiếu cụ thể
  */
-router.post('/valuation/sync-single/:symbol', (req, res) => {
+router.post('/valuation/sync-single/:symbol', asyncHandler(async (req, res) => {
   const sym = (req.params.symbol || '').trim().toUpperCase();
   if (!sym) {
     return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
@@ -518,35 +511,14 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
   const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
 
   const readLocalData = () => {
-    let finData = null;
-    if (fs.existsSync(filePath)) {
-      try {
-        finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    let fundData = null;
-    if (fs.existsSync(FUNDAMENTALS_FILE)) {
-      try {
-        const allFunds = JSON.parse(fs.readFileSync(FUNDAMENTALS_FILE, 'utf-8'));
-        fundData = allFunds[sym] || null;
-      } catch (e) {
-        // ignore
-      }
-    }
+    const finData = readJsonCached(filePath, { fallback: null });
+    const allFunds = readJsonCached(FUNDAMENTALS_FILE, { fallback: {} });
+    const fundData = allFunds[sym] || null;
     return { finData, fundData };
   };
 
-  const isServerlessOrNoPython = Boolean(
-    process.env.VERCEL ||
-    process.env.NOW_REGION ||
-    !fs.existsSync(VENV_PYTHON)
-  );
-
   // Nếu môi trường không thể chạy Python hoặc là môi trường read-only
-  if (isServerlessOrNoPython) {
+  if (!isPythonAvailable()) {
     const { finData, fundData } = readLocalData();
     if (finData) {
       return res.json({
@@ -568,41 +540,39 @@ router.post('/valuation/sync-single/:symbol', (req, res) => {
     });
   }
 
-  const syncScript = path.join(ROOT_DIR, 'scripts', 'sync_fundamentals.py');
-  const reportScript = path.join(ROOT_DIR, 'scripts', 'fetch_financial_reports.py');
-
   // Bước 1: Đồng bộ chỉ số cơ bản & định giá từ TradingView cho mã này
-  execFile(PYTHON_CMD, [syncScript, '--symbols', sym], (err1, out1, errOut1) => {
-    // Bước 2: Đồng bộ BCTC toàn diện (8Q, 5Y, 54 Ratios, Cổ tức, Cổ đông)
-    execFile(PYTHON_CMD, [reportScript, '--symbols', sym], (err2, out2, errOut2) => {
-      const { finData, fundData } = readLocalData();
+  await runPythonScript('scripts/sync_fundamentals.py', ['--symbols', sym]);
+  // Bước 2: Đồng bộ BCTC toàn diện (8Q, 5Y, 54 Ratios, Cổ tức, Cổ đông)
+  await runPythonScript('scripts/fetch_financial_reports.py', ['--symbols', sym]);
 
-      if (!finData) {
-        queueRequestedStock(sym).catch(() => {});
-        return res.status(202).json({
-          success: false,
-          isQueued: true,
-          message: `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Hệ thống sẽ tự động thu thập BCTC và định giá trong phiên đồng bộ EOD tiếp theo!`,
-          symbol: sym
-        });
-      }
+  invalidateJsonCache(filePath);
+  invalidateJsonCache(FUNDAMENTALS_FILE);
+  const { finData, fundData } = readLocalData();
 
-      return res.json({
-        success: true,
-        message: `Đã tra cứu và cập nhật toàn bộ định giá cho mã ${sym}!`,
-        symbol: sym,
-        fundamentals: fundData,
-        data: finData
-      });
+  if (!finData) {
+    queueRequestedStock(sym).catch(() => {});
+    return res.status(202).json({
+      success: false,
+      isQueued: true,
+      message: `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Hệ thống sẽ tự động thu thập BCTC và định giá trong phiên đồng bộ EOD tiếp theo!`,
+      symbol: sym
     });
+  }
+
+  return res.json({
+    success: true,
+    message: `Đã tra cứu và cập nhật toàn bộ định giá cho mã ${sym}!`,
+    symbol: sym,
+    fundamentals: fundData,
+    data: finData
   });
-});
+}));
 
 /**
  * 7. GET /api/valuation/requested-stocks
  * Lấy danh sách các mã cổ phiếu trong hàng đợi yêu cầu (chuẩn 5 trường)
  */
-router.get('/valuation/requested-stocks', async (req, res) => {
+router.get('/valuation/requested-stocks', asyncHandler(async (req, res) => {
   try {
     const result = await db.execute(`
       SELECT symbol, requested_at, status, synced_at, error_message
@@ -616,183 +586,154 @@ router.get('/valuation/requested-stocks', async (req, res) => {
     });
   } catch (err) {
     // Fallback đọc từ file JSON nếu DB tạm thời chưa sẵn sàng
-    if (fs.existsSync(REQUESTED_STOCKS_FILE)) {
-      try {
-        const raw = JSON.parse(fs.readFileSync(REQUESTED_STOCKS_FILE, 'utf-8'));
-        const list = Object.values(raw);
-        return res.json({ total: list.length, requested_stocks: list });
-      } catch {
-        // ignore
-      }
-    }
-    return res.json({ total: 0, requested_stocks: [] });
+    const raw = readJsonCached(REQUESTED_STOCKS_FILE, { fallback: {} });
+    const list = Object.values(raw);
+    return res.json({ total: list.length, requested_stocks: list });
   }
-});
+}));
 
 /**
  * 8. POST /api/valuation/ai-refresh/:symbol
  * Kích hoạt cập nhật AI tích hợp riêng cho 1 mã cổ phiếu cụ thể (On-Demand Single Stock Refresh)
  */
-router.post('/valuation/ai-refresh/:symbol', (req, res) => {
+router.post('/valuation/ai-refresh/:symbol', asyncHandler(async (req, res) => {
   const sym = (req.params.symbol || '').trim().toUpperCase();
   if (!sym) {
     return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
   }
 
   const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
-  const isServerlessOrNoPython = Boolean(
-    process.env.VERCEL ||
-    process.env.NOW_REGION ||
-    !fs.existsSync(VENV_PYTHON)
-  );
 
-  if (isServerlessOrNoPython) {
-    if (fs.existsSync(filePath)) {
-      try {
-        const finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        return res.json({
-          success: true,
-          message: `Dữ liệu phân tích AI cho mã ${sym} đã sẵn sàng từ kho lưu trữ.`,
-          symbol: sym,
-          data: finData
-        });
-      } catch (e) {
-        return res.status(500).json({ error: e.message });
-      }
+  if (!isPythonAvailable()) {
+    const finData = readJsonCached(filePath, { fallback: null });
+    if (finData) {
+      return res.json({
+        success: true,
+        message: `Dữ liệu phân tích AI cho mã ${sym} đã sẵn sàng từ kho lưu trữ.`,
+        symbol: sym,
+        data: finData
+      });
     }
     return res.status(404).json({ error: `Chưa có dữ liệu cho mã ${sym}` });
   }
 
-  const aiScript = path.join(ROOT_DIR, 'scripts', 'generate_ai_insights.py');
-  execFile(PYTHON_CMD, [aiScript, '--scope', 'stocks', '--symbols', sym, '--force'], (err, stdout, stderr) => {
-    if (err) {
-      console.warn(`Lỗi chạy AI refresh cho ${sym}:`, stderr || err.message);
-    }
-    if (fs.existsSync(filePath)) {
-      try {
-        const finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        return res.json({
-          success: true,
-          message: `Đã làm mới phân tích AI tích hợp cho mã ${sym}!`,
-          symbol: sym,
-          data: finData
-        });
-      } catch (e) {
-        return res.status(500).json({ error: e.message });
-      }
-    }
-    return res.status(404).json({ error: `Không tìm thấy file BCTC sau khi chạy AI cho ${sym}` });
-  });
-});
+  const { success, stderr } = await runPythonScript('scripts/generate_ai_insights.py', [
+    '--scope', 'stocks',
+    '--symbols', sym,
+    '--force'
+  ]);
+  if (!success) {
+    console.warn(`Lỗi chạy AI refresh cho ${sym}:`, stderr);
+  }
+
+  invalidateJsonCache(filePath);
+  const finData = readJsonCached(filePath, { fallback: null });
+  if (finData) {
+    return res.json({
+      success: true,
+      message: `Đã làm mới phân tích AI tích hợp cho mã ${sym}!`,
+      symbol: sym,
+      data: finData
+    });
+  }
+  return res.status(404).json({ error: `Không tìm thấy file BCTC sau khi chạy AI cho ${sym}` });
+}));
 
 /**
  * 9. GET /api/portfolio/ai-stress-test
  * Đọc báo cáo sức khỏe danh mục & mô phỏng chịu tải vĩ mô theo người dùng (0ms)
  */
-router.get('/portfolio/ai-stress-test', async (req, res) => {
-  try {
-    const userId = req.user?.id || req.query?.userId || 'demo';
+router.get('/portfolio/ai-stress-test', asyncHandler(async (req, res) => {
+  const userId = req.user?.id || req.query?.userId || 'demo';
 
-    // 1. Đọc từ Tầng 1: ACID Database portfolio_ai_insights theo user_id
-    const dbInsight = await getPortfolioAiInsight(userId);
-    if (dbInsight) {
-      return res.json(dbInsight);
-    }
-
-    // 2. Fallback nếu là tài khoản demo và có file local
-    if (userId === 'demo' && fs.existsSync(PORTFOLIO_AI_FILE)) {
-      const raw = fs.readFileSync(PORTFOLIO_AI_FILE, 'utf-8');
-      return res.json(JSON.parse(raw));
-    }
-
-    // 3. Fallback mặc định
-    return res.json({
-      healthScore: 'Chưa có dữ liệu',
-      healthVerdict: 'Chưa có báo cáo sức khỏe danh mục. Vui lòng bấm Làm Mới để phân tích.',
-      summary: '',
-      portfolioBeta: 1.0,
-      cashWeightPct: 0.0,
-      macroSensitivity: {
-        interestRateRisk: 'Chưa phân tích',
-        fxRisk: 'Chưa phân tích',
-        cyclicalRisk: 'Chưa phân tích'
-      },
-      stressTestScenarios: [],
-      rebalancingRecommendations: [],
-      updatedAt: null
-    });
-  } catch (err) {
-    console.error('Lỗi đọc portfolio AI stress-test:', err);
-    return res.status(500).json({ error: err.message });
+  // 1. Đọc từ Tầng 1: ACID Database portfolio_ai_insights theo user_id
+  const dbInsight = await getPortfolioAiInsight(userId);
+  if (dbInsight) {
+    return res.json(dbInsight);
   }
-});
+
+  // 2. Fallback nếu là tài khoản demo và có file local
+  if (userId === 'demo') {
+    const raw = readJsonCached(PORTFOLIO_AI_FILE, { fallback: null });
+    if (raw) {
+      return res.json(raw);
+    }
+  }
+
+  // 3. Fallback mặc định
+  return res.json({
+    healthScore: 'Chưa có dữ liệu',
+    healthVerdict: 'Chưa có báo cáo sức khỏe danh mục. Vui lòng bấm Làm Mới để phân tích.',
+    summary: '',
+    portfolioBeta: 1.0,
+    cashWeightPct: 0.0,
+    macroSensitivity: {
+      interestRateRisk: 'Chưa phân tích',
+      fxRisk: 'Chưa phân tích',
+      cyclicalRisk: 'Chưa phân tích'
+    },
+    stressTestScenarios: [],
+    rebalancingRecommendations: [],
+    status: 'none',
+    updatedAt: null
+  });
+}));
 
 /**
  * 10. POST /api/portfolio/ai-stress-test/refresh
  * Kích hoạt sinh lại báo cáo sức khỏe danh mục on-demand theo người dùng
  */
-router.post('/portfolio/ai-stress-test/refresh', (req, res) => {
+router.post('/portfolio/ai-stress-test/refresh', asyncHandler(async (req, res) => {
   const userId = req.user?.id || req.body?.userId || req.query?.userId || 'demo';
-  const isServerlessOrNoPython = Boolean(
-    process.env.VERCEL ||
-    process.env.NOW_REGION ||
-    !fs.existsSync(VENV_PYTHON)
-  );
 
-  if (isServerlessOrNoPython) {
-    getPortfolioAiInsight(userId).then((insight) => {
-      if (insight) {
-        return res.json({
-          success: true,
-          message: 'Dữ liệu phân tích danh mục định kỳ sẵn sàng từ database.',
-          data: insight
-        });
-      }
-      if (userId === 'demo' && fs.existsSync(PORTFOLIO_AI_FILE)) {
-        try {
-          const raw = fs.readFileSync(PORTFOLIO_AI_FILE, 'utf-8');
-          return res.json({
-            success: true,
-            message: 'Dữ liệu phân tích danh mục định kỳ sẵn sàng từ kho lưu trữ.',
-            data: JSON.parse(raw)
-          });
-        } catch (e) {
-          return res.status(500).json({ error: e.message });
-        }
-      }
-      return res.json({ success: true, message: 'Dữ liệu đang được đồng bộ định kỳ.' });
-    }).catch((err) => res.status(500).json({ error: err.message }));
-    return;
+  if (!isPythonAvailable()) {
+    const existing = await getPortfolioAiInsight(userId);
+    // Ghi nhận trạng thái PENDING vào database để batch job Python / GitHub Actions xử lý
+    await savePortfolioAiInsight(userId, {
+      ...(existing || {}),
+      status: 'PENDING'
+    });
+    return res.status(202).json({
+      success: true,
+      isQueued: true,
+      message: 'Yêu cầu làm mới AI danh mục đã được ghi nhận vào hàng đợi! Hệ thống sẽ phân tích chuyên sâu trong phiên đồng bộ tiếp theo.',
+      data: existing ? { ...existing, status: 'PENDING' } : { status: 'PENDING' }
+    });
   }
 
-  const aiScript = path.join(ROOT_DIR, 'scripts', 'generate_ai_insights.py');
-  execFile(PYTHON_CMD, [aiScript, '--scope', 'portfolio', '--user-id', userId, '--force'], async (err, stdout, stderr) => {
-    if (err) {
-      console.warn('Lỗi chạy portfolio AI refresh:', stderr || err.message);
+  const { success, stderr } = await runPythonScript('scripts/generate_ai_insights.py', [
+    '--scope', 'portfolio',
+    '--user-id', userId,
+    '--force'
+  ]);
+  if (!success) {
+    console.warn('Lỗi chạy portfolio AI refresh:', stderr);
+  }
+
+  const updated = await getPortfolioAiInsight(userId);
+  if (updated) {
+    return res.json({
+      success: true,
+      isQueued: false,
+      message: 'Đã hoàn tất đánh giá sức khỏe danh mục & mô phỏng chịu tải!',
+      data: updated
+    });
+  }
+
+  if (userId === 'demo') {
+    const raw = readJsonCached(PORTFOLIO_AI_FILE, { fallback: null });
+    if (raw) {
+      return res.json({
+        success: true,
+        isQueued: false,
+        message: 'Đã hoàn tất đánh giá sức khỏe danh mục & mô phỏng chịu tải!',
+        data: raw
+      });
     }
-    try {
-      const updated = await getPortfolioAiInsight(userId);
-      if (updated) {
-        return res.json({
-          success: true,
-          message: 'Đã hoàn tất đánh giá sức khỏe danh mục & mô phỏng chịu tải!',
-          data: updated
-        });
-      }
-      if (userId === 'demo' && fs.existsSync(PORTFOLIO_AI_FILE)) {
-        const raw = fs.readFileSync(PORTFOLIO_AI_FILE, 'utf-8');
-        return res.json({
-          success: true,
-          message: 'Đã hoàn tất đánh giá sức khỏe danh mục & mô phỏng chịu tải!',
-          data: JSON.parse(raw)
-        });
-      }
-      return res.status(500).json({ error: 'Không thể tạo báo cáo danh mục' });
-    } catch (e) {
-      return res.status(500).json({ error: e.message });
-    }
-  });
-});
+  }
+
+  return res.status(500).json({ error: 'Không thể tạo báo cáo danh mục' });
+}));
 
 export default router;
 

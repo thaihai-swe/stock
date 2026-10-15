@@ -37,9 +37,21 @@ export default function Settings({ data, currentUser, onSuccess }) {
     symbols: [],
     lastSyncedAt: null,
     syncedCount: 0,
+    lastSyncedCadence: null,
   });
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState('');
+  const [selectedCadence, setSelectedCadence] = useState('all');
+  const [syncElapsedSeconds, setSyncElapsedSeconds] = useState(0);
+  const [syncLogOutput, setSyncLogOutput] = useState('');
+  const [isLogOpen, setIsLogOpen] = useState(false);
+
+  // Xác định môi trường thực thi: Nút bấm chỉ xuất hiện khi chạy ở Local
+  const isLocalEnvironment =
+    (typeof window !== 'undefined' &&
+      ['localhost', '127.0.0.1'].includes(window.location.hostname)) ||
+    sysInfo?.isLocal === true ||
+    sysInfo?.environment === 'local';
 
   useEffect(() => {
     fetchHealth()
@@ -51,18 +63,40 @@ export default function Settings({ data, currentUser, onSuccess }) {
       .catch(() => {});
   }, []);
 
-  async function handleTriggerSync() {
+  async function handleTriggerSync(cadenceToRun = selectedCadence) {
+    if (!isLocalEnvironment) {
+      showToast('🛡️ Chức năng đồng bộ dữ liệu pipeline chỉ có thể thực thi trên máy Local.', 'warning');
+      return;
+    }
+
     setIsSyncing(true);
     setSyncMsg('');
+    setSyncLogOutput('');
+    setSyncElapsedSeconds(0);
+
+    const timer = setInterval(() => {
+      setSyncElapsedSeconds(s => s + 1);
+    }, 1000);
+
     try {
-      const res = await triggerFundamentalsSync();
-      setSyncMsg(res.message || 'Đồng bộ thành công!');
-      showToast(res.message || 'Đồng bộ dữ liệu định giá thành công!', 'success');
+      const res = await triggerFundamentalsSync(cadenceToRun);
+      clearInterval(timer);
+      const msg = res.message || `Đã hoàn tất đồng bộ Pipeline [${cadenceToRun.toUpperCase()}] thành công!`;
+      setSyncMsg(msg);
+      if (res.output) {
+        setSyncLogOutput(res.output);
+        setIsLogOpen(true);
+      }
+      showToast(msg, 'success');
       const refreshed = await fetchSupportedStocks();
       if (refreshed) setSyncConfig(refreshed);
     } catch (err) {
-      setSyncMsg('❌ Lỗi đồng bộ: ' + (err.message || 'Không thể kết nối TradingView'));
+      clearInterval(timer);
+      const errMsg = err.message || 'Không thể thực thi Python pipeline';
+      setSyncMsg('❌ Lỗi đồng bộ: ' + errMsg);
+      showToast('❌ ' + errMsg, 'error');
     } finally {
+      clearInterval(timer);
       setIsSyncing(false);
     }
   }
@@ -273,18 +307,45 @@ export default function Settings({ data, currentUser, onSuccess }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleTriggerSync}
-              disabled={isSyncing}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
-              title="Chạy Python trích xuất 50+ chỉ số cơ bản TradingView Scanner cho danh sách mã theo dõi (~5 giây)"
-            >
-              <span>{isSyncing ? '⏳' : '🔄'}</span>
-              <span>{isSyncing ? 'Đang quét TradingView (~5s)...' : 'Đồng bộ EOD ngay (TradingView)'}</span>
-            </button>
-          </div>
+          {isLocalEnvironment ? (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              {/* Bộ chọn chu kỳ đồng bộ */}
+              <select
+                value={selectedCadence}
+                onChange={(e) => setSelectedCadence(e.target.value)}
+                disabled={isSyncing}
+                className="px-3 py-2 rounded-xl bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-900 dark:text-indigo-200 shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                title="Chọn chu kỳ đồng bộ dữ liệu"
+              >
+                <option value="all">🚀 Toàn Bộ (All - Khuyến nghị)</option>
+                <option value="daily">☀️ Hằng Ngày (Daily EOD)</option>
+                <option value="weekly">📅 Hàng Tuần (Weekly Macro & AI)</option>
+                <option value="quarterly">📑 Hàng Quý (Quarterly BCTC & DCF)</option>
+              </select>
+
+              {/* Nút bấm ĐỒNG BỘ DỮ LIỆU ĐỊNH GIÁ CHẠY NỀN */}
+              <button
+                type="button"
+                onClick={() => handleTriggerSync(selectedCadence)}
+                disabled={isSyncing}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Kích hoạt bộ điều phối run_pipeline.py chạy toàn bộ dữ liệu nền và AI local"
+              >
+                <span className={isSyncing ? 'animate-spin' : ''}>{isSyncing ? '🔄' : '⚡'}</span>
+                <span>
+                  {isSyncing
+                    ? `Đang đồng bộ [${selectedCadence.toUpperCase()}] (${syncElapsedSeconds}s)...`
+                    : 'Đồng Bộ Dữ Liệu Định Giá Chạy Nền'}
+                </span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5" title="Chạy script Python nền chỉ khả dụng trên máy Local">
+                <span>☁️</span> Chế Độ Cloud (Auto Sync GitHub Actions)
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="p-6 space-y-5">
@@ -301,11 +362,16 @@ export default function Settings({ data, currentUser, onSuccess }) {
               <span className="text-base font-bold text-gray-800 dark:text-gray-200 block mt-0.5">
                 {syncConfig.lastSyncedAt ? new Date(syncConfig.lastSyncedAt).toLocaleString('vi-VN') : 'Chưa có'}
               </span>
+              {syncConfig.lastSyncedCadence && (
+                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block mt-0.5">
+                  Chu kỳ: {syncConfig.lastSyncedCadence}
+                </span>
+              )}
             </div>
             <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-700">
-              <span className="text-[10px] font-bold text-gray-400 uppercase block">Lịch GitHub Actions</span>
-              <span className="text-base font-bold text-emerald-700 dark:text-emerald-400 block mt-0.5">
-                18:00 T2 - T6 (Hàng ngày)
+              <span className="text-[10px] font-bold text-gray-400 uppercase block">Trạng thái môi trường</span>
+              <span className={`text-base font-bold block mt-0.5 ${isLocalEnvironment ? 'text-indigo-600 dark:text-indigo-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                {isLocalEnvironment ? '💻 Local (Python .venv Sẵn Sàng)' : '☁️ 18:00 T2 - T6 (GitHub Actions)'}
               </span>
             </div>
           </div>
@@ -315,6 +381,30 @@ export default function Settings({ data, currentUser, onSuccess }) {
               syncMsg.startsWith('❌') ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900/40' : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/40'
             }`}>
               {syncMsg}
+            </div>
+          )}
+
+          {/* Hộp xem log dòng lệnh Terminal (Collapsible Log Drawer) */}
+          {syncLogOutput && (
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-950 text-gray-100 shadow-md">
+              <div
+                onClick={() => setIsLogOpen(!isLogOpen)}
+                className="px-4 py-2.5 bg-gray-900/90 flex items-center justify-between cursor-pointer hover:bg-gray-900 transition-colors"
+              >
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-400">
+                  <span>📟</span>
+                  <span>Nhật Ký Thực Thi Pipeline ({selectedCadence.toUpperCase()})</span>
+                  <span className="text-gray-400 text-[10px] font-normal">
+                    {syncElapsedSeconds > 0 ? `(${syncElapsedSeconds}s)` : '(Hoàn tất)'}
+                  </span>
+                </div>
+                <span className="text-xs text-gray-400 font-mono">{isLogOpen ? 'Thu gọn ▲' : 'Xem chi tiết ▼'}</span>
+              </div>
+              {isLogOpen && (
+                <div className="p-4 max-h-96 overflow-y-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-gray-300 border-t border-gray-800 selection:bg-indigo-500 selection:text-white">
+                  {syncLogOutput}
+                </div>
+              )}
             </div>
           )}
 
@@ -365,16 +455,16 @@ export default function Settings({ data, currentUser, onSuccess }) {
           {/* Hướng dẫn cấu hình GitHub Actions & Terminal */}
           <div className="bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl p-4 border border-indigo-100/70 dark:border-indigo-900/30 text-xs space-y-2">
             <div className="font-bold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
-              <span>🐍</span> Tự Động Hóa Với Python & GitHub Actions:
+              <span>🐍</span> Tự Động Hóa Với Python & Bộ Điều Phối Pipeline:
             </div>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Hệ thống sử dụng động cơ <b>Python 3</b> (<code className="px-1.5 py-0.5 rounded bg-white dark:bg-gray-800 text-indigo-700 dark:text-indigo-400 font-mono text-[11px] border border-gray-200 dark:border-gray-700">scripts/sync_fundamentals.py</code>) để tải và chuẩn hóa 50+ chỉ số, dễ dàng mở rộng và tích hợp mô hình phân tích định lượng sau này.
-              Workflow GitHub Actions (<code className="px-1.5 py-0.5 rounded bg-white dark:bg-gray-800 text-indigo-700 dark:text-indigo-400 font-mono text-[11px] border border-gray-200 dark:border-gray-700">.github/workflows/sync-fundamentals.yml</code>) sẽ tự động chạy Python và commit file cache mới về kho lưu trữ.
+              Hệ thống sử dụng bộ điều phối thống nhất <b>Python 3</b> (<code className="px-1.5 py-0.5 rounded bg-white dark:bg-gray-800 text-indigo-700 dark:text-indigo-400 font-mono text-[11px] border border-gray-200 dark:border-gray-700">scripts/run_pipeline.py</code>) để tải và chuẩn hóa 50+ chỉ số, 122+ chỉ tiêu BCTC và sinh toàn bộ dữ liệu phân tích AI local.
             </p>
             <div className="flex flex-wrap gap-4 text-[11px] text-gray-500 dark:text-gray-400 pt-1">
-              <div>• <b>Lịch tự động:</b> 18:00 T2 - T6 (Hàng ngày sau giờ đóng sàn)</div>
-              <div>• <b>Chạy qua npm:</b> <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700">npm run sync:fundamentals</code></div>
-              <div>• <b>Chạy trực tiếp Python:</b> <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700">python3 scripts/sync_fundamentals.py</code></div>
+              <div>• <b>Toàn bộ:</b> <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700">python3 scripts/run_pipeline.py --cadence all</code></div>
+              <div>• <b>Hằng ngày (EOD):</b> <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700">python3 scripts/run_pipeline.py --cadence daily</code></div>
+              <div>• <b>Hàng tuần (Vĩ mô):</b> <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700">python3 scripts/run_pipeline.py --cadence weekly</code></div>
+              <div>• <b>Hàng quý (BCTC):</b> <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700">python3 scripts/run_pipeline.py --cadence quarterly</code></div>
             </div>
           </div>
         </div>

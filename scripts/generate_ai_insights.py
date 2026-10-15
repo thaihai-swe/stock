@@ -33,114 +33,24 @@ DB_FILE = DATA_DIR / "stock.db"
 sys.path.insert(0, str(CURRENT_DIR))
 
 from lib.ai_service import ai_service
+from lib.db_client import db_client
 
 
 def get_active_portfolio_and_holdings(user_id: str = "demo") -> Tuple[List[Dict[str, Any]], float]:
-    """Đọc danh mục nắm giữ thực tế và số dư tiền mặt của user_id từ SQLite stock.db."""
-    if not DB_FILE.exists():
-        return [], 0.0
-
+    """Đọc danh mục nắm giữ thực tế và số dư tiền mặt của user_id từ Turso Cloud hoặc SQLite qua db_client."""
     try:
-        conn = sqlite3.connect(str(DB_FILE))
-        cur = conn.cursor()
-
-        # 1. Đọc các lệnh mua còn khối lượng nắm giữ (remaining_qty > 0) của user_id
-        cur.execute("""
-            SELECT symbol, SUM(remaining_qty), SUM(remaining_qty * cost_per_share)
-            FROM buy_orders
-            WHERE remaining_qty > 0 AND (user_id = ? OR (? = 'demo' AND (user_id IS NULL OR user_id = '')))
-            GROUP BY symbol
-        """, (user_id, user_id))
-        rows = cur.fetchall()
-
-        prices_map = {}
-        if FUNDAMENTALS_FILE.exists():
-            try:
-                with open(FUNDAMENTALS_FILE, "r", encoding="utf-8") as f:
-                    prices_map = json.load(f)
-            except Exception:
-                pass
-
-        holdings = []
-        total_mkt_val = 0.0
-        for r in rows:
-            sym = str(r[0]).strip().upper()
-            qty = int(r[1] or 0)
-            cost = float(r[2] or 0.0)
-            if qty <= 0:
-                continue
-
-            avg_cost = round(cost / qty) if qty > 0 else 0
-            f_info = prices_map.get(sym, {})
-            cur_price = f_info.get("close") or f_info.get("price") or avg_cost
-            mkt_val = qty * cur_price
-            total_mkt_val += mkt_val
-
-            holdings.append({
-                "symbol": sym,
-                "holdingQty": qty,
-                "shares": qty,
-                "avgCost": avg_cost,
-                "totalCost": cost,
-                "currentPrice": cur_price,
-                "marketValue": mkt_val,
-                "beta": f_info.get("beta") or 1.05,
-                "sector": f_info.get("sector") or "Khác"
-            })
-
-        for h in holdings:
-            h["weightPct"] = round((h["marketValue"] / total_mkt_val * 100), 1) if total_mkt_val > 0 else 0.0
-            h["unrealizedPLPct"] = round(((h["currentPrice"] - h["avgCost"]) / h["avgCost"] * 100), 2) if h["avgCost"] > 0 else 0.0
-
-        # 2. Đọc số dư tiền mặt từ app_settings của user_id
-        cash_balance = 0.0
-        try:
-            cur.execute("""
-                SELECT value FROM app_settings 
-                WHERE key = 'cash_balance' AND (user_id = ? OR (? = 'demo' AND (user_id IS NULL OR user_id = '')))
-                LIMIT 1
-            """, (user_id, user_id))
-            c_row = cur.fetchone()
-            if c_row and c_row[0]:
-                cash_balance = float(c_row[0])
-            else:
-                # Fallback sang cấu hình settings JSON nếu có
-                cur.execute("""
-                    SELECT value FROM app_settings 
-                    WHERE key = 'settings' AND (user_id = ? OR (? = 'demo' AND (user_id IS NULL OR user_id = '')))
-                    LIMIT 1
-                """, (user_id, user_id))
-                s_row = cur.fetchone()
-                if s_row and s_row[0]:
-                    s_data = json.loads(s_row[0])
-                    cash_balance = float(s_data.get("cashBalance") or 0.0)
-        except Exception:
-            pass
-
-        conn.close()
-        return holdings, cash_balance
+        return db_client.get_user_portfolio_and_cash(user_id=user_id)
     except Exception as e:
-        print(f"⚠️ Không thể đọc portfolio của user '{user_id}' từ SQLite: {e}")
+        print(f"⚠️ Không thể đọc portfolio của user '{user_id}': {e}")
         return [], 0.0
 
 
 def get_priority_symbols(all_symbols: List[str]) -> List[str]:
     """Phân tầng ưu tiên: Danh mục thực tế -> Watchlist -> Mã khác."""
-    holdings_syms = set()
-    watchlist_syms = set()
-
-    if DB_FILE.exists():
-        try:
-            conn = sqlite3.connect(str(DB_FILE))
-            cur = conn.cursor()
-            cur.execute("SELECT DISTINCT symbol FROM buy_orders WHERE remaining_qty > 0")
-            holdings_syms = {str(r[0]).strip().upper() for r in cur.fetchall() if r[0]}
-
-            cur.execute("SELECT DISTINCT symbol FROM watchlist")
-            watchlist_syms = {str(r[0]).strip().upper() for r in cur.fetchall() if r[0]}
-            conn.close()
-        except Exception:
-            pass
+    try:
+        holdings_syms, watchlist_syms = db_client.get_priority_symbols_from_db()
+    except Exception:
+        holdings_syms, watchlist_syms = set(), set()
 
     t1 = [s for s in all_symbols if s in holdings_syms]
     t2 = [s for s in all_symbols if s in watchlist_syms and s not in holdings_syms]
@@ -148,6 +58,7 @@ def get_priority_symbols(all_symbols: List[str]) -> List[str]:
 
     prioritized = t1 + t2 + t3
     return prioritized
+
 
 
 def is_ai_stale(fin_data: Dict[str, Any], max_days: int = 6) -> bool:
@@ -223,6 +134,14 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
         ai_tail["updatedAt"] = now_iso
         ai_tail["provider"] = active_prov
 
+        ai_sbv_omo = macro_suite.get("aiSbvOmoDiagnosis", {})
+        ai_sbv_omo["updatedAt"] = now_iso
+        ai_sbv_omo["provider"] = active_prov
+
+        ai_inflation = macro_suite.get("aiInflationDiagnosis", {})
+        ai_inflation["updatedAt"] = now_iso
+        ai_inflation["provider"] = active_prov
+
         if dry_run:
             print(f"   [DRY-RUN] Headline: {briefing.get('headline')}")
             print(f"   [DRY-RUN] Sector Transmission: {sector_trans.get('transmissionHeadline')}")
@@ -231,6 +150,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             print(f"   [DRY-RUN] Yield Curve Status: {ai_yield.get('curveStatus')}")
             print(f"   [DRY-RUN] Multi-Asset Thesis: {ai_asset.get('multiAssetThesis')}")
             print(f"   [DRY-RUN] Style Rotation: {ai_style.get('rotationHeadline')}")
+            print(f"   [DRY-RUN] SBV OMO Diagnosis: {ai_sbv_omo.get('headline')}")
+            print(f"   [DRY-RUN] Inflation Diagnosis: {ai_inflation.get('cpiAssessment')}")
         else:
             macro_data["aiInsight"] = briefing
             macro_data["sectorTransmission"] = sector_trans
@@ -240,6 +161,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             macro_data["aiMultiAssetStrategy"] = ai_asset
             macro_data["aiStyleRotation"] = ai_style
             macro_data["aiTailRiskAnalysis"] = ai_tail
+            macro_data["aiSbvOmoDiagnosis"] = ai_sbv_omo
+            macro_data["aiInflationDiagnosis"] = ai_inflation
 
             with open(MACRO_FILE, "w", encoding="utf-8") as f:
                 json.dump(macro_data, f, ensure_ascii=False, indent=2)
@@ -261,6 +184,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             cache["aiMultiAssetStrategy"] = ai_asset
             cache["aiStyleRotation"] = ai_style
             cache["aiTailRiskAnalysis"] = ai_tail
+            cache["aiSbvOmoDiagnosis"] = ai_sbv_omo
+            cache["aiInflationDiagnosis"] = ai_inflation
 
             with open(AI_CACHE_FILE, "w", encoding="utf-8") as f:
                 json.dump(cache, f, ensure_ascii=False, indent=2)
@@ -319,86 +244,40 @@ def generate_weekly_market_insights(dry_run: bool = False, model: Optional[str] 
 
 
 def init_portfolio_ai_table():
-    """Tạo bảng portfolio_ai_insights trong SQLite nếu chưa có."""
-    if not DB_FILE.exists():
-        return
+    """Tạo bảng portfolio_ai_insights nếu chưa có."""
+    sql = """
+        CREATE TABLE IF NOT EXISTS portfolio_ai_insights (
+            user_id TEXT PRIMARY KEY,
+            health_score TEXT,
+            health_verdict TEXT,
+            portfolio_beta REAL,
+            cash_weight_pct REAL,
+            report_json TEXT NOT NULL,
+            status TEXT DEFAULT 'success',
+            updated_at TEXT NOT NULL
+        );
+    """
     try:
-        conn = sqlite3.connect(str(DB_FILE))
-        cur = conn.cursor()
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS portfolio_ai_insights (
-                user_id TEXT PRIMARY KEY,
-                health_score TEXT,
-                health_verdict TEXT,
-                portfolio_beta REAL,
-                cash_weight_pct REAL,
-                report_json TEXT NOT NULL,
-                status TEXT DEFAULT 'success',
-                updated_at TEXT NOT NULL
-            );
-        """)
-        conn.commit()
-        conn.close()
+        db_client.execute_query(sql, is_write=True)
     except Exception as e:
         print(f"⚠️ Lỗi khởi tạo bảng portfolio_ai_insights: {e}")
 
 
 def save_portfolio_ai_to_db(user_id: str, report: Dict[str, Any]):
-    """Lưu báo cáo phân tích danh mục vào bảng portfolio_ai_insights."""
-    if not DB_FILE.exists():
-        return
-    try:
-        init_portfolio_ai_table()
-        conn = sqlite3.connect(str(DB_FILE))
-        cur = conn.cursor()
-        report_json = json.dumps(report, ensure_ascii=False)
-        health_score = report.get("healthScore", "B+")
-        health_verdict = report.get("healthVerdict", "")
-        portfolio_beta = float(report.get("portfolioBeta") or 1.0)
-        cash_weight_pct = float(report.get("cashWeightPct") or 0.0)
-        status = report.get("status", "success")
-        updated_at = report.get("updatedAt") or datetime.datetime.now(datetime.timezone.utc).isoformat()
-
-        cur.execute("""
-            INSERT OR REPLACE INTO portfolio_ai_insights
-            (user_id, health_score, health_verdict, portfolio_beta, cash_weight_pct, report_json, status, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-        """, (user_id, health_score, health_verdict, portfolio_beta, cash_weight_pct, report_json, status, updated_at))
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        print(f"⚠️ Lỗi lưu portfolio_ai_insights vào DB cho user '{user_id}': {e}")
+    """Lưu báo cáo phân tích danh mục vào bảng portfolio_ai_insights qua db_client."""
+    init_portfolio_ai_table()
+    db_client.save_user_portfolio_ai_insight(user_id, report, status="success")
 
 
 def get_portfolio_ai_updated_at(user_id: str) -> Optional[str]:
-    """Lấy updatedAt của báo cáo trong DB."""
-    if not DB_FILE.exists():
-        return None
-    try:
-        conn = sqlite3.connect(str(DB_FILE))
-        cur = conn.cursor()
-        cur.execute("SELECT updated_at FROM portfolio_ai_insights WHERE user_id = ? LIMIT 1", (user_id,))
-        row = cur.fetchone()
-        conn.close()
-        return row[0] if row else None
-    except Exception:
-        return None
+    """Lấy updatedAt của báo cáo trong DB qua db_client."""
+    return db_client.get_user_portfolio_ai_updated_at(user_id)
 
 
 def get_all_active_users() -> List[str]:
-    """Lấy danh sách tất cả các user_id có lệnh mua còn số lượng."""
-    if not DB_FILE.exists():
-        return ["demo"]
-    try:
-        conn = sqlite3.connect(str(DB_FILE))
-        cur = conn.cursor()
-        cur.execute("SELECT DISTINCT user_id FROM buy_orders WHERE remaining_qty > 0")
-        rows = cur.fetchall()
-        users = [str(r[0]).strip() for r in rows if r[0]]
-        conn.close()
-        return users if users else ["demo"]
-    except Exception:
-        return ["demo"]
+    """Lấy danh sách tất cả các user_id có lệnh mua còn số lượng qua db_client."""
+    return db_client.get_all_active_user_ids()
+
 
 
 def generate_single_user_portfolio_insights(
@@ -464,18 +343,41 @@ def generate_portfolio_insights(
 
     target_user = (user_id or "demo").strip()
 
+    if target_user.lower() == "pending":
+        pending_users = db_client.get_pending_portfolio_user_ids()
+        if not pending_users:
+            print("   ℹ️ Không có yêu cầu làm mới AI nào đang PENDING trong hàng đợi.")
+            return
+        print(f"\n⏳ [PENDING QUEUE PORTFOLIO AI] Xử lý {len(pending_users)} người dùng đang chờ làm mới...")
+        for idx, u in enumerate(pending_users):
+            generate_single_user_portfolio_insights(
+                user_id=u,
+                macro_data=macro_data,
+                dry_run=dry_run,
+                model=model,
+                provider=provider
+            )
+            if idx < len(pending_users) - 1:
+                time.sleep(2.0)
+        print(f"✅ Hoàn tất xử lý hàng đợi PENDING cho {len(pending_users)} người dùng.")
+        return
+
     if target_user.lower() == "all":
         users = get_all_active_users()
-        print(f"\n👥 [BATCH PORTFOLIO AI] Quét danh mục của {len(users)} người dùng...")
+        pending_users = set(db_client.get_pending_portfolio_user_ids())
+        # Đảm bảo các user pending cũng nằm trong danh sách xử lý
+        all_target_users = sorted(list(set(users).union(pending_users)))
+        print(f"\n👥 [BATCH PORTFOLIO AI] Quét danh mục của {len(all_target_users)} người dùng (Pending: {len(pending_users)})...")
         processed_count = 0
-        for idx, u in enumerate(users):
+        for idx, u in enumerate(all_target_users):
+            is_pending = u in pending_users
             updated_at_str = get_portfolio_ai_updated_at(u)
-            if not force and updated_at_str:
+            if not force and not is_pending and updated_at_str:
                 try:
                     dt = datetime.datetime.fromisoformat(updated_at_str.replace("Z", "+00:00"))
                     now = datetime.datetime.now(datetime.timezone.utc)
                     if (now - dt).total_seconds() <= (6 * 86400):
-                        print(f"   ℹ️ [{idx+1}/{len(users)}] User [{u}]: AI còn mới (< 6 ngày) -> Bỏ qua.")
+                        print(f"   ℹ️ [{idx+1}/{len(all_target_users)}] User [{u}]: AI còn mới (< 6 ngày) -> Bỏ qua.")
                         continue
                 except Exception:
                     pass
@@ -488,9 +390,9 @@ def generate_portfolio_insights(
                 provider=provider
             )
             processed_count += 1
-            if idx < len(users) - 1:
+            if idx < len(all_target_users) - 1:
                 time.sleep(2.0)
-        print(f"✅ Hoàn tất Batch Portfolio AI: Đã xử lý {processed_count}/{len(users)} người dùng.")
+        print(f"✅ Hoàn tất Batch Portfolio AI: Đã xử lý {processed_count}/{len(all_target_users)} người dùng.")
     else:
         generate_single_user_portfolio_insights(
             user_id=target_user,
@@ -624,7 +526,7 @@ def main():
     )
     parser.add_argument(
         "--user-id", "-u",
-        help="ID người dùng cho phân tích danh mục (mặc định 'demo', hoặc 'all' cho batch)",
+        help="ID người dùng cho phân tích danh mục (mặc định 'demo', 'all' cho batch, hoặc 'pending' cho hàng đợi)",
         default="demo"
     )
     parser.add_argument(

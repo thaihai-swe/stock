@@ -1,4 +1,5 @@
 import { fmtMoney, plColor, plBg } from '../../utils/format.js';
+import { TIMEFRAME_IDS } from '../../utils/timeframe.js';
 
 export default function DashboardKpiMatrix({
   // Trụ cột 1: Vốn & Thị giá
@@ -10,7 +11,7 @@ export default function DashboardKpiMatrix({
   buyOrdersCount = 0,
 
   // Trụ cột 2: Hiệu suất & Lợi nhuận
-  timeWindow = 'all',
+  timeWindow = TIMEFRAME_IDS.ALL,
   periodLabel = 'Toàn Thời Gian',
   periodRealizedPL = 0,
   periodCashDividends = 0,
@@ -30,7 +31,7 @@ export default function DashboardKpiMatrix({
   portfolioDividendYield = null,
   riskRatios = { sharpe: 0, sortino: 0, ratingText: 'Chưa đủ dữ liệu', ratingColor: 'text-gray-400' },
 }) {
-  const isPeriod = timeWindow !== 'all';
+  const isPeriod = timeWindow !== TIMEFRAME_IDS.ALL;
   const periodTotalReturn = periodRealizedPL + periodCashDividends;
 
   return (

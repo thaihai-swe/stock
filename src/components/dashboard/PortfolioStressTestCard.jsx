@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import IntelligenceBadge, { getIntelligenceSource } from '../common/IntelligenceBadge.jsx';
 import { fetchPortfolioAiStressTest, refreshPortfolioAiStressTest } from '../../utils/api.js';
+import { useToast } from '../../context/ToastContext.jsx';
 
 export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0, onRefreshSuccess }) {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const { showToast } = useToast();
+
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('collapse_stress_test') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('collapse_stress_test', String(next));
+      } catch (e) {}
+      return next;
+    });
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -33,19 +53,26 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
     try {
       setRefreshing(true);
       const res = await refreshPortfolioAiStressTest();
-      if (res?.data) {
+      if (res?.isQueued) {
+        showToast(res.message || 'Yêu cầu làm mới đã được ghi nhận vào hàng đợi xử lý!', 'info');
+        if (res.data) setReport(res.data);
+      } else if (res?.data) {
         setReport(res.data);
+        showToast(res.message || 'Đã làm mới báo cáo sức khỏe danh mục thành công!', 'success');
       } else {
         const updated = await fetchPortfolioAiStressTest();
         setReport(updated);
+        showToast('Đã làm mới báo cáo sức khỏe danh mục!', 'success');
       }
       if (onRefreshSuccess) onRefreshSuccess();
     } catch (err) {
       console.warn('Lỗi refresh portfolio stress test:', err);
+      showToast(err.message || 'Lỗi khi làm mới báo cáo AI', 'error');
     } finally {
       setRefreshing(false);
     }
   };
+
 
   const intel = getIntelligenceSource(report);
   const healthScore = report?.healthScore || 'B+';
@@ -68,6 +95,11 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
               Quản Trị Rủi Ro Danh Mục (CRO)
             </span>
             <IntelligenceBadge source={report} provider={report?.provider} />
+            {report?.status === 'PENDING' && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 animate-pulse border border-amber-300 dark:border-amber-700">
+                ⏳ Đang chờ phân tích
+              </span>
+            )}
             <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full border ${scoreColor}`}>
               Hạng {healthScore}
             </span>
@@ -88,17 +120,36 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
             <span className={refreshing ? 'animate-spin' : ''}>⚡</span>
             <span>{refreshing ? 'Đang phân tích...' : 'Làm Mới AI'}</span>
           </button>
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors cursor-pointer"
+            title={isCollapsed ? 'Mở rộng phân hệ' : 'Thu gọn phân hệ'}
+          >
+            <span>{isCollapsed ? 'Mở Rộng ▼' : 'Thu Gọn ▲'}</span>
+          </button>
         </div>
       </div>
 
-      {loading && !report ? (
+      {isCollapsed ? (
+        <div className="flex flex-wrap items-center justify-between text-xs py-1 text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-3">
+            <span>Beta: <strong className="text-slate-800 dark:text-slate-200 font-mono">{report?.portfolioBeta ?? 1.05}x</strong></span>
+            <span>•</span>
+            <span>Đệm Tiền: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">{report?.cashWeightPct ?? 0}%</strong></span>
+            <span>•</span>
+            <span className="truncate max-w-xs">{report?.healthVerdict || 'Sức khỏe danh mục ổn định'}</span>
+          </div>
+          <span className="font-bold text-indigo-600 dark:text-indigo-400">Hạng {healthScore}</span>
+        </div>
+      ) : loading && !report ? (
         <div className="p-8 text-center text-xs text-gray-400 dark:text-slate-500 animate-pulse">
           ⏳ Đang tính toán ma trận chịu tải vĩ mô của danh mục...
         </div>
       ) : (
         <>
           {/* ── 2. HERO VERDICT & TỔNG QUAN ── */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 space-y-2">
+          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-2">
             <div className="flex items-start gap-2.5">
               <span className="text-xl">🛡️</span>
               <div className="space-y-1 flex-1">
@@ -111,7 +162,7 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-750 text-xs">
+            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
               <span className="text-gray-500 dark:text-slate-400">
                 Beta Danh Mục: <strong className="text-gray-900 dark:text-slate-200 font-mono">{report?.portfolioBeta ?? 1.05}x</strong>
               </span>
@@ -191,7 +242,7 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
                         {sc.name}
                       </h5>
                     </div>
-                    <p className="text-[11px] text-gray-600 dark:text-slate-300 leading-relaxed pt-1 border-t border-gray-200/50 dark:border-slate-750">
+                    <p className="text-[11px] text-gray-600 dark:text-slate-300 leading-relaxed pt-1 border-t border-gray-200/50 dark:border-slate-700/60">
                       {sc.description}
                     </p>
                   </div>

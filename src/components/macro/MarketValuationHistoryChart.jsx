@@ -11,13 +11,9 @@ import {
 } from 'recharts';
 import { fetchMarketValuationHistory } from '../../utils/api.js';
 import { useChartTheme } from '../../utils/useChartTheme.js';
+import { TIMEFRAME_PRESETS, TIMEFRAME_IDS } from '../../utils/constants.js';
 
-const PERIODS = [
-  { id: '1year', label: '1Y' },
-  { id: '3year', label: '3Y' },
-  { id: '5year', label: '5Y' },
-  { id: '10year', label: '10Y' },
-];
+const PERIODS = TIMEFRAME_PRESETS.VALUATION_HISTORY;
 
 const METRICS = [
   { id: 'absolutePe', label: 'Absolute PE', unit: 'x', isMultiplier: true },
@@ -30,7 +26,7 @@ const METRICS = [
 
 export default function MarketValuationHistoryChart() {
   const [valuationData, setValuationData] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('1year');
+  const [selectedPeriod, setSelectedPeriod] = useState(TIMEFRAME_IDS['1Y']);
   const [selectedMetric, setSelectedMetric] = useState('absolutePe');
   const [loading, setLoading] = useState(true);
   const chartTheme = useChartTheme();
@@ -50,7 +46,9 @@ export default function MarketValuationHistoryChart() {
     loadData();
   }, []);
 
-  const activePeriodObj = valuationData?.periods?.[selectedPeriod];
+  const activePeriodConfig = PERIODS.find((p) => p.id === selectedPeriod) || PERIODS[0];
+  const activePeriodKey = activePeriodConfig?.dataKey || selectedPeriod;
+  const activePeriodObj = valuationData?.periods?.[activePeriodKey];
   const metricConfig = METRICS.find((m) => m.id === selectedMetric) || METRICS[0];
   const stats = activePeriodObj?.stats?.[selectedMetric] || {};
   const rawSeries = activePeriodObj?.series || [];
@@ -199,7 +197,7 @@ export default function MarketValuationHistoryChart() {
         {/* ── 2. 4 THẺ THỐNG KÊ (CURRENT, AVERAGE, STD. DEVIATION, OBSERVATIONS) ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6">
           {/* Card 1: Current */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               CURRENT
             </span>
@@ -223,7 +221,7 @@ export default function MarketValuationHistoryChart() {
           </div>
 
           {/* Card 2: Average */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               AVERAGE (MEAN)
             </span>
@@ -235,7 +233,7 @@ export default function MarketValuationHistoryChart() {
           </div>
 
           {/* Card 3: Std. Deviation */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               STD. DEVIATION (1 SD)
             </span>
@@ -247,7 +245,7 @@ export default function MarketValuationHistoryChart() {
           </div>
 
           {/* Card 4: Observations */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               OBSERVATIONS
             </span>

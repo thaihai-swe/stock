@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { fmtMoney, plColor } from '../../utils/format.js';
-import { RISK_POSTURES } from '../../utils/constants.js';
+import { RISK_POSTURES, TIMEFRAME_IDS } from '../../utils/constants.js';
 
 export default function DashboardHero({
   totalNAV = 0,
@@ -12,18 +13,33 @@ export default function DashboardHero({
   periodRealizedPL = 0,
   periodCashDividends = 0,
   totalUnrealizedPL = 0,
-  timeWindow = 'all',
+  timeWindow = TIMEFRAME_IDS.ALL,
   periodLabel = 'Toàn Thời Gian',
   pricesSession = null,
   lastUpdated = '',
   loadingPrices = false,
   onRefreshPrices,
   onOpenEditCash,
+  onSaveCash,
   onNavigateBuy,
   onNavigateSell,
   onNavigateDca,
   onSwitchTab,
 }) {
+  const [isInlineEditingCash, setIsInlineEditingCash] = useState(false);
+  const [tempCashInput, setTempCashInput] = useState('');
+
+  const handleInlineSubmit = (e) => {
+    e.preventDefault();
+    const val = parseFloat(tempCashInput);
+    if (!isNaN(val) && onSaveCash) {
+      onSaveCash(val);
+      setIsInlineEditingCash(false);
+    } else if (onOpenEditCash) {
+      onOpenEditCash();
+      setIsInlineEditingCash(false);
+    }
+  };
   // Phong cách quản trị rủi ro phân bổ tài sản
   const getRiskPosture = () => {
     if (cashBalance < 0) {
@@ -51,7 +67,7 @@ export default function DashboardHero({
   };
 
   const posture = getRiskPosture();
-  const isAllTime = timeWindow === 'all';
+  const isAllTime = timeWindow === TIMEFRAME_IDS.ALL;
   const displayPL = isAllTime ? totalCumulativePL : (periodRealizedPL + periodCashDividends);
   const displayRealized = isAllTime ? periodRealizedPL : periodRealizedPL;
   const displayDividends = isAllTime ? periodCashDividends : periodCashDividends;
@@ -168,23 +184,62 @@ export default function DashboardHero({
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div className={`card-nested !p-2.5 ${cashBalance < 0 ? '!border-rose-300 dark:!border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20' : ''}`}>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-slate-500 dark:text-indigo-300 block">
-                  {cashBalance < 0 ? '⚠️ Tiền mặt (Nợ Margin)' : '💵 Tiền mặt'}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-slate-500 dark:text-indigo-300 block">
+                    {cashBalance < 0 ? '⚠️ Tiền mặt (Nợ Margin)' : '💵 Tiền mặt'}
+                  </span>
+                  {!isInlineEditingCash && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempCashInput(String(cashBalance));
+                        setIsInlineEditingCash(true);
+                      }}
+                      className="text-[11px] text-indigo-500 hover:text-indigo-700 dark:text-indigo-400 p-0.5 cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+                      title="Sửa nhanh số dư tiền mặt tại chỗ"
+                    >
+                      ✏️
+                    </button>
+                  )}
+                </div>
                 {cashBalance < 0 && (
                   <span className="text-[10px] font-extrabold text-rose-600 dark:text-rose-400">
                     Ký Quỹ
                   </span>
                 )}
               </div>
-              <div className="flex items-baseline justify-between mt-0.5">
-                <span className={`font-bold text-base sm:text-lg truncate ${cashBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
-                  {fmtMoney(cashBalance)}đ
-                </span>
-                <span className={`text-xs font-bold ml-1 ${cashBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                  {cashPct}%
-                </span>
-              </div>
+
+              {isInlineEditingCash ? (
+                <form onSubmit={handleInlineSubmit} className="flex items-center gap-1 mt-1">
+                  <input
+                    type="number"
+                    step="1000"
+                    value={tempCashInput}
+                    onChange={(e) => setTempCashInput(e.target.value)}
+                    className="w-full text-xs font-bold px-2 py-1 rounded-lg border border-indigo-400 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    autoFocus
+                    placeholder="VD: 50000000"
+                  />
+                  <button type="submit" className="px-1.5 py-1 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-md font-bold cursor-pointer">✓</button>
+                  <button type="button" onClick={() => setIsInlineEditingCash(false)} className="px-1.5 py-1 text-xs bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 text-gray-700 dark:text-gray-300 rounded-md cursor-pointer">✕</button>
+                </form>
+              ) : (
+                <div className="flex items-baseline justify-between mt-0.5">
+                  <span
+                    onClick={() => {
+                      setTempCashInput(String(cashBalance));
+                      setIsInlineEditingCash(true);
+                    }}
+                    className={`font-bold text-base sm:text-lg truncate cursor-pointer hover:underline ${cashBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}
+                    title="Bấm để sửa nhanh số dư tiền mặt"
+                  >
+                    {fmtMoney(cashBalance)}đ
+                  </span>
+                  <span className={`text-xs font-bold ml-1 ${cashBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    {cashPct}%
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="card-nested !p-2.5">

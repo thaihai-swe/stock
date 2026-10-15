@@ -6,7 +6,7 @@ import YieldCurveMonitorCard from './macro/YieldCurveMonitorCard.jsx';
 import MacroHeroStatusBar from './macro/MacroHeroStatusBar.jsx';
 import MacroSubTabNav from './macro/MacroSubTabNav.jsx';
 import MacroYieldCurveStressBox from './macro/MacroYieldCurveStressBox.jsx';
-import MacroIntermarketGrid from './macro/MacroIntermarketGrid.jsx';
+import SbvOmoInterbankRadarCard from './macro/SbvOmoInterbankRadarCard.jsx';
 import MacroRegimeRadarSection from './macro/MacroRegimeRadarSection.jsx';
 import MacroAllocationGoldSection from './macro/MacroAllocationGoldSection.jsx';
 import MacroTradingEconomicsTable from './macro/MacroTradingEconomicsTable.jsx';
@@ -19,7 +19,24 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
   const [indicatorsData, setIndicatorsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [activeTab, setActiveTab] = useState('regime'); // 'regime' | 'yield_curve' | 'allocation' | 'indicators'
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const saved = localStorage.getItem('macro_active_subtab');
+      if (saved === 'yield_curve') return 'liquidity';
+      return saved || 'regime';
+    } catch (e) {
+      return 'regime';
+    }
+  });
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    try {
+      localStorage.setItem('macro_active_subtab', tabId);
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  };
 
   const loadAllMacroData = async () => {
     setLoading(true);
@@ -135,7 +152,7 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
       />
 
       {/* ── 3. THANH ĐIỀU HƯỚNG 4 PHÂN HỆ VĨ MÔ ── */}
-      <MacroSubTabNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <MacroSubTabNav activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* ── 4. NỘI DUNG TỪNG PHÂN HỆ ── */}
 
@@ -149,34 +166,32 @@ export default function MacroDashboard({ refreshKey, onSwitchTab }) {
           leading={leading}
           leadLag={leadLag}
           confidence={confidence}
-          scenarioMatrix={scenarioMatrix}
-          tailRisks={tailRisks}
-          hasActiveTailRisk={hasActiveTailRisk}
-          market={market}
         />
       )}
 
-      {/* PHÂN HỆ 2: ĐƯỜNG CONG LỢI SUẤT 17 DÒNG & THỊ TRƯỜNG NỢ */}
-      {activeTab === 'yield_curve' && (
+      {/* PHÂN HỆ 2: THANH KHOẢN SBV & ĐƯỜNG CONG LỢI SUẤT TPCP */}
+      {activeTab === 'liquidity' && (
         <div className="space-y-6">
+          <SbvOmoInterbankRadarCard macroData={macroData} />
           <MacroYieldCurveStressBox yieldCurve={yieldCurve} macro={macro} />
           <YieldCurveMonitorCard data={macroData} />
         </div>
       )}
 
-      {/* PHÂN HỆ 3: PHÂN BỔ 4 TÀI SẢN & GIÁ VÀNG */}
+      {/* PHÂN HỆ 3: MA TRẬN KỊCH BẢN & PHÂN BỔ ĐA TÀI SẢN */}
       {activeTab === 'allocation' && (
-        <div className="space-y-6">
-          <MacroAllocationGoldSection
-            macroData={macroData}
-            assetAlloc={assetAlloc}
-            goldAdv={goldAdv}
-            macro={macro}
-            risk={risk}
-            regime={regime}
-          />
-          <MacroIntermarketGrid macro={macro} />
-        </div>
+        <MacroAllocationGoldSection
+          macroData={macroData}
+          assetAlloc={assetAlloc}
+          goldAdv={goldAdv}
+          macro={macro}
+          risk={risk}
+          regime={regime}
+          scenarioMatrix={scenarioMatrix}
+          tailRisks={tailRisks}
+          hasActiveTailRisk={hasActiveTailRisk}
+          market={market}
+        />
       )}
 
       {/* PHÂN HỆ 4: THƯ VIỆN 95 CHỈ SỐ TRADINGECONOMICS */}

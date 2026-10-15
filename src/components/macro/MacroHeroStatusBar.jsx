@@ -7,9 +7,18 @@ export default function MacroHeroStatusBar({
   confidence = {},
   market = {},
   assetAlloc = {},
+  macro = {},
 }) {
   const currentRiskScore = Number(risk.riskScore) || 44;
   const riskProgress = Math.min(100, Math.max(0, currentRiskScore));
+
+  // Thông số thanh khoản tiền tệ & SBV
+  const sbvRate = Number(macro.sbvRefinancingRate) || 4.5;
+  const onRate = Number(macro.interbankOvernight) || 6.47;
+  const spread = parseFloat((onRate - sbvRate).toFixed(2));
+  const isTight = spread > 1.0;
+  const isEasing = spread < -0.5;
+  const usdVnd = macro.usdVndRate ? Number(macro.usdVndRate).toLocaleString('vi-VN') : '25.450';
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
@@ -101,29 +110,43 @@ export default function MacroHeroStatusBar({
         </div>
       </div>
 
-      {/* ── CARD 4: NHIỆT KẾ ĐỊNH GIÁ VN-INDEX ── */}
+      {/* ── CARD 4: THANH KHOẢN TIỀN TỆ & LÃI SUẤT SBV ── */}
       <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
-        <div className="text-[11px] font-extrabold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
-          Định Giá VN-Index (P/E)
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">
-            {market.currentPE || 13.15}x
-          </span>
-          <span className="text-[11px] font-bold text-gray-400 dark:text-slate-500">
-            Mean 5Y: {market.historicalMeanPE || 14.2}x
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold">
-            {market.bandText || 'Rẻ (Vùng gom mua)'}
-          </span>
-          <span className="text-xs text-gray-400 dark:text-slate-500">
-            Z: {market.zScore || -0.5}σ
+        <div className="text-[11px] font-extrabold text-gray-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-between">
+          <span>Thanh Khoản & Lãi Suất SBV</span>
+          <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${
+            isTight ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' :
+            isEasing ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300' :
+            'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+          }`}>
+            {isTight ? 'Hút Ròng OMO' : isEasing ? 'Bơm Tiền Rẻ' : 'Cân Bằng'}
           </span>
         </div>
-        <div className="text-[11px] text-gray-400 dark:text-slate-500 truncate pt-2 border-t border-gray-100 dark:border-slate-800">
-          Khuyến nghị: <b className="text-gray-700 dark:text-slate-300">{assetAlloc.stance || '80% CP / 20% Tiền'}</b>
+        <div className="flex items-baseline justify-between gap-1">
+          <div>
+            <span className="text-xs text-gray-400 font-semibold">Tái cấp vốn: </span>
+            <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
+              {sbvRate}%
+            </span>
+          </div>
+          <div className="text-right">
+            <span className="text-xs text-gray-400 font-semibold">Qua đêm: </span>
+            <span className={`text-base sm:text-lg font-black ${isTight ? 'text-rose-600 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200'}`}>
+              {onRate}%
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-xs pt-0.5">
+          <span className="text-gray-500 dark:text-slate-400">
+            Spread LNH: <strong className={spread > 0 ? 'text-amber-500' : 'text-emerald-500'}>{spread > 0 ? `+${spread}` : spread}%</strong>
+          </span>
+          <span className="text-[11px] text-slate-400">
+            TPCP 10Y: <b className="text-slate-700 dark:text-slate-200">{macro.vn10yYield || '4.50'}%</b>
+          </span>
+        </div>
+        <div className="text-[11px] text-gray-400 dark:text-slate-500 truncate pt-2 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between">
+          <span>USD/VND: <b className="text-gray-800 dark:text-slate-200 font-mono">{usdVnd}đ</b></span>
+          <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold">Thị trường 2</span>
         </div>
       </div>
     </div>

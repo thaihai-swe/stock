@@ -1,108 +1,27 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import {
+  TIMEFRAME_IDS,
+  calculateDateRange,
+  getLocalDateString,
+  formatDisplayDate,
+  normalizeTimeframeId,
+  TIMEFRAME_PRESETS,
+  getTimeframePresetList,
+} from '../../utils/timeframe.js';
 
-/**
- * Lấy chuỗi ngày YYYY-MM-DD theo giờ địa phương của người dùng (GMT+7)
- */
-export function getLocalDateString(d = new Date()) {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * Định dạng ngày DD/MM/YYYY hiển thị thân thiện
- */
-export function formatDisplayDate(dateStr) {
-  if (!dateStr) return '';
-  const parts = dateStr.slice(0, 10).split('-');
-  if (parts.length === 3) {
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  }
-  return dateStr;
-}
-
-/**
- * Tính toán mốc ngày bắt đầu và kết thúc chuẩn xác theo preset
- * @param {'all' | 'ytd' | '1y' | 'mtd' | 'custom'} preset
- * @param {string} [customStart=''] YYYY-MM-DD
- * @param {string} [customEnd=''] YYYY-MM-DD
- * @returns {{ preset: string, startDate: string, endDate: string, label: string, isFiltered: boolean }}
- */
-export function calculateDateRange(preset = 'all', customStart = '', customEnd = '') {
-  const now = new Date();
-  const todayStr = getLocalDateString(now);
-
-  switch (preset) {
-    case 'ytd': {
-      const start = `${now.getFullYear()}-01-01`;
-      return {
-        preset: 'ytd',
-        startDate: start,
-        endDate: todayStr,
-        label: `Năm ${now.getFullYear()} (YTD)`,
-        isFiltered: true,
-      };
-    }
-    case '1y': {
-      const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-      return {
-        preset: '1y',
-        startDate: getLocalDateString(oneYearAgo),
-        endDate: todayStr,
-        label: '1 Năm Gần Nhất',
-        isFiltered: true,
-      };
-    }
-    case 'mtd': {
-      const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-      const start = `${now.getFullYear()}-${monthStr}-01`;
-      return {
-        preset: 'mtd',
-        startDate: start,
-        endDate: todayStr,
-        label: `Tháng ${monthStr}/${now.getFullYear()} (MTD)`,
-        isFiltered: true,
-      };
-    }
-    case 'custom': {
-      let label = 'Tùy chỉnh';
-      if (customStart && customEnd) {
-        label = `${formatDisplayDate(customStart)} → ${formatDisplayDate(customEnd)}`;
-      } else if (customStart) {
-        label = `Từ ${formatDisplayDate(customStart)}`;
-      } else if (customEnd) {
-        label = `Đến ${formatDisplayDate(customEnd)}`;
-      }
-      return {
-        preset: 'custom',
-        startDate: customStart || '',
-        endDate: customEnd || '',
-        label,
-        isFiltered: Boolean(customStart || customEnd),
-      };
-    }
-    case 'all':
-    default:
-      return {
-        preset: 'all',
-        startDate: '',
-        endDate: '',
-        label: 'Toàn thời gian',
-        isFiltered: false,
-      };
-  }
-}
+// Re-export để đảm bảo tương thích ngược 100% với các component đang import từ TimeHorizonFilter
+export { calculateDateRange, getLocalDateString, formatDisplayDate };
 
 /**
  * Component Bộ Lọc Chu Kỳ Thời Gian & Khoảng Ngày Dùng Chung (TimeHorizonFilter)
- * Kết hợp dải nút Segments Pill (Toàn thời gian, YTD, 1Y, MTD) và Custom Date Range Picker
+ * Kết hợp dải nút Segments Pill (Toàn thời gian, YTD, 1Y, MTD, hoặc bất kỳ danh sách presets nào) và Custom Date Range Picker
  *
  * @param {Object} props
- * @param {'all' | 'ytd' | '1y' | 'mtd' | 'custom'} [props.preset='all']
+ * @param {string} [props.preset='ALL']
  * @param {string} [props.startDate=''] YYYY-MM-DD
  * @param {string} [props.endDate=''] YYYY-MM-DD
  * @param {Function} props.onChange ({ preset, startDate, endDate, label, isFiltered }) => void
+ * @param {Array<Object|string>} [props.presets] Danh sách nút preset tùy biến (mặc định: TIMEFRAME_PRESETS.PORTFOLIO)
  * @param {string} [props.customLabel='Khoảng Ngày:']
  * @param {boolean} [props.showCustomToggle=true] Có hiển thị nút "Tùy chỉnh" hay không
  * @param {boolean} [props.allowExpand=true] Cho phép mở rộng 2 ô input ngày
@@ -110,20 +29,21 @@ export function calculateDateRange(preset = 'all', customStart = '', customEnd =
  * @param {string} [props.className='']
  */
 export default function TimeHorizonFilter({
-  preset = 'all',
+  preset = TIMEFRAME_IDS.ALL,
   startDate = '',
   endDate = '',
   onChange,
+  presets = null,
   customLabel = 'Khoảng Ngày:',
   showCustomToggle = true,
   allowExpand = true,
   showSummaryBadge = false,
   className = '',
 }) {
-  const [internalPreset, setInternalPreset] = useState(preset || 'all');
+  const [internalPreset, setInternalPreset] = useState(preset || TIMEFRAME_IDS.ALL);
   const [customStart, setCustomStart] = useState(startDate || '');
   const [customEnd, setCustomEnd] = useState(endDate || '');
-  const [isCustomExpanded, setIsCustomExpanded] = useState(preset === 'custom' || Boolean(startDate || endDate));
+  const [isCustomExpanded, setIsCustomExpanded] = useState(preset === TIMEFRAME_IDS.CUSTOM || Boolean(startDate || endDate));
 
   // Đồng bộ props từ ngoài vào nếu có thay đổi
   useEffect(() => {
@@ -144,25 +64,23 @@ export default function TimeHorizonFilter({
     }
   }, [internalPreset, customStart, customEnd]);
 
-  // Danh sách các presets tiêu chuẩn
-  const PRESET_BUTTONS = useMemo(() => [
-    { id: 'all', label: 'Toàn thời gian', shortLabel: 'Tất cả' },
-    { id: 'ytd', label: 'YTD', shortLabel: 'YTD' },
-    { id: '1y', label: '1Y', shortLabel: '1Y' },
-    { id: 'mtd', label: 'MTD', shortLabel: 'MTD' },
-  ], []);
+  // Danh sách các presets được cấu hình
+  const PRESET_BUTTONS = useMemo(() => {
+    if (presets) return getTimeframePresetList(presets);
+    return TIMEFRAME_PRESETS.PORTFOLIO;
+  }, [presets]);
 
   // Xử lý khi bấm nút Preset
   const handlePresetClick = (pId) => {
     setInternalPreset(pId);
-    if (pId === 'custom') {
+    if (pId === TIMEFRAME_IDS.CUSTOM) {
       setIsCustomExpanded(true);
-      const res = calculateDateRange('custom', customStart, customEnd);
+      const res = calculateDateRange(TIMEFRAME_IDS.CUSTOM, customStart, customEnd);
       if (onChange) onChange(res);
       return;
     }
 
-    // Nếu chọn all, ytd, 1y, mtd
+    // Nếu chọn preset chuẩn (ALL, YTD, 1Y, MTD, 1M, 3M, 6M...)
     setIsCustomExpanded(false);
     const res = calculateDateRange(pId);
     setCustomStart(res.startDate);
@@ -172,13 +90,13 @@ export default function TimeHorizonFilter({
 
   // Bật/tắt ô chọn ngày tùy chỉnh
   const handleToggleCustom = () => {
-    if (isCustomExpanded && internalPreset === 'custom') {
-      // Đang mở custom mà bấm lại -> quay về 'all'
-      handlePresetClick('all');
+    if (isCustomExpanded && internalPreset === TIMEFRAME_IDS.CUSTOM) {
+      // Đang mở custom mà bấm lại -> quay về ALL
+      handlePresetClick(TIMEFRAME_IDS.ALL);
     } else {
       setIsCustomExpanded(true);
-      setInternalPreset('custom');
-      const res = calculateDateRange('custom', customStart, customEnd);
+      setInternalPreset(TIMEFRAME_IDS.CUSTOM);
+      const res = calculateDateRange(TIMEFRAME_IDS.CUSTOM, customStart, customEnd);
       if (onChange) onChange(res);
     }
   };
@@ -186,26 +104,26 @@ export default function TimeHorizonFilter({
   // Xử lý khi thay đổi input ngày bắt đầu
   const handleStartDateChange = (val) => {
     setCustomStart(val);
-    setInternalPreset('custom');
-    const res = calculateDateRange('custom', val, customEnd);
+    setInternalPreset(TIMEFRAME_IDS.CUSTOM);
+    const res = calculateDateRange(TIMEFRAME_IDS.CUSTOM, val, customEnd);
     if (onChange) onChange(res);
   };
 
   // Xử lý khi thay đổi input ngày kết thúc
   const handleEndDateChange = (val) => {
     setCustomEnd(val);
-    setInternalPreset('custom');
-    const res = calculateDateRange('custom', customStart, val);
+    setInternalPreset(TIMEFRAME_IDS.CUSTOM);
+    const res = calculateDateRange(TIMEFRAME_IDS.CUSTOM, customStart, val);
     if (onChange) onChange(res);
   };
 
   // Đặt lại về Toàn thời gian
   const handleResetToAll = () => {
-    setInternalPreset('all');
+    setInternalPreset(TIMEFRAME_IDS.ALL);
     setCustomStart('');
     setCustomEnd('');
     setIsCustomExpanded(false);
-    const res = calculateDateRange('all');
+    const res = calculateDateRange(TIMEFRAME_IDS.ALL);
     if (onChange) onChange(res);
   };
 
@@ -217,9 +135,9 @@ export default function TimeHorizonFilter({
     <div className={`space-y-2 ${className}`}>
       {/* ── 1. HÀNG NÚT BẤM PILL SEGMENTS ── */}
       <div className="flex items-center gap-1.5 flex-wrap">
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 sm:p-1 rounded-xl text-xs border border-slate-200/50 dark:border-slate-750">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 sm:p-1 rounded-xl text-xs border border-slate-200/50 dark:border-slate-700">
           {PRESET_BUTTONS.map((item) => {
-            const isActive = internalPreset === item.id && (item.id !== 'all' || (!customStart && !customEnd));
+            const isActive = internalPreset === item.id && (item.id !== TIMEFRAME_IDS.ALL || (!customStart && !customEnd));
             return (
               <button
                 key={item.id}
@@ -243,7 +161,7 @@ export default function TimeHorizonFilter({
               type="button"
               onClick={handleToggleCustom}
               className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shrink-0 ${
-                internalPreset === 'custom'
+                internalPreset === TIMEFRAME_IDS.CUSTOM
                   ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
               }`}
@@ -278,7 +196,7 @@ export default function TimeHorizonFilter({
 
       {/* ── 2. KHU VỰC CHỌN NGÀY TÙY CHỈNH (EXPANDABLE DATE PICKER) ── */}
       {allowExpand && isCustomExpanded && (
-        <div className="p-2.5 sm:p-3 bg-slate-50/90 dark:bg-slate-850/80 rounded-xl border border-slate-200/70 dark:border-slate-750 flex flex-col sm:flex-row sm:items-center gap-2.5 text-xs animate-in fade-in duration-200 shadow-2xs">
+        <div className="p-2.5 sm:p-3 bg-slate-50/90 dark:bg-slate-800/80 rounded-xl border border-slate-200/70 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-2.5 text-xs animate-in fade-in duration-200 shadow-2xs">
           <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 shrink-0 flex items-center gap-1">
             <span>🗓️</span> {customLabel}
           </span>

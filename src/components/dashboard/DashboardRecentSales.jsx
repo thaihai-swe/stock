@@ -1,8 +1,9 @@
 import { fmtMoney, plColor, plBg } from '../../utils/format.js';
+import { TIMEFRAME_IDS } from '../../utils/timeframe.js';
 
 export default function DashboardRecentSales({
   sellOrders = [],
-  timeWindow = 'all',
+  timeWindow = TIMEFRAME_IDS.ALL,
   periodLabel = 'Toàn Thời Gian',
   onSwitchTab,
 }) {
@@ -19,7 +20,7 @@ export default function DashboardRecentSales({
               <span>💹</span> Lệnh Bán Gần Nhất
             </h3>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
-              5 giao dịch chốt lời/cắt lỗ gần nhất {timeWindow !== 'all' ? `(${periodLabel})` : ''}
+              5 giao dịch chốt lời/cắt lỗ gần nhất {timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}
             </p>
           </div>
 

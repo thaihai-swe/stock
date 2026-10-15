@@ -31,18 +31,30 @@ app.use('/api', fundamentalRoutes);
 app.use('/api', valuationRoutes);
 
 import { getDbInfo } from './storage/db.js';
+import { isPythonAvailable } from './utils/pythonRunner.js';
 
 // Health check & Environment info endpoint
 app.get('/api/health', (req, res) => {
   const isVercel = Boolean(process.env.VERCEL);
+  const canRunPipeline = isPythonAvailable();
   res.json({
     status: 'ok',
     environment: isVercel ? 'production' : 'local',
+    isLocal: !isVercel,
+    canRunPipeline,
     label: isVercel ? 'Vercel Serverless (Production)' : 'Local Express Server (Port ' + (process.env.PORT || 3001) + ')',
     database: getDbInfo(),
     time: new Date().toISOString(),
   });
 });
+
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+
+// Bắt các route /api/* không tồn tại
+app.use('/api/*', notFoundHandler);
+
+// Middleware xử lý lỗi toàn cục
+app.use(errorHandler);
 
 // Serve React build (khi chạy local độc lập hoặc Docker)
 if (fs.existsSync(DIST_DIR)) {

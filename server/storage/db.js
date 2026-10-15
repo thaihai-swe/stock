@@ -62,15 +62,18 @@ export function getDbInfo() {
 }
 
 let isInitialized = false;
+let initPromise = null;
 
 export async function initDatabase() {
   if (isInitialized) return;
-
-  if (dbInfo.isTurso) {
-    console.log(`🌐 [Database] Đang kết nối tới Turso Cloud: ${dbInfo.url}`);
-  } else {
-    console.log(`📁 [Database] Đang sử dụng Local SQLite: ${dbInfo.url}`);
-  }
+  if (!initPromise) {
+    initPromise = (async () => {
+      try {
+        if (dbInfo.isTurso) {
+          console.log(`🌐 [Database] Đang kết nối tới Turso Cloud: ${dbInfo.url}`);
+        } else {
+          console.log(`📁 [Database] Đang sử dụng Local SQLite: ${dbInfo.url}`);
+        }
 
   // 1. Tạo bảng buy_orders
   await db.execute(`
@@ -226,7 +229,13 @@ export async function initDatabase() {
   // 8. Tự động chuyển đổi dữ liệu từ transactions.json nếu database đang trống
   await autoMigrateFromJson();
 
-  isInitialized = true;
+        isInitialized = true;
+      } finally {
+        initPromise = null;
+      }
+    })();
+  }
+  return initPromise;
 }
 
 async function addColumnSafe(table, columnDef) {

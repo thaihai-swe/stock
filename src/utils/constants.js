@@ -1,4 +1,4 @@
-import defaultConstantsJson from '../../data/default-constant-value.json';
+import defaultConstantsJson from '../../data/default-constant-value.json' with { type: 'json' };
 
 /**
  * Single Source of Truth cho các hằng số, ngưỡng kỹ thuật và nhận định mặc định ở Frontend
@@ -173,3 +173,62 @@ export const DIVIDEND_CASH_TAX_PCT = TAX_CONFIG.dividendCashTaxPct ?? 5.0;
 export const DEFAULT_TRADE_FEE_PCT = TAX_CONFIG.defaultTradeFeePct ?? 0.1;
 export const PRESET_FEE_PCTS = Array.isArray(TAX_CONFIG.presetFeePcts) ? TAX_CONFIG.presetFeePcts : ['0', '0.1', '0.15'];
 export const TAX_LEGAL_NOTE = TAX_CONFIG.legalNote || 'Theo quy định thuế TNCN tại Việt Nam, thuế chuyển nhượng chứng khoán được CTCK tự động khấu trừ 0.1% trên giá trị chuyển nhượng từng lần, thuế cổ tức tiền mặt là 5.0%.';
+
+// 6. Phân hệ Khung Thời Gian (Timeframes, Horizons & Periods)
+export * from './timeframe.js';
+
+// 7. Phân hệ Cố Vấn Khóa Lợi Nhuận & Thước Đo R:R (Smart Trailing Stop & Risk-Reward)
+export * from './riskRewardAdvisor.js';
+
+// 8. Phân hệ Radar Bơm/Hút Tiền SBV OMO & Sức Mua Thực Tế
+export * from './sbvOmoRadar.js';
+export * from './inflationAdjuster.js';
+
+// 9. Phân hệ Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & Dòng Tiền Chủ Động (Aggressive Order Flow)
+export const ORDER_FLOW_CONFIG = DEFAULT_CONSTANTS.orderFlow || {};
+
+const DEFAULT_ORDER_SIZE_TIERS = [
+  {
+    id: 'whale',
+    name: 'Cá Mập / Tổ Chức',
+    shortName: 'Cá Mập',
+    icon: '🐋',
+    minValueVnd: 500000000,
+    minShares: 25000,
+    description: 'Lệnh giao dịch quy mô lớn từ 500 triệu VNĐ trở lên hoặc trên 25,000 cổ phiếu',
+    badgeClass: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    barColor: '#10b981'
+  },
+  {
+    id: 'medium',
+    name: 'Tay To / Sói Biển',
+    shortName: 'Tay To',
+    icon: '🐬',
+    minValueVnd: 100000000,
+    maxValueVnd: 500000000,
+    minShares: 5000,
+    maxShares: 25000,
+    description: 'Lệnh giao dịch trung bình từ 100 triệu đến 500 triệu VNĐ (5,000 - 25,000 cổ phiếu)',
+    badgeClass: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+    barColor: '#6366f1'
+  },
+  {
+    id: 'retail',
+    name: 'Nhỏ Lẻ / Cừu Non',
+    shortName: 'Nhỏ Lẻ',
+    icon: '🦐',
+    minValueVnd: 0,
+    maxValueVnd: 100000000,
+    maxShares: 5000,
+    description: 'Lệnh giao dịch nhỏ lẻ dưới 100 triệu VNĐ (dưới 5,000 cổ phiếu)',
+    badgeClass: 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700',
+    barColor: '#94a3b8'
+  }
+];
+
+export const ORDER_SIZE_TIERS = safeNormalizeList(
+  ORDER_FLOW_CONFIG.orderSizeTiers,
+  DEFAULT_ORDER_SIZE_TIERS
+);
+
+

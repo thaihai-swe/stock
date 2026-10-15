@@ -142,6 +142,36 @@ export async function getAllData(userId = 'demo') {
   };
 }
 
+// 1b. Lấy danh sách watchlist chuyên biệt của người dùng (Tối ưu hóa 1 query đơn lẻ)
+export async function getWatchlist(userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: 'SELECT * FROM watchlist WHERE user_id = ? ORDER BY created_at DESC;',
+    args: [userId],
+  });
+  return (res.rows || []).map(mapWatchlist);
+}
+
+// 1c. Lấy danh sách cổ tức chuyên biệt của người dùng (Tối ưu hóa 1 query đơn lẻ)
+export async function getDividends(userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: 'SELECT * FROM dividends WHERE user_id = ? ORDER BY date DESC, id DESC;',
+    args: [userId],
+  });
+  return (res.rows || []).map(mapDividend);
+}
+
+// 1d. Lấy danh sách lệnh mua chuyên biệt của người dùng
+export async function getBuyOrders(userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: 'SELECT * FROM buy_orders WHERE user_id = ? ORDER BY date ASC, id ASC;',
+    args: [userId],
+  });
+  return (res.rows || []).map(mapBuyOrder);
+}
+
 // 2. Thao tác Lệnh Mua (Buy Orders)
 export async function addBuyOrder(order, userId = 'demo') {
   await initDatabase();
@@ -756,4 +786,5 @@ export async function savePortfolioAiInsight(userId = 'demo', report = {}) {
   });
   return true;
 }
+
 

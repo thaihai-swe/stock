@@ -871,6 +871,25 @@ class PythonAiService:
                 "aiTailRiskAnalysis": {
                     "contingencyPlan": "Duy trì kỷ luật dừng lỗ tại các ngưỡng hỗ trợ kỹ thuật trọng yếu và chủ động hạ tỷ lệ margin khi thị trường xuất hiện tín hiệu căng thẳng thanh khoản liên ngân hàng.",
                     "contagionChain": "Nếu tỷ giá USD/VND vượt đỉnh, áp lực rút vốn ròng của khối ngoại sẽ tác động trực tiếp lên nhóm cổ phiếu vốn hóa lớn VN30, sau đó lan tỏa sang tâm lý thị trường chung."
+                },
+                "aiSbvOmoDiagnosis": {
+                    "liquidityPosture": "TIGHTENING" if float(macro_indicators.get("interbankOvernight", 6.47)) > 6.0 else "NEUTRAL",
+                    "headline": "Áp Lực Tỷ Giá Buộc SBV Duy Trì Lãi Suất Liên Ngân Hàng Neo Cao",
+                    "strategicNarrative": "Chênh lệch lãi suất USD-VND và tỷ giá neo cao khiến SBV duy trì trạng thái kiểm soát thanh khoản liên ngân hàng thận trọng qua kênh OMO.",
+                    "bankingNIMImpact": "Chi phí vốn thị trường 2 tăng nhẹ tạo sự phân hóa rõ nét giữa ngân hàng có CASA cao và các ngân hàng nhỏ.",
+                    "equityMarketVerdict": "Dòng tiền trên TTCK sẽ phân hóa mạnh, ưu tiên các cổ phiếu có lượng tiền mặt ròng dồi dào và đòn bẩy thấp.",
+                    "actionableAdvice": "Duy trì tỷ trọng cổ phiếu ở mức 50-65%, hạn chế sử dụng Margin cao trong giai đoạn thanh khoản liên ngân hàng neo cao."
+                },
+                "aiInflationDiagnosis": {
+                    "cpiAssessment": f"Lạm phát CPI ở mức {cpi_val:.2f}% YoY, phản ánh áp lực chi phí đẩy từ nhiên liệu và dịch vụ công.",
+                    "purchasingPowerVerdict": "Lãi suất tiền gửi tiết kiệm thực tế bị bào mòn đáng kể sau khi trừ lạm phát, việc nắm giữ tiền mặt kéo dài gây suy giảm sức mua.",
+                    "assetProtectionRanking": [
+                        {"asset": "Cổ Phiếu Cơ Bản Tốt", "rating": "Tối Ưu", "note": "Khả năng chuyển giao chi phí lạm phát vào giá bán giúp bảo toàn EPS."},
+                        {"asset": "Vàng SJC / PNJ", "rating": "Khá Tốt", "note": "Kênh trú ẩn an toàn truyền thống chống mất giá tiền tệ."},
+                        {"asset": "Trái Phiếu DN Chất Lượng", "rating": "Trung Bình", "note": "Lợi suất cố định bù đắp vừa đủ lạm phát."},
+                        {"asset": "Tiền Gửi Ngân Hàng", "rating": "Yếu", "note": "Lãi suất thực sau lạm phát chỉ tiệm cận 0 - 0.5%."}
+                    ],
+                    "hedgingStrategy": "Phân bổ tối thiểu 60-70% vốn vào cổ phiếu chất lượng cao và Vàng vật chất để bảo vệ sức mua thực tế vượt trên lạm phát."
                 }
             }
 
@@ -936,6 +955,22 @@ class PythonAiService:
             '  "aiTailRiskAnalysis": {\n'
             '    "contingencyPlan": "Kế hoạch ứng phó kịch bản thiên nga đen / rủi ro đuôi",\n'
             '    "contagionChain": "Chuỗi tác động lan truyền vào các nhóm ngành"\n'
+            '  },\n'
+            '  "aiSbvOmoDiagnosis": {\n'
+            '    "liquidityPosture": "FLUSH | NEUTRAL | TIGHTENING",\n'
+            '    "headline": "Tiêu đề nhận định về thanh khoản liên ngân hàng và trạng thái điều hành OMO của SBV",\n'
+            '    "strategicNarrative": "Phân tích áp lực tỷ giá USD/VND và định hướng can thiệp của Ngân hàng Nhà nước",\n'
+            '    "bankingNIMImpact": "Tác động đến chi phí vốn và biên lãi ròng NIM của các nhóm ngân hàng",\n'
+            '    "equityMarketVerdict": "Tác động đến thanh khoản và dòng tiền vào thị trường chứng khoán",\n'
+            '    "actionableAdvice": "Khuyến nghị tỷ trọng cổ phiếu và quản trị rủi ro đòn bẩy Margin"\n'
+            '  },\n'
+            '  "aiInflationDiagnosis": {\n'
+            '    "cpiAssessment": "Đánh giá diễn biến CPI và lạm phát lõi",\n'
+            '    "purchasingPowerVerdict": "Nhận định mức độ bào mòn sức mua của tiền mặt và tiền gửi tiết kiệm",\n'
+            '    "assetProtectionRanking": [\n'
+            '      {"asset": "Tên kênh tài sản", "rating": "Tối Ưu | Khá Tốt | Trung Bình | Yếu", "note": "Lý giải ngắn gọn"}\n'
+            '    ],\n'
+            '    "hedgingStrategy": "Chiến lược phân bổ bảo vệ sức mua thực tế vượt trên đà lạm phát"\n'
             '  }\n'
             "}"
         )
@@ -1187,24 +1222,77 @@ class PythonAiService:
 
         def fallback():
             # Fallback 1: Deep Dive
-            cur_price = val_eval.get("currentPrice", 0)
-            fair_price = val_eval.get("fairPrice", 0)
-            mos = val_eval.get("marginOfSafety", 0)
-            rec = "MUA GOM TÍCH LŨY" if mos > 15 else ("THEO DÕI NẮM GIỮ" if mos > -10 else "CÂN NHẮC CHỐT LỜI")
+            cur_price = (
+                val_eval.get("currentPrice") or
+                val_eval.get("close") or
+                fin_data.get("close") or
+                fin_data.get("_meta", {}).get("close") or
+                0
+            )
+            fair_price = (
+                val_eval.get("fairPrice") or
+                val_eval.get("consensusFairValue") or
+                val_eval.get("fairValue") or
+                0
+            )
+
+            # Đọc bổ sung từ fundamentals_cache nếu cur_price hoặc fair_price vẫn thiếu
+            if (cur_price == 0 or fair_price == 0) and FUNDAMENTALS_FILE.exists():
+                try:
+                    with open(FUNDAMENTALS_FILE, "r", encoding="utf-8") as f_fc:
+                        fc_data = json.load(f_fc)
+                        fc_stock = fc_data.get(symbol, {})
+                        if cur_price == 0:
+                            cur_price = fc_stock.get("close", 0)
+                        if fair_price == 0:
+                            fair_price = fc_stock.get("valuation", {}).get("fairValue", 0)
+                except Exception:
+                    pass
+
+            mos = val_eval.get("marginOfSafety")
+            if mos is None and fair_price > 0 and cur_price > 0:
+                mos = round(((fair_price - cur_price) / fair_price) * 100, 1)
+            elif mos is None:
+                mos = 0.0
+
+            upside = round(((fair_price - cur_price) / cur_price) * 100, 1) if (cur_price > 0 and fair_price > 0) else 0.0
+            rec = "MUA GOM TÍCH LŨY" if mos >= 15 else ("THEO DÕI NẮM GIỮ" if mos >= -10 else "CÂN NHẮC CHỐT LỜI")
+            conviction = 85 if mos >= 20 else (75 if mos >= 10 else 60)
+            safe_buy = round(fair_price * 0.8, -2) if fair_price > 0 else 0
+            take_profit = round(fair_price * 1.05, -2) if fair_price > 0 else 0
 
             deep_dive = {
                 "thesisHeadline": f"Luận Điểm Đầu Tư {symbol}: Định Giá Hợp Lý, Biên An Toàn {mos:.1f}%",
-                "cfaSummary": f"{symbol} ghi nhận thị giá {cur_price:,.0f} đ so với giá trị nội tại hội tụ {fair_price:,.0f} đ. Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
+                "cfaSummary": f"{symbol} ghi nhận thị giá {cur_price:,.0f} đ so với giá trị nội tại hội tụ {fair_price:,.0f} đ (Biên an toàn MoS: {mos:+.1f}%, Upside kỳ vọng: {upside:+.1f}%). Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
+                "valuationConvergenceAnalysis": f"Mô hình hội tụ 10 phương pháp định lượng xác lập giá trị hợp lý {fair_price:,.0f} đ. Với thị giá hiện tại {cur_price:,.0f} đ, cổ phiếu mở ra biên an toàn {mos:.1f}% bảo vệ vốn trước các biến động thị trường.",
+                "financialHealthCheck": "Cấu trúc vốn lành mạnh, đòn bẩy tài chính trong ngưỡng an toàn và hệ số thanh toán bảo đảm tính thanh khoản kinh doanh.",
+                "growthAndMoatAnalysis": f"Duy trì con hào kinh tế vững chắc với năng lực cạnh tranh cốt lõi, tỷ suất sinh lời trên vốn vượt trội chi phí vốn bình quân WACC.",
+                "catalysts": [
+                    "Tiến độ giải ngân tài sản dở dang và mở rộng quy mô năng lực sản xuất.",
+                    "Phục hồi nhu cầu tiêu thụ và mở rộng thị phần trong chu kỳ kinh tế mới.",
+                    "Dòng tiền tự do FCF thặng dư hỗ trợ tái đầu tư và cổ tức tiền mặt."
+                ],
                 "coreCatalysts": [
-                    "Duy trì tăng trưởng doanh thu cốt lõi và mở rộng quy mô thị phần.",
-                    "Biên lợi nhuận gộp cải thiện nhờ tối ưu hóa chi phí vận hành."
+                    "Tiến độ giải ngân tài sản dở dang và mở rộng quy mô năng lực sản xuất.",
+                    "Phục hồi nhu cầu tiêu thụ và mở rộng thị phần trong chu kỳ kinh tế mới.",
+                    "Dòng tiền tự do FCF thặng dư hỗ trợ tái đầu tư và cổ tức tiền mặt."
+                ],
+                "downsideRisks": [
+                    "Biến động chu kỳ giá cả hàng hóa đầu vào và chi phí logistics.",
+                    "Rủi ro mặt bằng lãi suất vay vốn và thanh khoản tín dụng chung.",
+                    "Cạnh tranh gia tăng từ các đối thủ trong khu vực."
                 ],
                 "investmentRisks": [
-                    "Biến động chu kỳ ngành và sức ép cạnh tranh thị trường.",
-                    "Rủi ro chi phí vốn vay và thanh khoản chung."
+                    "Biến động chu kỳ giá cả hàng hóa đầu vào và chi phí logistics.",
+                    "Rủi ro mặt bằng lãi suất vay vốn và thanh khoản tín dụng chung.",
+                    "Cạnh tranh gia tăng từ các đối thủ trong khu vực."
                 ],
+                "actionStrategy": f"Khuyến nghị {rec}. Nhà đầu tư có thể giải ngân từng phần (DCA) khi thị giá tiệm cận hoặc nằm dưới vùng mua an toàn {safe_buy:,.0f} đ và cân nhắc chốt lời từng phần quanh ngưỡng mục tiêu {take_profit:,.0f} đ.",
                 "recommendation": rec,
-                "targetHorizon": "12 - 24 Tháng"
+                "convictionScore": conviction,
+                "targetHorizon": "12 - 24 Tháng",
+                "safeBuyZone": safe_buy,
+                "takeProfitZone": take_profit
             }
 
             # Fallback 2: News

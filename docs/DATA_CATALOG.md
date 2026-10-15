@@ -45,8 +45,7 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 | Cấp Độ Nút | Biểu Tượng & Tên Nút Chuẩn | API Endpoint | Phạm Vi & Thao Tác Kỹ Thuật | Tầng Dữ Liệu Tác Động |
 | :--- | :--- | :--- | :--- | :--- |
 | **CẤP 1: Sổ Cái Nội Bộ** | 🔄 *(Header)*<br>`Tải lại sổ lệnh cá nhân từ Database` | `GET /api/data` | Đọc lại SQLite `stock.db` (lệnh mua/bán, cổ tức, ví tiền). Phản hồi ~50ms. | **Tầng 1 (ACID DB)** |
-| **CẤP 2: Thị Giá Live Sàn** | ⚡ **Cập nhật giá sàn** / **Làm mới nến Live** | `GET /api/prices?force=true`<br>`GET /api/valuation/dnse-ohlc` | Bỏ qua cache 1h, lấy giá khớp lệnh thời gian thực từ sàn HOSE/HNX (VPS/DNSE). Phản hồi ~300ms. | **Tầng 2 (Ephemeral Cache)** |
-| **CẤP 3: Python Pipeline** | 🔄 **Cập nhật BCTC & Định Giá [MÃ]** (3-5s)<br>🔄 **Đồng Bộ Vĩ Mô (Python)** (~20s)<br>🔄 **Đồng bộ EOD ngay** (~5s) | `POST /api/valuation/sync-single/:sym`<br>`POST /api/valuation/sync`<br>`POST /api/fundamentals/sync` | Kích hoạt Python crawler (TradingView, vnstock, BCTC 8Q&5Y, Yield TPCP, Vàng, Ngoại tệ). Có thông báo thời gian rõ ràng. | **Tầng 3, 4, 5 (JSON Repositories)** |
+| **CẤP 3: Python Pipeline** | 🔄 **Cập nhật BCTC & Định Giá [MÃ]** (3-5s)<br>🔄 **Đồng Bộ Vĩ Mô (Python)** (~20s)<br>⚡ **Đồng Bộ Dữ Liệu Định Giá Chạy Nền** *(Local Only)* | `POST /api/valuation/sync-single/:sym`<br>`POST /api/valuation/sync`<br>`POST /api/fundamentals/sync` (`{ cadence: 'all' \| 'daily' \| 'weekly' \| 'quarterly' }`) | Kích hoạt Python crawler hoặc bộ điều phối toàn diện (`scripts/run_pipeline.py --cadence <cadence>`) trên máy Local để tải trọn vẹn dữ liệu EOD, Vĩ mô, BCTC và tối ưu AI Local. Nút bấm chỉ hiển thị khi chạy ở Local và có xem Terminal Logs trực tiếp. | **Tầng 3, 4, 5 (JSON Repositories)** |
 
 ---
 
@@ -306,6 +305,24 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
      - `es95`, `es99`: Expected Shortfall (CVaR - mức lỗ bình quân khi chạm 5% kịch bản xấu nhất).
   5. **Archetype Phân Loại Tính Cách Cổ Phiếu**:
      - `TREND_FOLLOWING` (Bám xu hướng), `ACCUMULATION_BREAKOUT` (Tích lũy bùng nổ), `RANGE_BOUND_CYCLICAL` (Dao động hộp), `TRAP_PRONE` (Biến động cao / Dễ bẫy giá). Tuân thủ nguyên tắc `neutral_descriptive_non_advice`.
+
+#### Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ & Dòng Tiền Chủ Động (Aggressive Order Flow & CVD Dynamics):
+* **Key trong JSON**: `data/financials/<MÃ>.json` trong object `orderFlow`.
+* **Nguồn Dữ Liệu Thực Tế**:
+  - Chuỗi nến 1-phút trong phiên từ DNSE Chart API (`resolution=1`).
+  - Sổ lệnh khớp tick thật thời gian thực từ VCI `Quote.intraday()`.
+  - Nến ngày EOD 10-15 phiên từ DNSE / Yahoo Finance.
+* **Cơ Chế Incremental Snapshot Caching**: Lưu 9 ngày lịch sử cũ cố định vào JSON, chỉ cập nhật nến ngày hôm nay để tiết kiệm 90% request mạng và phản hồi 0ms.
+* **Cấu Hình Tập Trung**: 3 Tầng Quy Mô Lệnh được quản lý tại `data/default-constant-value.json` (`orderFlow.orderSizeTiers`):
+  1. `whale`: Cá Mập / Tổ Chức ($\ge 500$ triệu VNĐ hoặc $\ge 25,000$ cp)
+  2. `medium`: Tay To / Sói Biển ($100 - 500$ triệu VNĐ)
+  3. `retail`: Nhỏ Lẻ / Cừu Non ($< 100$ triệu VNĐ)
+* **2 Khung Thời Gian Phân Tích**:
+  - `intraday`: Nến 1m, BVC Delta, CVD trong phiên, phân rã 3 nhóm, bảng Top 15 Lệnh Khủng.
+  - `multiDay`: Chuỗi CVD 10 phiên, tổng vốn Cá mập mua/bán 10 ngày (tỷ VNĐ), phân kỳ tích lũy/phân phối.
+* **Chỉ Số Định Lượng**:
+  - `whaleDominanceIndex`: Thang điểm 0 - 100 đo mức độ áp đảo của dòng tiền Cá Mập.
+  - `divergenceSignal`: `BULLISH_ABSORPTION` (Hấp thụ mua ngầm), `BEARISH_DISTRIBUTION` (Phân phối kéo xả), `MARKUP_EXPANSION` (Đồng thuận đẩy giá).
 
 #### Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (Corporate News Digest & Sentiment):
 * **Key trong JSON**: `data/financials/<MÃ>.json` trong object `newsDigest`.
@@ -630,6 +647,18 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
           * **`aiTailRiskAnalysis` (Kế Hoạch Dự Phòng & Chuỗi Dẫn Truyền Rủi Ro Đuôi)**:
             * `contingencyPlan`: Kế hoạch hành động ứng phó dự phòng khi các cảnh báo rủi ro đuôi kích hoạt.
             * `contagionChain`: Cơ chế dẫn truyền và mức độ lan tỏa rủi ro xuyên thị trường (Tỷ giá $\to$ Khối ngoại $\to$ Large-Cap $\to$ Thị trường chung).
+          * **`aiSbvOmoDiagnosis` (Chẩn Đoán Thanh Khoản OMO & Liên Ngân Hàng Hàng Tuần)**:
+            * `liquidityPosture`: Trạng thái thanh khoản hệ thống (`FLUSH`, `NEUTRAL`, `TIGHTENING`).
+            * `headline`: Tiêu đề cô đọng về tình trạng bơm/hút tiền và tỷ giá USD/VND.
+            * `strategicNarrative`: Phân tích sâu sắc cơ chế điều hành OMO, áp lực tỷ giá và thanh khoản tiền tệ.
+            * `bankingNIMImpact`: Tác động chi phí vốn liên ngân hàng lên biên lãi ròng NIM ngành ngân hàng.
+            * `equityMarketVerdict`: Tác động cụ thể đến thanh khoản và dòng tiền trên thị trường cổ phiếu.
+            * `actionableAdvice`: Khuyến nghị tỷ trọng danh mục và quản trị đòn bẩy Margin.
+          * **`aiInflationDiagnosis` (Kiểm Toán Sức Mua & Áp Lực Lạm Phát Hàng Tuần)**:
+            * `cpiAssessment`: Đánh giá diễn biến CPI YoY và lạm phát lõi Core Inflation.
+            * `purchasingPowerVerdict`: Nhận định về mức độ bào mòn sức mua của tiền mặt và tiền gửi tiết kiệm.
+            * `assetProtectionRanking`: Bảng xếp hạng 4 kênh tài sản (Cổ phiếu, Vàng, Trái phiếu, Tiền gửi) theo khả năng phòng thủ lạm phát.
+            * `hedgingStrategy`: Chiến lược phân bổ vốn dài hạn bảo toàn và tăng trưởng sức mua thực tế.
 
 ---
 
@@ -1097,6 +1126,11 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
    - `httpTimeoutSeconds`: 30.
    - `httpMaxRetries`: 2.
    - `rateLimitsPerMinute`: VCI: 45, TCBS: 45, TRADINGVIEW: 60, DEFAULT: 45.
+6. **`timeframeConfig` (Quản Trị Khung Thời Gian & Bộ Lọc Thống Nhất)**:
+   - `defaultTimeframe`: `"ALL"`.
+   - `definitions`: 13 mốc định nghĩa chuẩn (`1D`, `1W`, `1M`, `3M`, `6M`, `MTD`, `YTD`, `1Y`, `3Y`, `5Y`, `10Y`, `ALL`, `CUSTOM`) kèm số ngày, độ phân giải nến DNSE (`dnseResolution`: `'1'`, `'1D'`, `'1W'`, `'1M'`) và khóa hiệu suất TradingView (`perfKey`: `'w1'`, `'m1'`, `'m3'`, `'m6'`, `'ytd'`, `'y1'`, `'y5'`).
+   - `presets`: Nhóm chu kỳ tùy biến cho từng phân hệ UI (`benchmark`, `portfolio`, `portfolioExtended`, `marketChart`, `valuationHistory`, `stockPerformance`).
+   - Bộ điều phối: `src/utils/timeframe.js` & `src/utils/constants.js`.
 
 ---
 
@@ -1443,7 +1477,8 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
   | `portfolio_beta` | `REAL` | Hệ số Beta bình quân gia quyền của danh mục so với VN-Index. |
   | `cash_weight_pct` | `REAL` | Tỷ trọng đệm tiền mặt bảo vệ trên tổng NAV (%). |
   | `report_json` | `TEXT` | Chuỗi JSON đầy đủ chứa ma trận 3 tầng độ nhạy vĩ mô (`macroSensitivity`), 3 kịch bản chịu tải cực đoan (`stressTestScenarios`), và khuyến nghị tái cân bằng (`rebalancingRecommendations`). |
-  | `status` | `TEXT` | Trạng thái sinh dữ liệu (`success` / `failed`). |
+  | `status` | `TEXT` | Trạng thái sinh dữ liệu (`success` / `PENDING` / `failed`). Giá trị `PENDING` được gán khi người dùng bấm Làm Mới trên môi trường Online/Vercel để hàng đợi tự động xử lý trong lượt đồng bộ kế tiếp. |
+
   | `updated_at` | `TEXT (ISO)` | Thời điểm sinh báo cáo phân tích. Dùng để kiểm tra Smart Delta Cache (> 6 ngày). |
 
 ---
@@ -1465,4 +1500,92 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
   | `outlook3Y` | `string` | Dự phóng triển vọng duy trì hoặc cắt giảm cổ tức trong 1-3 năm tới. |
   | `redFlags` | `array` | Danh sách các cờ cảnh báo rủi ro bẫy cổ tức (mảng rỗng `[]` nếu an toàn). |
   | `updatedAt` | `string (ISO)` | Thời điểm sinh báo cáo kiểm toán. |
+
+---
+
+### PHÂN HỆ 12: CỐ VẤN KHÓA LỢI NHUẬN LINH HOẠT (SMART TRAILING STOP) & THƯỚC ĐO TỶ LỆ THƯỞNG / RỦI RO (R:R)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`riskRewardConfig`).
+  - Runtime Module: `src/utils/riskRewardAdvisor.js` (Re-exported qua `src/utils/constants.js`).
+  - Giao diện trực quan: `src/components/dashboard/SmartProfitProtectionAdvisor.jsx`, `DashboardHoldingsTable.jsx`, `SellForm.jsx`, `StockCockpitHeader.jsx`.
+* **Mục đích**: Bảo toàn tối đa thành quả lợi nhuận của nhà đầu tư, loại bỏ tâm lý "chốt non" hoặc "gồng lãi thành lỗ" bằng cơ chế Khóa Lãi 5 Bậc Thang thích ứng theo Beta, đồng thời đo lường định lượng tỷ lệ Thưởng / Rủi Ro (R:R) giữa Tiềm năng tăng giá (Consensus Fair Value) và Mức rủi ro sụt giảm (Trailing Stop).
+* **Đặc tả Schema chi tiết (`riskRewardConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `defaultInitialStopLossPct` | `number` | `7.0%` | Mức cắt lỗ kỷ luật ban đầu tính từ giá vốn khi vị thế chưa sinh lời đáng kể (Pha 0). |
+  | `breakevenTriggerPct` | `number` | `6.0%` | Ngưỡng kích hoạt Pha 1: Khi P/L $\ge +6\%$, Trailing Stop tự động dời lên Giá Hòa Vốn (Free Trade - rủi ro mất vốn về 0). |
+  | `tier1ProfitTriggerPct` | `number` | `15.0%` | Ngưỡng kích hoạt Pha 2 (Khóa Lãi Bậc 1): Khi P/L $\ge +15\%$. |
+  | `tier1LockMinPct` | `number` | `8.0%` | Mức lợi nhuận tối thiểu bảo toàn chắc chắn trong Pha 2 ($+8\%$ đến $+10\%$). |
+  | `tier2ProfitTriggerPct` | `number` | `25.0%` | Ngưỡng kích hoạt Pha 3 (Khóa Lãi Bậc 2): Khi P/L $\ge +25\%$. |
+  | `tier2LockMinPct` | `number` | `18.0%` | Mức lợi nhuận tối thiểu bảo toàn chắc chắn trong Pha 3 ($+18\%$ đến $+22\%$). |
+  | `superProfitTriggerPct` | `number` | `40.0%` | Ngưỡng kích hoạt Pha 4 (Nước Rút Siêu Lãi): Khi P/L $\ge +40\%$. |
+  | `superProfitBufferPct` | `number` | `5.0%` | Biên độ siết sát đỉnh cao nhất trong Pha 4 ($\text{Peak} \times (1 - 5\%)$). |
+  | `defaultTrailingBufferPct` | `number` | `6.0%` | Biên độ Trailing Stop chuẩn cho cổ phiếu có $\beta = 1.0$. |
+  | `betaSensitivity` | `number` | `3.0` | Độ nhạy điều chỉnh biên độ thở theo Beta: $\text{Buffer} = 6.0\% + (\beta - 1.0) \times 3.0\%$. |
+  | `minBufferPct` / `maxBufferPct` | `number` | `4.5%` / `10.0%` | Giới hạn kẹp biên thở thích ứng tối thiểu và tối đa cho mọi cổ phiếu. |
+  | `warningDistancePct` | `number` | `3.0%` | Khoảng cách cảnh báo đèn vàng khi thị giá tiệm cận Trailing Stop $\le 3\%$. |
+  | `rrRatings` | `array` | 4 bậc | Phân loại ma trận R:R: `EXCELLENT` ($\ge 3:1$ - Kèo Vàng), `GOOD` ($\ge 2:1$), `FAIR` ($\ge 1.5:1$), `POOR` ($< 1.5:1$ - Bất Lợi). |
+  | `protectionTiers` | `array` | 5 bậc | Danh mục 5 pha bảo vệ: `INITIAL` (0), `BREAKEVEN` (1), `TIER1_LOCK` (2), `TIER2_LOCK` (3), `SUPER_PROFIT` (4). |
+
+---
+
+### PHÂN HỆ 12.2: LƯỚI CHỐT LỜI KHOA HỌC 3 TẦNG (SCIENTIFIC 3-TIER TAKE-PROFIT GRID)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`takeProfitGridConfig`).
+  - Runtime Module: `src/utils/riskRewardAdvisor.js` (Hàm `calculateTakeProfitGrid`).
+  - Giao diện trực quan: `src/components/dashboard/SmartProfitProtectionAdvisor.jsx`, `src/components/valuation/StockCockpitHeader.jsx`.
+* **Mục đích**: Loại bỏ triệt để tâm lý "bán non mất hàng" hoặc "gồng lãi thành lỗ" bằng kế hoạch chia nhỏ vị thế thu hoạch lợi nhuận khoa học 3 tầng (30% - 40% - 30%) phối hợp nhịp nhàng với mốc Chặn Lãi (Trailing Stop).
+* **Đặc tả Schema chi tiết (`takeProfitGridConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `tier1RatioPct` | `number` | `30.0%` | Tỷ trọng khối lượng khuyến nghị chốt lời ở Tầng 1 (Thu hồi vốn gốc). |
+  | `tier1MinProfitPct` | `number` | `15.0%` | Ngưỡng lãi tối thiểu để kích hoạt Tầng 1 (+15% từ giá vốn). |
+  | `tier1FairValueDiscountPct`| `number` | `12.0%` | Chiết khấu so với Fair Value để xác định cận dưới Tầng 1 ($\text{FairValue} \times 0.88$). |
+  | `tier2RatioPct` | `number` | `40.0%` | Tỷ trọng khối lượng khuyến nghị chốt lời ở Tầng 2 (Hiện thực hóa theo định giá cơ bản). |
+  | `tier2FairValueRatio` | `number` | `1.0` | Tỷ lệ định giá của Tầng 2 ($100\%$ Consensus Fair Value). |
+  | `tier3RatioPct` | `number` | `30.0%` | Tỷ trọng khối lượng giữ lại ở Tầng 3 (Thả trôi bắt trọn siêu sóng / Trend Runner). |
+  | `tier3BubblePremiumPct`| `number` | `20.0%` | Mức thặng dư quá nhiệt của Tầng 3 ($\text{FairValue} \times 1.20$). Điểm bán của 30% này theo Trailing Stop. |
+  | `defaultFallbackGainPct` | `number` | `25.0%` | Mức tăng giả định mặc định nếu cổ phiếu chưa có dữ liệu định giá Consensus (+25%). |
+  | `tiers` | `array` | 3 tầng | Mảng định nghĩa siêu dữ liệu cho 3 tầng: `tier` (1,2,3), `name`, `label`, `description`, `defaultSellPct`, `badge`. |
+
+---
+
+### PHÂN HỆ 13: RADAR BƠM/HÚT TIỀN NGÂN HÀNG NHÀ NƯỚC & THANH KHOẢN LIÊN NGÂN HÀNG (SBV OMO & INTERBANK RADAR)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`sbvOmoRadarConfig`).
+  - Dữ liệu nguồn: `data/macro_valuation.json` (`macro.interbankOvernight`, `macro.sbvRefinancingRate`, `macro.usdVndRate`, `aiSbvOmoDiagnosis`) và `data/macro_indicators.json`.
+  - Runtime Module: `src/utils/sbvOmoRadar.js` (Re-exported qua `src/utils/constants.js`).
+  - Giao diện trực quan: `src/components/macro/SbvOmoInterbankRadarCard.jsx` (Nhúng tại `src/components/macro/MacroRegimeRadarSection.jsx`).
+* **Mục đích**: Nhận diện sớm các pha thắt chặt/nới lỏng thanh khoản tiền tệ của Ngân hàng Nhà nước Việt Nam (SBV), đo lường mức độ căng thẳng thị trường 2 và phát tín hiệu định hướng cho danh mục cổ phiếu.
+* **Đặc tả Schema chi tiết (`sbvOmoRadarConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `interbankStressThreshold` | `number` | `6.0%` | Ngưỡng lãi suất liên ngân hàng qua đêm căng thẳng (Stress Threshold). |
+  | `interbankComfortThreshold`| `number` | `3.0%` | Ngưỡng lãi suất liên ngân hàng thoải mái, tiền rẻ dồi dào. |
+  | `interbankSpreadWarning` | `number` | `1.5%` | Chênh lệch cảnh báo giữa Lãi suất qua đêm LNH và Lãi suất tái cấp vốn SBV ($\text{ON} - \text{Refinancing} \ge 1.5\%$). |
+  | `usdVndInterventionThreshold`| `number`| `25500` | Ngưỡng tỷ giá USD/VND nhạy cảm kích hoạt can thiệp OMO/bán ngoại tệ của SBV. |
+  | `stressScoreWeights` | `object` | 4 trọng số | Trọng số chấm điểm Điểm Căng Thẳng Thanh Khoản: Lãi suất LNH (40%), Chênh lệch Spread (30%), Tỷ giá USD/VND (20%), Cung tiền M2 (10%). |
+  | `postures` | `object` | 3 trạng thái | Phân loại trạng thái thanh khoản: `FLUSH` ($\le 35$ điểm - Dồi dào tiền rẻ), `NEUTRAL` (36-65 điểm - Cân bằng nhịp nhàng), `TIGHTENING` ($> 65$ điểm - Thắt chặt/hút tiền). |
+
+---
+
+### PHÂN HỆ 14: THƯỚC ĐO TĂNG TRƯỞNG SỨC MUA THỰC TẾ (INFLATION-ADJUSTED REAL RETURN)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`inflationReturnConfig`).
+  - Dữ liệu nguồn: `data/macro_valuation.json` (`macro.inflationCpi`, `macro.coreInflation`, `aiInflationDiagnosis`) và Sổ lệnh giao dịch cá nhân.
+  - Runtime Module: `src/utils/inflationAdjuster.js` (Re-exported qua `src/utils/constants.js`).
+  - Giao diện trực quan: `src/components/dashboard/RealPurchasingPowerCard.jsx` (Nhúng tại `src/components/dashboard/DashboardAnalyticsHub.jsx` qua tab `real_return`).
+* **Mục đích**: Ứng dụng phương trình kinh tế lượng Fisher ($r_{\text{real}} = \frac{1 + r_{\text{nominal}}}{1 + i_{\text{cpi}}} - 1$), bóc tách lượng tiền bị lạm phát bào mòn (VNĐ Drag), và thiết lập bảng so sánh 4 kênh tài sản lớn (Danh mục cá nhân, VN-Index, Vàng SJC, Tiết kiệm ngân hàng).
+* **Đặc tả Schema chi tiết (`inflationReturnConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `defaultBenchmarkSavingsRate`| `number` | `5.5%` | Lãi suất tiền gửi tiết kiệm 12 tháng bình quân của các NHTM để làm benchmark phi rủi ro. |
+  | `defaultAnnualCpi` | `number` | `5.08%` | Tỷ lệ lạm phát CPI hàng năm mặc định dùng trong các phép tính chiết khấu sức mua. |
+  | `realReturnBrackets` | `array` | 4 bậc | Thang đánh giá thành quả sức mua: `OUTPERFORM` ($> +10\%$), `BEAT_INFLATION` ($+3\%$ đến $+10\%$), `PRESERVED` ($0\%$ đến $+3\%$), `EROSION` ($< 0\%$ - Bị lạm phát bào mòn). |
+
+
 

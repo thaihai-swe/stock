@@ -3,6 +3,9 @@ import MonthlyPLChart from '../charts/MonthlyPLChart.jsx';
 import PortfolioChart from '../charts/PortfolioChart.jsx';
 import StockContributionChart from '../charts/StockContributionChart.jsx';
 import WaterfallReturnChart from '../charts/WaterfallReturnChart.jsx';
+import BenchmarkComparisonChart from '../charts/BenchmarkComparisonChart.jsx';
+import RealPurchasingPowerCard from './RealPurchasingPowerCard.jsx';
+import { TIMEFRAME_IDS } from '../../utils/timeframe.js';
 
 export default function DashboardAnalyticsHub({
   portfolio = [],
@@ -11,20 +14,27 @@ export default function DashboardAnalyticsHub({
   dividends = [],
   marketPrices = {},
   fundamentalsMap = {},
-  timeWindow = 'all',
+  timeWindow = TIMEFRAME_IDS.ALL,
   periodLabel = 'Toàn Thời Gian',
   onSelectSymbolModal,
 }) {
-  const [activeTab, setActiveTab] = useState('monthly'); // 'monthly' | 'allocation' | 'waterfall' | 'contribution'
+  const [activeTab, setActiveTab] = useState('benchmark'); // 'benchmark' | 'monthly' | 'allocation' | 'waterfall' | 'contribution' | 'real_return'
   const [viewMode, setViewMode] = useState('tabs'); // 'tabs' | 'grid'
 
   const tabs = [
+    {
+      id: 'benchmark',
+      label: 'Tương Quan vs VN-Index',
+      shortLabel: 'vs VN-Index',
+      icon: '⚔️',
+      desc: 'So sánh tỷ suất sinh lời danh mục (%) trực tiếp với chỉ số thị trường VN-Index theo thời gian',
+    },
     {
       id: 'monthly',
       label: 'Lãi/Lỗ & Quỹ Đạo Vốn',
       shortLabel: 'Quỹ Đạo Vốn',
       icon: '📊',
-      desc: `Lợi nhuận thực nhận từng tháng và đường tích lũy ${timeWindow !== 'all' ? `(${periodLabel})` : ''}`,
+      desc: `Lợi nhuận thực nhận từng tháng và đường tích lũy ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
     },
     {
       id: 'allocation',
@@ -38,14 +48,21 @@ export default function DashboardAnalyticsHub({
       label: 'Thác Nước Dòng Tiền',
       shortLabel: 'Thác Nước',
       icon: '🌊',
-      desc: `Dòng chảy vốn: Vốn gốc → Lãi chốt → Cổ tức → Tạm tính ${timeWindow !== 'all' ? `(${periodLabel})` : ''}`,
+      desc: `Dòng chảy vốn: Vốn gốc → Lãi chốt → Cổ tức → Tạm tính ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
     },
     {
       id: 'contribution',
       label: 'Đóng Góp Hiệu Suất Mã',
       shortLabel: 'Đóng Góp Mã',
       icon: '🎯',
-      desc: `Xếp hạng Top cổ phiếu đóng góp lãi/lỗ nhiều nhất ${timeWindow !== 'all' ? `(${periodLabel})` : ''}`,
+      desc: `Xếp hạng Top cổ phiếu đóng góp lãi/lỗ nhiều nhất ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
+    },
+    {
+      id: 'real_return',
+      label: 'Sức Mua Thực Tế vs Lạm Phát',
+      shortLabel: 'Sức Mua Thực',
+      icon: '🛡️',
+      desc: 'Khấu trừ lạm phát CPI theo phương trình Fisher, đo lường lượng tiền bị bào mòn và đối chiếu 4 kênh tài sản',
     },
   ];
 
@@ -60,7 +77,7 @@ export default function DashboardAnalyticsHub({
             <h3 className="font-extrabold text-gray-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2">
               <span>📈</span> Trung Tâm Phân Tích Kỹ Thuật & Hiệu Suất
             </h3>
-            {timeWindow !== 'all' && (
+            {timeWindow !== TIMEFRAME_IDS.ALL && (
               <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-bold border border-indigo-100 dark:border-indigo-900/40">
                 {periodLabel}
               </span>
@@ -132,6 +149,17 @@ export default function DashboardAnalyticsHub({
       {viewMode === 'tabs' ? (
         /* CHẾ ĐỘ 1 TAB ĐƠN: Render duy nhất biểu đồ đang chọn (Gọn gàng, không cuộn dài) */
         <div className="pt-2 min-h-[380px]">
+          {activeTab === 'benchmark' && (
+            <BenchmarkComparisonChart
+              buyOrders={buyOrders}
+              sellOrders={sellOrders}
+              dividends={dividends}
+              portfolio={portfolio}
+              marketPrices={marketPrices}
+              fundamentalsMap={fundamentalsMap}
+            />
+          )}
+
           {activeTab === 'monthly' && (
             <MonthlyPLChart sellOrders={sellOrders} dividends={dividends} />
           )}
@@ -163,64 +191,99 @@ export default function DashboardAnalyticsHub({
               onSelectSymbol={onSelectSymbolModal}
             />
           )}
+
+          {activeTab === 'real_return' && (
+            <RealPurchasingPowerCard
+              portfolio={portfolio}
+              buyOrders={buyOrders}
+              sellOrders={sellOrders}
+              dividends={dividends}
+              marketPrices={marketPrices}
+            />
+          )}
         </div>
       ) : (
-        /* CHẾ ĐỘ LƯỚI 2x2 BENTO GRID: Render cả 4 biểu đồ trong lưới cân đối */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
-          {/* Card 1: Monthly PL */}
+        /* CHẾ ĐỘ LƯỚI BENTO GRID: Render biểu đồ tương quan VN-Index nổi bật và 4 biểu đồ bổ trợ */
+        <div className="space-y-4 pt-2">
+          {/* Card Tiêu Điểm: Tương quan Lợi nhuận vs VN-Index */}
           <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
-                <span>📊</span> Lãi / Lỗ & Quỹ Đạo Vốn
-              </h4>
-            </div>
-            <MonthlyPLChart sellOrders={sellOrders} dividends={dividends} />
-          </div>
-
-          {/* Card 2: Portfolio Allocation */}
-          <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
-                <span>🥧</span> Cấu Trúc Phân Bổ Vốn
-              </h4>
-            </div>
-            <PortfolioChart
+            <BenchmarkComparisonChart
+              buyOrders={buyOrders}
+              sellOrders={sellOrders}
+              dividends={dividends}
               portfolio={portfolio}
+              marketPrices={marketPrices}
               fundamentalsMap={fundamentalsMap}
-              marketPrices={marketPrices}
             />
           </div>
 
-          {/* Card 3: Waterfall */}
-          <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
-                <span>🌊</span> Thác Nước Dòng Tiền Lợi Nhuận
-              </h4>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Card 1: Monthly PL */}
+            <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <span>📊</span> Lãi / Lỗ & Quỹ Đạo Vốn
+                </h4>
+              </div>
+              <MonthlyPLChart sellOrders={sellOrders} dividends={dividends} />
             </div>
-            <WaterfallReturnChart
-              buyOrders={buyOrders}
-              sellOrders={sellOrders}
-              portfolio={portfolio}
-              dividends={dividends}
-              marketPrices={marketPrices}
-            />
-          </div>
 
-          {/* Card 4: Contribution */}
-          <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
-                <span>🎯</span> Đóng Góp Hiệu Suất Từng Mã
-              </h4>
+            {/* Card 2: Portfolio Allocation */}
+            <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <span>🥧</span> Cấu Trúc Phân Bổ Vốn
+                </h4>
+              </div>
+              <PortfolioChart
+                portfolio={portfolio}
+                fundamentalsMap={fundamentalsMap}
+                marketPrices={marketPrices}
+              />
             </div>
-            <StockContributionChart
-              buyOrders={buyOrders}
-              sellOrders={sellOrders}
-              dividends={dividends}
-              marketPrices={marketPrices}
-              onSelectSymbol={onSelectSymbolModal}
-            />
+
+            {/* Card 3: Waterfall */}
+            <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <span>🌊</span> Thác Nước Dòng Tiền Lợi Nhuận
+                </h4>
+              </div>
+              <WaterfallReturnChart
+                buyOrders={buyOrders}
+                sellOrders={sellOrders}
+                portfolio={portfolio}
+                dividends={dividends}
+                marketPrices={marketPrices}
+              />
+            </div>
+
+            {/* Card 4: Contribution */}
+            <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <span>🎯</span> Đóng Góp Hiệu Suất Từng Mã
+                </h4>
+              </div>
+              <StockContributionChart
+                buyOrders={buyOrders}
+                sellOrders={sellOrders}
+                dividends={dividends}
+                marketPrices={marketPrices}
+                onSelectSymbol={onSelectSymbolModal}
+              />
+            </div>
+
+            {/* Card 5: Real Purchasing Power vs Inflation */}
+            <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 lg:col-span-2">
+              <RealPurchasingPowerCard
+                portfolio={portfolio}
+                buyOrders={buyOrders}
+                sellOrders={sellOrders}
+                dividends={dividends}
+                marketPrices={marketPrices}
+              />
+            </div>
           </div>
         </div>
       )}
