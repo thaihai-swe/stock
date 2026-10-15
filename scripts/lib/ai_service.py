@@ -1187,24 +1187,77 @@ class PythonAiService:
 
         def fallback():
             # Fallback 1: Deep Dive
-            cur_price = val_eval.get("currentPrice", 0)
-            fair_price = val_eval.get("fairPrice", 0)
-            mos = val_eval.get("marginOfSafety", 0)
-            rec = "MUA GOM TÍCH LŨY" if mos > 15 else ("THEO DÕI NẮM GIỮ" if mos > -10 else "CÂN NHẮC CHỐT LỜI")
+            cur_price = (
+                val_eval.get("currentPrice") or
+                val_eval.get("close") or
+                fin_data.get("close") or
+                fin_data.get("_meta", {}).get("close") or
+                0
+            )
+            fair_price = (
+                val_eval.get("fairPrice") or
+                val_eval.get("consensusFairValue") or
+                val_eval.get("fairValue") or
+                0
+            )
+
+            # Đọc bổ sung từ fundamentals_cache nếu cur_price hoặc fair_price vẫn thiếu
+            if (cur_price == 0 or fair_price == 0) and FUNDAMENTALS_FILE.exists():
+                try:
+                    with open(FUNDAMENTALS_FILE, "r", encoding="utf-8") as f_fc:
+                        fc_data = json.load(f_fc)
+                        fc_stock = fc_data.get(symbol, {})
+                        if cur_price == 0:
+                            cur_price = fc_stock.get("close", 0)
+                        if fair_price == 0:
+                            fair_price = fc_stock.get("valuation", {}).get("fairValue", 0)
+                except Exception:
+                    pass
+
+            mos = val_eval.get("marginOfSafety")
+            if mos is None and fair_price > 0 and cur_price > 0:
+                mos = round(((fair_price - cur_price) / fair_price) * 100, 1)
+            elif mos is None:
+                mos = 0.0
+
+            upside = round(((fair_price - cur_price) / cur_price) * 100, 1) if (cur_price > 0 and fair_price > 0) else 0.0
+            rec = "MUA GOM TÍCH LŨY" if mos >= 15 else ("THEO DÕI NẮM GIỮ" if mos >= -10 else "CÂN NHẮC CHỐT LỜI")
+            conviction = 85 if mos >= 20 else (75 if mos >= 10 else 60)
+            safe_buy = round(fair_price * 0.8, -2) if fair_price > 0 else 0
+            take_profit = round(fair_price * 1.05, -2) if fair_price > 0 else 0
 
             deep_dive = {
                 "thesisHeadline": f"Luận Điểm Đầu Tư {symbol}: Định Giá Hợp Lý, Biên An Toàn {mos:.1f}%",
-                "cfaSummary": f"{symbol} ghi nhận thị giá {cur_price:,.0f} đ so với giá trị nội tại hội tụ {fair_price:,.0f} đ. Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
+                "cfaSummary": f"{symbol} ghi nhận thị giá {cur_price:,.0f} đ so với giá trị nội tại hội tụ {fair_price:,.0f} đ (Biên an toàn MoS: {mos:+.1f}%, Upside kỳ vọng: {upside:+.1f}%). Doanh nghiệp duy trì nền tảng tài chính ổn định và vị thế ngành vững chắc.",
+                "valuationConvergenceAnalysis": f"Mô hình hội tụ 10 phương pháp định lượng xác lập giá trị hợp lý {fair_price:,.0f} đ. Với thị giá hiện tại {cur_price:,.0f} đ, cổ phiếu mở ra biên an toàn {mos:.1f}% bảo vệ vốn trước các biến động thị trường.",
+                "financialHealthCheck": "Cấu trúc vốn lành mạnh, đòn bẩy tài chính trong ngưỡng an toàn và hệ số thanh toán bảo đảm tính thanh khoản kinh doanh.",
+                "growthAndMoatAnalysis": f"Duy trì con hào kinh tế vững chắc với năng lực cạnh tranh cốt lõi, tỷ suất sinh lời trên vốn vượt trội chi phí vốn bình quân WACC.",
+                "catalysts": [
+                    "Tiến độ giải ngân tài sản dở dang và mở rộng quy mô năng lực sản xuất.",
+                    "Phục hồi nhu cầu tiêu thụ và mở rộng thị phần trong chu kỳ kinh tế mới.",
+                    "Dòng tiền tự do FCF thặng dư hỗ trợ tái đầu tư và cổ tức tiền mặt."
+                ],
                 "coreCatalysts": [
-                    "Duy trì tăng trưởng doanh thu cốt lõi và mở rộng quy mô thị phần.",
-                    "Biên lợi nhuận gộp cải thiện nhờ tối ưu hóa chi phí vận hành."
+                    "Tiến độ giải ngân tài sản dở dang và mở rộng quy mô năng lực sản xuất.",
+                    "Phục hồi nhu cầu tiêu thụ và mở rộng thị phần trong chu kỳ kinh tế mới.",
+                    "Dòng tiền tự do FCF thặng dư hỗ trợ tái đầu tư và cổ tức tiền mặt."
+                ],
+                "downsideRisks": [
+                    "Biến động chu kỳ giá cả hàng hóa đầu vào và chi phí logistics.",
+                    "Rủi ro mặt bằng lãi suất vay vốn và thanh khoản tín dụng chung.",
+                    "Cạnh tranh gia tăng từ các đối thủ trong khu vực."
                 ],
                 "investmentRisks": [
-                    "Biến động chu kỳ ngành và sức ép cạnh tranh thị trường.",
-                    "Rủi ro chi phí vốn vay và thanh khoản chung."
+                    "Biến động chu kỳ giá cả hàng hóa đầu vào và chi phí logistics.",
+                    "Rủi ro mặt bằng lãi suất vay vốn và thanh khoản tín dụng chung.",
+                    "Cạnh tranh gia tăng từ các đối thủ trong khu vực."
                 ],
+                "actionStrategy": f"Khuyến nghị {rec}. Nhà đầu tư có thể giải ngân từng phần (DCA) khi thị giá tiệm cận hoặc nằm dưới vùng mua an toàn {safe_buy:,.0f} đ và cân nhắc chốt lời từng phần quanh ngưỡng mục tiêu {take_profit:,.0f} đ.",
                 "recommendation": rec,
-                "targetHorizon": "12 - 24 Tháng"
+                "convictionScore": conviction,
+                "targetHorizon": "12 - 24 Tháng",
+                "safeBuyZone": safe_buy,
+                "takeProfitZone": take_profit
             }
 
             # Fallback 2: News

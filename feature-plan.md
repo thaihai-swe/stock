@@ -1,6 +1,6 @@
 1: [x] Tương Quan Lợi Nhuận vs VN-Index (Benchmark Comparison Chart), không cần lãi suất gửi tiết kiệm (Đã xong)
 2: [x] Phòng Thí Nghiệm Giả Định Định Giá (Interactive Valuation Sandbox) (Đã xong)
-3: [ ] AI BCTC Executive Summary. Dùng AI phân tích báo cáo tài chính và tạo bản tóm tắt điều hành, định giá cổ phiếu.
+3: [x] AI BCTC Executive Summary. Dùng AI phân tích báo cáo tài chính và tạo bản tóm tắt điều hành, định giá cổ phiếu. (Đã xong)
 4: [x] Bộ Lọc Theo Các Triết Lý Đầu Tư Kinh Điển. ở tab định giá cần hiển thị cổ phiếu này thoả mãn các triết lý đầu tư kinh điển nào (Đã xong)
 5: [x] Thước Đo Chất Lượng Lợi Nhuận (Quality of Earnings & Sloan Accrual) (Đã xong)
 6: [x] Cố Vấn Khóa Lợi Nhuận Linh Hoạt (Smart Trailing Stop Advisor) (Đã xong)

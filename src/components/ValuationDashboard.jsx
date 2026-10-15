@@ -39,6 +39,7 @@ import InteractiveValuationSandboxCard from './valuation/InteractiveValuationSan
 import ClassicInvestmentPhilosophiesCard from './valuation/ClassicInvestmentPhilosophiesCard.jsx';
 import QualityOfEarningsCard from './valuation/QualityOfEarningsCard.jsx';
 import SmartStatementNotesCard from './valuation/SmartStatementNotesCard.jsx';
+import AiExecutiveSummaryCard from './valuation/AiExecutiveSummaryCard.jsx';
 
 // Định nghĩa 4 Không Gian Phân Tích Chuyên Sâu
 const WORKSPACES = [
@@ -46,8 +47,8 @@ const WORKSPACES = [
     id: 'valuation-models',
     label: '1. Định Giá & Quyết Định',
     icon: '🎯',
-    badge: '8 Công Cụ',
-    desc: '7 Vùng Giá, Sandbox Giả Định, 6 Triết Lý Đầu Tư, 7 Bẫy, Bands 5Y, DCF, Giải Phẫu Toán & FinVal Lab'
+    badge: '9 Công Cụ',
+    desc: 'AI Executive Summary, 7 Vùng Giá, Sandbox Giả Định, 6 Triết Lý Đầu Tư, 7 Bẫy, Bands 5Y, DCF, Giải Phẫu Toán & FinVal Lab'
   },
   {
     id: 'financial-statements',
@@ -333,6 +334,16 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       {/* 🎯 KHÔNG GIAN 1: ĐỊNH GIÁ & CÁC MÔ HÌNH QUYẾT ĐỊNH */}
       {activeWorkspace === 'valuation-models' && currentStock && (
         <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Bản Tóm Tắt Điều Hành & Thẩm Định Doanh Nghiệp (AI BCTC Executive Summary) */}
+          <AiExecutiveSummaryCard
+            financials={financials}
+            currentStock={currentStock}
+            symbol={selectedSymbol}
+            handleRefreshSingleAi={handleRefreshSingleAi}
+            refreshingAi={refreshingAi}
+            setIsReportModalOpen={setIsReportModalOpen}
+          />
+
           {/* Bản đồ 7 Vùng Định Giá & Khung Quyết Định 3 Tầng */}
           <ValuationSevenZonesCard
             sevenPriceZones={

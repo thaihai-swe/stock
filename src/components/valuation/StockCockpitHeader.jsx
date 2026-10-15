@@ -224,43 +224,6 @@ export default function StockCockpitHeader({
 
       {/* ── 2. HERO CARD: GIÁ TRỊ HỘI TỤ CONSENSUS & LƯỚI 10 MÔ HÌNH ── */}
       <div className="p-5 sm:p-6 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50/60 dark:from-indigo-900 dark:via-indigo-950 dark:to-slate-900 text-gray-900 dark:text-white rounded-3xl shadow-sm dark:shadow-xl border border-indigo-100 dark:border-indigo-800/40 space-y-4 transition-colors">
-        {/* CFA Equity Research AI Deep-Dive Banner */}
-        {financials?.aiDeepDive && (
-          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10 border border-indigo-200/80 dark:border-indigo-700/60 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-start gap-2.5">
-              <span className="text-xl">🧠</span>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wide">
-                    CFA Equity Research Copilot
-                  </span>
-                  <IntelligenceBadge
-                    type={financials?.aiDeepDive?.thesisHeadline ? 'ai' : 'heuristic'}
-                    provider={financials?.aiDeepDive?.provider}
-                  />
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-700/50">
-                    {financials.aiDeepDive.recommendation}
-                  </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">
-                    Conviction: {financials.aiDeepDive.convictionScore}/100
-                  </span>
-                </div>
-                <p className="text-xs text-gray-800 dark:text-gray-200 font-semibold mt-1">
-                  {financials.aiDeepDive.thesisHeadline}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsReportModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0 self-start md:self-auto cursor-pointer transition shadow-xs flex items-center gap-1 active:scale-95"
-            >
-              <span>Xem Luận Điểm CFA</span>
-              <span>➔</span>
-            </button>
-          </div>
-        )}
-
         {/* Hàng trên: Giá Hội Tụ, Thị Giá, Upside, MoS */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-indigo-100 dark:border-indigo-800/60 pb-4">
           <div>
