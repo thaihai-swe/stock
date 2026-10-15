@@ -37,6 +37,7 @@ import NewsSentimentCard from './valuation/NewsSentimentCard.jsx';
 import FullResearchReportModal from './valuation/FullResearchReportModal.jsx';
 import InteractiveValuationSandboxCard from './valuation/InteractiveValuationSandboxCard.jsx';
 import ClassicInvestmentPhilosophiesCard from './valuation/ClassicInvestmentPhilosophiesCard.jsx';
+import QualityOfEarningsCard from './valuation/QualityOfEarningsCard.jsx';
 
 // Định nghĩa 4 Không Gian Phân Tích Chuyên Sâu
 const WORKSPACES = [
@@ -59,7 +60,7 @@ const WORKSPACES = [
     label: '3. Pháp Y BCTC & Sức Khỏe',
     icon: '🛡️',
     badge: 'Kiểm Toán',
-    desc: 'Beneish M-Score, Magic Formula, Điểm Uốn FCF, Cổ Tức & Cổ Đông'
+    desc: 'Beneish M-Score, Sloan Accruals, Chất Lượng Lợi Nhuận, Điểm Uốn FCF & Sức Khỏe'
   },
   {
     id: 'market-dynamics',
@@ -497,6 +498,15 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
             <ForensicAccountingCard
               financials={financials}
               stockItem={currentStock}
+            />
+          )}
+
+          {/* Thước Đo Chất Lượng Lợi Nhuận & Hệ Số Dồn Tích Sloan */}
+          {financials && (
+            <QualityOfEarningsCard
+              financials={financials}
+              stockItem={currentStock}
+              symbol={selectedSymbol}
             />
           )}
 

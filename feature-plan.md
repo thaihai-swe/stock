@@ -2,7 +2,7 @@
 2: [x] Phòng Thí Nghiệm Giả Định Định Giá (Interactive Valuation Sandbox) (Đã xong)
 3: [ ] AI BCTC Executive Summary. Dùng AI phân tích báo cáo tài chính và tạo bản tóm tắt điều hành, định giá cổ phiếu.
 4: [x] Bộ Lọc Theo Các Triết Lý Đầu Tư Kinh Điển. ở tab định giá cần hiển thị cổ phiếu này thoả mãn các triết lý đầu tư kinh điển nào (Đã xong)
-5: [ ] Thước Đo Chất Lượng Lợi Nhuận (Quality of Earnings & Sloan Accrual)
+5: [x] Thước Đo Chất Lượng Lợi Nhuận (Quality of Earnings & Sloan Accrual) (Đã xong)
 6: [ ] Cố Vấn Khóa Lợi Nhuận Linh Hoạt (Smart Trailing Stop Advisor)
 7: [ ] Thước Đo Tỷ Lệ Thưởng / Rủi Ro (Risk-Reward Ratio — R:R)
 8: [ ] Giám Sát Cán Cân Lệnh Cá Mập vs Nhỏ Lẻ (Aggressive Buy/Sell Order Flow)
