@@ -606,7 +606,16 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 42352
+    "impliedFcfYieldPrice": 42352,
+    "aiConvergence": {
+      "convergenceHeadline": "Hội Tụ Định Giá: P/B Bảo Vệ Giá Sàn, DCF Nâng Tầm Giá Trị Nội Tại Dài Hạn",
+      "divergenceExplanation": "Mô hình P/E ngắn hạn có xu hướng định giá chiết khấu do chưa phản ánh đầy đủ công suất mới từ Dung Quất 2; ngược lại, mô hình chiết khấu dòng tiền (DCF/FCFF) lượng hóa trọn vẹn giá trị gia tăng sau chu kỳ đầu tư, lý giải cho mức biên an toàn 27% hiện hữu giữa giá trị hợp lý và giá thị trường.",
+      "sensitivityStory": "Khi thử tải độ nhạy với chi phí vốn bình quân WACC tăng thêm 1.5% (từ giả định 10.5% lên 12.0%), giá trị định giá nội tại theo DCF điều chỉnh giảm 11.8%, nhưng biên an toàn vẫn được bảo toàn trên 15%, thể hiện sức chống chịu vĩ mô vững vàng.",
+      "preferredModelRecommendation": "Kết hợp giữa Phương pháp Chiết khấu dòng tiền tự do doanh nghiệp (FCFF chu kỳ 10 năm) và P/B mục tiêu theo chu kỳ tài sản",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -3302,6 +3311,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Tích Cực",
+      "sentimentScore": 75,
+      "executiveSummary": "Dòng thông tin 30 ngày qua phản ánh tiến độ xây dựng tích cực của Khu liên hợp Dung Quất 2 cùng diễn biến khả quan trong cuộc điều tra phòng vệ thương mại thép HRC nhập khẩu. Áp lực cạnh tranh từ thép giá rẻ được cân bằng nhờ sản lượng bán hàng nội địa và xuất khẩu duy trì đà phục hồi vững chắc.",
+      "catalysts": [
+        "Bộ Công Thương đẩy nhanh tiến trình điều tra chống bán phá giá HRC, tạo tiền đề cho biện pháp bảo hộ sản xuất trong nước",
+        "Công tác lắp đặt thiết bị phân kỳ 1 dự án Dung Quất 2 bám sát kế hoạch, sẵn sàng cho công tác chạy thử lò cao"
+      ],
+      "keyRisks": [
+        "Tỷ giá USD/VND duy trì ở mức cao gây áp lực chi phí tài chính lên các khoản nợ vay ngoại tệ và chi phí nhập khẩu nguyên liệu",
+        "Các rào cản kỹ thuật và quy định carbon (CBAM) từ thị trường EU gây áp lực chuyển dịch xanh dài hạn"
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -3540,6 +3566,67 @@
       "latestCfo": 5825.0,
       "latestCapex": 7034.0,
       "constructionInProgress": 13987.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.56 (vượt ngưỡng an toàn -1.78) phát tín hiệu cảnh báo nhưng đây là hiện tượng 'dương tính giả' kinh điển do HPG đang ở đỉnh chu kỳ giải ngân tài sản cố định (CAPEX) tại Dung Quất 2. Sự gia tăng mạnh của chi phí xây dựng cơ bản dở dang làm sai lệch chỉ số chất lượng tài sản (AQI) và chỉ số tăng trưởng doanh thu (SGI), hoàn toàn không xuất phát từ việc ghi nhận doanh thu ảo.",
+      "dupontEarningsQuality": "Chất lượng ROE (18.01%) rất lành mạnh và bền vững khi động lực chính đến từ Biên hoạt động EBIT xuất sắc (15.34%) và gánh nặng lãi vay được kiểm soát tốt (0.849x), thay vì phụ thuộc vào việc kéo giãn đòn bẩy tài chính (FL ở mức an toàn 1.97x). Vòng quay tài sản tạm thời đạt 0.79x do quy mô tài sản dở dang lớn chưa phát sinh doanh thu thương mại.",
+      "auditorChecklist": [
+        "Kế hoạch vốn hóa chi phí lãi vay vào giá trị dự án Dung Quất 2 và lộ trình trích khấu hao tài sản cố định sau khi vận hành thương mại",
+        "Chính sách trích lập dự phòng giảm giá hàng tồn kho nguyên liệu (quặng sắt, than coke) trước biến động giá hàng hóa thế giới"
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
+  },
+  "aiDeepDive": {
+    "thesisHeadline": "Bình Minh Chu Kỳ Mới Cùng Dung Quất 2: Vị Thế Thống Lĩnh Vững Chắc và Biên An Toàn Cao",
+    "cfaSummary": "HPG đang bước vào điểm uốn chu kỳ quan trọng khi đại dự án Dung Quất 2 hoàn thiện phân kỳ 1, giúp củng cố vị thế nhà sản xuất thép có chi phí thấp nhất khu vực Đông Nam Á. Với biên hoạt động EBIT ấn tượng 15.34% và ROE vượt 18%, mức chiết khấu hiện tại tương ứng biên an toàn 27% mở ra cơ hội tích lũy hấp dẫn cho tầm nhìn trung - dài hạn.",
+    "coreCatalysts": [
+      "Dự án Dung Quất 2 đi vào hoạt động nâng tổng công suất HRC lên trên 11 triệu tấn/năm, tạo bước nhảy vọt về doanh thu và quy mô kinh tế",
+      "Triển vọng áp thuế chống bán phá giá thép HRC nhập khẩu từ Trung Quốc/Ấn Độ giúp bảo vệ thị phần và nâng cao biên lợi nhuận nội địa"
+    ],
+    "investmentRisks": [
+      "Biến động giá nguyên liệu đầu vào (quặng sắt, than mỡ) và rủi ro dư thừa nguồn cung thép giá rẻ từ thị trường Trung Quốc",
+      "Tiến độ phục hồi của thị trường bất động sản dân dụng trong nước chậm hơn kỳ vọng làm suy yếu sức hấp thụ thép xây dựng"
+    ],
+    "recommendation": "MUA GOM TÍCH LŨY",
+    "targetHorizon": "12 - 24 Tháng",
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
+  },
+  "dividendSustainability": {
+    "aiDividendAudit": {
+      "safetyRating": "Cần Theo Dõi (Borderline)",
+      "fcfCoverageVerdict": "Dòng tiền tự do (FCF) hiện tại bị co hẹp hoặc âm do doanh nghiệp tập trung dòng tiền thuần từ hoạt động kinh doanh (OCF) để tài trợ cho chương trình đầu tư mở rộng Dung Quất 2 (hơn 85.000 tỷ VND). Cổ tức tiền mặt trong ngắn hạn không được FCF bảo chứng toàn phần mà phụ thuộc vào điều phối thanh khoản thực tế.",
+      "trapRiskLevel": "Thấp",
+      "capitalAllocationScore": 8.5,
+      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn của Ban Lãnh Đạo thuộc nhóm tối ưu nhất trên TTCK Việt Nam: kiên định không đầu tư ngoài ngành, ưu tiên tối đa vốn tự có và nợ vay chi phí thấp vào dự án cốt lõi có ROI cao vượt trội, chủ động cắt giảm cổ tức tiền mặt tạm thời để tránh rủi ro đòn bẩy.",
+      "outlook3Y": "Dự kiến trong 1-2 năm tới HPG sẽ ưu tiên chia cổ tức bằng cổ phiếu (10-15%) và hạn chế tiền mặt để phục vụ giai đoạn cuối dự án; dòng tiền FCF thặng dư từ năm thứ 3 khi Dung Quất 2 hoạt động tối đa công suất sẽ mở đường cho việc khôi phục cổ tức tiền mặt 15-20%.",
+      "redFlags": [
+        "Dòng tiền tự do (FCF) âm tạm thời trong giai đoạn cao điểm giải ngân CAPEX dự án Dung Quất 2",
+        "Chính sách ưu tiên cổ tức bằng cổ phiếu để giữ lại vốn khiến nhà đầu tư thu nhập cổ tức tiền mặt ngắn hạn không đạt lợi suất kỳ vọng"
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
+  },
+  "aiDividendAudit": {
+    "safetyRating": "Cần Theo Dõi (Borderline)",
+    "fcfCoverageVerdict": "Dòng tiền tự do (FCF) hiện tại bị co hẹp hoặc âm do doanh nghiệp tập trung dòng tiền thuần từ hoạt động kinh doanh (OCF) để tài trợ cho chương trình đầu tư mở rộng Dung Quất 2 (hơn 85.000 tỷ VND). Cổ tức tiền mặt trong ngắn hạn không được FCF bảo chứng toàn phần mà phụ thuộc vào điều phối thanh khoản thực tế.",
+    "trapRiskLevel": "Thấp",
+    "capitalAllocationScore": 8.5,
+    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn của Ban Lãnh Đạo thuộc nhóm tối ưu nhất trên TTCK Việt Nam: kiên định không đầu tư ngoài ngành, ưu tiên tối đa vốn tự có và nợ vay chi phí thấp vào dự án cốt lõi có ROI cao vượt trội, chủ động cắt giảm cổ tức tiền mặt tạm thời để tránh rủi ro đòn bẩy.",
+    "outlook3Y": "Dự kiến trong 1-2 năm tới HPG sẽ ưu tiên chia cổ tức bằng cổ phiếu (10-15%) và hạn chế tiền mặt để phục vụ giai đoạn cuối dự án; dòng tiền FCF thặng dư từ năm thứ 3 khi Dung Quất 2 hoạt động tối đa công suất sẽ mở đường cho việc khôi phục cổ tức tiền mặt 15-20%.",
+    "redFlags": [
+      "Dòng tiền tự do (FCF) âm tạm thời trong giai đoạn cao điểm giải ngân CAPEX dự án Dung Quất 2",
+      "Chính sách ưu tiên cổ tức bằng cổ phiếu để giữ lại vốn khiến nhà đầu tư thu nhập cổ tức tiền mặt ngắn hạn không đạt lợi suất kỳ vọng"
+    ],
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   }
 }

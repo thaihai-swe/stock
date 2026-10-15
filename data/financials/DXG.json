@@ -609,7 +609,16 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 6576
+    "impliedFcfYieldPrice": 6576,
+    "aiConvergence": {
+      "convergenceHeadline": "Xung đột định giá sâu sắc giữa giá trị tài sản ròng kỳ vọng (RNAV) và hiệu quả dòng tiền hiện hữu (DCF/PE)",
+      "divergenceExplanation": "Mô hình P/E và DCF đưa ra định giá thận trọng do ROE chạm đáy (0.25%) và dòng tiền tự do (FCF) âm triền miên bởi áp lực chôn vốn trong hàng tồn kho. Trái lại, định giá theo phương pháp RNAV lại neo ở mức cao nhờ quỹ đất lớn tích lũy từ quá khứ, song phương pháp này phụ thuộc hoàn toàn vào giả định lạc quan về tiến độ pháp lý và khả năng hấp thụ của thị trường.",
+      "sensitivityStory": "Thử nghiệm kịch bản bất lợi khi chi phí vốn WACC tăng thêm 1.5% và thời gian cấp phép dự án kéo dài thêm 12 tháng, giá trị nội tại ước tính theo DCF/RNAV sụt giảm từ 22% đến 28%, phản ánh mức độ nhạy cảm rất cao của DXG đối với chi phí tài trợ vốn.",
+      "preferredModelRecommendation": "Phương pháp RNAV (Giá trị tài sản ròng) có áp dụng mức chiết khấu an toàn tối thiểu 25-30% cho rủi ro pháp lý và chi phí vốn hóa dở dang, phối hợp kiểm chứng cùng P/B chu kỳ.",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -2884,6 +2893,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 55,
+      "executiveSummary": "Dòng chảy thông tin gần đây phân hóa mạnh giữa kỳ vọng tháo gỡ pháp lý hạ tầng dự án và những lo ngại thường trực về các kế hoạch phát hành thêm cổ phiếu tăng vốn. Tâm lý thị trường ngắn hạn nhìn chung được nâng đỡ bởi chính sách nới lỏng tiền tệ nhưng cơ bản doanh nghiệp chưa có sự bứt phá tương ứng.",
+      "catalysts": [
+        "Tiến độ hoàn thiện pháp lý và bàn giao sổ đỏ tại các dự án vùng ven giúp củng cố niềm tin khách hàng.",
+        "Khung pháp lý từ các bộ luật Bất động sản mới tạo hành lang giải quyết tắc nghẽn dự án dở dang."
+      ],
+      "keyRisks": [
+        "Áp lực nguồn cung cổ phiếu gia tăng sau các đợt chào bán cho cổ đông hiện hữu gây áp lực bán ngắn hạn.",
+        "Tốc độ hấp thụ thực tế của phân khúc đất nền và căn hộ trung cấp vẫn còn chậm do tâm lý thận trọng của người mua."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -3122,6 +3148,69 @@
       "latestCfo": -880.0,
       "latestCapex": 44.0,
       "constructionInProgress": 777.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.91 tiệm cận ngưỡng rủi ro (-1.78), cảnh báo nguy cơ tiềm ẩn trong việc vốn hóa chi phí lãi vay và chi phí phát triển vào hàng tồn kho dở dang thay vì phản ánh lên kết quả kinh doanh. Tỷ số gánh nặng lãi vay (Interest Burden = 1.0) cho thấy chi phí tài chính chưa được trừ trực tiếp vào EBIT kỳ này mà phần lớn được kích hoạt vào giá trị tài sản dở dang.",
+      "dupontEarningsQuality": "Chất lượng ROE (0.25%) suy giảm nghiêm trọng, phản ánh hiệu quả sử dụng vốn cực thấp do vòng quay tài sản chậm chạp (0.08x) và biên lợi nhuận hoạt động mỏng (1.65%), cho thấy lợi nhuận kế toán không có sự bảo chứng từ hiệu quả kinh doanh cốt lõi.",
+      "auditorChecklist": [
+        "Chi tiết giá trị chi phí lãi vay và chi phí quản lý được vốn hóa vào số dư hàng tồn kho tại các dự án trọng điểm (Gem Sky World, Opal Boulevard, Riverside) trong năm qua là bao nhiêu?",
+        "Tiến độ thu hồi và mức độ an toàn tín dụng của các khoản phải thu hợp tác đầu tư, đặt cọc nhận chuyển nhượng dự án đối với các bên liên quan?"
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
+  },
+  "aiDeepDive": {
+    "thesisHeadline": "Đáy chu kỳ sinh lời phản ánh vào định giá; Thách thức giải phóng tồn kho và áp lực pha loãng",
+    "cfaSummary": "Hiệu suất sinh lời của DXG rơi về vùng đáy lịch sử với ROE chỉ đạt 0.25% do vòng quay tài sản tê liệt (0.08x) và hoạt động bàn giao dự án đình trệ. Mặc dù đòn bẩy nợ ở ngưỡng kiểm soát được (1.88x) nhờ liên tục gọi vốn cổ phần, thị giá hiện tại đang vượt xa giá trị nội tại thực tế (Biên an toàn -40.2%), đòi hỏi sự thận trọng cao độ.",
+    "coreCatalysts": [
+      "Kỳ vọng tái khởi động mở bán và tháo gỡ vướng mắc pháp lý tại các dự án trọng điểm như Gem Sky World và DatxanhHomes Riverside.",
+      "Mảng dịch vụ môi giới bất động sản (DXS) phục hồi dần theo thanh khoản thị trường địa ốc phía Nam."
+    ],
+    "investmentRisks": [
+      "Rủi ro pha loãng EPS và giá trị cổ phiếu kéo dài từ các đợt phát hành tăng vốn để tài trợ hoạt động kinh doanh.",
+      "Tiến độ gỡ vướng pháp lý kéo dài làm gia tăng chi phí vốn hóa vào hàng tồn kho, đè nặng lên biên lợi nhuận tương lai."
+    ],
+    "recommendation": "CÂN NHẮC CHỐT LỜI",
+    "targetHorizon": "12 - 24 Tháng",
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
+  },
+  "dividendSustainability": {
+    "aiDividendAudit": {
+      "safetyRating": "Nguy Cơ Bẫy Cổ Tức (Trap Risk)",
+      "fcfCoverageVerdict": "Dòng tiền tự do (FCF) âm kéo dài do nhu cầu vốn khổng lồ để duy trì quỹ đất và xử lý nợ gốc, khiến DXG hoàn toàn không có khả năng bảo chứng chi trả cổ tức tiền mặt từ dòng tiền kinh doanh thực.",
+      "trapRiskLevel": "Cao",
+      "capitalAllocationScore": 4.5,
+      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn thiên lệch về mở rộng quy mô thông qua phát hành cổ phiếu và tích lũy quỹ đất, trong khi năng lực tạo tiền mặt tự do suy yếu; quyền lợi cổ tức tiền mặt của cổ đông thiểu số liên tục bị thay thế bằng cổ phiếu thưởng và quyền mua bổ sung.",
+      "outlook3Y": "Dự kiến trong 1-3 năm tới, DXG sẽ tiếp tục chính sách không chi trả cổ tức tiền mặt hoặc chỉ chia cổ phiếu nhằm bảo toàn thanh khoản phục vụ hoàn thiện dự án và thanh toán nghĩa vụ nợ.",
+      "redFlags": [
+        "Dòng tiền tự do FCF âm kéo dài qua các năm, không có thặng dư tiền mặt thực tế để chia cổ tức.",
+        "Tập quán huy động vốn liên tục qua phát hành quyền mua gây pha loãng giá trị sổ sách và EPS.",
+        "Vòng quay tài sản suy kiệt (0.08x) cho thấy dòng vốn bị kẹt cứng trong các dự án chậm tiến độ pháp lý."
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
+  },
+  "aiDividendAudit": {
+    "safetyRating": "Nguy Cơ Bẫy Cổ Tức (Trap Risk)",
+    "fcfCoverageVerdict": "Dòng tiền tự do (FCF) âm kéo dài do nhu cầu vốn khổng lồ để duy trì quỹ đất và xử lý nợ gốc, khiến DXG hoàn toàn không có khả năng bảo chứng chi trả cổ tức tiền mặt từ dòng tiền kinh doanh thực.",
+    "trapRiskLevel": "Cao",
+    "capitalAllocationScore": 4.5,
+    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn thiên lệch về mở rộng quy mô thông qua phát hành cổ phiếu và tích lũy quỹ đất, trong khi năng lực tạo tiền mặt tự do suy yếu; quyền lợi cổ tức tiền mặt của cổ đông thiểu số liên tục bị thay thế bằng cổ phiếu thưởng và quyền mua bổ sung.",
+    "outlook3Y": "Dự kiến trong 1-3 năm tới, DXG sẽ tiếp tục chính sách không chi trả cổ tức tiền mặt hoặc chỉ chia cổ phiếu nhằm bảo toàn thanh khoản phục vụ hoàn thiện dự án và thanh toán nghĩa vụ nợ.",
+    "redFlags": [
+      "Dòng tiền tự do FCF âm kéo dài qua các năm, không có thặng dư tiền mặt thực tế để chia cổ tức.",
+      "Tập quán huy động vốn liên tục qua phát hành quyền mua gây pha loãng giá trị sổ sách và EPS.",
+      "Vòng quay tài sản suy kiệt (0.08x) cho thấy dòng vốn bị kẹt cứng trong các dự án chậm tiến độ pháp lý."
+    ],
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   }
 }
