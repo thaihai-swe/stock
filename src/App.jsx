@@ -188,7 +188,38 @@ export default function App({ hasGoogleClientId = false }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [authExpired, setAuthExpired] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Nhận diện lỗi hết hạn token hoặc không hợp lệ
+  const isAuthError = useCallback((err) => {
+    return Boolean(
+      err?.status === 401 ||
+      err?.isAuth ||
+      (typeof err?.message === 'string' && (
+        err.message.includes('hết hạn') ||
+        err.message.includes('không hợp lệ') ||
+        err.message.includes('Phiên đăng nhập') ||
+        err.message.includes('401')
+      ))
+    );
+  }, []);
+
+  // Lắng nghe sự kiện toàn cục khi bất kỳ API call nào bị từ chối với HTTP 401
+  useEffect(() => {
+    let lastToast = 0;
+    const handleGlobalAuthExpired = (e) => {
+      setAuthExpired(true);
+      setIsLoginModalOpen(true);
+      const now = Date.now();
+      if (now - lastToast > 4000) {
+        lastToast = now;
+        showToast(e.detail?.message || 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'warning');
+      }
+    };
+    window.addEventListener('auth:expired', handleGlobalAuthExpired);
+    return () => window.removeEventListener('auth:expired', handleGlobalAuthExpired);
+  }, [showToast]);
 
   const loadData = useCallback(async () => {
     try {
@@ -196,12 +227,17 @@ export default function App({ hasGoogleClientId = false }) {
       setData(d);
       setRefreshKey(k => k + 1);
       setError('');
+      setAuthExpired(false);
     } catch (err) {
+      if (isAuthError(err)) {
+        setAuthExpired(true);
+        setIsLoginModalOpen(true);
+      }
       setError(err.message || 'Không thể kết nối server. Hãy đảm bảo server đang chạy.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthError]);
 
   // Kiểm tra phiên đăng nhập hiện tại khi khởi động
   const checkAuth = useCallback(async () => {
@@ -209,11 +245,16 @@ export default function App({ hasGoogleClientId = false }) {
       const res = await fetchCurrentUser();
       if (res?.user) {
         setCurrentUser(res.user);
+        setAuthExpired(false);
       }
     } catch (err) {
       console.warn('Không thể kiểm tra phiên đăng nhập:', err);
+      if (isAuthError(err)) {
+        setAuthExpired(true);
+        setIsLoginModalOpen(true);
+      }
     }
-  }, []);
+  }, [isAuthError]);
 
   useEffect(() => {
     checkAuth();
@@ -226,6 +267,8 @@ export default function App({ hasGoogleClientId = false }) {
   // Xử lý Đăng nhập Google hoặc Test User
   async function handleLoginSuccess(token) {
     setAuthToken(token);
+    setAuthExpired(false);
+    setError('');
     try {
       let userObj;
       if (token.startsWith('test-')) {
@@ -252,6 +295,8 @@ export default function App({ hasGoogleClientId = false }) {
   // Chuyển sang chế độ Demo
   async function handleSwitchToDemo() {
     setAuthToken('demo');
+    setAuthExpired(false);
+    setError('');
     const demoUser = {
       id: 'demo',
       email: 'demo@stockmanager.app',
@@ -267,6 +312,8 @@ export default function App({ hasGoogleClientId = false }) {
   // Đăng xuất
   async function handleLogout() {
     clearAuthToken();
+    setAuthExpired(false);
+    setError('');
     const demoUser = {
       id: 'demo',
       email: 'demo@stockmanager.app',
@@ -581,21 +628,57 @@ export default function App({ hasGoogleClientId = false }) {
         {loading ? (
           <DashboardSkeleton />
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-6 text-center max-w-lg mx-auto my-8 shadow-xs">
-            <p className="text-4xl mb-2">⚠️</p>
-            <p className="font-bold text-base mb-1">Không thể kết nối máy chủ</p>
-            <p className="text-xs text-red-600 bg-white/70 p-2.5 rounded-xl border border-red-100 font-mono text-left break-all">
-              {error}
-            </p>
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <button
-                onClick={loadData}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer"
-              >
-                🔄 Thử lại
-              </button>
+          authExpired || isAuthError({ message: error }) ? (
+            <div className="bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-3xl p-6 sm:p-8 text-center max-w-lg mx-auto my-10 shadow-sm">
+              <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-2xs">
+                🔐
+              </div>
+              <h3 className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white mb-2">
+                Phiên Đăng Nhập Đã Hết Hạn
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                Phiên làm việc của bạn đã hết hạn hoặc không còn hiệu lực. Vui lòng đăng nhập lại để tiếp tục đồng bộ dữ liệu danh mục của bạn, hoặc chuyển sang chế độ Demo để tiếp tục trải nghiệm.
+              </p>
+              <div className="mb-6 p-2.5 bg-amber-100/70 dark:bg-amber-900/30 rounded-xl text-[11px] font-mono text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/40 break-all text-left">
+                {error}
+              </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>🔑</span>
+                  <span>Đăng Nhập Lại</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSwitchToDemo}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>🏖️</span>
+                  <span>Tiếp Tục Với Demo</span>
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 rounded-2xl p-6 text-center max-w-lg mx-auto my-8 shadow-xs">
+              <p className="text-4xl mb-2">⚠️</p>
+              <p className="font-bold text-base mb-1 text-red-800 dark:text-red-200">Không thể kết nối máy chủ</p>
+              <p className="text-xs text-red-600 dark:text-red-400 bg-white/70 dark:bg-red-900/20 p-2.5 rounded-xl border border-red-100 dark:border-red-900/40 font-mono text-left break-all mb-4">
+                {error}
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadData}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer transition-colors"
+                >
+                  🔄 Thử lại
+                </button>
+              </div>
+            </div>
+          )
         ) : (
           <>
             {tab === 'dashboard' && (

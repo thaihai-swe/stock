@@ -57,7 +57,11 @@ def run_tests():
     if REQUESTED_FILE.exists():
         try:
             with open(REQUESTED_FILE, "r", encoding="utf-8") as f:
-                req_data = json.load(f)
+                loaded = json.load(f)
+                if isinstance(loaded, dict):
+                    req_data = loaded
+                elif isinstance(loaded, list):
+                    req_data = {item.get("symbol"): item for item in loaded if isinstance(item, dict) and item.get("symbol")}
         except Exception:
             req_data = {}
 

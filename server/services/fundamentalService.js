@@ -1,6 +1,5 @@
 import { FUNDAMENTALS_TTL_MS } from '../config/constants.js';
 import { loadFundamentalsCache, saveFundamentalsCache } from '../storage/jsonStore.js';
-import { db } from '../storage/db.js';
 
 let memoryFundamentalsCache = loadFundamentalsCache();
 
@@ -218,31 +217,9 @@ async function fetchTradingViewFundamentals(symbols = []) {
   return results;
 }
 
-async function fetchFromDatabase(symbols = []) {
-  if (!symbols.length || !db) return {};
-  try {
-    const placeholders = symbols.map(() => '?').join(',');
-    const res = await db.execute({
-      sql: `SELECT symbol, data, updated_at FROM fundamentals_cache WHERE symbol IN (${placeholders})`,
-      args: symbols
-    });
-    const map = {};
-    if (res && res.rows) {
-      for (const row of res.rows) {
-        if (row.symbol && row.data) {
-          map[row.symbol] = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
-        }
-      }
-    }
-    return map;
-  } catch {
-    return {};
-  }
-}
-
 /**
  * Hàm chính: Lấy dữ liệu cơ bản cho danh sách mã cổ phiếu
- * Tích hợp cache memory & Turso Cloud DB với TTL 12h
+ * Tích hợp cache memory & Local JSON Tầng 3 với TTL 12h
  */
 export async function getMultipleFundamentals(symbols = [], force = false) {
   const cleanSymbols = [...new Set(symbols.map(s => (s || '').trim().toUpperCase()).filter(Boolean))];
@@ -268,31 +245,13 @@ export async function getMultipleFundamentals(symbols = [], force = false) {
     }
   }
 
-  // 1. Thử lấy từ Turso Database nếu cache memory chưa có hoặc đã hết hạn
-  let remainingToFetch = [...symbolsToFetch];
-  if (!force && remainingToFetch.length > 0) {
-    const dbMap = await fetchFromDatabase(remainingToFetch);
-    const stillNeeded = [];
-    for (const sym of remainingToFetch) {
-      const dbItem = dbMap[sym];
-      const isDbExpired = !dbItem || !dbItem.updatedAt || (now - dbItem.updatedAt > FUNDAMENTALS_TTL_MS);
-      if (dbItem && !isDbExpired) {
-        memoryFundamentalsCache[sym] = dbItem;
-        resultMap[sym] = dbItem;
-      } else {
-        stillNeeded.push(sym);
-      }
-    }
-    remainingToFetch = stillNeeded;
-  }
-
-  // 2. Chỉ gọi TradingView API cho những mã thực sự còn thiếu
-  if (remainingToFetch.length > 0) {
+  // Chỉ gọi TradingView API cho những mã thực sự còn thiếu hoặc hết hạn cache
+  if (symbolsToFetch.length > 0) {
     try {
-      const fetchedMap = await fetchTradingViewFundamentals(remainingToFetch);
+      const fetchedMap = await fetchTradingViewFundamentals(symbolsToFetch);
       let hasNewData = false;
 
-      for (const sym of remainingToFetch) {
+      for (const sym of symbolsToFetch) {
         if (fetchedMap[sym]) {
           const old = memoryFundamentalsCache[sym] || {};
           const merged = {
@@ -355,7 +314,7 @@ export async function getMultipleFundamentals(symbols = [], force = false) {
     } catch (err) {
       console.error('[fundamentalService] Error fetching TradingView data:', err.message);
       // Fallback to existing cache if available
-      for (const sym of remainingToFetch) {
+      for (const sym of symbolsToFetch) {
         if (memoryFundamentalsCache[sym]) {
           resultMap[sym] = memoryFundamentalsCache[sym];
         }

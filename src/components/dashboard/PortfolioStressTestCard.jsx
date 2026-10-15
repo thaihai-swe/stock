@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import IntelligenceBadge, { getIntelligenceSource } from '../common/IntelligenceBadge.jsx';
 import { fetchPortfolioAiStressTest, refreshPortfolioAiStressTest } from '../../utils/api.js';
+import { useToast } from '../../context/ToastContext.jsx';
 
 export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0, onRefreshSuccess }) {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
@@ -33,19 +35,26 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
     try {
       setRefreshing(true);
       const res = await refreshPortfolioAiStressTest();
-      if (res?.data) {
+      if (res?.isQueued) {
+        showToast(res.message || 'Yêu cầu làm mới đã được ghi nhận vào hàng đợi xử lý!', 'info');
+        if (res.data) setReport(res.data);
+      } else if (res?.data) {
         setReport(res.data);
+        showToast(res.message || 'Đã làm mới báo cáo sức khỏe danh mục thành công!', 'success');
       } else {
         const updated = await fetchPortfolioAiStressTest();
         setReport(updated);
+        showToast('Đã làm mới báo cáo sức khỏe danh mục!', 'success');
       }
       if (onRefreshSuccess) onRefreshSuccess();
     } catch (err) {
       console.warn('Lỗi refresh portfolio stress test:', err);
+      showToast(err.message || 'Lỗi khi làm mới báo cáo AI', 'error');
     } finally {
       setRefreshing(false);
     }
   };
+
 
   const intel = getIntelligenceSource(report);
   const healthScore = report?.healthScore || 'B+';
@@ -68,6 +77,11 @@ export default function PortfolioStressTestCard({ holdings = [], cashBalance = 0
               Quản Trị Rủi Ro Danh Mục (CRO)
             </span>
             <IntelligenceBadge source={report} provider={report?.provider} />
+            {report?.status === 'PENDING' && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 animate-pulse border border-amber-300 dark:border-amber-700">
+                ⏳ Đang chờ phân tích
+              </span>
+            )}
             <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full border ${scoreColor}`}>
               Hạng {healthScore}
             </span>

@@ -44,6 +44,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+
+// Bắt các route /api/* không tồn tại
+app.use('/api/*', notFoundHandler);
+
+// Middleware xử lý lỗi toàn cục
+app.use(errorHandler);
+
 // Serve React build (khi chạy local độc lập hoặc Docker)
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));

@@ -34,43 +34,21 @@ def urlopen_safe(req, timeout=30):
             return urllib.request.urlopen(req, timeout=timeout, context=unverified_ctx)
         raise e
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = CURRENT_DIR.parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+
+from lib.io_helper import atomic_write_json, safe_read_json, load_project_env
+from fetchers.market_fetcher import TRADINGVIEW_COLUMNS as COLUMNS, MarketFetcher
+
+load_project_env()
+
 DATA_DIR = ROOT_DIR / "data"
 FINANCIALS_DIR = DATA_DIR / "financials"
 SUPPORTED_FILE = DATA_DIR / "supported_stocks.json"
 CACHE_FILE = DATA_DIR / "fundamentals_cache.json"
 MACRO_FILE = DATA_DIR / "macro_valuation.json"
-ENV_FILE = ROOT_DIR / ".env"
-
-def load_env_file():
-    if ENV_FILE.exists():
-        try:
-            for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if line and not line.startswith("#") and "=" in line:
-                    key, val = line.split("=", 1)
-                    key = key.strip()
-                    val = val.strip().strip("'").strip('"')
-                    os.environ.setdefault(key, val)
-        except Exception as e:
-            print(f"⚠️ Không thể đọc file .env: {e}")
-
-load_env_file()
-
-COLUMNS = [
-    "name", "description", "close", "change", "change_abs", "volume",
-    "sector.tr", "industry.tr",
-    "price_earnings_ttm", "price_book_ratio", "price_sales_ratio", "enterprise_value_to_ebitda_ratio",
-    "return_on_equity_fq", "return_on_equity_fy", "return_on_assets_fq", "return_on_assets_fy",
-    "earnings_per_share_basic_ttm", "gross_margin_ttm", "operating_margin_ttm", "net_margin_ttm",
-    "dividends_yield", "dps_common_stock_prim_issue_fy", "free_cash_flow_ttm", "free_cash_flow_margin_ttm",
-    "total_debt_fq", "total_assets_fq", "debt_to_equity_fq", "current_ratio_fq", "quick_ratio_fq", "ebitda_ttm",
-    "total_revenue_ttm", "net_income_ttm", "market_cap_basic", "total_shares_outstanding_fundamental",
-    "Perf.W", "Perf.1M", "Perf.3M", "Perf.6M", "Perf.YTD", "Perf.Y", "Perf.5Y",
-    "price_52_week_high", "price_52_week_low",
-    "average_volume_10d_calc", "average_volume_30d_calc", "Volatility.W", "Volatility.M",
-    "Recommend.All", "beta_1_year"
-]
 
 def load_symbols():
     if len(sys.argv) > 1:
@@ -81,40 +59,27 @@ def load_symbols():
                 return [s.strip().upper() for s in arg.split(",") if s.strip()]
 
     symbols = []
-    if SUPPORTED_FILE.exists():
-        try:
-            with open(SUPPORTED_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                raw_list = data.get("symbols", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
-                seen = set()
-                for s in raw_list:
-                    if s and isinstance(s, str):
-                        clean = s.strip().upper()
-                        if clean and clean not in seen:
-                            seen.add(clean)
-                            symbols.append(clean)
-        except Exception as e:
-            print(f"⚠️ Không đọc được supported_stocks.json: {e}")
+    data = safe_read_json(SUPPORTED_FILE, fallback={})
+    raw_list = data.get("symbols", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
+    seen = set()
+    for s in raw_list:
+        if s and isinstance(s, str):
+            clean = s.strip().upper()
+            if clean and clean not in seen:
+                seen.add(clean)
+                symbols.append(clean)
 
     if not symbols:
         # Tự động quét từ data/financials/*.json hoặc keys từ fundamentals_cache.json
         if FINANCIALS_DIR.exists():
             symbols = sorted([p.stem.upper() for p in FINANCIALS_DIR.glob("*.json") if p.stem and not p.stem.startswith(".")])
-        if not symbols and CACHE_FILE.exists():
-            try:
-                with open(CACHE_FILE, "r", encoding="utf-8") as f:
-                    symbols = sorted(list(json.load(f).keys()))
-            except Exception:
-                pass
+        if not symbols:
+            c_data = safe_read_json(CACHE_FILE, fallback={})
+            symbols = sorted([k for k in c_data.keys() if not k.startswith("_")])
         if not symbols:
             symbols = ["HPG", "FPT", "VNM", "MWG", "MBB", "TCB", "VCB", "SSI", "VIC", "VHM"]
 
     return symbols
-
-try:
-    from fetchers.market_fetcher import MarketFetcher
-except ImportError:
-    from scripts.fetchers.market_fetcher import MarketFetcher
 
 def fetch_tradingview(symbols):
     """Ủy thác việc lấy dữ liệu TradingView Scanner sang MarketFetcher độc lập."""
@@ -486,13 +451,7 @@ def main():
         return
 
     # Đọc cache cũ dự phòng
-    old_cache = {}
-    if CACHE_FILE.exists():
-        try:
-            with open(CACHE_FILE, "r", encoding="utf-8") as f:
-                old_cache = json.load(f)
-        except Exception:
-            old_cache = {}
+    old_cache = safe_read_json(CACHE_FILE, fallback={})
 
     print("🌐 Đang truy vấn TradingView Scanner API...")
     raw = None
@@ -517,16 +476,9 @@ def main():
             item = old_cache[s]
             # Bổ sung tính toán định giá cập nhật
             fin_f = FINANCIALS_DIR / f"{s}.json"
-            fallback_yearly = []
-            fallback_ratios = {}
-            if fin_f.exists():
-                try:
-                    with open(fin_f, "r", encoding="utf-8") as f_f:
-                        f_data = json.load(f_f)
-                        fallback_yearly = f_data.get("yearly", [])
-                        fallback_ratios = f_data.get("financialRatios", {})
-                except Exception:
-                    pass
+            f_data = safe_read_json(fin_f, fallback={})
+            fallback_yearly = f_data.get("yearly", [])
+            fallback_ratios = f_data.get("financialRatios", {})
 
             val_eval = engine.evaluate({
                 "close": item.get("close"),
@@ -597,21 +549,15 @@ def main():
     if len(sys.argv) > 1:
         merged_cache = {**old_cache, **new_cache}
         # Cập nhật danh sách supported_stocks.json nếu có mã mới
-        if SUPPORTED_FILE.exists():
-            try:
-                with open(SUPPORTED_FILE, "r", encoding="utf-8") as f:
-                    sup_data = json.load(f)
-                cur_syms = sup_data.get("symbols", []) if isinstance(sup_data, dict) else (sup_data if isinstance(sup_data, list) else [])
-                updated = False
-                for s in symbols:
-                    if s not in cur_syms:
-                        cur_syms.append(s)
-                        updated = True
-                if updated:
-                    with open(SUPPORTED_FILE, "w", encoding="utf-8") as f:
-                        json.dump({"symbols": cur_syms}, f, ensure_ascii=False, indent=2)
-            except Exception:
-                pass
+        sup_data = safe_read_json(SUPPORTED_FILE, fallback={})
+        cur_syms = sup_data.get("symbols", []) if isinstance(sup_data, dict) else (sup_data if isinstance(sup_data, list) else [])
+        updated = False
+        for s in symbols:
+            if s not in cur_syms:
+                cur_syms.append(s)
+                updated = True
+        if updated:
+            atomic_write_json(SUPPORTED_FILE, {"symbols": cur_syms}, indent=2)
         new_cache = merged_cache
 
     # Lưu metadata đồng bộ vào fundamentals_cache
@@ -634,8 +580,7 @@ def main():
             pass
 
     # Ghi file data/fundamentals_cache.json (Trách nhiệm duy nhất của sync_fundamentals)
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(new_cache, f, ensure_ascii=False, indent=2)
+    atomic_write_json(CACHE_FILE, new_cache, indent=2)
     print(f"📁 Đã ghi cache định giá & xung lực kỹ thuật: {CACHE_FILE}")
 
     # Đồng bộ vào DB nếu được cấu hình

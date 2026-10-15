@@ -1443,7 +1443,8 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
   | `portfolio_beta` | `REAL` | Hệ số Beta bình quân gia quyền của danh mục so với VN-Index. |
   | `cash_weight_pct` | `REAL` | Tỷ trọng đệm tiền mặt bảo vệ trên tổng NAV (%). |
   | `report_json` | `TEXT` | Chuỗi JSON đầy đủ chứa ma trận 3 tầng độ nhạy vĩ mô (`macroSensitivity`), 3 kịch bản chịu tải cực đoan (`stressTestScenarios`), và khuyến nghị tái cân bằng (`rebalancingRecommendations`). |
-  | `status` | `TEXT` | Trạng thái sinh dữ liệu (`success` / `failed`). |
+  | `status` | `TEXT` | Trạng thái sinh dữ liệu (`success` / `PENDING` / `failed`). Giá trị `PENDING` được gán khi người dùng bấm Làm Mới trên môi trường Online/Vercel để hàng đợi tự động xử lý trong lượt đồng bộ kế tiếp. |
+
   | `updated_at` | `TEXT (ISO)` | Thời điểm sinh báo cáo phân tích. Dùng để kiểm tra Smart Delta Cache (> 6 ngày). |
 
 ---

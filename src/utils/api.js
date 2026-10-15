@@ -96,7 +96,19 @@ async function request(path, options = {}) {
       } catch {
         data = {};
       }
-      if (!res.ok) throw new Error(data.error || `Lỗi máy chủ (${res.status} ${res.statusText})`);
+      if (!res.ok) {
+        const error = new Error(data.error || `Lỗi máy chủ (${res.status} ${res.statusText})`);
+        error.status = res.status;
+        error.isAuth = res.status === 401;
+        if (res.status === 401 && typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('auth:expired', {
+              detail: { message: data.error || 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.' }
+            })
+          );
+        }
+        throw error;
+      }
 
       // 3. Lưu vào Cache nếu là GET thành công
       if (isGet) {

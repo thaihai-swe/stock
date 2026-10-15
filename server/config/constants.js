@@ -31,7 +31,12 @@ export const DEFAULT_CONSTANTS_FILE = path.join(DATA_DIR, 'default-constant-valu
 export const REQUESTED_STOCKS_FILE = path.join(DATA_DIR, 'requested_stocks.json');
 export const AI_INSIGHTS_CACHE_FILE = path.join(DATA_DIR, 'ai_insights_cache.json');
 export const AI_PORTFOLIO_CACHE_FILE = path.join(DATA_DIR, 'ai_portfolio_cache.json');
+export const FINANCIALS_DIR = path.join(DATA_DIR, 'financials');
+export const PORTFOLIO_AI_FILE = path.join(DATA_DIR, 'portfolio_ai_insights.json');
+export const MACRO_INDICATORS_FILE = path.join(DATA_DIR, 'macro_indicators.json');
+export const MARKET_HISTORY_FILE = path.join(DATA_DIR, 'market_valuation_history.json');
 export const DIST_DIR = path.join(ROOT_DIR, 'dist');
+
 
 export const PORT = process.env.PORT || sysConfig.serverPort || 3001;
 export const IN_SESSION_TTL_MS = sysConfig.inSessionTtlMs || 60 * 60 * 1000; // 1 giờ trong phiên giao dịch

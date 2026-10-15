@@ -1,44 +1,31 @@
 import express from 'express';
-import fs from 'fs';
-import { execFile } from 'child_process';
-import path from 'path';
-import { ROOT_DIR } from '../config/constants.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 import { getMultipleFundamentals } from '../services/fundamentalService.js';
 import { loadSupportedStocks, saveSupportedStocks } from '../storage/jsonStore.js';
+import { isPythonAvailable, runPythonScript } from '../utils/pythonRunner.js';
 
 const router = express.Router();
-
-const VENV_PYTHON = path.join(ROOT_DIR, '.venv', 'bin', 'python');
-const PYTHON_CMD = fs.existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
 
 /**
  * 1. Lấy dữ liệu cơ bản theo danh sách mã
  */
-router.get('/fundamentals', async (req, res) => {
+router.get('/fundamentals', asyncHandler(async (req, res) => {
   const symbols = (req.query.symbols || '')
     .split(',')
     .map(s => s.trim().toUpperCase())
     .filter(Boolean);
   const force = req.query.force === 'true';
 
-  try {
-    const result = await getMultipleFundamentals(symbols, force);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  const result = await getMultipleFundamentals(symbols, force);
+  return res.json(result);
+}));
 
 /**
  * 2. Lấy cấu hình danh sách mã hỗ trợ đồng bộ định giá
  */
 router.get('/fundamentals/supported-stocks', (req, res) => {
-  try {
-    const config = loadSupportedStocks();
-    res.json(config);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  const config = loadSupportedStocks();
+  return res.json(config);
 });
 
 /**
@@ -53,14 +40,8 @@ router.post('/fundamentals/supported-stocks', (req, res) => {
 /**
  * 4. Kích hoạt đồng bộ nền bằng Python (kèm fallback JS an toàn)
  */
-router.post('/fundamentals/sync', (req, res) => {
-  const isServerlessOrNoPython = Boolean(
-    process.env.VERCEL ||
-    process.env.NOW_REGION ||
-    !fs.existsSync(VENV_PYTHON)
-  );
-
-  if (isServerlessOrNoPython) {
+router.post('/fundamentals/sync', asyncHandler(async (req, res) => {
+  if (!isPythonAvailable()) {
     const config = loadSupportedStocks();
     return res.json({
       success: true,
@@ -71,46 +52,40 @@ router.post('/fundamentals/sync', (req, res) => {
     });
   }
 
-  const pythonScript = path.join(ROOT_DIR, 'scripts', 'sync_fundamentals.py');
+  // Chạy Python sync script qua unified pythonRunner
+  const { success, stdout, stderr } = await runPythonScript('scripts/sync_fundamentals.py');
 
-  // Ưu tiên chạy Python sync script
-  execFile(PYTHON_CMD, [pythonScript], async (error, stdout, stderr) => {
-    if (!error) {
-      const config = loadSupportedStocks();
-      return res.json({
-        success: true,
-        message: `Đã chạy xong đồng bộ Python thành công cho ${config.syncedCount || 0} mã!`,
-        syncedCount: config.syncedCount || 0,
-        lastSyncedAt: config.lastSyncedAt,
-        runner: 'Python 3',
-        output: stdout
-      });
-    }
+  if (success) {
+    const config = loadSupportedStocks();
+    return res.json({
+      success: true,
+      message: `Đã chạy xong đồng bộ Python thành công cho ${config.syncedCount || 0} mã!`,
+      syncedCount: config.syncedCount || 0,
+      lastSyncedAt: config.lastSyncedAt,
+      runner: 'Python 3',
+      output: stdout
+    });
+  }
 
-    console.warn('⚠️ Không thể chạy python3 (fallback sang JS service):', stderr || error.message);
+  console.warn('⚠️ Không thể chạy python3 (fallback sang JS service):', stderr);
 
-    // Fallback: Thực hiện fetch trực tiếp nếu môi trường thiếu python3
-    try {
-      const config = loadSupportedStocks();
-      const allSymbols = config.symbols || [];
-      const results = await getMultipleFundamentals(allSymbols, true);
-      const successCount = Object.keys(results).filter(k => !results[k]?.error).length;
+  // Fallback: Thực hiện fetch trực tiếp nếu script Python gặp lỗi
+  const config = loadSupportedStocks();
+  const allSymbols = config.symbols || [];
+  const results = await getMultipleFundamentals(allSymbols, true);
+  const successCount = Object.keys(results).filter(k => !results[k]?.error).length;
 
-      config.lastSyncedAt = new Date().toISOString();
-      config.syncedCount = successCount;
-      saveSupportedStocks(config);
+  config.lastSyncedAt = new Date().toISOString();
+  config.syncedCount = successCount;
+  saveSupportedStocks(config);
 
-      return res.json({
-        success: true,
-        message: `Đã đồng bộ thành công ${successCount}/${allSymbols.length} mã cổ phiếu!`,
-        syncedCount: successCount,
-        lastSyncedAt: config.lastSyncedAt,
-        runner: 'JavaScript Fallback'
-      });
-    } catch (fallbackErr) {
-      return res.status(500).json({ error: fallbackErr.message });
-    }
+  return res.json({
+    success: true,
+    message: `Đã đồng bộ thành công ${successCount}/${allSymbols.length} mã cổ phiếu!`,
+    syncedCount: successCount,
+    lastSyncedAt: config.lastSyncedAt,
+    runner: 'JavaScript Fallback'
   });
-});
+}));
 
 export default router;

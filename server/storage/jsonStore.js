@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { DATA_DIR, DATA_FILE, PRICES_CACHE_FILE, FUNDAMENTALS_CACHE_FILE, SUPPORTED_STOCKS_FILE } from '../config/constants.js';
+import { readJsonCached, invalidateJsonCache } from '../utils/cachedFileReader.js';
 
 /**
  * NOTE: Nghiệp vụ sổ lệnh mua/bán, danh mục và cổ tức của người dùng đã được chuyển 100%
@@ -7,16 +8,8 @@ import { DATA_DIR, DATA_FILE, PRICES_CACHE_FILE, FUNDAMENTALS_CACHE_FILE, SUPPOR
  * File jsonStore.js hiện chỉ chịu trách nhiệm quản lý Ephemeral Cache (prices) và cấu hình mã.
  */
 
-
 export function loadPriceCache() {
-  if (fs.existsSync(PRICES_CACHE_FILE)) {
-    try {
-      return JSON.parse(fs.readFileSync(PRICES_CACHE_FILE, 'utf-8'));
-    } catch {
-      return {};
-    }
-  }
-  return {};
+  return readJsonCached(PRICES_CACHE_FILE, { ttlMs: 10000, fallback: {} });
 }
 
 export function savePriceCache(cache) {
@@ -25,19 +18,14 @@ export function savePriceCache(cache) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(PRICES_CACHE_FILE, JSON.stringify(cache, null, 2));
+    invalidateJsonCache(PRICES_CACHE_FILE);
   } catch (e) {
     // Không làm gián đoạn server nếu ở môi trường Read-only
   }
 }
+
 export function loadFundamentalsCache() {
-  if (fs.existsSync(FUNDAMENTALS_CACHE_FILE)) {
-    try {
-      return JSON.parse(fs.readFileSync(FUNDAMENTALS_CACHE_FILE, 'utf-8'));
-    } catch {
-      return {};
-    }
-  }
-  return {};
+  return readJsonCached(FUNDAMENTALS_CACHE_FILE, { ttlMs: 30000, fallback: {} });
 }
 
 export function saveFundamentalsCache(cache) {
@@ -46,6 +34,7 @@ export function saveFundamentalsCache(cache) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(FUNDAMENTALS_CACHE_FILE, JSON.stringify(cache, null, 2));
+    invalidateJsonCache(FUNDAMENTALS_CACHE_FILE);
   } catch (e) {
     // Không làm gián đoạn server nếu ở môi trường Read-only
   }
