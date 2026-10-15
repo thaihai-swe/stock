@@ -35,6 +35,7 @@ import MarketProfileCard from './valuation/MarketProfileCard.jsx';
 import StockRiskMetricsCard from './valuation/StockRiskMetricsCard.jsx';
 import NewsSentimentCard from './valuation/NewsSentimentCard.jsx';
 import FullResearchReportModal from './valuation/FullResearchReportModal.jsx';
+import InteractiveValuationSandboxCard from './valuation/InteractiveValuationSandboxCard.jsx';
 
 // Định nghĩa 4 Không Gian Phân Tích Chuyên Sâu
 const WORKSPACES = [
@@ -42,8 +43,8 @@ const WORKSPACES = [
     id: 'valuation-models',
     label: '1. Định Giá & Quyết Định',
     icon: '🎯',
-    badge: '6 Công Cụ',
-    desc: '7 Vùng Giá, 7 Bẫy, Bands 5Y, DCF, Giải Phẫu Toán & FinVal Lab'
+    badge: '7 Công Cụ',
+    desc: '7 Vùng Giá, Sandbox Giả Định, 7 Bẫy, Bands 5Y, DCF, Giải Phẫu Toán & FinVal Lab'
   },
   {
     id: 'financial-statements',
@@ -340,6 +341,14 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
               financials?.valuationMultiples?.threeLayerDecision
             }
             currentPrice={currentStock.close}
+            symbol={selectedSymbol}
+          />
+
+          {/* Phòng Thí Nghiệm Giả Định Định Giá (Interactive Valuation Sandbox) */}
+          <InteractiveValuationSandboxCard
+            valuation={currentStock?.valuation || financials?.valuationMultiples}
+            financials={financials}
+            currentPrice={currentStock?.close}
             symbol={selectedSymbol}
           />
 

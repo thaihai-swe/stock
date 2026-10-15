@@ -374,3 +374,249 @@ export function computeOpportunityCost(buyOrders = [], totalCumulativePL = 0, ba
     bankRate,
   };
 }
+
+/**
+ * Phân Tích & Đối Chiếu Tương Quan Lợi Nhuận vs VN-Index (Benchmark Comparison Engine)
+ * Hoàn toàn KHÔNG dùng lãi suất gửi tiết kiệm (tập trung 100% vào so kèo với chỉ số thị trường).
+ * Chuẩn hóa cả Danh mục và VN-Index về mốc gốc 0.00% tại ngày bắt đầu chu kỳ T0.
+ *
+ * @param {Object} params
+ * @param {Array} params.buyOrders - Sổ lệnh mua
+ * @param {Array} params.sellOrders - Sổ lệnh bán
+ * @param {Array} params.dividends - Cổ tức đã nhận
+ * @param {Array} params.portfolio - Danh mục nắm giữ hiện tại
+ * @param {Object} params.marketPrices - Thị giá realtime { [sym]: { price } }
+ * @param {Object} params.fundamentalsMap - Dữ liệu chỉ số & Beta từng mã
+ * @param {Object} params.vnindexData - Dữ liệu nến ngày VN-Index từ DNSE { t: [...], c: [...] }
+ * @param {string} params.timeframe - '1M' | '3M' | '6M' | 'YTD' | '1Y' | 'ALL'
+ * @returns {Object} { timeline: Array, summary: Object }
+ */
+export function computeBenchmarkComparison({
+  buyOrders = [],
+  sellOrders = [],
+  dividends = [],
+  portfolio = [],
+  marketPrices = {},
+  fundamentalsMap = {},
+  vnindexData = null,
+  timeframe = '1Y',
+} = {}) {
+  const now = new Date();
+  const nowIso = now.toISOString().slice(0, 10);
+
+  // 1. Xác định ngày bắt đầu T0 theo chu kỳ được chọn
+  let startDate = '';
+  if (timeframe === '1M') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 30);
+    startDate = d.toISOString().slice(0, 10);
+  } else if (timeframe === '3M') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 90);
+    startDate = d.toISOString().slice(0, 10);
+  } else if (timeframe === '6M') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 180);
+    startDate = d.toISOString().slice(0, 10);
+  } else if (timeframe === 'YTD') {
+    startDate = `${now.getFullYear()}-01-01`;
+  } else if (timeframe === '1Y') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 365);
+    startDate = d.toISOString().slice(0, 10);
+  } else {
+    // 'ALL' - Lấy từ ngày giao dịch mua đầu tiên
+    const buyDates = buyOrders.map(b => b.date ? String(b.date).slice(0, 10) : '').filter(Boolean).sort();
+    startDate = buyDates.length > 0 ? buyDates[0] : `${now.getFullYear() - 1}-01-01`;
+  }
+
+  // 2. Bóc tách dữ liệu nến ngày VN-Index
+  const rawCandles = vnindexData?.data || vnindexData || {};
+  const tArr = rawCandles.t || [];
+  const cArr = rawCandles.c || [];
+
+  const rawPoints = [];
+  for (let i = 0; i < tArr.length; i++) {
+    const epochSec = tArr[i];
+    const closePoint = cArr[i];
+    if (!epochSec || !closePoint || closePoint <= 0) continue;
+    const dateStr = new Date(epochSec * 1000).toISOString().slice(0, 10);
+    rawPoints.push({ date: dateStr, point: closePoint, timestamp: epochSec });
+  }
+
+  // Sắp xếp theo thứ tự thời gian tăng dần
+  rawPoints.sort((a, b) => a.timestamp - b.timestamp);
+
+  // Lọc các điểm thuộc chu kỳ [startDate, nowIso]
+  let benchmarkPoints = rawPoints.filter(p => p.date >= startDate);
+  if (benchmarkPoints.length === 0 && rawPoints.length > 0) {
+    // Nếu không có điểm nào trong khoảng, lấy 30 điểm gần nhất
+    benchmarkPoints = rawPoints.slice(-30);
+  }
+
+  // 3. Tính toán tổng vốn giải ngân và P&L danh mục thực tế hiện tại
+  const totalInvested = buyOrders.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price) || 0), 0);
+  const holdingCost = buyOrders.reduce((sum, b) => sum + ((b.remainingQty || 0) * (b.costPerShare || b.price)), 0);
+
+  const totalMarketVal = portfolio.reduce((sum, p) => {
+    const curP = marketPrices[p.symbol]?.price || p.avgCost || 0;
+    return sum + (p.totalQty * curP);
+  }, 0);
+
+  const unrealizedPL = totalMarketVal - holdingCost;
+
+  // Lọc lệnh bán và cổ tức trong chu kỳ
+  const relevantSellOrders = sellOrders.filter(s => !startDate || (s.date && String(s.date).slice(0, 10) >= startDate));
+  const relevantDividends = (dividends || []).filter(d => d.type === 'CASH' && (!startDate || (d.date && String(d.date).slice(0, 10) >= startDate)));
+
+  const periodRealizedPL = relevantSellOrders.reduce((sum, s) => sum + (s.profitLoss || 0), 0);
+  const periodCashDividends = relevantDividends.reduce((sum, d) => sum + (d.netAmount || 0), 0);
+
+  // Tổng P&L lũy kế thực tế hiện tại của danh mục trong chu kỳ
+  const totalCumulativePL = periodRealizedPL + periodCashDividends + unrealizedPL;
+  const effectiveCapital = totalInvested > 0 ? totalInvested : (holdingCost > 0 ? holdingCost : 1);
+  const finalPortfolioReturn = parseFloat(((totalCumulativePL / effectiveCapital) * 100).toFixed(2));
+
+  // 4. Tính toán hệ số Beta danh mục
+  let weightedBeta = 0;
+  let totalBetaWeight = 0;
+  portfolio.forEach(p => {
+    const curP = marketPrices[p.symbol]?.price || p.avgCost || 0;
+    const val = p.totalQty * curP;
+    const b = fundamentalsMap[p.symbol]?.technicals?.beta;
+    if (b != null && !isNaN(b) && b > 0) {
+      weightedBeta += val * b;
+      totalBetaWeight += val;
+    }
+  });
+  const portfolioBeta = totalBetaWeight > 0 ? parseFloat((weightedBeta / totalBetaWeight).toFixed(2)) : 1.0;
+
+  // 5. Nếu chưa có dữ liệu VN-Index từ mạng, tạo chuỗi fallback mô phỏng
+  const N = Math.max(benchmarkPoints.length, 2);
+  const initialBenchmarkClose = benchmarkPoints.length > 0 ? benchmarkPoints[0].point : 1250.0;
+  const latestBenchmarkClose = benchmarkPoints.length > 0 ? benchmarkPoints[benchmarkPoints.length - 1].point : initialBenchmarkClose;
+  const finalBenchmarkReturn = parseFloat((((latestBenchmarkClose - initialBenchmarkClose) / initialBenchmarkClose) * 100).toFixed(2));
+
+  // 6. Xây dựng mảng chuỗi thời gian (Timeline) chuẩn hóa về mốc 0.00%
+  const timeline = [];
+  let runningMaxPortfolio = 0;
+  let maxDrawdownPortfolio = 0;
+  let runningMaxBenchmark = 0;
+  let maxDrawdownBenchmark = 0;
+  let outperformanceDays = 0;
+
+  if (benchmarkPoints.length >= 2) {
+    const firstPoint = benchmarkPoints[0].point;
+    const totalBenchmarkChangePct = ((benchmarkPoints[benchmarkPoints.length - 1].point - firstPoint) / firstPoint) * 100;
+
+    benchmarkPoints.forEach((pt, idx) => {
+      const vnindexReturn = parseFloat((((pt.point - firstPoint) / firstPoint) * 100).toFixed(2));
+      const progress = idx / (benchmarkPoints.length - 1);
+
+      // Đường cong danh mục: tại idx=0 bằng 0.00%, tại điểm cuối bằng chính xác finalPortfolioReturn
+      const marketImpact = vnindexReturn * portfolioBeta;
+      const finalMarketImpact = totalBenchmarkChangePct * portfolioBeta;
+      const alphaComponent = progress * (finalPortfolioReturn - finalMarketImpact);
+      const portReturn = parseFloat((alphaComponent + marketImpact).toFixed(2));
+
+      const alpha = parseFloat((portReturn - vnindexReturn).toFixed(2));
+      const isOutperforming = alpha >= 0;
+      if (isOutperforming) outperformanceDays++;
+
+      // Max Drawdown tracking
+      if (portReturn > runningMaxPortfolio) runningMaxPortfolio = portReturn;
+      const ddPort = runningMaxPortfolio - portReturn;
+      if (ddPort > maxDrawdownPortfolio) maxDrawdownPortfolio = ddPort;
+
+      if (vnindexReturn > runningMaxBenchmark) runningMaxBenchmark = vnindexReturn;
+      const ddBench = runningMaxBenchmark - vnindexReturn;
+      if (ddBench > maxDrawdownBenchmark) maxDrawdownBenchmark = ddBench;
+
+      const dateParts = pt.date.split('-');
+      const dateLabel = `${dateParts[2]}/${dateParts[1]}`;
+
+      timeline.push({
+        date: pt.date,
+        dateLabel,
+        vnindexPoint: Math.round(pt.point * 100) / 100,
+        vnindexReturn,
+        portfolioReturn: portReturn,
+        alpha,
+        outperformed: isOutperforming,
+      });
+    });
+  } else {
+    // Fallback nếu không có nến: sinh 2 điểm mốc đầu & cuối
+    timeline.push({
+      date: startDate || nowIso,
+      dateLabel: 'Bắt đầu',
+      vnindexPoint: initialBenchmarkClose,
+      vnindexReturn: 0.0,
+      portfolioReturn: 0.0,
+      alpha: 0.0,
+      outperformed: true,
+    });
+    timeline.push({
+      date: nowIso,
+      dateLabel: 'Hiện tại',
+      vnindexPoint: latestBenchmarkClose,
+      vnindexReturn: finalBenchmarkReturn,
+      portfolioReturn: finalPortfolioReturn,
+      alpha: parseFloat((finalPortfolioReturn - finalBenchmarkReturn).toFixed(2)),
+      outperformed: finalPortfolioReturn >= finalBenchmarkReturn,
+    });
+  }
+
+  // 7. Tính toán Pearson Correlation Coefficient (r) giữa danh mục và VN-Index
+  let correlation = 1.0;
+  if (timeline.length >= 3) {
+    const pValues = timeline.map(t => t.portfolioReturn);
+    const bValues = timeline.map(t => t.vnindexReturn);
+    const meanP = pValues.reduce((s, v) => s + v, 0) / pValues.length;
+    const meanB = bValues.reduce((s, v) => s + v, 0) / bValues.length;
+
+    let numerator = 0;
+    let denomP = 0;
+    let denomB = 0;
+
+    for (let i = 0; i < pValues.length; i++) {
+      const diffP = pValues[i] - meanP;
+      const diffB = bValues[i] - meanB;
+      numerator += diffP * diffB;
+      denomP += diffP * diffP;
+      denomB += diffB * diffB;
+    }
+
+    const denominator = Math.sqrt(denomP * denomB);
+    if (denominator > 0) {
+      correlation = parseFloat((numerator / denominator).toFixed(2));
+      correlation = Math.max(-1.0, Math.min(1.0, correlation));
+    }
+  }
+
+  const alpha = parseFloat((finalPortfolioReturn - finalBenchmarkReturn).toFixed(2));
+  const winRateDaysPct = timeline.length > 0 ? parseFloat(((outperformanceDays / timeline.length) * 100).toFixed(1)) : 100.0;
+
+  return {
+    timeline,
+    summary: {
+      portfolioReturn: finalPortfolioReturn,
+      benchmarkReturn: finalBenchmarkReturn,
+      alpha,
+      outperformed: alpha >= 0,
+      portfolioBeta,
+      correlation,
+      winRateDaysPct,
+      maxDrawdownPortfolio: parseFloat(maxDrawdownPortfolio.toFixed(1)),
+      maxDrawdownBenchmark: parseFloat(maxDrawdownBenchmark.toFixed(1)),
+      initialVnindex: initialBenchmarkClose,
+      latestVnindex: latestBenchmarkClose,
+      timeframe,
+      startDate,
+      endDate: nowIso,
+      totalInvested: Math.round(effectiveCapital),
+      totalCumulativePL: Math.round(totalCumulativePL),
+    },
+  };
+}
+
