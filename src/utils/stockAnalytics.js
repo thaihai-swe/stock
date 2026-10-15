@@ -66,7 +66,7 @@ export function computeStockPerformance(buyOrders = [], sellOrders = [], dividen
     let totalInvested = 0;
     if (isPeriodFilterActive) {
       const buysCost = symbolBuysInPeriod.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price)), 0);
-      const sellsCostBasis = symbolSells.reduce((sum, s) => sum + ((s.totalRevenue || (s.quantity * s.price)) - (s.profitLoss || 0)), 0);
+      const sellsCostBasis = symbolSells.reduce((sum, s) => sum + (s.totalCost ?? ((s.netRevenue ?? s.totalRevenue ?? (s.quantity * s.price)) - (s.profitLoss || 0))), 0);
       totalInvested = buysCost > 0
         ? buysCost
         : (holdingCost > 0 ? holdingCost : (sellsCostBasis > 0 ? sellsCostBasis : allSymbolBuys.reduce((sum, b) => sum + (b.totalCost || (b.quantity * b.price)), 0)));

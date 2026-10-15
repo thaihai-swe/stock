@@ -167,7 +167,10 @@ export default function ForensicAccountingCard({ financials, stockItem }) {
                       <h5 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
                         Chẩn Đoán Kiểm Toán Pháp Y (AI Forensic Auditor)
                       </h5>
-                      <IntelligenceBadge provider={financials.forensicAnalysis.aiAuditComment.provider} />
+                      <IntelligenceBadge
+                        type={financials?.forensicAnalysis?.aiAuditComment ? 'ai' : 'heuristic'}
+                        provider={financials?.forensicAnalysis?.aiAuditComment?.provider}
+                      />
                     </div>
                     {financials.forensicAnalysis.aiAuditComment.auditVerdict && (
                       <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${

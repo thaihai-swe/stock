@@ -1,7 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
-import { addBuyOrder } from '../utils/api.js';
+import { addBuyOrder, fetchPrices } from '../utils/api.js';
 import { DEFAULT_TAGS, fmtMoney, getTodayDate } from '../utils/format.js';
 import { PRESET_FEE_PCTS } from '../utils/constants.js';
+import TagSelector from './common/TagSelector.jsx';
+import StockSymbolInput from './common/StockSymbolInput.jsx';
 
 export default function BuyForm({
   onSuccess,
@@ -10,24 +12,83 @@ export default function BuyForm({
   initialPrice = '',
   portfolio = [],
   watchlist = [],
+  marketPrices = {},
 }) {
-  const [form, setForm] = useState({
-    symbol: initialSymbol || '',
-    quantity: initialQuantity ? String(initialQuantity) : '100',
-    price: initialPrice ? String(initialPrice) : '',
-    feePct: '0',
-    note: '',
-    date: getTodayDate(),
+  const [form, setForm] = useState(() => {
+    const sym = initialSymbol ? initialSymbol.toUpperCase() : '';
+    const mPrice = sym ? marketPrices[sym]?.price : null;
+    const pCost = sym ? portfolio.find(p => p.symbol === sym)?.avgCost : null;
+    const wPrice = sym ? watchlist.find(w => w.symbol === sym)?.targetBuyPrice : null;
+    const resolvedPrice = initialPrice
+      ? String(initialPrice)
+      : (mPrice || pCost || wPrice ? String((mPrice || pCost || wPrice) / 1000) : '');
+
+    return {
+      symbol: sym,
+      quantity: initialQuantity ? String(initialQuantity) : '100',
+      price: resolvedPrice,
+      feePct: '0',
+      note: '',
+      date: getTodayDate(),
+    };
   });
   const [selectedTag, setSelectedTag] = useState('');
-  const [customTag, setCustomTag] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [fetchedPriceSymbol, setFetchedPriceSymbol] = useState('');
+
+  // Giá tham chiếu theo mã đang chọn
+  const currentRefPrices = useMemo(() => {
+    if (!form.symbol) return null;
+    const sym = form.symbol.toUpperCase();
+    const marketPrice = marketPrices[sym]?.price;
+    const portfolioStock = portfolio.find(p => p.symbol === sym);
+    const avgCost = portfolioStock?.avgCost;
+    const watchItem = watchlist.find(w => w.symbol === sym);
+    const targetBuyPrice = watchItem?.targetBuyPrice;
+
+    return {
+      marketPrice: marketPrice ? marketPrice / 1000 : null,
+      avgCost: avgCost ? avgCost / 1000 : null,
+      targetBuyPrice: targetBuyPrice ? targetBuyPrice / 1000 : null,
+    };
+  }, [form.symbol, marketPrices, portfolio, watchlist]);
+
+  // Tự động fetch giá sàn cho mã mới nhập
+  useEffect(() => {
+    const sym = form.symbol.trim().toUpperCase();
+    if (sym.length === 3 && !marketPrices[sym] && fetchedPriceSymbol !== sym) {
+      setFetchedPriceSymbol(sym);
+      fetchPrices([sym], false)
+        .then(res => {
+          const live = res?.prices?.[sym]?.price;
+          if (live) {
+            setForm(f => {
+              if (f.symbol.toUpperCase() === sym && !f.price) {
+                return { ...f, price: String(live / 1000) };
+              }
+              return f;
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [form.symbol, marketPrices, fetchedPriceSymbol]);
 
   useEffect(() => {
     if (initialSymbol) {
-      setForm(f => ({ ...f, symbol: initialSymbol.toUpperCase() }));
+      const sym = initialSymbol.toUpperCase();
+      const mPrice = marketPrices[sym]?.price;
+      const pCost = portfolio.find(p => p.symbol === sym)?.avgCost;
+      const wPrice = watchlist.find(w => w.symbol === sym)?.targetBuyPrice;
+      const resolved = (mPrice || pCost || wPrice) ? (mPrice || pCost || wPrice) / 1000 : null;
+
+      setForm(f => ({
+        ...f,
+        symbol: sym,
+        price: initialPrice ? String(initialPrice) : (resolved ? String(resolved) : f.price),
+      }));
     }
     if (initialQuantity) {
       setForm(f => ({ ...f, quantity: String(initialQuantity) }));
@@ -35,7 +96,7 @@ export default function BuyForm({
     if (initialPrice) {
       setForm(f => ({ ...f, price: String(initialPrice) }));
     }
-  }, [initialSymbol, initialQuantity, initialPrice]);
+  }, [initialSymbol, initialQuantity, initialPrice, marketPrices]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -44,19 +105,6 @@ export default function BuyForm({
       [name]: name === 'symbol' ? value.toUpperCase() : value,
     }));
     setError('');
-  }
-
-  function selectTag(tag) {
-    setSelectedTag(prev => (prev === tag ? '' : tag));
-  }
-
-  function handleAddCustomTag(e) {
-    e.preventDefault();
-    const trimmed = customTag.trim();
-    if (trimmed) {
-      setSelectedTag(trimmed);
-      setCustomTag('');
-    }
   }
 
   // Tính toán thời gian thực giá trị đặt mua & phí
@@ -147,38 +195,48 @@ export default function BuyForm({
               ⚡ Chọn nhanh mã để mua:
             </span>
             <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-              {portfolio.slice(0, 6).map(p => (
-                <button
-                  key={p.symbol}
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, symbol: p.symbol }))}
-                  className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all cursor-pointer ${
-                    form.symbol === p.symbol
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                      : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-600 hover:border-emerald-400'
-                  }`}
-                >
-                  {p.symbol}
-                </button>
-              ))}
-              {watchlist.slice(0, 4).map(w => (
-                <button
-                  key={w.symbol}
-                  type="button"
-                  onClick={() => setForm(f => ({
-                    ...f,
-                    symbol: w.symbol,
-                    price: w.targetBuyPrice ? String(w.targetBuyPrice / 1000) : f.price
-                  }))}
-                  className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all cursor-pointer ${
-                    form.symbol === w.symbol
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                      : 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                  }`}
-                >
-                  ⭐ {w.symbol}
-                </button>
-              ))}
+              {portfolio.slice(0, 6).map(p => {
+                const pPrice = (marketPrices[p.symbol]?.price || p.avgCost) ? String((marketPrices[p.symbol]?.price || p.avgCost) / 1000) : null;
+                return (
+                  <button
+                    key={p.symbol}
+                    type="button"
+                    onClick={() => setForm(f => ({
+                      ...f,
+                      symbol: p.symbol,
+                      price: pPrice || f.price
+                    }))}
+                    className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all cursor-pointer ${
+                      form.symbol === p.symbol
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                        : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-600 hover:border-emerald-400'
+                    }`}
+                  >
+                    {p.symbol}
+                  </button>
+                );
+              })}
+              {watchlist.slice(0, 4).map(w => {
+                const wPrice = (marketPrices[w.symbol]?.price || w.targetBuyPrice) ? String((marketPrices[w.symbol]?.price || w.targetBuyPrice) / 1000) : null;
+                return (
+                  <button
+                    key={w.symbol}
+                    type="button"
+                    onClick={() => setForm(f => ({
+                      ...f,
+                      symbol: w.symbol,
+                      price: wPrice || f.price
+                    }))}
+                    className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all cursor-pointer ${
+                      form.symbol === w.symbol
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                        : 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                    }`}
+                  >
+                    ⭐ {w.symbol}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -190,13 +248,25 @@ export default function BuyForm({
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300 mb-1.5">
               Mã Cổ Phiếu <span className="text-red-500">*</span>
             </label>
-            <input
-              name="symbol"
+            <StockSymbolInput
               value={form.symbol}
-              onChange={handleChange}
+              onChange={(sym) => {
+                const upper = sym.toUpperCase();
+                const mPrice = marketPrices[upper]?.price;
+                const pCost = portfolio.find(p => p.symbol === upper)?.avgCost;
+                const wPrice = watchlist.find(w => w.symbol === upper)?.targetBuyPrice;
+                const resolved = (mPrice || pCost || wPrice) ? String((mPrice || pCost || wPrice) / 1000) : null;
+
+                setForm(f => ({
+                  ...f,
+                  symbol: upper,
+                  price: resolved || f.price,
+                }));
+              }}
               placeholder="VD: VNM, HPG, FPT..."
-              autoCapitalize="characters"
-              className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm uppercase font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+              size="lg"
+              colorTheme="emerald"
+              required
             />
           </div>
 
@@ -282,6 +352,58 @@ export default function BuyForm({
               × 1.000đ
             </span>
           </div>
+
+          {/* Quick Price Helper Chips */}
+          {currentRefPrices && (currentRefPrices.marketPrice || currentRefPrices.avgCost || currentRefPrices.targetBuyPrice) && (
+            <div className="flex items-center gap-1.5 flex-wrap mt-2">
+              <span className="text-[11px] font-semibold text-gray-500 dark:text-slate-400">Gợi ý giá:</span>
+              {currentRefPrices.marketPrice && (
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, price: String(currentRefPrices.marketPrice) }))}
+                  className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                    Number(form.price) === currentRefPrices.marketPrice
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                      : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                  }`}
+                  title="Điền giá theo thị giá sàn hiện tại"
+                >
+                  <span>⚡ Thị giá:</span>
+                  <span>{currentRefPrices.marketPrice} (= {fmtMoney(currentRefPrices.marketPrice * 1000)}đ)</span>
+                </button>
+              )}
+              {currentRefPrices.avgCost && (
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, price: String(currentRefPrices.avgCost) }))}
+                  className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                    Number(form.price) === currentRefPrices.avgCost
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
+                      : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                  }`}
+                  title="Điền giá theo giá vốn bình quân đang nắm giữ"
+                >
+                  <span>💼 Vốn TB:</span>
+                  <span>{currentRefPrices.avgCost} (= {fmtMoney(currentRefPrices.avgCost * 1000)}đ)</span>
+                </button>
+              )}
+              {currentRefPrices.targetBuyPrice && (
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, price: String(currentRefPrices.targetBuyPrice) }))}
+                  className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                    Number(form.price) === currentRefPrices.targetBuyPrice
+                      ? 'bg-amber-600 text-white border-amber-600 shadow-2xs'
+                      : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100'
+                  }`}
+                  title="Điền giá theo giá mua mục tiêu từ danh sách theo dõi"
+                >
+                  <span>🎯 Mục tiêu:</span>
+                  <span>{currentRefPrices.targetBuyPrice} (= {fmtMoney(currentRefPrices.targetBuyPrice * 1000)}đ)</span>
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Cảnh báo nếu nhập giá nguyên chưa chia 1000 */}
           {calculation?.isPriceOverLimit && (
@@ -390,73 +512,16 @@ export default function BuyForm({
         </div>
 
         {/* 6. CHIẾN LƯỢC ĐẦU TƯ (INVESTMENT STRATEGY JOURNAL TAGS) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
-              🏷️ Chiến Lược Đầu Tư <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">(Chọn 1 thẻ)</span>
-            </label>
-            {selectedTag && (
-              <button
-                type="button"
-                onClick={() => setSelectedTag('')}
-                className="text-[11px] text-rose-500 hover:text-rose-600 font-bold transition-colors cursor-pointer"
-              >
-                ✕ Bỏ chọn
-              </button>
-            )}
-          </div>
-
-          <div className="flex flex-wrap gap-1.5">
-            {DEFAULT_TAGS.map(t => {
-              const isSelected = selectedTag === t;
-              return (
-                <button
-                  type="button"
-                  key={t}
-                  onClick={() => selectTag(t)}
-                  className={`text-xs px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer border ${
-                    isSelected
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs ring-2 ring-emerald-500/20'
-                      : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200/80 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  {isSelected ? '✓ ' : ''}{t}
-                </button>
-              );
-            })}
-            {selectedTag && !DEFAULT_TAGS.includes(selectedTag) && (
-              <button
-                type="button"
-                onClick={() => setSelectedTag('')}
-                className="text-xs px-3 py-1.5 rounded-xl font-bold bg-emerald-600 text-white border-emerald-600 shadow-2xs ring-2 ring-emerald-500/20 cursor-pointer"
-              >
-                ✓ {selectedTag}
-              </button>
-            )}
-          </div>
-
-          <div className="flex gap-2 pt-1">
-            <input
-              value={customTag}
-              onChange={(e) => setCustomTag(e.target.value)}
-              placeholder="Nhập chiến lược khác..."
-              className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddCustomTag(e);
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleAddCustomTag}
-              className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-3 py-2 rounded-xl font-bold border border-gray-200 dark:border-slate-700 transition-colors cursor-pointer"
-            >
-              + Thêm
-            </button>
-          </div>
-        </div>
+        <TagSelector
+          tags={DEFAULT_TAGS}
+          selectedTag={selectedTag}
+          onSelect={setSelectedTag}
+          onClear={() => setSelectedTag('')}
+          label="🏷️ Chiến Lược Đầu Tư"
+          labelHint="(Chọn 1 thẻ)"
+          placeholder="Nhập chiến lược khác..."
+          colorTheme="emerald"
+        />
 
         {/* 7. GHI CHÚ */}
         <div>

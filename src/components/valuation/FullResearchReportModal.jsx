@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { formatVND, formatBn, formatPercent } from '../../utils/format';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
+import Modal from '../common/Modal.jsx';
 
 /**
  * FullResearchReportModal.jsx
@@ -131,11 +132,12 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/60 dark:bg-black/80 backdrop-blur-md overflow-hidden">
-      <div
-        ref={scrollContainerRef}
-        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-700/80 p-5 md:p-8 space-y-6 relative scroll-smooth"
-      >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="5xl"
+    >
+      <div className="p-5 md:p-8 space-y-6">
         {/* Sticky Header & Action Bar */}
         <div className="sticky -top-5 md:-top-8 z-20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md pt-2 pb-4 border-b border-gray-200 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -238,7 +240,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
             <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
               <span>📌</span>
               <span>Chương 1: Tóm Tắt Khuyến Nghị & Luận Điểm Đầu Tư (Executive Summary)</span>
-              <IntelligenceBadge provider={aiDeepDive?.provider} />
+              <IntelligenceBadge
+                type={aiDeepDive ? 'ai' : 'heuristic'}
+                provider={aiDeepDive?.provider}
+              />
             </h3>
             {aiDeepDive && (
               <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold self-start sm:self-auto flex items-center gap-1">
@@ -890,6 +895,6 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

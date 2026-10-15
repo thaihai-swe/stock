@@ -1,4 +1,5 @@
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
+import StockSymbolInput from '../common/StockSymbolInput.jsx';
 
 // Format tiền VND
 function formatVND(val) {
@@ -135,24 +136,16 @@ export default function StockCockpitHeader({
             }}
             className="flex items-center gap-1.5 flex-1 sm:flex-initial"
           >
-            <div className="relative w-full sm:w-56">
-              <input
-                type="text"
+            <div className="w-full sm:w-56">
+              <StockSymbolInput
                 value={inputSymbol}
-                onChange={(e) => setInputSymbol(e.target.value.toUpperCase())}
+                onChange={setInputSymbol}
+                onSubmit={handleLookupSymbol}
                 placeholder="Tra mã (VNM, MBB, SSI...)"
-                className="w-full pl-3 pr-7 py-2 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase shadow-2xs"
+                size="sm"
+                colorTheme="indigo"
                 disabled={lookingUp}
               />
-              {inputSymbol && (
-                <button
-                  type="button"
-                  onClick={() => setInputSymbol('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
-                >
-                  ✕
-                </button>
-              )}
             </div>
 
             <button
@@ -216,7 +209,8 @@ export default function StockCockpitHeader({
                     CFA Equity Research Copilot
                   </span>
                   <IntelligenceBadge
-                    provider={financials.aiDeepDive.provider}
+                    type={financials?.aiDeepDive?.thesisHeadline ? 'ai' : 'heuristic'}
+                    provider={financials?.aiDeepDive?.provider}
                   />
                   <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-700/50">
                     {financials.aiDeepDive.recommendation}

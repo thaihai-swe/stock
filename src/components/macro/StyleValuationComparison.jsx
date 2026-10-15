@@ -1,6 +1,12 @@
 import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
-export default function StyleValuationComparison({ styleIndices = [], vnindexPE = null, vnindexPB = null }) {
+export default function StyleValuationComparison({
+  styleIndices = [],
+  vnindexPE = null,
+  vnindexPB = null,
+  aiStyleRotation = null,
+}) {
   if (!styleIndices || styleIndices.length === 0) {
     return null;
   }
@@ -17,10 +23,14 @@ export default function StyleValuationComparison({ styleIndices = [], vnindexPE 
       {/* ── 1. HEADER & THƯỚC ĐO BENJAMIN GRAHAM ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-700/60">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Phân Khúc & Phong Cách Đầu Tư
             </span>
+            <IntelligenceBadge
+              type={aiStyleRotation ? 'ai' : 'heuristic'}
+              tooltip={aiStyleRotation ? 'Phân tích xu hướng luân chuyển phong cách đầu tư từ AI Copilot' : 'Mô hình so sánh 4 phân khúc phong cách đầu tư'}
+            />
             <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/50">
               💎 Diamond · Midcap · Large-Cap
             </span>
@@ -71,6 +81,55 @@ export default function StyleValuationComparison({ styleIndices = [], vnindexPE 
           </div>
         </div>
       </div>
+
+      {/* ── 1B. AI CHIẾN LƯỢC LUÂN CHUYỂN PHONG CÁCH & DÒNG VỐN ── */}
+      {aiStyleRotation && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-gray-900 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 dark:border-indigo-900/50 pb-2.5">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🧭</span>
+              <span className="text-xs font-black uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
+                Chiến Lược Luân Chuyển Phong Cách Đầu Tư (AI Style Rotation)
+              </span>
+            </div>
+            <IntelligenceBadge type="ai" tooltip="Nhận định từ mô hình phân tích xu hướng dịch chuyển dòng vốn" />
+          </div>
+
+          <div className="text-sm font-bold text-gray-900 dark:text-gray-100 flex items-start gap-2">
+            <span className="text-indigo-600 dark:text-indigo-400 mt-0.5">⚡</span>
+            <span>{aiStyleRotation.rotationHeadline}</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-gray-800/80 border border-indigo-100/60 dark:border-indigo-900/40 space-y-1">
+              <span className="font-extrabold text-indigo-700 dark:text-indigo-300 block">
+                🏢 Large-Cap (VN30) vs Midcap Tăng Trưởng
+              </span>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                {aiStyleRotation.largeCapVsMidcap}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-gray-800/80 border border-purple-100/60 dark:border-purple-900/40 space-y-1">
+              <span className="font-extrabold text-purple-700 dark:text-purple-300 block">
+                💎 Cổ Phiếu Kim Cương (VN Diamond & Room Ngoại)
+              </span>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                {aiStyleRotation.diamondForeignRoom}
+              </p>
+            </div>
+          </div>
+
+          {aiStyleRotation.actionableStrategy && (
+            <div className="p-3 rounded-xl bg-indigo-100/50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/80 flex items-start gap-2.5 text-xs">
+              <span className="font-black text-indigo-700 dark:text-indigo-300 shrink-0">🎯 Khuyến nghị:</span>
+              <span className="text-indigo-950 dark:text-indigo-200 font-medium">
+                {aiStyleRotation.actionableStrategy}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── 2. LƯỚI THẺ SO SÁNH 4 PHÂN KHÚC (RESPONSIVE CARDS) ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">

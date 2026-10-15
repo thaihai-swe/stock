@@ -10,6 +10,8 @@ import DashboardRecentSales from './dashboard/DashboardRecentSales.jsx';
 import PortfolioStressTestCard from './dashboard/PortfolioStressTestCard.jsx';
 import OpportunityCostCard from './OpportunityCostCard.jsx';
 import TimeHorizonFilter, { calculateDateRange } from './common/TimeHorizonFilter.jsx';
+import Modal from './common/Modal.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
 const StockDetailModal = lazy(() => import('./StockDetailModal.jsx'));
 
@@ -21,8 +23,8 @@ export default function Dashboard({
   onSuccess,
   refreshKey,
   onSwitchTab,
-  showToast,
 }) {
+  const { showToast } = useToast();
   const { buyOrders = [], sellOrders = [], portfolio = [], dividends = [], watchlist = [] } = data;
 
   // State mở Modal Sổ Cái Tích Luỹ khi click vào mã CP
@@ -74,6 +76,7 @@ export default function Dashboard({
   const [periodStartDate, setPeriodStartDate] = useState('');
   const [periodEndDate, setPeriodEndDate] = useState('');
   const [periodLabel, setPeriodLabel] = useState('Toàn thời gian');
+  const timeWindow = timePreset; // Alias tương thích ngược cho các component con kế thừa
 
   const handleTimeRangeChange = useCallback(({ preset, startDate, endDate, label }) => {
     setTimePreset(preset);
@@ -227,17 +230,16 @@ export default function Dashboard({
   async function handleSaveCash(e) {
     e?.preventDefault();
     const val = Number(cashInput);
-    if (isNaN(val) || val < 0) return;
+    if (isNaN(val)) return;
     setSavingCash(true);
     try {
       await updateCashBalance(val);
       setCashBalance(val);
       setIsEditingCash(false);
-      if (showToast) showToast('✅ Đã cập nhật số dư tiền mặt thành công!', 'success');
+      showToast('✅ Đã cập nhật số dư tiền mặt thành công!', 'success');
       if (onSuccess) onSuccess();
     } catch (err) {
-      if (showToast) showToast(err.message || 'Lỗi cập nhật số dư tiền mặt', 'error');
-      else alert(err.message || 'Lỗi cập nhật số dư tiền mặt');
+      showToast(err.message || 'Lỗi cập nhật số dư tiền mặt', 'error');
     } finally {
       setSavingCash(false);
     }
@@ -439,7 +441,7 @@ export default function Dashboard({
         periodRealizedPL={periodRealizedPL}
         periodCashDividends={periodCashDividends}
         totalUnrealizedPL={totalUnrealizedPL}
-        timeWindow={timeWindow}
+        timeWindow={timePreset}
         periodLabel={periodLabel}
         pricesSession={pricesData?.session}
         lastUpdated={lastUpdated}
@@ -562,7 +564,7 @@ export default function Dashboard({
         totalUnrealizedPL={totalUnrealizedPL}
         totalUnrealizedPLPct={totalUnrealizedPLPct}
         buyOrdersCount={buyOrders.length}
-        timeWindow={timeWindow}
+        timeWindow={timePreset}
         periodLabel={periodLabel}
         periodRealizedPL={periodRealizedPL}
         periodCashDividends={periodCashDividends}
@@ -624,7 +626,7 @@ export default function Dashboard({
         dividends={dividends}
         marketPrices={pricesData?.prices || {}}
         fundamentalsMap={fundamentalsMap}
-        timeWindow={timeWindow}
+        timeWindow={timePreset}
         periodLabel={periodLabel}
         onSelectSymbolModal={setSelectedSymbolModal}
       />
@@ -634,14 +636,14 @@ export default function Dashboard({
         <OpportunityCostCard
           buyOrders={buyOrders}
           totalCumulativePL={
-            timeWindow === 'all'
+            timePreset === 'all'
               ? totalCumulativePL
               : (periodRealizedPL + periodCashDividends + totalUnrealizedPL)
           }
         />
         <DashboardRecentSales
           sellOrders={sellOrdersInPeriod}
-          timeWindow={timeWindow}
+          timeWindow={timePreset}
           periodLabel={periodLabel}
           onSwitchTab={onSwitchTab}
         />
@@ -664,84 +666,73 @@ export default function Dashboard({
       )}
 
       {/* 🌟 9. MODAL CẬP NHẬT SỐ DƯ TIỀN MẶT */}
-      {isEditingCash && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
-              <h3 className="font-bold text-gray-800 dark:text-slate-100 text-base flex items-center gap-2">
-                <span>💵</span> Cập Nhật Số Dư Tiền Mặt
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsEditingCash(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 p-1 rounded-lg text-lg cursor-pointer"
-              >
-                ✕
-              </button>
+      <Modal
+        isOpen={isEditingCash}
+        onClose={() => setIsEditingCash(false)}
+        title="Cập Nhật Số Dư Tiền Mặt"
+        icon="💵"
+        size="md"
+      >
+        <form onSubmit={handleSaveCash} className="space-y-4 p-5 sm:p-6">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
+              Nhập số dư tiền mặt hiện tại (VNĐ):
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="1000"
+                value={cashInput}
+                onChange={(e) => setCashInput(e.target.value)}
+                placeholder="VD: 50000000 hoặc -20000000 (nếu vay margin)"
+                className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12"
+                autoFocus
+              />
+              <span className="absolute right-3 top-2.5 text-xs text-gray-400 dark:text-slate-500 font-medium">VNĐ</span>
             </div>
-
-            <form onSubmit={handleSaveCash} className="space-y-4 mt-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
-                  Nhập số dư tiền mặt hiện tại (VNĐ):
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1000"
-                    value={cashInput}
-                    onChange={(e) => setCashInput(e.target.value)}
-                    placeholder="VD: 50000000 (= 50.000.000đ)"
-                    className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12"
-                    autoFocus
-                  />
-                  <span className="absolute right-3 top-2.5 text-xs text-gray-400 dark:text-slate-500 font-medium">VNĐ</span>
-                </div>
-                {cashInput && !isNaN(Number(cashInput)) && (
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5">
-                    💵 Quy đổi: {fmtMoney(Number(cashInput))} đồng
-                  </p>
-                )}
-              </div>
-
-              {/* Phím bấm chọn nhanh */}
-              <div>
-                <p className="text-[11px] text-gray-400 dark:text-slate-500 mb-1.5">Gợi ý mốc tiền nhanh:</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {[0, 10000000, 20000000, 50000000, 100000000, 200000000].map(amt => (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => setCashInput(amt.toString())}
-                      className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer border border-transparent dark:border-slate-750"
-                    >
-                      {amt === 0 ? '0đ' : `${amt / 1000000} Triệu`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsEditingCash(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingCash}
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
-                >
-                  {savingCash ? '⏳ Đang lưu...' : '💾 Lưu Số Dư'}
-                </button>
-              </div>
-            </form>
+            {cashInput && !isNaN(Number(cashInput)) && (
+              <p className={`text-xs font-semibold mt-1.5 ${Number(cashInput) < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                {Number(cashInput) < 0 ? '⚠️ Dư nợ ký quỹ (Margin): ' : '💵 Quy đổi: '}
+                {fmtMoney(Number(cashInput))} đồng
+              </p>
+            )}
           </div>
-        </div>
-      )}
+
+          {/* Phím bấm chọn nhanh */}
+          <div>
+            <p className="text-[11px] text-gray-400 dark:text-slate-500 mb-1.5">Gợi ý mốc tiền nhanh:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {[0, 10000000, 20000000, 50000000, 100000000, 200000000].map(amt => (
+                <button
+                  key={amt}
+                  type="button"
+                  onClick={() => setCashInput(amt.toString())}
+                  className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer border border-transparent dark:border-slate-750"
+                >
+                  {amt === 0 ? '0đ' : `${amt / 1000000} Triệu`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => setIsEditingCash(false)}
+              className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={savingCash}
+              className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+            >
+              {savingCash ? '⏳ Đang lưu...' : '💾 Lưu Số Dư'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

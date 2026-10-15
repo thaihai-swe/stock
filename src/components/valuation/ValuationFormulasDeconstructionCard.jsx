@@ -114,7 +114,10 @@ export default function ValuationFormulasDeconstructionCard({
               <h5 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
                 Luận Giải Hội Tụ Định Giá & Thử Tải Độ Nhạy (AI Valuation Convergence)
               </h5>
-              <IntelligenceBadge provider={valData.aiConvergence.provider} />
+              <IntelligenceBadge
+                type={valData?.aiConvergence ? 'ai' : 'heuristic'}
+                provider={valData?.aiConvergence?.provider}
+              />
             </div>
             {valData.aiConvergence.preferredModelRecommendation && (
               <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300">

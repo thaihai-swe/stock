@@ -8,6 +8,9 @@ import {
   refreshSingleStockAi
 } from '../utils/api.js';
 import { syncUrlRoute } from '../utils/navigation.js';
+import { useToast } from '../context/ToastContext.jsx';
+import SubTabNav from './common/SubTabNav.jsx';
+import LoadingState from './common/LoadingState.jsx';
 
 // Sub-components mới tách
 import StockCockpitHeader from './valuation/StockCockpitHeader.jsx';
@@ -66,6 +69,8 @@ const WORKSPACES = [
 ];
 
 export default function ValuationDashboard({ data, refreshKey, onSwitchTab, initialSymbol }) {
+  const { showToast } = useToast();
+
   // ── STATE DỮ LIỆU CỐT LÕI ──
   const [valuationData, setValuationData] = useState({});
   const [selectedSymbol, setSelectedSymbol] = useState('HPG');
@@ -89,7 +94,6 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
   // ── STATE LOADING & SYNC ──
   const [loading, setLoading] = useState(true);
   const [syncingSingle, setSyncingSingle] = useState(false);
-  const [syncMessage, setSyncMessage] = useState(null);
 
   // ── STATE TÌM KIẾM CỔ PHIẾU ──
   const [inputSymbol, setInputSymbol] = useState('');
@@ -164,20 +168,19 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
   const handleSyncSingleFinancials = async () => {
     if (!selectedSymbol) return;
     setSyncingSingle(true);
-    setSyncMessage(null);
     try {
       const res = await triggerSingleFinancialSync(selectedSymbol);
       if (res?.isQueued) {
-        setSyncMessage({
-          type: 'info',
-          text: res.message || `Mã ${selectedSymbol} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Bot sẽ tự động thu thập BCTC trong phiên đồng bộ EOD lúc 18:00 hôm nay!`
-        });
+        showToast(
+          res.message || `Mã ${selectedSymbol} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Bot sẽ tự động thu thập BCTC lúc 18:00!`,
+          'info'
+        );
         return;
       }
-      setSyncMessage({
-        type: 'success',
-        text: res.message || `Đã tải lại BCTC & Định giá cho ${selectedSymbol} thành công!`
-      });
+      showToast(
+        res.message || `Đã tải lại BCTC & Định giá cho ${selectedSymbol} thành công!`,
+        'success'
+      );
       await loadFinancialsForSymbol(selectedSymbol);
       if (inspectorType === 'financials') {
         loadRawJson('financials', selectedSymbol);
@@ -186,13 +189,9 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       const stocksRes = await fetchValuationStocks().catch(() => ({}));
       setValuationData(stocksRes || {});
     } catch (err) {
-      setSyncMessage({
-        type: 'error',
-        text: err.message || `Lỗi tải dữ liệu cho mã ${selectedSymbol}.`
-      });
+      showToast(err.message || `Lỗi tải dữ liệu cho mã ${selectedSymbol}.`, 'error');
     } finally {
       setSyncingSingle(false);
-      setTimeout(() => setSyncMessage(null), 8000);
     }
   };
 
@@ -201,7 +200,6 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
   const handleRefreshSingleAi = async () => {
     if (!selectedSymbol || refreshingAi) return;
     setRefreshingAi(true);
-    setSyncMessage(null);
     try {
       const res = await refreshSingleStockAi(selectedSymbol);
       if (res?.data) {
@@ -209,21 +207,17 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       } else {
         await loadFinancialsForSymbol(selectedSymbol);
       }
-      setSyncMessage({
-        type: 'success',
-        text: `Đã làm mới thành công toàn bộ phân tích AI (Thesis, News, Audit, Convergence, Dividend) cho ${selectedSymbol}!`
-      });
+      showToast(
+        `Đã làm mới thành công toàn bộ phân tích AI cho ${selectedSymbol}!`,
+        'success'
+      );
       if (inspectorType === 'financials') {
         loadRawJson('financials', selectedSymbol);
       }
     } catch (err) {
-      setSyncMessage({
-        type: 'error',
-        text: err.message || `Lỗi cập nhật AI cho mã ${selectedSymbol}.`
-      });
+      showToast(err.message || `Lỗi cập nhật AI cho mã ${selectedSymbol}.`, 'error');
     } finally {
       setRefreshingAi(false);
-      setTimeout(() => setSyncMessage(null), 8000);
     }
   };
 
@@ -240,26 +234,20 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
     }
 
     setLookingUp(true);
-    setSyncMessage({
-      type: 'info',
-      text: `Đang tra cứu dữ liệu và phân tích BCTC cho mã ${sym}...`
-    });
+    showToast(`Đang tra cứu dữ liệu và phân tích BCTC cho mã ${sym}...`, 'info');
 
     try {
       const res = await triggerSingleFinancialSync(sym);
       if (res?.isQueued) {
-        setSyncMessage({
-          type: 'info',
-          text: res.message || `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Bot sẽ tự động thu thập BCTC trong phiên đồng bộ EOD lúc 18:00 hôm nay!`
-        });
+        showToast(
+          res.message || `Mã ${sym} đã được ghi nhận vào hàng đợi yêu cầu dữ liệu. Bot sẽ thu thập BCTC lúc 18:00!`,
+          'info'
+        );
         setInputSymbol('');
         return;
       }
 
-      setSyncMessage({
-        type: 'success',
-        text: res.message || `Đã tra cứu và định giá thành công cho mã ${sym}!`
-      });
+      showToast(res.message || `Đã tra cứu và định giá thành công cho mã ${sym}!`, 'success');
 
       const stocksRes = await fetchValuationStocks().catch(() => ({}));
       setValuationData(stocksRes || {});
@@ -271,13 +259,9 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       }
       setInputSymbol('');
     } catch (err) {
-      setSyncMessage({
-        type: 'error',
-        text: err.message || `Không thể tra cứu mã ${sym}.`
-      });
+      showToast(err.message || `Không thể tra cứu mã ${sym}.`, 'error');
     } finally {
       setLookingUp(false);
-      setTimeout(() => setSyncMessage(null), 8000);
     }
   };
 
@@ -300,29 +284,18 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
 
   const currentStock = valuationData[selectedSymbol] || null;
 
+  if (loading && !currentStock && Object.keys(valuationData).length === 0) {
+    return (
+      <LoadingState
+        message="Đang nạp mô hình định giá & hồ sơ tài chính..."
+        subMessage="Đồng bộ 122+ chỉ tiêu BCTC VAS TT200 và 10 mô hình định lượng hội tụ"
+        minHeight="min-h-[400px]"
+      />
+    );
+  }
+
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-200">
-      {/* ── THÔNG BÁO SYNC NẾU CÓ ── */}
-      {syncMessage && (
-        <div
-          className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-2xs ${
-            syncMessage.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
-              : syncMessage.type === 'info'
-              ? 'bg-indigo-50 text-indigo-800 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800'
-              : 'bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
-          }`}
-        >
-          <span>{syncMessage.text}</span>
-          <button
-            onClick={() => setSyncMessage(null)}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm font-bold"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
       {/* ── TẦNG 1: EXECUTIVE COCKPIT (HEADER, HERO CONSENSUS & 52W RANGE SLIDER) ── */}
       {currentStock && (
         <StockCockpitHeader
@@ -343,49 +316,13 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
       )}
 
       {/* ── TẦNG 2: THANH CHUYỂN ĐỔI 4 KHÔNG GIAN PHÂN TÍCH (WORKSPACES NAVIGATION) ── */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-2 border border-gray-100 dark:border-gray-700/60 shadow-xs">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-          {WORKSPACES.map((ws) => {
-            const isActive = activeWorkspace === ws.id;
-            return (
-              <button
-                key={ws.id}
-                type="button"
-                onClick={() => setActiveWorkspace(ws.id)}
-                className={`p-3 rounded-xl text-left transition-all cursor-pointer flex flex-col justify-between ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
-                    : 'bg-gray-50/70 hover:bg-gray-100 dark:bg-gray-700/40 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border border-gray-100 dark:border-gray-700/50'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-1">
-                  <div className="flex items-center gap-1.5 font-bold text-xs truncate">
-                    <span>{ws.icon}</span>
-                    <span className="truncate">{ws.label}</span>
-                  </div>
-                  <span
-                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded-md uppercase font-bold shrink-0 ${
-                      isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
-                    }`}
-                  >
-                    {ws.badge}
-                  </span>
-                </div>
-                <p
-                  className={`text-[10px] mt-1.5 line-clamp-1 ${
-                    isActive ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'
-                  }`}
-                  title={ws.desc}
-                >
-                  {ws.desc}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <SubTabNav
+        tabs={WORKSPACES}
+        activeTab={activeWorkspace}
+        onChange={setActiveWorkspace}
+        variant="cards"
+        layout="grid4"
+      />
 
       {/* ── CÁC PHÂN KHU NỘI DUNG CHUYÊN SÂU THEO WORKSPACE ĐANG CHỌN ── */}
 
@@ -413,6 +350,11 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
               financials?.valuationMultiples?.valuationTraps
             }
             symbol={selectedSymbol}
+            aiAuditComment={
+              financials?.forensicAnalysis?.aiAuditComment ||
+              financials?.aiAuditComment ||
+              currentStock?.valuation?.forensicAnalysis?.aiAuditComment
+            }
           />
 
           {/* Dải Băng Phân Vị Lịch Sử 5 Năm P/E & P/B (P25 - P50 - P75) */}

@@ -1,8 +1,9 @@
-import { Fragment, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard.jsx';
 import UserNav from './components/UserNav.jsx';
 import { DashboardSkeleton, TabSkeleton } from './components/common/SkeletonLoader.jsx';
 import { useTheme } from './context/ThemeContext.jsx';
+import { useToast } from './context/ToastContext.jsx';
 import {
   clearAuthToken,
   cloneDemoData,
@@ -43,7 +44,7 @@ const prefetchTab = (tabId) => {
 
 const TABS = [
   // Cụm 1: Quản Trị Danh Mục & Giao Dịch
-  { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊', group: 'portfolio' },
+  { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Dashboard', icon: '📊', group: 'portfolio' },
   { id: 'trade', label: '⚡ Nhật Ký', shortLabel: 'Nhật Ký', icon: '⚡', group: 'portfolio' },
   { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋', group: 'portfolio' },
 
@@ -82,7 +83,7 @@ const TAB_GROUPS = [
     groupTitle: 'Tiện Ích & Cấu Hình Hệ Thống',
     items: [
       { id: 'watchlist', label: 'Danh Sách Theo Dõi', icon: '👁️', desc: 'Cảnh báo mốc giá mua/bán mục tiêu' },
-      { id: 'settings', label: 'Cài Đặt & Báo Cáo', icon: '⚙️', desc: 'Báo cáo thuế, backup JSON & database' },
+      { id: 'settings', label: 'Cài Đặt & Dữ Liệu', icon: '⚙️', desc: 'Giao diện, backup JSON & sao lưu database' },
     ]
   }
 ];
@@ -94,6 +95,11 @@ export default function App({ hasGoogleClientId = false }) {
   const [tradeType, setTradeType] = useState(initialRoute.tradeType || 'buy');
   const [buyInitial, setBuyInitial] = useState({
     symbol: initialRoute.tab === 'trade' && initialRoute.tradeType === 'buy' ? initialRoute.symbol : '',
+    quantity: '',
+    price: '',
+  });
+  const [sellInitial, setSellInitial] = useState({
+    symbol: initialRoute.tab === 'trade' && initialRoute.tradeType === 'sell' ? initialRoute.symbol : '',
     quantity: '',
     price: '',
   });
@@ -119,7 +125,7 @@ export default function App({ hasGoogleClientId = false }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [toast, setToast] = useState(null);
+  const { showToast } = useToast();
 
   // Quản lý Dark Mode / Light Mode từ ThemeContext
   const { themeMode, effectiveTheme, isDark, setThemeMode, toggleTheme } = useTheme();
@@ -171,15 +177,6 @@ export default function App({ hasGoogleClientId = false }) {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const toastTimerRef = useRef(null);
-  const showToast = useCallback((message, type = 'info') => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    setToast({ message, type });
-    toastTimerRef.current = setTimeout(() => {
-      setToast(null);
-    }, 4000);
   }, []);
 
   const [data, setData] = useState({
@@ -337,8 +334,22 @@ export default function App({ hasGoogleClientId = false }) {
     setIsTradeSheetOpen(false);
   }
 
-  function handleSelectSell(symbol) {
-    const sym = symbol || '';
+  function handleSelectSell(symbolOrObj, quantity = '', price = '') {
+    let sym = '';
+    let qty = '';
+    let prc = '';
+
+    if (typeof symbolOrObj === 'object' && symbolOrObj !== null) {
+      sym = symbolOrObj.symbol || '';
+      qty = symbolOrObj.quantity || '';
+      prc = symbolOrObj.price || '';
+    } else {
+      sym = symbolOrObj || '';
+      qty = quantity || '';
+      prc = price || '';
+    }
+
+    setSellInitial({ symbol: sym, quantity: qty, price: prc });
     setSellInitialSymbol(sym);
     setTradeType('sell');
     setTab('trade');
@@ -596,7 +607,6 @@ export default function App({ hasGoogleClientId = false }) {
                 onNavigateDca={handleSelectDca}
                 onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
-                showToast={showToast}
               />
             )}
             <Suspense fallback={<TabSkeleton />}>
@@ -604,14 +614,12 @@ export default function App({ hasGoogleClientId = false }) {
                 <MarketDashboard
                   refreshKey={refreshKey}
                   onSwitchTab={switchTab}
-                  showToast={showToast}
                 />
               )}
               {tab === 'macro' && (
                 <MacroDashboard
                   refreshKey={refreshKey}
                   onSwitchTab={switchTab}
-                  showToast={showToast}
                 />
               )}
               {tab === 'valuation' && (
@@ -637,10 +645,11 @@ export default function App({ hasGoogleClientId = false }) {
                   dividends={data.dividends || []}
                   watchlist={data.watchlist || []}
                   buyInitial={buyInitial}
+                  sellInitial={sellInitial}
                   sellInitialSymbol={sellInitialSymbol}
-                  showToast={showToast}
                   onSuccess={() => {
                     setBuyInitial({ symbol: '', quantity: '', price: '' });
+                    setSellInitial({ symbol: '', quantity: '', price: '' });
                     setSellInitialSymbol('');
                     loadData();
                   }}
@@ -653,7 +662,6 @@ export default function App({ hasGoogleClientId = false }) {
                   onNavigateBuy={handleSelectBuy}
                   onNavigateSell={handleSelectSell}
                   onSwitchTab={switchTab}
-                  showToast={showToast}
                 />
               )}
               {tab === 'strategy' && (
@@ -667,7 +675,6 @@ export default function App({ hasGoogleClientId = false }) {
                   onSuccess={loadData}
                   onSelectBuy={handleSelectBuy}
                   onSelectSell={handleSelectSell}
-                  showToast={showToast}
                 />
               )}
               {tab === 'settings' && (
@@ -675,7 +682,6 @@ export default function App({ hasGoogleClientId = false }) {
                   data={data}
                   currentUser={currentUser}
                   onSuccess={loadData}
-                  showToast={showToast}
                 />
               )}
             </Suspense>
@@ -1035,31 +1041,6 @@ export default function App({ hasGoogleClientId = false }) {
             hasGoogleClientId={hasGoogleClientId}
           />
         </Suspense>
-      )}
-
-      {/* 9. TOAST NOTIFICATION */}
-      {toast && (
-        <div
-          className={`fixed bottom-20 md:bottom-6 right-4 z-50 max-w-sm sm:max-w-md px-4 py-3 rounded-2xl shadow-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-200 ${toast.type === 'success'
-            ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-950/20'
-            : toast.type === 'error'
-              ? 'bg-rose-600 text-white border-rose-500 shadow-rose-950/20'
-              : 'bg-slate-900 text-white border-slate-800 shadow-slate-950/20'
-            }`}
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm shrink-0">{toast.type === 'success' ? '✅' : toast.type === 'error' ? '⚠️' : 'ℹ️'}</span>
-            <span className="truncate">{toast.message}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setToast(null)}
-            className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/20 transition-colors cursor-pointer shrink-0 text-xs font-bold leading-none"
-            title="Đóng thông báo"
-          >
-            ✕
-          </button>
-        </div>
       )}
     </div>
   );

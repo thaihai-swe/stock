@@ -594,6 +594,42 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
           * *Giao diện người dùng (`SectorValuationHeatmap.jsx`)*: Hợp nhất toàn bộ dữ liệu định giá P/E và 6 động lực vĩ mô vào đúng **2 chế độ xem trực quan & bảng số liệu chuyên sâu**:
             1. **`💎 Ma Trận Thiên Thời & Bản Đồ Nhiệt`**: 4 Phân vùng chiến lược, tích hợp thẻ P/E Heatmap so sánh % chênh lệch với VN-Index, P/E Rank, Macro Rank và widget bung mở xem 6 động lực vĩ mô.
             2. **`📋 Bảng Toàn Diện & Phân Rã Vĩ Mô`**: Bảng tổng hợp đa chiều BCTC & vĩ mô, hỗ trợ mở rộng dòng (Expandable Row) phân tích chi tiết 6 động lực chu kỳ.
+    21. **Bộ Phân Tích Vĩ Mô & Thị Trường Đa Kịch Bản Trí Tuệ Nhân Tạo (Macro Intelligence Suite - AI Enhanced)**:
+        * *Nguồn sinh dữ liệu*: `scripts/generate_ai_insights.py --scope macro` (gọi phương thức `generate_macro_intelligence_suite` trong `scripts/lib/ai_service.py` bằng 1 request gộp duy nhất).
+        * *Cơ chế lưu trữ & 2-tier Fallback*:
+          * Tầng 1: `data/macro_valuation.json` lưu trực tiếp vào các key chuyên biệt.
+          * Tầng 2: Đồng bộ song song vào `data/ai_insights_cache.json` để API `/api/valuation/macro` tự động merge nếu file chính bị làm mới bởi EOD pipeline.
+          * Offline Heuristic Fallback: Nếu không có API Key AI hoặc kết nối proxy bị gián đoạn, hệ thống tự động sinh dữ liệu định lượng chất lượng cao từ các biến số vĩ mô thực tế mà không làm gián đoạn UI.
+        * *Các trường dữ liệu cấu trúc chi tiết*:
+          * **`aiScenarios` (3 Kịch Bản VN-Index Định Lượng Động)**:
+            * `marketVerdict`: Nhận định tổng quan 1-2 câu về xu hướng chỉ số và tương quan P/E thị trường.
+            * `scenarios.base` (Kịch bản Cơ sở): Xác suất động (phụ thuộc Risk Score), dải điểm mục tiêu, dải P/E kỳ vọng, dự phóng tăng trưởng EPS, các chất xúc tác vĩ mô (`macroCatalysts`), nhóm ngành dẫn dắt (`leadingSectors` kèm `thesis`), nhóm ngành thận trọng (`laggingSectors` kèm `risk`), tỷ trọng phân bổ tài sản chiến thuật (`tacticalAllocation`), khuyến nghị hành động (`actionSummary`).
+            * `scenarios.bull` (Kịch bản Tích cực): Cấu trúc tương tự cho kịch bản hưng phấn & nới lỏng tiền tệ.
+            * `scenarios.bear` (Kịch bản Thận trọng): Cấu trúc tương tự cho kịch bản phòng thủ & thắt chặt thanh khoản.
+          * **`aiClockDynamics` (Động Lực Học Đồng Hồ Vĩ Mô)**:
+            * `clockHandPosition`: Vị trí kim đồng hồ (VD: "2:30 (Cuối pha Mở Rộng — Chớm Tăng Nhiệt)").
+            * `transitionVelocity`: Vận tốc chuyển dịch pha chu kỳ (CHẬM, TRUNG BÌNH, NHANH).
+            * `dynamicsAnalysis`: Phân tích cơ chế xung lực giữa tăng trưởng GDP, lạm phát và thanh khoản SBV.
+            * `historicalAnalog`: Thời kỳ lịch sử tương đồng (`period`) và bản chất tương đồng (`similarity`).
+            * `sectorPlaybook`: Cẩm nang ngành (`favored`: các ngành ưu tiên, `cautious`: các ngành cần thận trọng).
+          * **`aiYieldCurveDiagnosis` (Chẩn Đoán Thị Trường Nợ & Thanh Khoản Hệ Thống)**:
+            * `curveStatus`: Trạng thái hình thái đường cong lợi suất TPCP và chênh lệch 10Y-2Y.
+            * `bankingLiquidityImpact`: Tác động thanh khoản hệ thống NHTM và biên lãi ròng NIM.
+            * `corporateDebtStress`: Mức độ áp lực đáo hạn trái phiếu doanh nghiệp và rủi ro tín dụng.
+            * `equityMarketSignal`: Tương quan lợi tức thu nhập cổ phiếu (E/P) so với lợi suất trái phiếu 10Y (ERP).
+          * **`aiMultiAssetStrategy` (Chiến Lược Phân Bổ Đa Tài Sản & Nhận Định Vàng)**:
+            * `multiAssetThesis`: Luận điểm phân bổ tài sản tổng thể giữa Cổ phiếu, Trái phiếu, Vàng và Tiền mặt.
+            * `goldArbitrageRationale`: Luận giải mức độ chênh lệch vàng SJC/PNJ so với thế giới và khuyến nghị đầu tư vàng.
+            * `policyRiskAlert`: Cảnh báo rủi ro chính sách quản lý thị trường vàng từ Ngân hàng Nhà nước.
+            * `recommendedAllocation`: Tỷ lệ phân bổ 4 lớp tài sản tối ưu.
+          * **`aiStyleRotation` (Chiến Lược Luân Chuyển Phong Cách Đầu Tư)**:
+            * `rotationHeadline`: Tiêu đề luận điểm dòng vốn tổ chức giữa các phân khúc.
+            * `largeCapVsMidcap`: Phân tích đối chiếu giữa Large-Cap Blue-chips (VN30) và Midcap tăng trưởng.
+            * `diamondForeignRoom`: Nhận định nhóm cổ phiếu kín room ngoại (VN Diamond) và định giá tương đối.
+            * `actionableStrategy`: Khuyến nghị tỷ trọng phân bổ cụ thể giữa các phong cách đầu tư.
+          * **`aiTailRiskAnalysis` (Kế Hoạch Dự Phòng & Chuỗi Dẫn Truyền Rủi Ro Đuôi)**:
+            * `contingencyPlan`: Kế hoạch hành động ứng phó dự phòng khi các cảnh báo rủi ro đuôi kích hoạt.
+            * `contagionChain`: Cơ chế dẫn truyền và mức độ lan tỏa rủi ro xuyên thị trường (Tỷ giá $\to$ Khối ngoại $\to$ Large-Cap $\to$ Thị trường chung).
 
 ---
 
@@ -637,14 +673,16 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 1. **Sổ Lệnh Mua (`buy_orders`)**:
    * Quản lý giá mua, phí môi giới, tổng vốn đầu tư và số lượng cổ phiếu còn khả dụng (`remaining_qty`).
 2. **Sổ Lệnh Bán (`sell_orders`)**:
-   * Khi phát sinh lệnh bán, thuật toán **FIFO (First-In, First-Out)** tự động quét tìm các lô mua cũ nhất để đối trừ giá vốn.
-   * Tính toán doanh thu thuần sau thuế TNCN 0.1% và phí môi giới, từ đó xác định chính xác số tiền **Lãi/Lỗ Đã Thực Hiện (Realized P/L)**.
-   * Ghi nhận lịch sử chi tiết vào cột `matched_lots` dạng JSON.
+   * Khi phát sinh lệnh bán, thuật toán **Khớp Lô Đa Chiến Lược (FIFO / Giá Vốn Cao Nhất / Giá Vốn Thấp Nhất)** tự động quét tìm các lô mua để đối trừ giá vốn.
+   * Cơ chế phí đơn giản hóa: Phí bán được trừ trực tiếp vào đơn giá bán thực nhận (`net_price`), doanh thu thuần thực nhận (`net_revenue`), và tự động cộng vào số dư tiền mặt (`cash_balance`).
+   * Xác định chính xác số tiền **Lãi/Lỗ Đã Thực Hiện (Realized P/L)** = `Khối lượng × (Giá bán thực nhận - Giá vốn gốc)` — đối soát hoàn hảo 100% trên toàn bộ giao diện.
+   * Ghi nhận lịch sử chi tiết từng lô khớp vào cột `matched_lots` dạng JSON.
 3. **Sổ Cổ Tức (`dividends`)**:
-   * Ghi nhận cổ tức tiền mặt (tự động khấu trừ 5% thuế TNCN theo luật chứng khoán Việt Nam).
+   * Ghi nhận cổ tức tiền mặt (tự động cộng tiền thực nhận vào số dư tiền mặt `cash_balance`).
    * Ghi nhận cổ tức bằng cổ phiếu (làm tăng số lượng nắm giữ và tự động điều chỉnh giá vốn bình quân).
-4. **Sổ Theo Dõi & Kế Hoạch (`watchlist` & `app_settings`)**:
-   * Lưu trữ số dư tiền mặt danh mục (`cash_balance`).
+4. **Sổ Theo Dõi & Quản Lý Vốn (`watchlist` & `app_settings`)**:
+   * Lưu trữ số dư tiền mặt danh mục (`cash_balance`), hỗ trợ cả số âm (dư nợ Margin / ký quỹ).
+   * Tự động điều chỉnh `cash_balance` khi phát sinh giao dịch Mua (-), Bán (+), Nhận Cổ Tức (+), hoặc Xóa/Undo lệnh.
    * Mục tiêu tỷ trọng cổ phiếu và cảnh báo vùng giá mua/bán gom tích lũy.
 
 ---

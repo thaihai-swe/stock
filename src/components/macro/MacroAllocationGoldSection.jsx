@@ -142,6 +142,48 @@ export default function MacroAllocationGoldSection({
           </div>
         </div>
       </div>
+
+      {/* ── 4. AI CHIẾN LƯỢC ĐA TÀI SẢN & VÀNG (AI MULTI-ASSET & GOLD STRATEGY) ── */}
+      {macroData?.aiMultiAssetStrategy && (
+        <div className="p-5 sm:p-7 rounded-3xl bg-gradient-to-br from-amber-50/80 via-yellow-50/30 to-white dark:from-amber-950/30 dark:via-yellow-950/15 dark:to-slate-900 border border-amber-200/70 dark:border-amber-800/50 space-y-4 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-100 dark:border-amber-900/50 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🧠</span>
+              <span className="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
+                Chiến Lược Phân Bổ Đa Tài Sản & Nhận Định Giá Vàng (AI Multi-Asset Strategist)
+              </span>
+              <IntelligenceBadge type="ai" tooltip="Phân tích định tính tương quan Cổ phiếu, Trái phiếu, Tiền mặt và Vàng từ AI" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-amber-100 dark:border-slate-700/60 space-y-2">
+              <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <span>📊</span>
+                <span>Luận Điểm Phân Bổ 4 Lớp Tài Sản:</span>
+              </span>
+              <p className="text-xs text-gray-700 dark:text-slate-300 leading-relaxed font-medium">
+                {macroData.aiMultiAssetStrategy.multiAssetThesis}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-amber-100 dark:border-slate-700/60 space-y-2">
+              <span className="text-xs font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                <span>🪙</span>
+                <span>Độ Lệch Vàng SJC & Rủi Ro Can Thiệp Chính Sách:</span>
+              </span>
+              <p className="text-xs text-gray-700 dark:text-slate-300 leading-relaxed font-medium">
+                {macroData.aiMultiAssetStrategy.goldArbitrageRationale}
+              </p>
+              {macroData.aiMultiAssetStrategy.policyRiskAlert && (
+                <p className="text-[11px] text-amber-800 dark:text-amber-300/90 pt-1 border-t border-amber-100 dark:border-slate-700">
+                  ⚠️ <b>Lưu ý chính sách:</b> {macroData.aiMultiAssetStrategy.policyRiskAlert}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

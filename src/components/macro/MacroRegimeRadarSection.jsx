@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import ExecutiveSummaryCard from './ExecutiveSummaryCard.jsx';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
@@ -14,6 +15,18 @@ export default function MacroRegimeRadarSection({
   hasActiveTailRisk = false,
   market = {},
 }) {
+  const [scenarioViewMode, setScenarioViewMode] = useState('ai'); // 'ai' | 'heuristic'
+  const [clockViewMode, setClockViewMode] = useState('ai'); // 'ai' | 'heuristic'
+
+  const aiScenariosData = macroData?.aiScenarios || {};
+  const aiScenarios = aiScenariosData?.scenarios || {};
+  const hasAiScenarios = Boolean(aiScenarios?.base);
+  const isAiScenarioActive = scenarioViewMode === 'ai' && hasAiScenarios;
+
+  const aiClockData = macroData?.aiClockDynamics || {};
+  const hasAiClock = Boolean(aiClockData?.clockHandPosition);
+  const isAiClockActive = clockViewMode === 'ai' && hasAiClock;
+  const aiTailRisk = macroData?.aiTailRiskAnalysis;
   return (
     <div className="space-y-6">
       {/* ── 1. BÁO CÁO ĐIỀU HÀNH TRỌNG YẾU (EXECUTIVE SUMMARY) ── */}
@@ -57,6 +70,27 @@ export default function MacroRegimeRadarSection({
                 </div>
               </div>
             ))}
+            {aiTailRisk && (
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/20 via-amber-950/10 to-transparent border border-rose-500/30 text-xs space-y-2 md:col-span-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🧠</span>
+                  <span className="font-bold text-rose-700 dark:text-rose-300 uppercase tracking-wide">
+                    Chiến Lược Phòng Vệ & Chuỗi Tác Động Dây Chuyền (AI Tail-Risk Copilot)
+                  </span>
+                  <IntelligenceBadge type="ai" tooltip="Phân tích chuỗi dẫn truyền rủi ro đuôi từ AI Copilot" />
+                </div>
+                {aiTailRisk.contagionChain && (
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <b>Chuỗi lây lan:</b> {aiTailRisk.contagionChain}
+                  </p>
+                )}
+                {aiTailRisk.contingencyPlan && (
+                  <p className="text-rose-800 dark:text-rose-300 font-semibold bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl leading-relaxed">
+                    🛡️ <b>Kế hoạch ứng phó:</b> {aiTailRisk.contingencyPlan}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -69,145 +103,424 @@ export default function MacroRegimeRadarSection({
               <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                 Dự Phóng Vĩ Mô & Định Lượng Kịch Bản (Scenario Matrix)
               </span>
-              <IntelligenceBadge type="heuristic" tooltip="Mô hình dự phóng xác suất 3 kịch bản VN-Index & phân bổ ngành" />
+              <IntelligenceBadge
+                type={isAiScenarioActive ? 'ai' : 'heuristic'}
+                tooltip={isAiScenarioActive ? 'Kịch bản dự phóng động tổng hợp từ AI Copilot' : 'Mô hình dự phóng xác suất 3 kịch bản VN-Index & phân bổ ngành'}
+              />
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
               3 Kịch Bản Định Giá VN-Index & Phân Bổ Ngành
             </h3>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            {(market?.currentPoint || scenarioMatrix?.base?.currentPoint) && (
-              <span className="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/40">
-                🎯 Điểm gốc: <b>{Number(market?.currentPoint || scenarioMatrix?.base?.currentPoint).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> điểm
-              </span>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* View Mode Toggle */}
+            {hasAiScenarios && (
+              <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setScenarioViewMode('ai')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isAiScenarioActive
+                      ? 'bg-purple-600 text-white shadow-2xs'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>🤖</span>
+                  <span>AI Phân Tích Động</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScenarioViewMode('heuristic')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    !isAiScenarioActive
+                      ? 'bg-amber-600 text-white shadow-2xs'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>📐</span>
+                  <span>Định Lượng Neo</span>
+                </button>
+              </div>
             )}
-            <span className="text-gray-400 dark:text-slate-500">
-              Xác suất: <b className="text-indigo-600 dark:text-indigo-400">{scenarioMatrix?.base?.probability || 55}% Base · {scenarioMatrix?.bull?.probability || 25}% Bull · {scenarioMatrix?.bear?.probability || 20}% Bear</b>
-            </span>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {(market?.currentPoint || scenarioMatrix?.base?.currentPoint) && (
+                <span className="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/40">
+                  🎯 Điểm gốc: <b>{Number(market?.currentPoint || scenarioMatrix?.base?.currentPoint).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> điểm
+                </span>
+              )}
+              <span className="text-gray-400 dark:text-slate-500">
+                Xác suất: <b className="text-indigo-600 dark:text-indigo-400">
+                  {isAiScenarioActive
+                    ? `${aiScenarios?.base?.probability || 55}% Base · ${aiScenarios?.bull?.probability || 25}% Bull · ${aiScenarios?.bear?.probability || 20}% Bear`
+                    : `${scenarioMatrix?.base?.probability || 55}% Base · ${scenarioMatrix?.bull?.probability || 25}% Bull · ${scenarioMatrix?.bear?.probability || 20}% Bear`}
+                </b>
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Base Case */}
-          {scenarioMatrix?.base && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/40 space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase text-blue-700 dark:text-blue-300">
-                    {scenarioMatrix.base.name}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-xs font-black">
-                    {scenarioMatrix.base.probability}%
-                  </span>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-black text-blue-900 dark:text-blue-100">
-                    {scenarioMatrix.base.vnIndexRange}
-                  </div>
-                  <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-0.5">
-                    Dải điểm kỳ vọng VN-Index
-                  </div>
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.base.conditions}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.base.narrative}
-                </div>
-              </div>
-              <div className="pt-3 border-t border-blue-200/60 dark:border-blue-800/40 space-y-1.5">
-                <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span>✓ Ưu tiên:</span>
-                  <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.base.sectorBenefit?.join(', ')}</span>
-                </div>
-                <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
-                  <span>✕ Thận trọng:</span>
-                  <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.base.sectorImpacted?.join(', ')}</span>
-                </div>
-              </div>
+        {/* AI Market Verdict Banner */}
+        {isAiScenarioActive && aiScenariosData.marketVerdict && (
+          <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/40 text-xs text-indigo-900 dark:text-indigo-200 flex items-start gap-2.5">
+            <span className="text-base">🎯</span>
+            <div className="leading-relaxed">
+              <span className="font-bold">Định Vị Thị Trường: </span>
+              {aiScenariosData.marketVerdict}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Bull Case */}
-          {scenarioMatrix?.bull && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase text-emerald-700 dark:text-emerald-300">
-                    {scenarioMatrix.bull.name}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-black">
-                    {scenarioMatrix.bull.probability}%
-                  </span>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-black text-emerald-900 dark:text-emerald-100">
-                    {scenarioMatrix.bull.vnIndexRange}
+        {/* ── HIỂN THỊ GÓC NHÌN AI PHÂN TÍCH ĐỘNG ── */}
+        {isAiScenarioActive ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Base Case AI */}
+            {aiScenarios.base && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/40 space-y-3.5 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-blue-700 dark:text-blue-300">
+                      {aiScenarios.base.name}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-xs font-black">
+                      {aiScenarios.base.probability}%
+                    </span>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                    Dải điểm kỳ vọng VN-Index
+                  <div>
+                    <div className="text-xl sm:text-2xl font-black text-blue-900 dark:text-blue-100">
+                      {aiScenarios.base.vnIndexTargetRange}
+                    </div>
+                    <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                      Target P/E: {aiScenarios.base.targetPeRange} &bull; EPS: {aiScenarios.base.projectedEpsGrowth}
+                    </div>
                   </div>
+                  {aiScenarios.base.macroCatalysts?.length > 0 && (
+                    <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                      <b className="text-gray-900 dark:text-white block">Chất xúc tác vĩ mô:</b>
+                      <ul className="list-disc pl-4 space-y-0.5 text-[11px] leading-relaxed">
+                        {aiScenarios.base.macroCatalysts.map((c, i) => (
+                          <li key={i}>{c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {aiScenarios.base.actionSummary && (
+                    <div className="text-xs text-blue-800 dark:text-blue-200 bg-blue-100/50 dark:bg-blue-900/30 p-2.5 rounded-xl leading-relaxed">
+                      <b>Chiến lược:</b> {aiScenarios.base.actionSummary}
+                    </div>
+                  )}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.bull.conditions}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.bull.narrative}
+                <div className="pt-3 border-t border-blue-200/60 dark:border-blue-800/40 space-y-2">
+                  {aiScenarios.base.leadingSectors?.length > 0 && (
+                    <div className="text-[11px] space-y-0.5">
+                      <div className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span>✓ Ngành dẫn dắt:</span>
+                      </div>
+                      {aiScenarios.base.leadingSectors.map((s, i) => (
+                        <div key={i} className="text-gray-600 dark:text-gray-300 pl-2">
+                          &bull; <b>{s.sector}:</b> {s.thesis}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {aiScenarios.base.laggingSectors?.length > 0 && (
+                    <div className="text-[11px] space-y-0.5">
+                      <div className="font-bold text-rose-500 flex items-center gap-1">
+                        <span>✕ Thận trọng:</span>
+                      </div>
+                      {aiScenarios.base.laggingSectors.map((s, i) => (
+                        <div key={i} className="text-gray-600 dark:text-gray-300 pl-2">
+                          &bull; <b>{s.sector}:</b> {s.risk}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {aiScenarios.base.tacticalAllocation && (
+                    <div className="pt-1.5 flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                      <span>Phân bổ:</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">CP {aiScenarios.base.tacticalAllocation.equity}%</span>
+                      <span className="text-blue-600 dark:text-blue-400">TP {aiScenarios.base.tacticalAllocation.bond}%</span>
+                      <span className="text-indigo-600 dark:text-indigo-400">Tiền {aiScenarios.base.tacticalAllocation.cash}%</span>
+                      <span className="text-amber-600 dark:text-amber-400">Vàng {aiScenarios.base.tacticalAllocation.gold}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="pt-3 border-t border-emerald-200/60 dark:border-emerald-800/40 space-y-1.5">
-                <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span>✓ Ưu tiên:</span>
-                  <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bull.sectorBenefit?.join(', ')}</span>
-                </div>
-                <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
-                  <span>✕ Thận trọng:</span>
-                  <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bull.sectorImpacted?.join(', ')}</span>
-                </div>
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Bear Case */}
-          {scenarioMatrix?.bear && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase text-rose-700 dark:text-rose-300">
-                    {scenarioMatrix.bear.name}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-black">
-                    {scenarioMatrix.bear.probability}%
-                  </span>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-black text-rose-900 dark:text-rose-100">
-                    {scenarioMatrix.bear.vnIndexRange}
+            {/* Bull Case AI */}
+            {aiScenarios.bull && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 space-y-3.5 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-emerald-700 dark:text-emerald-300">
+                      {aiScenarios.bull.name}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-black">
+                      {aiScenarios.bull.probability}%
+                    </span>
                   </div>
-                  <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 mt-0.5">
-                    Dải điểm kỳ vọng VN-Index
+                  <div>
+                    <div className="text-xl sm:text-2xl font-black text-emerald-900 dark:text-emerald-100">
+                      {aiScenarios.bull.vnIndexTargetRange}
+                    </div>
+                    <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                      Target P/E: {aiScenarios.bull.targetPeRange} &bull; EPS: {aiScenarios.bull.projectedEpsGrowth}
+                    </div>
                   </div>
+                  {aiScenarios.bull.macroCatalysts?.length > 0 && (
+                    <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                      <b className="text-gray-900 dark:text-white block">Chất xúc tác vĩ mô:</b>
+                      <ul className="list-disc pl-4 space-y-0.5 text-[11px] leading-relaxed">
+                        {aiScenarios.bull.macroCatalysts.map((c, i) => (
+                          <li key={i}>{c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {aiScenarios.bull.actionSummary && (
+                    <div className="text-xs text-emerald-800 dark:text-emerald-200 bg-emerald-100/50 dark:bg-emerald-900/30 p-2.5 rounded-xl leading-relaxed">
+                      <b>Chiến lược:</b> {aiScenarios.bull.actionSummary}
+                    </div>
+                  )}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.bear.conditions}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.bear.narrative}
+                <div className="pt-3 border-t border-emerald-200/60 dark:border-emerald-800/40 space-y-2">
+                  {aiScenarios.bull.leadingSectors?.length > 0 && (
+                    <div className="text-[11px] space-y-0.5">
+                      <div className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span>✓ Ngành dẫn dắt:</span>
+                      </div>
+                      {aiScenarios.bull.leadingSectors.map((s, i) => (
+                        <div key={i} className="text-gray-600 dark:text-gray-300 pl-2">
+                          &bull; <b>{s.sector}:</b> {s.thesis}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {aiScenarios.bull.laggingSectors?.length > 0 && (
+                    <div className="text-[11px] space-y-0.5">
+                      <div className="font-bold text-rose-500 flex items-center gap-1">
+                        <span>✕ Thận trọng:</span>
+                      </div>
+                      {aiScenarios.bull.laggingSectors.map((s, i) => (
+                        <div key={i} className="text-gray-600 dark:text-gray-300 pl-2">
+                          &bull; <b>{s.sector}:</b> {s.risk}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {aiScenarios.bull.tacticalAllocation && (
+                    <div className="pt-1.5 flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                      <span>Phân bổ:</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">CP {aiScenarios.bull.tacticalAllocation.equity}%</span>
+                      <span className="text-blue-600 dark:text-blue-400">TP {aiScenarios.bull.tacticalAllocation.bond}%</span>
+                      <span className="text-indigo-600 dark:text-indigo-400">Tiền {aiScenarios.bull.tacticalAllocation.cash}%</span>
+                      <span className="text-amber-600 dark:text-amber-400">Vàng {aiScenarios.bull.tacticalAllocation.gold}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="pt-3 border-t border-rose-200/60 dark:border-rose-800/40 space-y-1.5">
-                <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span>✓ Ưu tiên:</span>
-                  <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bear.sectorBenefit?.join(', ')}</span>
+            )}
+
+            {/* Bear Case AI */}
+            {aiScenarios.bear && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 space-y-3.5 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-rose-700 dark:text-rose-300">
+                      {aiScenarios.bear.name}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-black">
+                      {aiScenarios.bear.probability}%
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-black text-rose-900 dark:text-rose-100">
+                      {aiScenarios.bear.vnIndexTargetRange}
+                    </div>
+                    <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 mt-0.5">
+                      Target P/E: {aiScenarios.bear.targetPeRange} &bull; EPS: {aiScenarios.bear.projectedEpsGrowth}
+                    </div>
+                  </div>
+                  {aiScenarios.bear.macroCatalysts?.length > 0 && (
+                    <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                      <b className="text-gray-900 dark:text-white block">Chất xúc tác vĩ mô:</b>
+                      <ul className="list-disc pl-4 space-y-0.5 text-[11px] leading-relaxed">
+                        {aiScenarios.bear.macroCatalysts.map((c, i) => (
+                          <li key={i}>{c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {aiScenarios.bear.actionSummary && (
+                    <div className="text-xs text-rose-800 dark:text-rose-200 bg-rose-100/50 dark:bg-rose-900/30 p-2.5 rounded-xl leading-relaxed">
+                      <b>Chiến lược:</b> {aiScenarios.bear.actionSummary}
+                    </div>
+                  )}
                 </div>
-                <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
-                  <span>✕ Thận trọng:</span>
-                  <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bear.sectorImpacted?.join(', ')}</span>
+                <div className="pt-3 border-t border-rose-200/60 dark:border-rose-800/40 space-y-2">
+                  {aiScenarios.bear.leadingSectors?.length > 0 && (
+                    <div className="text-[11px] space-y-0.5">
+                      <div className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span>✓ Ngành dẫn dắt:</span>
+                      </div>
+                      {aiScenarios.bear.leadingSectors.map((s, i) => (
+                        <div key={i} className="text-gray-600 dark:text-gray-300 pl-2">
+                          &bull; <b>{s.sector}:</b> {s.thesis}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {aiScenarios.bear.laggingSectors?.length > 0 && (
+                    <div className="text-[11px] space-y-0.5">
+                      <div className="font-bold text-rose-500 flex items-center gap-1">
+                        <span>✕ Thận trọng:</span>
+                      </div>
+                      {aiScenarios.bear.laggingSectors.map((s, i) => (
+                        <div key={i} className="text-gray-600 dark:text-gray-300 pl-2">
+                          &bull; <b>{s.sector}:</b> {s.risk}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {aiScenarios.bear.tacticalAllocation && (
+                    <div className="pt-1.5 flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                      <span>Phân bổ:</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">CP {aiScenarios.bear.tacticalAllocation.equity}%</span>
+                      <span className="text-blue-600 dark:text-blue-400">TP {aiScenarios.bear.tacticalAllocation.bond}%</span>
+                      <span className="text-indigo-600 dark:text-indigo-400">Tiền {aiScenarios.bear.tacticalAllocation.cash}%</span>
+                      <span className="text-amber-600 dark:text-amber-400">Vàng {aiScenarios.bear.tacticalAllocation.gold}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          /* ── HIỂN THỊ GÓC NHÌN ĐỊNH LƯỢNG NEO (HEURISTIC) ── */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Base Case */}
+            {scenarioMatrix?.base && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/40 space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-blue-700 dark:text-blue-300">
+                      {scenarioMatrix.base.name}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-xs font-black">
+                      {scenarioMatrix.base.probability}%
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-black text-blue-900 dark:text-blue-100">
+                      {scenarioMatrix.base.vnIndexRange}
+                    </div>
+                    <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                      Dải điểm kỳ vọng VN-Index
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.base.conditions}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.base.narrative}
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-blue-200/60 dark:border-blue-800/40 space-y-1.5">
+                  <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span>✓ Ưu tiên:</span>
+                    <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.base.sectorBenefit?.join(', ')}</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
+                    <span>✕ Thận trọng:</span>
+                    <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.base.sectorImpacted?.join(', ')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Bull Case */}
+            {scenarioMatrix?.bull && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-emerald-700 dark:text-emerald-300">
+                      {scenarioMatrix.bull.name}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-black">
+                      {scenarioMatrix.bull.probability}%
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-black text-emerald-900 dark:text-emerald-100">
+                      {scenarioMatrix.bull.vnIndexRange}
+                    </div>
+                    <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                      Dải điểm kỳ vọng VN-Index
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.bull.conditions}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.bull.narrative}
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-emerald-200/60 dark:border-emerald-800/40 space-y-1.5">
+                  <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span>✓ Ưu tiên:</span>
+                    <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bull.sectorBenefit?.join(', ')}</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
+                    <span>✕ Thận trọng:</span>
+                    <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bull.sectorImpacted?.join(', ')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Bear Case */}
+            {scenarioMatrix?.bear && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-rose-700 dark:text-rose-300">
+                      {scenarioMatrix.bear.name}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-black">
+                      {scenarioMatrix.bear.probability}%
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-black text-rose-900 dark:text-rose-100">
+                      {scenarioMatrix.bear.vnIndexRange}
+                    </div>
+                    <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 mt-0.5">
+                      Dải điểm kỳ vọng VN-Index
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <b className="text-gray-900 dark:text-white">Điều kiện:</b> {scenarioMatrix.bear.conditions}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <b className="text-gray-900 dark:text-white">Luận điểm:</b> {scenarioMatrix.bear.narrative}
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-rose-200/60 dark:border-rose-800/40 space-y-1.5">
+                  <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span>✓ Ưu tiên:</span>
+                    <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bear.sectorBenefit?.join(', ')}</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1">
+                    <span>✕ Thận trọng:</span>
+                    <span className="font-normal text-gray-700 dark:text-gray-300">{scenarioMatrix.bear.sectorImpacted?.join(', ')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── 4. MACRO CLOCK: 4 GÓC PHẦN TƯ CHU KỲ VĨ MÔ ── */}
@@ -218,106 +531,227 @@ export default function MacroRegimeRadarSection({
               <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                 Đồng Hồ Vĩ Mô (Macro Clock Framework)
               </span>
-              <IntelligenceBadge type="heuristic" tooltip="Khung lý thuyết Macro Clock 4 góc phần tư GDP vs Lạm phát" />
+              <IntelligenceBadge
+                type={isAiClockActive ? 'ai' : 'heuristic'}
+                tooltip={isAiClockActive ? 'Phân tích động học chu kỳ & vận tốc dịch chuyển từ AI Copilot' : 'Khung lý thuyết Macro Clock 4 góc phần tư GDP vs Lạm phát'}
+              />
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-slate-100 mt-0.5">
-              4 Góc Phần Tư Tăng Trưởng GDP & Lạm Phát
+              Đồng Hồ Vĩ Mô & Động Lực Học Chu Kỳ
             </h3>
           </div>
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800 self-start sm:self-auto">
-            {macroClock?.titleVi || 'Tăng Trưởng Bền Vững'}
-          </span>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* View Mode Toggle */}
+            {hasAiClock && (
+              <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setClockViewMode('ai')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isAiClockActive
+                      ? 'bg-purple-600 text-white shadow-2xs'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>🤖</span>
+                  <span>Động Lực Học AI</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClockViewMode('heuristic')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    !isAiClockActive
+                      ? 'bg-amber-600 text-white shadow-2xs'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>📐</span>
+                  <span>4 Góc Phần Tư</span>
+                </button>
+              </div>
+            )}
+
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800 self-start sm:self-auto">
+              {macroClock?.titleVi || 'Tăng Trưởng Bền Vững'}
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {[
-            {
-              key: 'expansion',
-              aliases: ['expansion', 'goldilocks'],
-              icon: '🌟',
-              title: 'Tăng Trưởng Vững Vàng (Goldilocks)',
-              sub: 'GDP Tăng Trưởng Cao • Lạm Phát Ổn Định',
-              desc: 'Môi trường lý tưởng nhất cho thị trường chứng khoán. Lợi nhuận doanh nghiệp tăng trưởng mạnh.',
-              sectors: 'Ngân hàng, Chứng khoán, Bán lẻ, Công nghệ',
-              activeClass: 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 shadow-xs',
-              badgeBg: 'bg-emerald-600',
-              subColor: 'text-emerald-600 dark:text-emerald-400',
-              sectorColor: 'text-emerald-700 dark:text-emerald-300'
-            },
-            {
-              key: 'overheating',
-              aliases: ['overheating'],
-              icon: '🔥',
-              title: 'Quá Nhiệt / Tăng Tốc (Overheating)',
-              sub: 'GDP Tăng Trưởng Tốt • Lạm Phát Tăng Cao',
-              desc: 'Sản xuất sôi động nhưng chi phí vốn bắt đầu tăng. Lợi nhuận phân hóa mạnh giữa các nhóm ngành.',
-              sectors: 'Bất động sản, Thép, Hóa chất, Năng lượng',
-              activeClass: 'bg-amber-50/70 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xs',
-              badgeBg: 'bg-amber-600',
-              subColor: 'text-amber-600 dark:text-amber-400',
-              sectorColor: 'text-amber-700 dark:text-amber-300'
-            },
-            {
-              key: 'stagflation',
-              aliases: ['stagflation'],
-              icon: '⚠️',
-              title: 'Đình Lạm (Stagflation)',
-              sub: 'GDP Chậm Lại • Lạm Phát Neo Cao',
-              desc: 'Kịch bản rủi ro: chi phí đầu vào tăng xói mòn biên lợi nhuận trong khi sức mua sụt giảm.',
-              sectors: 'Tiện ích, Dược phẩm, Tiền mặt, Vàng',
-              activeClass: 'bg-rose-50/70 dark:bg-rose-950/30 border-2 border-rose-500 shadow-xs',
-              badgeBg: 'bg-rose-600',
-              subColor: 'text-rose-600 dark:text-rose-400',
-              sectorColor: 'text-rose-700 dark:text-rose-300'
-            },
-            {
-              key: 'reflation',
-              aliases: ['reflation'],
-              icon: '🌱',
-              title: 'Phục Hồi / Bơm Tiền (Reflation)',
-              sub: 'GDP Tạo Đáy • Lạm Phát Hạ Nhiệt',
-              desc: 'Chính sách tiền tệ nới lỏng tạo thanh khoản dồi dào, định giá cổ phiếu phục hồi từ vùng trũng.',
-              sectors: 'Chứng khoán, Công nghệ, Bán lẻ, Xây dựng',
-              activeClass: 'bg-blue-50/70 dark:bg-blue-950/30 border-2 border-blue-500 shadow-xs',
-              badgeBg: 'bg-blue-600',
-              subColor: 'text-blue-600 dark:text-blue-400',
-              sectorColor: 'text-blue-700 dark:text-blue-300'
-            }
-          ].map((q) => {
-            const isCurrent = q.aliases.includes(macroClock?.quadrantKey);
-            return (
-              <div
-                key={q.key}
-                className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-                  isCurrent
-                    ? q.activeClass
-                    : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-lg">{q.icon}</span>
-                  {isCurrent && (
-                    <span className={`px-2 py-0.5 rounded-full ${q.badgeBg} text-white text-[10px] font-black uppercase`}>
-                      Đang Ở Đây
-                    </span>
-                  )}
-                </div>
-                <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
-                  {q.title}
-                </div>
-                <div className={`text-xs font-bold ${q.subColor} mt-1`}>
-                  {q.sub}
-                </div>
-                <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                  {q.desc}
-                </p>
-                <div className={`mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] ${q.sectorColor}`}>
-                  <b>Ngành ưu tiên:</b> {q.sectors}
+        {/* ── HIỂN THỊ GÓC NHÌN ĐỘNG LỰC HỌC AI ── */}
+        {isAiClockActive ? (
+          <div className="space-y-4">
+            {/* Top 3-Pillar Banner */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-white dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-900 border border-indigo-200/60 dark:border-indigo-800/40 space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+                  🕐 Vị Trí Kim Đồng Hồ (Clock Hand):
+                </span>
+                <div className="text-sm font-black text-gray-900 dark:text-white">
+                  {aiClockData.clockHandPosition}
                 </div>
               </div>
-            );
-          })}
-        </div>
+
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50/80 via-orange-50/40 to-white dark:from-amber-950/40 dark:via-orange-950/20 dark:to-slate-900 border border-amber-200/60 dark:border-amber-800/40 space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
+                  ⚡ Vận Tốc Chuyển Dịch (Velocity):
+                </span>
+                <div className="text-sm font-black text-amber-700 dark:text-amber-300">
+                  {aiClockData.transitionVelocity}
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-50/80 via-emerald-50/40 to-white dark:from-teal-950/40 dark:via-emerald-950/20 dark:to-slate-900 border border-teal-200/60 dark:border-teal-800/40 space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400 block">
+                  🏛️ Chu Kỳ Tương Đồng Lịch Sử:
+                </span>
+                <div className="text-sm font-black text-teal-700 dark:text-teal-300">
+                  {aiClockData.historicalAnalog?.period || 'Giai đoạn Q4/2017 – Q1/2018'}
+                </div>
+              </div>
+            </div>
+
+            {/* Dynamics Analysis Text */}
+            {aiClockData.dynamicsAnalysis && (
+              <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-slate-800/50 border border-gray-200/60 dark:border-slate-800 text-xs text-gray-700 dark:text-slate-300 leading-relaxed space-y-1.5">
+                <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <span>🔬</span>
+                  <span>Phân Tích Động Lực Học Vĩ Mô:</span>
+                </div>
+                <p>{aiClockData.dynamicsAnalysis}</p>
+                {aiClockData.historicalAnalog?.similarity && (
+                  <p className="text-[11px] text-gray-500 dark:text-slate-400 pt-1 border-t border-gray-200/50 dark:border-slate-700/50">
+                    <b className="text-gray-700 dark:text-slate-300">Bài học lịch sử:</b> {aiClockData.historicalAnalog.similarity}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Sector Playbook */}
+            {aiClockData.sectorPlaybook && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 space-y-1.5">
+                  <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                    <span>✓</span>
+                    <span>Nhóm Ngành Đón Đầu Tích Lũy:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {aiClockData.sectorPlaybook.favored?.map((s, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-800/40 space-y-1.5">
+                  <div className="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
+                    <span>✕</span>
+                    <span>Nhóm Ngành Thận Trọng / Hạ Tỷ Trọng:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {aiClockData.sectorPlaybook.cautious?.map((s, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-200 text-xs font-semibold">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* ── HIỂN THỊ GÓC NHÌN 4 GÓC PHẦN TƯ (HEURISTIC) ── */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {[
+              {
+                key: 'expansion',
+                aliases: ['expansion', 'goldilocks'],
+                icon: '🌟',
+                title: 'Tăng Trưởng Vững Vàng (Goldilocks)',
+                sub: 'GDP Tăng Trưởng Cao • Lạm Phát Ổn Định',
+                desc: 'Môi trường lý tưởng nhất cho thị trường chứng khoán. Lợi nhuận doanh nghiệp tăng trưởng mạnh.',
+                sectors: 'Ngân hàng, Chứng khoán, Bán lẻ, Công nghệ',
+                activeClass: 'bg-emerald-50/70 dark:bg-emerald-950/30 border-2 border-emerald-500 shadow-xs',
+                badgeBg: 'bg-emerald-600',
+                subColor: 'text-emerald-600 dark:text-emerald-400',
+                sectorColor: 'text-emerald-700 dark:text-emerald-300'
+              },
+              {
+                key: 'overheating',
+                aliases: ['overheating'],
+                icon: '🔥',
+                title: 'Quá Nhiệt / Tăng Tốc (Overheating)',
+                sub: 'GDP Tăng Trưởng Tốt • Lạm Phát Tăng Cao',
+                desc: 'Sản xuất sôi động nhưng chi phí vốn bắt đầu tăng. Lợi nhuận phân hóa mạnh giữa các nhóm ngành.',
+                sectors: 'Bất động sản, Thép, Hóa chất, Năng lượng',
+                activeClass: 'bg-amber-50/70 dark:bg-amber-950/30 border-2 border-amber-500 shadow-xs',
+                badgeBg: 'bg-amber-600',
+                subColor: 'text-amber-600 dark:text-amber-400',
+                sectorColor: 'text-amber-700 dark:text-amber-300'
+              },
+              {
+                key: 'stagflation',
+                aliases: ['stagflation'],
+                icon: '⚠️',
+                title: 'Đình Lạm (Stagflation)',
+                sub: 'GDP Chậm Lại • Lạm Phát Neo Cao',
+                desc: 'Kịch bản rủi ro: chi phí đầu vào tăng xói mòn biên lợi nhuận trong khi sức mua sụt giảm.',
+                sectors: 'Tiện ích, Dược phẩm, Tiền mặt, Vàng',
+                activeClass: 'bg-rose-50/70 dark:bg-rose-950/30 border-2 border-rose-500 shadow-xs',
+                badgeBg: 'bg-rose-600',
+                subColor: 'text-rose-600 dark:text-rose-400',
+                sectorColor: 'text-rose-700 dark:text-rose-300'
+              },
+              {
+                key: 'reflation',
+                aliases: ['reflation'],
+                icon: '🌱',
+                title: 'Phục Hồi / Bơm Tiền (Reflation)',
+                sub: 'GDP Tạo Đáy • Lạm Phát Hạ Nhiệt',
+                desc: 'Chính sách tiền tệ nới lỏng tạo thanh khoản dồi dào, định giá cổ phiếu phục hồi từ vùng trũng.',
+                sectors: 'Chứng khoán, Công nghệ, Bán lẻ, Xây dựng',
+                activeClass: 'bg-blue-50/70 dark:bg-blue-950/30 border-2 border-blue-500 shadow-xs',
+                badgeBg: 'bg-blue-600',
+                subColor: 'text-blue-600 dark:text-blue-400',
+                sectorColor: 'text-blue-700 dark:text-blue-300'
+              }
+            ].map((q) => {
+              const isCurrent = q.aliases.includes(macroClock?.quadrantKey);
+              return (
+                <div
+                  key={q.key}
+                  className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                    isCurrent
+                      ? q.activeClass
+                      : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200/60 dark:border-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">{q.icon}</span>
+                    {isCurrent && (
+                      <span className={`px-2 py-0.5 rounded-full ${q.badgeBg} text-white text-[10px] font-black uppercase`}>
+                        Đang Ở Đây
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-black text-sm text-gray-900 dark:text-white mt-2">
+                    {q.title}
+                  </div>
+                  <div className={`text-xs font-bold ${q.subColor} mt-1`}>
+                    {q.sub}
+                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                    {q.desc}
+                  </p>
+                  <div className={`mt-3 pt-2 border-t border-gray-100 dark:border-slate-800 text-[11px] ${q.sectorColor}`}>
+                    <b>Ngành ưu tiên:</b> {q.sectors}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Current Position Note */}
         <div className="p-3.5 bg-gray-50 dark:bg-slate-800/40 rounded-2xl border border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">

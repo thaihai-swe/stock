@@ -3,6 +3,8 @@ import BuyForm from './BuyForm.jsx';
 import DividendManager from './DividendManager.jsx';
 import SellForm from './SellForm.jsx';
 import TradeSidebarContext from './trade/TradeSidebarContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import { fetchPrices } from '../utils/api.js';
 
 export default function TradeOrderView({
   initialType = 'buy',
@@ -11,13 +13,14 @@ export default function TradeOrderView({
   dividends = [],
   watchlist = [],
   buyInitial = { symbol: '', quantity: '', price: '' },
+  sellInitial = { symbol: '', quantity: '', price: '' },
   sellInitialSymbol = '',
   onSuccess,
   onBuySuccess,
   onSellSuccess,
   onDividendSuccess,
-  showToast,
 }) {
+  const { showToast } = useToast();
   const [activeType, setActiveType] = useState(initialType || 'buy');
 
   // Trạng thái tự động điền (Quick-fill state)
@@ -25,8 +28,31 @@ export default function TradeOrderView({
   const [currentBuyQuantity, setCurrentBuyQuantity] = useState(buyInitial?.quantity || '');
   const [currentBuyPrice, setCurrentBuyPrice] = useState(buyInitial?.price || '');
 
-  const [currentSellSymbol, setCurrentSellSymbol] = useState(sellInitialSymbol || '');
-  const [currentSellQuantity, setCurrentSellQuantity] = useState(null);
+  const [currentSellSymbol, setCurrentSellSymbol] = useState(sellInitial?.symbol || sellInitialSymbol || '');
+  const [currentSellQuantity, setCurrentSellQuantity] = useState(sellInitial?.quantity || null);
+  const [currentSellPrice, setCurrentSellPrice] = useState(sellInitial?.price || '');
+
+  // Live market prices cache
+  const [marketPrices, setMarketPrices] = useState({});
+
+  useEffect(() => {
+    const symbols = Array.from(new Set([
+      ...(portfolio || []).map(p => p.symbol),
+      ...(watchlist || []).map(w => w.symbol),
+      currentBuySymbol,
+      currentSellSymbol,
+    ].filter(Boolean)));
+
+    if (symbols.length > 0) {
+      fetchPrices(symbols, false)
+        .then(res => {
+          if (res?.prices) {
+            setMarketPrices(prev => ({ ...prev, ...res.prices }));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [portfolio, watchlist, currentBuySymbol, currentSellSymbol]);
 
   // Mở/đóng panel danh mục trên màn hình mobile
   const [showMobileContext, setShowMobileContext] = useState(false);
@@ -44,8 +70,12 @@ export default function TradeOrderView({
   }, [buyInitial]);
 
   useEffect(() => {
-    if (sellInitialSymbol) setCurrentSellSymbol(sellInitialSymbol);
-  }, [sellInitialSymbol]);
+    if (sellInitial?.symbol) setCurrentSellSymbol(sellInitial.symbol);
+    else if (sellInitialSymbol) setCurrentSellSymbol(sellInitialSymbol);
+
+    if (sellInitial?.quantity) setCurrentSellQuantity(sellInitial.quantity);
+    if (sellInitial?.price) setCurrentSellPrice(sellInitial.price);
+  }, [sellInitial, sellInitialSymbol]);
 
   const handleSwitch = (type) => {
     setActiveType(type);
@@ -57,8 +87,11 @@ export default function TradeOrderView({
   // Callback khi chọn mã mua từ sidebar hoặc chip
   const handleSelectBuyFromSidebar = (symbol, price) => {
     setCurrentBuySymbol(symbol);
-    if (price !== undefined) {
-      setCurrentBuyPrice(String(price));
+    const resolvedPrice = price !== undefined
+      ? String(price)
+      : (marketPrices[symbol]?.price ? String(marketPrices[symbol].price / 1000) : '');
+    if (resolvedPrice) {
+      setCurrentBuyPrice(resolvedPrice);
     }
     if (activeType !== 'buy') {
       handleSwitch('buy');
@@ -68,10 +101,16 @@ export default function TradeOrderView({
   };
 
   // Callback khi chọn mã bán từ sidebar hoặc chip
-  const handleSelectSellFromSidebar = (symbol, qty) => {
+  const handleSelectSellFromSidebar = (symbol, qty, price) => {
     setCurrentSellSymbol(symbol);
     if (qty) {
       setCurrentSellQuantity(qty);
+    }
+    const resolvedPrice = price !== undefined
+      ? String(price)
+      : (marketPrices[symbol]?.price ? String(marketPrices[symbol].price / 1000) : '');
+    if (resolvedPrice) {
+      setCurrentSellPrice(resolvedPrice);
     }
     if (activeType !== 'sell') {
       handleSwitch('sell');
@@ -80,19 +119,19 @@ export default function TradeOrderView({
   };
 
   const handleBuySuccess = () => {
-    if (showToast) showToast('✅ Khớp lệnh mua thành công!', 'success');
+    showToast('✅ Khớp lệnh mua thành công!', 'success');
     if (onBuySuccess) onBuySuccess();
     else if (onSuccess) onSuccess();
   };
 
   const handleSellSuccess = () => {
-    if (showToast) showToast('✅ Khớp lệnh bán thành công!', 'success');
+    showToast('✅ Khớp lệnh bán thành công!', 'success');
     if (onSellSuccess) onSellSuccess();
     else if (onSuccess) onSuccess();
   };
 
   const handleDividendSuccess = () => {
-    if (showToast) showToast('✅ Cập nhật cổ tức thành công!', 'success');
+    showToast('✅ Cập nhật cổ tức thành công!', 'success');
     if (onDividendSuccess) onDividendSuccess();
     else if (onSuccess) onSuccess();
   };
@@ -195,6 +234,7 @@ export default function TradeOrderView({
               portfolio={portfolio}
               watchlist={watchlist}
               dividends={dividends}
+              marketPrices={marketPrices}
               onSelectBuy={handleSelectBuyFromSidebar}
               onSelectSell={handleSelectSellFromSidebar}
             />
@@ -211,6 +251,7 @@ export default function TradeOrderView({
             portfolio={portfolio}
             watchlist={watchlist}
             dividends={dividends}
+            marketPrices={marketPrices}
             onSelectBuy={handleSelectBuyFromSidebar}
             onSelectSell={handleSelectSellFromSidebar}
           />
@@ -226,6 +267,7 @@ export default function TradeOrderView({
               initialPrice={currentBuyPrice}
               portfolio={portfolio}
               watchlist={watchlist}
+              marketPrices={marketPrices}
             />
           )}
 
@@ -235,6 +277,8 @@ export default function TradeOrderView({
               portfolio={portfolio}
               initialSymbol={currentSellSymbol}
               initialQuantity={currentSellQuantity}
+              initialPrice={currentSellPrice}
+              marketPrices={marketPrices}
             />
           )}
 
@@ -243,7 +287,6 @@ export default function TradeOrderView({
               dividends={dividends}
               portfolio={portfolio}
               onSuccess={handleDividendSuccess}
-              showToast={showToast}
             />
           )}
         </div>

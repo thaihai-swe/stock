@@ -182,7 +182,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             macro_data = json.load(f)
 
         briefing = ai_service.generate_macro_briefing(macro_data, model=model, provider=provider)
-        briefing["updatedAt"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        briefing["updatedAt"] = now_iso
 
         # Sinh phân tích dẫn truyền vĩ mô vào ngành (Sector Transmission)
         sector_trans = ai_service.generate_sector_transmission_analysis(
@@ -191,17 +192,80 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             model=model,
             provider=provider
         )
-        sector_trans["updatedAt"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        sector_trans["updatedAt"] = now_iso
+
+        # Sinh bộ phân tích vĩ mô nâng cấp (Scenarios, Clock, Yield Curve, Multi-Asset, Style, Tail Risks)
+        macro_suite = ai_service.generate_macro_intelligence_suite(macro_data, model=model, provider=provider)
+        macro_suite["updatedAt"] = now_iso
+        active_prov = macro_suite.get("provider") or ai_service.resolve_provider(requested_provider=provider)
+
+        ai_scenarios = macro_suite.get("aiScenarios", {})
+        ai_scenarios["updatedAt"] = now_iso
+        ai_scenarios["provider"] = active_prov
+
+        ai_clock = macro_suite.get("aiClockDynamics", {})
+        ai_clock["updatedAt"] = now_iso
+        ai_clock["provider"] = active_prov
+
+        ai_yield = macro_suite.get("aiYieldCurveDiagnosis", {})
+        ai_yield["updatedAt"] = now_iso
+        ai_yield["provider"] = active_prov
+
+        ai_asset = macro_suite.get("aiMultiAssetStrategy", {})
+        ai_asset["updatedAt"] = now_iso
+        ai_asset["provider"] = active_prov
+
+        ai_style = macro_suite.get("aiStyleRotation", {})
+        ai_style["updatedAt"] = now_iso
+        ai_style["provider"] = active_prov
+
+        ai_tail = macro_suite.get("aiTailRiskAnalysis", {})
+        ai_tail["updatedAt"] = now_iso
+        ai_tail["provider"] = active_prov
 
         if dry_run:
             print(f"   [DRY-RUN] Headline: {briefing.get('headline')}")
             print(f"   [DRY-RUN] Sector Transmission: {sector_trans.get('transmissionHeadline')}")
+            print(f"   [DRY-RUN] Scenarios Verdict: {ai_scenarios.get('marketVerdict')}")
+            print(f"   [DRY-RUN] Clock Hand: {ai_clock.get('clockHandPosition')}")
+            print(f"   [DRY-RUN] Yield Curve Status: {ai_yield.get('curveStatus')}")
+            print(f"   [DRY-RUN] Multi-Asset Thesis: {ai_asset.get('multiAssetThesis')}")
+            print(f"   [DRY-RUN] Style Rotation: {ai_style.get('rotationHeadline')}")
         else:
             macro_data["aiInsight"] = briefing
             macro_data["sectorTransmission"] = sector_trans
+            macro_data["aiScenarios"] = ai_scenarios
+            macro_data["aiClockDynamics"] = ai_clock
+            macro_data["aiYieldCurveDiagnosis"] = ai_yield
+            macro_data["aiMultiAssetStrategy"] = ai_asset
+            macro_data["aiStyleRotation"] = ai_style
+            macro_data["aiTailRiskAnalysis"] = ai_tail
+
             with open(MACRO_FILE, "w", encoding="utf-8") as f:
                 json.dump(macro_data, f, ensure_ascii=False, indent=2)
-            print(f"✅ Đã ghi nhận aiInsight & sectorTransmission thành công vào {MACRO_FILE}.")
+
+            # Cập nhật song song vào ai_insights_cache.json để phục vụ 2-tier fallback
+            cache = {}
+            if AI_CACHE_FILE.exists():
+                try:
+                    with open(AI_CACHE_FILE, "r", encoding="utf-8") as f:
+                        cache = json.load(f)
+                except Exception:
+                    pass
+
+            cache["aiInsight"] = briefing
+            cache["sectorTransmission"] = sector_trans
+            cache["aiScenarios"] = ai_scenarios
+            cache["aiClockDynamics"] = ai_clock
+            cache["aiYieldCurveDiagnosis"] = ai_yield
+            cache["aiMultiAssetStrategy"] = ai_asset
+            cache["aiStyleRotation"] = ai_style
+            cache["aiTailRiskAnalysis"] = ai_tail
+
+            with open(AI_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(cache, f, ensure_ascii=False, indent=2)
+
+            print(f"✅ Đã ghi nhận trọn bộ Macro Intelligence Suite thành công vào {MACRO_FILE} và {AI_CACHE_FILE}.")
     except Exception as e:
         print(f"⚠️ Lỗi khi sinh AI Macro Insights: {e}")
 
@@ -499,10 +563,15 @@ def generate_stocks_insights(
                 provider=provider
             )
 
-            # Bổ sung timestamp cho từng phân hệ
+            # Bổ sung timestamp, provider và model cho từng phân hệ
+            active_prov = intel.get("provider") or ai_service.resolve_provider(requested_provider=provider)
+            active_model = intel.get("model")
             for key in ["aiDeepDive", "aiNewsAnalysis", "aiAuditComment", "aiConvergence", "aiDividendAudit"]:
                 if key in intel and isinstance(intel[key], dict):
                     intel[key]["updatedAt"] = now_iso
+                    intel[key]["provider"] = active_prov
+                    if active_model:
+                        intel[key]["model"] = active_model
 
             if dry_run:
                 deep = intel.get("aiDeepDive", {})

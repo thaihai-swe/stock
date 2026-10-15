@@ -9,8 +9,11 @@ import MacroValuationWindowCard from './macro/MacroValuationWindowCard.jsx';
 import MarketValuationHistoryChart from './macro/MarketValuationHistoryChart.jsx';
 import StyleValuationComparison from './macro/StyleValuationComparison.jsx';
 import SectorValuationHeatmap from './macro/SectorValuationHeatmap.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import LoadingState from './common/LoadingState.jsx';
 
-export default function MarketDashboard({ refreshKey, onSwitchTab, showToast }) {
+export default function MarketDashboard({ refreshKey, onSwitchTab }) {
+  const { showToast } = useToast();
   const [marketData, setMarketData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -38,10 +41,9 @@ export default function MarketDashboard({ refreshKey, onSwitchTab, showToast }) 
     try {
       const res = await triggerValuationSync();
       await loadData();
-      if (showToast) showToast(res?.message || '✅ Đồng bộ dữ liệu thị trường thành công!', 'info');
+      showToast(res?.message || '✅ Đồng bộ dữ liệu thị trường thành công!', 'info');
     } catch (e) {
-      if (showToast) showToast('❌ ' + e.message, 'error');
-      else alert('Lỗi đồng bộ: ' + e.message);
+      showToast('❌ ' + e.message, 'error');
     } finally {
       setSyncing(false);
     }
@@ -49,10 +51,11 @@ export default function MarketDashboard({ refreshKey, onSwitchTab, showToast }) 
 
   if (loading && !marketData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-gray-500 font-medium text-sm">Đang nạp toàn cảnh thị trường chứng khoán & VN-Index...</p>
-      </div>
+      <LoadingState
+        message="Đang nạp toàn cảnh thị trường chứng khoán & VN-Index..."
+        subMessage="Đồng bộ chỉ số trực tuyến, nhiệt kế định giá 4 cửa sổ và bản đồ 10 ngành GICS"
+        minHeight="min-h-[400px]"
+      />
     );
   }
 
@@ -139,6 +142,7 @@ export default function MarketDashboard({ refreshKey, onSwitchTab, showToast }) 
             styleIndices={styleIndices}
             vnindexPE={market.currentPE || null}
             vnindexPB={market.currentPB || null}
+            aiStyleRotation={marketData?.aiStyleRotation}
           />
         </div>
       )}

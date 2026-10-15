@@ -1,4 +1,5 @@
 import TimeHorizonFilter from '../common/TimeHorizonFilter.jsx';
+import SubTabNav from '../common/SubTabNav.jsx';
 
 export default function HistoryFilterToolbar({
   subTab = 'orders',
@@ -37,68 +38,31 @@ export default function HistoryFilterToolbar({
       {/* HÀNG 1: SUB-TAB SWITCHER & VIEW SWITCHER (THẺ / BẢNG) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
         {/* Sub-Tab Selector */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-full sm:w-auto overflow-x-auto no-scrollbar">
-          <button
-            type="button"
-            onClick={() => setSubTab('orders')}
-            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 ${
-              subTab === 'orders'
-                ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>📑</span>
-            <span>Nhật Ký Từng Lệnh</span>
-            <span className="badge-indigo text-[10px] ml-0.5">
-              {allTxCount}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSubTab('performance')}
-            className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 ${
-              subTab === 'performance'
-                ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>📊</span>
-            <span>Hiệu Suất Theo Mã</span>
-            <span className="badge-gain text-[10px] ml-0.5">
-              {performanceCount}
-            </span>
-          </button>
-        </div>
+        <SubTabNav
+          tabs={[
+            { id: 'orders', label: 'Nhật Ký Từng Lệnh', icon: '📑', badge: allTxCount },
+            { id: 'performance', label: 'Hiệu Suất Theo Mã', icon: '📊', badge: performanceCount },
+          ]}
+          activeTab={subTab}
+          onChange={setSubTab}
+          size="md"
+          layout="inline"
+          className="w-full sm:w-auto"
+        />
 
         {/* Nút chuyển Thẻ / Bảng cho cả Mobile và Desktop */}
         <div className="flex items-center gap-2 self-end sm:self-auto">
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
-            <button
-              type="button"
-              onClick={() => setMobileViewMode('card')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                mobileViewMode === 'card'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              <span>📱</span>
-              <span>Thẻ</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileViewMode('table')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                mobileViewMode === 'table'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              <span>📊</span>
-              <span>Bảng</span>
-            </button>
-          </div>
+          <SubTabNav
+            tabs={[
+              { id: 'card', label: 'Thẻ', icon: '📱' },
+              { id: 'table', label: 'Bảng', icon: '📊' },
+            ]}
+            activeTab={mobileViewMode}
+            onChange={setMobileViewMode}
+            size="sm"
+            layout="inline"
+            className="w-auto shrink-0"
+          />
         </div>
       </div>
 
@@ -108,7 +72,7 @@ export default function HistoryFilterToolbar({
           {/* HÀNG 2: TÌM KIẾM NHANH + LOẠI LỆNH (MUA/BÁN) + NÚT MỞ BỘ LỌC NÂNG CAO */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             {/* Ô tìm kiếm tức thì */}
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-[180px] sm:min-w-[240px]">
               <input
                 type="text"
                 value={textSearch}
@@ -128,27 +92,18 @@ export default function HistoryFilterToolbar({
             </div>
 
             {/* Segmented Loại Lệnh: [Tất cả] [🛒 Mua] [💸 Bán] */}
-            <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl text-xs gap-1 shrink-0">
-              {[
+            <SubTabNav
+              tabs={[
                 { id: 'all', label: 'Tất cả', icon: '🌐' },
                 { id: 'buy', label: 'Mua vào', icon: '🛒' },
                 { id: 'sell', label: 'Bán ra', icon: '💸' },
-              ].map(item => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setTab(item.id)}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                    tab === item.id
-                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
-                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200'
-                  }`}
-                >
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </div>
+              ]}
+              activeTab={tab}
+              onChange={setTab}
+              size="sm"
+              layout="inline"
+              className="w-auto shrink-0"
+            />
 
             {/* Nút bật/tắt Bộ Lọc Nâng Cao (Advanced Filters) */}
             <button
@@ -173,41 +128,43 @@ export default function HistoryFilterToolbar({
           <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 text-xs">
             <div className="flex items-center gap-2 flex-wrap">
               {/* Lọc P&L cho Lệnh Bán */}
-              <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
-                <button
-                  type="button"
-                  onClick={() => setPnlFilter('all')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    pnlFilter === 'all'
-                      ? 'bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 shadow-2xs'
-                      : 'text-gray-500 dark:text-slate-400'
-                  }`}
-                >
-                  Tất cả P&L
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPnlFilter('profit')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
-                    pnlFilter === 'profit'
-                      ? 'bg-emerald-600 text-white shadow-2xs'
-                      : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
-                  }`}
-                >
-                  <span>🟢</span> Lãi
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPnlFilter('loss')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
-                    pnlFilter === 'loss'
-                      ? 'bg-rose-600 text-white shadow-2xs'
-                      : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-                  }`}
-                >
-                  <span>🔴</span> Lỗ
-                </button>
-              </div>
+              {tab !== 'buy' && (
+                <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setPnlFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                      pnlFilter === 'all'
+                        ? 'bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 shadow-2xs'
+                        : 'text-gray-500 dark:text-slate-400'
+                    }`}
+                  >
+                    Tất cả P&L
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPnlFilter('profit')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                      pnlFilter === 'profit'
+                        ? 'bg-emerald-600 text-white shadow-2xs'
+                        : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
+                    }`}
+                  >
+                    <span>🟢</span> Lãi
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPnlFilter('loss')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                      pnlFilter === 'loss'
+                        ? 'bg-rose-600 text-white shadow-2xs'
+                        : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                    }`}
+                  >
+                    <span>🔴</span> Lỗ
+                  </button>
+                </div>
+              )}
 
               {/* Presets Chu Kỳ Thời Gian & Khoảng Ngày Dùng Chung */}
               <TimeHorizonFilter

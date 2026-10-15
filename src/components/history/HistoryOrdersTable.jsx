@@ -1,5 +1,7 @@
 import { Fragment } from 'react';
 import { fmtDate, fmtMoney, getDisciplineTagInfo, getStockColor, plBg, plColor, getMatchMethodInfo } from '../../utils/format.js';
+import DisciplineBadge from '../common/DisciplineBadge.jsx';
+import EmptyState from '../common/EmptyState.jsx';
 
 export default function HistoryOrdersTable({
   sortedOrders = [],
@@ -19,24 +21,13 @@ export default function HistoryOrdersTable({
 }) {
   if (sortedOrders.length === 0) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-gray-100 dark:border-slate-800 shadow-sm">
-        <span className="text-4xl block mb-2">🔍</span>
-        <p className="font-extrabold text-gray-800 dark:text-slate-100 text-base">
-          Không tìm thấy giao dịch nào phù hợp
-        </p>
-        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1 max-w-sm mx-auto">
-          Thử thay đổi từ khóa tìm kiếm, bỏ bớt bộ lọc mã cổ phiếu hoặc mở rộng khoảng ngày giao dịch.
-        </p>
-        {hasFilterActive && (
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
-          >
-            ✕ Xóa Tất Cả Bộ Lọc
-          </button>
-        )}
-      </div>
+      <EmptyState
+        icon="🔍"
+        title="Không tìm thấy giao dịch nào phù hợp"
+        description="Thử thay đổi từ khóa tìm kiếm, bỏ bớt bộ lọc mã cổ phiếu hoặc mở rộng khoảng ngày giao dịch."
+        actionLabel={hasFilterActive ? '✕ Xóa Tất Cả Bộ Lọc' : undefined}
+        onAction={handleResetFilters}
+      />
     );
   }
 
@@ -44,7 +35,7 @@ export default function HistoryOrdersTable({
   const displayedBuys = sortedOrders.filter(t => t.type === 'BUY');
   const displayedSells = sortedOrders.filter(t => t.type === 'SELL');
   const totalDisplayedBuyCost = displayedBuys.reduce((s, o) => s + (o.totalCost || o.quantity * o.price), 0);
-  const totalDisplayedSellRevenue = displayedSells.reduce((s, o) => s + (o.totalRevenue || o.quantity * o.price), 0);
+  const totalDisplayedSellRevenue = displayedSells.reduce((s, o) => s + (o.netRevenue ?? o.totalRevenue ?? (o.quantity * o.price)), 0);
   const totalDisplayedRealizedPL = displayedSells.reduce((s, o) => s + (o.profitLoss || 0), 0);
 
   return (
@@ -53,11 +44,13 @@ export default function HistoryOrdersTable({
       <div className={`p-4 space-y-3 ${mobileViewMode === 'card' ? 'block sm:hidden' : 'hidden'}`}>
         {sortedOrders.map((tx) => {
           const isBuy = tx.type === 'BUY';
+          const netSellRevenue = !isBuy ? (tx.netRevenue ?? tx.totalRevenue ?? (tx.grossRevenue ? tx.grossRevenue - (tx.fee || 0) : tx.quantity * tx.price)) : 0;
+          const netSellPrice = !isBuy ? (tx.netPrice || (tx.quantity > 0 ? (netSellRevenue / tx.quantity) : tx.price)) : tx.price;
           const total = isBuy
             ? (tx.totalCost || (tx.quantity * tx.price))
-            : (tx.totalRevenue || (tx.quantity * tx.price));
+            : netSellRevenue;
           const avgCost = !isBuy && tx.totalCost && tx.quantity > 0 ? (tx.totalCost / tx.quantity) : 0;
-          const diffPerShare = !isBuy && avgCost > 0 ? (tx.price - avgCost) : 0;
+          const diffPerShare = !isBuy && avgCost > 0 ? (netSellPrice - avgCost) : 0;
           const stockColor = getStockColor(tx.symbol);
 
           return (
@@ -130,11 +123,16 @@ export default function HistoryOrdersTable({
 
                 <div>
                   <span className="text-gray-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">
-                    {isBuy ? 'Giá mua khớp' : 'Giá bán khớp'}
+                    {isBuy ? 'Giá mua khớp' : 'Giá bán thực nhận'}
                   </span>
                   <span className="font-bold text-gray-800 dark:text-slate-200 text-sm mt-0.5 block">
-                    {fmtMoney(tx.price)}đ
+                    {fmtMoney(isBuy ? tx.price : netSellPrice)}đ
                   </span>
+                  {!isBuy && Math.round(tx.price) !== Math.round(netSellPrice) && (
+                    <span className="text-[10px] text-gray-400 dark:text-slate-500 block">
+                      Khớp: {fmtMoney(tx.price)}đ
+                    </span>
+                  )}
                 </div>
 
                 {isBuy ? (
@@ -168,7 +166,7 @@ export default function HistoryOrdersTable({
                     <div>
                       <span className="text-gray-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Thu thực nhận</span>
                       <span className="font-bold text-indigo-700 dark:text-indigo-400 text-xs mt-0.5 block">
-                        {fmtMoney(tx.totalRevenue || total)}đ
+                        {fmtMoney(total)}đ
                       </span>
                     </div>
                   </>
@@ -186,23 +184,16 @@ export default function HistoryOrdersTable({
                   )}
                   {tx.tags && tx.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {tx.tags.map(t => {
-                        const disc = getDisciplineTagInfo(t);
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            onClick={() => setTagFilter && setTagFilter(t)}
-                            className={`text-[10px] px-2 py-0.5 rounded-lg font-bold cursor-pointer transition-opacity hover:opacity-80 ${
-                              disc
-                                ? `${disc.color} border`
-                                : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40'
-                            }`}
-                          >
-                            {disc ? t : `#${t}`}
-                          </button>
-                        );
-                      })}
+                      {tx.tags.map(t => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setTagFilter && setTagFilter(t)}
+                          className="cursor-pointer transition-opacity hover:opacity-80"
+                        >
+                          <DisciplineBadge tag={t} size="xs" />
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -340,11 +331,13 @@ export default function HistoryOrdersTable({
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {sortedOrders.map((tx) => {
               const isBuy = tx.type === 'BUY';
+              const netSellRevenue = !isBuy ? (tx.netRevenue ?? tx.totalRevenue ?? (tx.grossRevenue ? tx.grossRevenue - (tx.fee || 0) : tx.quantity * tx.price)) : 0;
+              const netSellPrice = !isBuy ? (tx.netPrice || (tx.quantity > 0 ? (netSellRevenue / tx.quantity) : tx.price)) : tx.price;
               const total = isBuy
                 ? (tx.totalCost || (tx.quantity * tx.price))
-                : (tx.totalRevenue || (tx.quantity * tx.price));
+                : netSellRevenue;
               const avgCost = !isBuy && tx.totalCost && tx.quantity > 0 ? (tx.totalCost / tx.quantity) : 0;
-              const diffPerShare = !isBuy && avgCost > 0 ? (tx.price - avgCost) : 0;
+              const diffPerShare = !isBuy && avgCost > 0 ? (netSellPrice - avgCost) : 0;
               const stockColor = getStockColor(tx.symbol);
 
               return (
@@ -397,8 +390,13 @@ export default function HistoryOrdersTable({
                     ) : (
                       <div>
                         <div className="font-bold text-gray-900 dark:text-slate-100">
-                          Bán: {fmtMoney(tx.price)}đ
+                          Bán: {fmtMoney(netSellPrice)}đ
                         </div>
+                        {Math.round(tx.price) !== Math.round(netSellPrice) && (
+                          <div className="text-[10px] text-gray-400 dark:text-slate-500">
+                            Khớp: {fmtMoney(tx.price)}đ
+                          </div>
+                        )}
                         <div className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold mt-0.5">
                           Vốn gốc: {fmtMoney(avgCost)}đ
                         </div>
@@ -420,7 +418,7 @@ export default function HistoryOrdersTable({
                     ) : (
                       <div>
                         <span className="font-bold text-indigo-700 dark:text-indigo-400">
-                          Thu: {fmtMoney(tx.totalRevenue || total)}đ
+                          Thu: {fmtMoney(total)}đ
                         </span>
                         <div className="text-[10px] text-gray-400 dark:text-slate-500">
                           Vốn gốc: {fmtMoney(tx.totalCost)}đ
@@ -465,23 +463,16 @@ export default function HistoryOrdersTable({
                     )}
                     {tx.tags && tx.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {tx.tags.map(t => {
-                          const disc = getDisciplineTagInfo(t);
-                          return (
-                            <button
-                              key={t}
-                              type="button"
-                              onClick={() => setTagFilter && setTagFilter(t)}
-                              className={`text-[10px] px-1.5 py-0.2 rounded-md font-bold cursor-pointer transition-opacity hover:opacity-80 ${
-                                disc
-                                  ? `${disc.color} border`
-                                  : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300'
-                              }`}
-                            >
-                              {disc ? t : `#${t}`}
-                            </button>
-                          );
-                        })}
+                        {tx.tags.map(t => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setTagFilter && setTagFilter(t)}
+                            className="cursor-pointer transition-opacity hover:opacity-80"
+                          >
+                            <DisciplineBadge tag={t} size="xs" />
+                          </button>
+                        ))}
                       </div>
                     )}
                     {!tx.note && (!tx.tags || tx.tags.length === 0) && (

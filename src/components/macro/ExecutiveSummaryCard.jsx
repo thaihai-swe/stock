@@ -38,16 +38,28 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
               Điều Hành Chiến Lược
             </span>
             {activeTab === 'ai_strategist' && (
-              <IntelligenceBadge provider={aiInsight?.provider} />
+              <IntelligenceBadge
+                type={aiInsight?.headline || aiInsight?.executiveSummary ? 'ai' : 'heuristic'}
+                provider={aiInsight?.provider}
+                tooltip={aiInsight?.headline ? `Trí tuệ nhân tạo (AI CIO Copilot • ${(aiInsight.provider || 'AI').toUpperCase()})` : 'Mô hình định lượng vĩ mô Heuristic'}
+              />
             )}
             {activeTab === 'weekly_pulse' && (
-              <IntelligenceBadge provider={weeklyPulse?.provider} />
+              <IntelligenceBadge
+                type={weeklyPulse?.pulseHeadline || weeklyPulse?.weeklySummary ? 'ai' : 'heuristic'}
+                provider={weeklyPulse?.provider}
+                tooltip={weeklyPulse?.pulseHeadline ? `Trí tuệ nhân tạo (Weekly Market Pulse • ${(weeklyPulse.provider || 'AI').toUpperCase()})` : 'Bản tin nhịp đập thị trường'}
+              />
             )}
             {activeTab === 'traditional' && (
-              <IntelligenceBadge type="heuristic" tooltip="Báo cáo vĩ mô Heuristic quy tắc (macro_advisor.py)" />
+              <IntelligenceBadge
+                type={aiInsight?.executiveSummary ? 'ai' : 'heuristic'}
+                provider={aiInsight?.provider}
+                tooltip={aiInsight?.executiveSummary ? 'Báo cáo điều hành tổng hợp tích hợp AI Executive Synthesis & chỉ báo định lượng quy chuẩn' : 'Báo cáo định lượng Heuristic quy chuẩn tài chính (macro_advisor.py)'}
+              />
             )}
             <span className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-[10px] font-bold border border-purple-200/50">
-              {activeTab === 'weekly_pulse' ? 'Weekly Market Wrap' : activeTab === 'traditional' ? 'Rule-based & AI Synthesis' : 'CIO Macro Copilot'}
+              {activeTab === 'weekly_pulse' ? 'Weekly Market Wrap' : activeTab === 'traditional' ? (aiInsight?.executiveSummary ? 'Dual-Engine AI Synthesis' : 'Rule-based Quantitative') : 'CIO Macro Copilot'}
             </span>
           </div>
           <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mt-1 flex items-center gap-2">
@@ -56,7 +68,7 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
               {activeTab === 'weekly_pulse'
                 ? 'Bản Tin Nhịp Đập Thị Trường Cuối Tuần'
                 : activeTab === 'traditional'
-                ? 'Báo Cáo Điều Hành Tổng Hợp Quy Chuẩn'
+                ? 'Báo Cáo Điều Hành Tổng Hợp'
                 : 'Báo Cáo Chiến Lược CIO & Động Lực Vĩ Mô'}
             </span>
           </h3>
@@ -75,7 +87,11 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
               }`}
             >
               <span>🤖 Chiến Lược CIO</span>
-              <IntelligenceBadge size="xs" provider={aiInsight?.provider} />
+              <IntelligenceBadge
+                size="xs"
+                type={aiInsight?.headline || aiInsight?.executiveSummary ? 'ai' : 'heuristic'}
+                provider={aiInsight?.provider}
+              />
             </button>
             <button
               type="button"
@@ -87,7 +103,11 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
               }`}
             >
               <span>📅 Nhịp Đập Tuần</span>
-              <IntelligenceBadge size="xs" provider={weeklyPulse?.provider} />
+              <IntelligenceBadge
+                size="xs"
+                type={weeklyPulse?.pulseHeadline || weeklyPulse?.weeklySummary ? 'ai' : 'heuristic'}
+                provider={weeklyPulse?.provider}
+              />
             </button>
             {hasTraditional && (
               <button
@@ -99,8 +119,13 @@ export default function ExecutiveSummaryCard({ executiveSummary = {}, aiInsight:
                     : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
                 }`}
               >
-                <span>📋 Tổng Hợp Quy Chuẩn</span>
-                <IntelligenceBadge size="xs" type="heuristic" tooltip="Báo cáo định lượng Heuristic quy chuẩn tài chính (macro_advisor.py) nhằm kiểm chứng chéo độc lập với AI" />
+                <span>📋 Tổng Hợp Điều Hành</span>
+                <IntelligenceBadge
+                  size="xs"
+                  type={aiInsight?.executiveSummary ? 'ai' : 'heuristic'}
+                  provider={aiInsight?.provider}
+                  tooltip={aiInsight?.executiveSummary ? 'Báo cáo điều hành tổng hợp tích hợp AI Executive Synthesis & chỉ báo định lượng quy chuẩn' : 'Báo cáo định lượng Heuristic quy chuẩn tài chính (macro_advisor.py) nhằm kiểm chứng chéo độc lập với AI'}
+                />
               </button>
             )}
           </div>

@@ -10,14 +10,12 @@ import {
 } from '../utils/api.js';
 import { fmtMoney, plColor, fmtDate } from '../utils/format.js';
 import { useTheme } from '../context/ThemeContext.jsx';
-import { STOCK_SALE_TAX_PCT, TAX_LEGAL_NOTE } from '../utils/constants.js';
+import { useToast } from '../context/ToastContext.jsx';
+import Modal from './common/Modal.jsx';
 
-export default function Settings({ data, currentUser, onSuccess, showToast }) {
+export default function Settings({ data, currentUser, onSuccess }) {
+  const { showToast } = useToast();
   const { themeMode, effectiveTheme, isDark, setThemeMode } = useTheme();
-  const { sellOrders = [] } = data;
-
-  // 1. Tax Report Year filter
-  const [taxYear, setTaxYear] = useState(new Date().getFullYear().toString());
 
   // 2. Backup & Restore state
   const [restoreLoading, setRestoreLoading] = useState(false);
@@ -59,7 +57,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
     try {
       const res = await triggerFundamentalsSync();
       setSyncMsg(res.message || 'Đồng bộ thành công!');
-      if (showToast) showToast(res.message || 'Đồng bộ dữ liệu định giá thành công!', 'success');
+      showToast(res.message || 'Đồng bộ dữ liệu định giá thành công!', 'success');
       const refreshed = await fetchSupportedStocks();
       if (refreshed) setSyncConfig(refreshed);
     } catch (err) {
@@ -82,8 +80,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      if (showToast) showToast('❌ Không thể tải file backup: ' + err.message, 'error');
-      else alert('❌ Không thể tải file backup: ' + err.message);
+      showToast('❌ Không thể tải file backup: ' + err.message, 'error');
     }
   }
 
@@ -93,8 +90,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
     if (!file) return;
 
     if (currentUser?.isDemo) {
-      if (showToast) showToast('🛡️ Tài khoản Demo mặc định được bảo vệ. Vui lòng đăng nhập Google.', 'error');
-      else alert('🛡️ Tài khoản Demo mặc định được bảo vệ và không thể khôi phục dữ liệu ghi đè. Vui lòng đăng nhập tài khoản Google để sử dụng tính năng này.');
+      showToast('🛡️ Tài khoản Demo mặc định được bảo vệ. Vui lòng đăng nhập Google.', 'error');
       e.target.value = '';
       return;
     }
@@ -110,7 +106,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
       const parsed = JSON.parse(text);
       await restoreData(parsed);
       setRestoreMsg(`✅ Khôi phục thành công! Đã cập nhật danh mục.`);
-      if (showToast) showToast('Khôi phục danh mục từ file backup thành công!', 'success');
+      showToast('Khôi phục danh mục từ file backup thành công!', 'success');
       onSuccess();
     } catch (err) {
       setRestoreMsg('❌ Lỗi khôi phục: ' + (err.message || 'File JSON không hợp lệ'));
@@ -128,9 +124,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
     try {
       await clearUserData();
       setIsResetModalOpen(false);
-      if (showToast) {
-        showToast('Đã xoá toàn bộ dữ liệu cá nhân thành công!', 'success');
-      }
+      showToast('Đã xoá toàn bộ dữ liệu cá nhân thành công!', 'success');
       if (onSuccess) {
         onSuccess();
       }
@@ -140,33 +134,6 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
       setResetLoading(false);
     }
   }
-
-  // Tính thuế và báo cáo theo năm
-  const availableYears = Array.from(
-    new Set(
-      sellOrders
-        .filter(s => s.date)
-        .map(s => s.date.slice(0, 4))
-    )
-  ).sort().reverse();
-  if (!availableYears.includes(new Date().getFullYear().toString())) {
-    availableYears.unshift(new Date().getFullYear().toString());
-  }
-
-  const taxOrders = sellOrders.filter(s => {
-    if (!taxYear || taxYear === 'all') return true;
-    return s.date && s.date.startsWith(taxYear);
-  });
-
-  const totalGrossRevenue = taxOrders.reduce(
-    (sum, s) => sum + (s.grossRevenue || (s.quantity * s.price)),
-    0
-  );
-  // Thuế TNCN tại Việt Nam theo luật chuyển nhượng chứng khoán
-  const personalIncomeTax = Math.round(totalGrossRevenue * (STOCK_SALE_TAX_PCT / 100));
-  const totalRealizedGain = taxOrders.filter(s => s.profitLoss > 0).reduce((sum, s) => sum + s.profitLoss, 0);
-  const totalRealizedLoss = taxOrders.filter(s => s.profitLoss < 0).reduce((sum, s) => sum + s.profitLoss, 0);
-  const netProfit = totalRealizedGain + totalRealizedLoss;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -242,72 +209,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
         </div>
       </div>
 
-      {/* 1. Báo Cáo Thuế TNCN Chuyển Nhượng */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-              <span>🧾</span> Báo Cáo Thuế TNCN Bán Cổ Phiếu
-            </h3>
-            <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">
-              Theo quy định thuế TNCN tại Việt Nam ({STOCK_SALE_TAX_PCT}% trên tổng giá trị chuyển nhượng khi bán)
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Năm:</span>
-            <select
-              value={taxYear}
-              onChange={e => setTaxYear(e.target.value)}
-              className="border border-gray-200 dark:border-gray-600 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white dark:bg-gray-700 font-semibold text-gray-700 dark:text-gray-200"
-            >
-              <option value="all">Tất cả các năm</option>
-              {availableYears.map(yr => (
-                <option key={yr} value={yr}>Năm {yr}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">Tổng giá trị bán</p>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-100 mt-1">{fmtMoney(totalGrossRevenue)}đ</p>
-              <p className="text-xs text-gray-400 mt-0.5">{taxOrders.length} lệnh bán</p>
-            </div>
-
-            <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-4 border border-amber-100 dark:border-amber-900/40">
-              <p className="text-xs text-amber-700 dark:text-amber-400 uppercase font-medium">Thuế TNCN tạm tính ({STOCK_SALE_TAX_PCT}%)</p>
-              <p className="text-lg font-bold text-amber-800 dark:text-amber-300 mt-1">{fmtMoney(personalIncomeTax)}đ</p>
-              <p className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">Khấu trừ tự động khi bán</p>
-            </div>
-
-            <div className="bg-green-50 dark:bg-emerald-950/20 rounded-xl p-4 border border-green-100 dark:border-emerald-900/40">
-              <p className="text-xs text-green-700 dark:text-emerald-400 uppercase font-medium">Tổng lãi gộp</p>
-              <p className="text-lg font-bold text-green-800 dark:text-emerald-300 mt-1">+{fmtMoney(totalRealizedGain)}đ</p>
-              <p className="text-xs text-green-600 dark:text-emerald-500 mt-0.5">từ các lệnh có lời</p>
-            </div>
-
-            <div className="bg-red-50 dark:bg-rose-950/20 rounded-xl p-4 border border-red-100 dark:border-rose-900/40">
-              <p className="text-xs text-red-700 dark:text-rose-400 uppercase font-medium">Lãi / Lỗ ròng</p>
-              <p className={`text-lg font-bold mt-1 ${plColor(netProfit)}`}>
-                {netProfit >= 0 ? '+' : ''}{fmtMoney(netProfit)}đ
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">sau toàn bộ chi phí</p>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 rounded-xl p-3 text-xs text-blue-800 dark:text-blue-300 mt-4 flex items-start gap-2">
-            <span className="text-base">💡</span>
-            <p>
-              <b>Lưu ý thuế:</b> {TAX_LEGAL_NOTE}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Sao Lưu & Khôi Phục Dữ Liệu */}
+      {/* 1. Sao Lưu & Khôi Phục Dữ Liệu */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -339,8 +241,7 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
             <button
               onClick={() => {
                 if (currentUser?.isDemo) {
-                  if (showToast) showToast('🛡️ Tài khoản Demo mặc định được bảo vệ. Vui lòng đăng nhập Google.', 'error');
-                  else alert('🛡️ Tài khoản Demo mặc định được bảo vệ và không thể khôi phục dữ liệu ghi đè. Vui lòng đăng nhập tài khoản Google để sử dụng tính năng này.');
+                  showToast('🛡️ Tài khoản Demo mặc định được bảo vệ. Vui lòng đăng nhập Google.', 'error');
                   return;
                 }
                 fileInputRef.current?.click();
@@ -547,83 +448,80 @@ export default function Settings({ data, currentUser, onSuccess, showToast }) {
       </div>
 
       {/* Modal Xác Nhận Xoá Toàn Bộ Dữ Liệu */}
-      {isResetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={() => !resetLoading && setIsResetModalOpen(false)}
-          />
+      <Modal
+        isOpen={isResetModalOpen}
+        onClose={() => !resetLoading && setIsResetModalOpen(false)}
+        size="md"
+      >
+        <div className="p-6">
+          <div className="w-12 h-12 bg-red-100 dark:bg-rose-950/60 text-red-600 dark:text-rose-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3">
+            ⚠️
+          </div>
 
-          <div className="relative bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-6 z-10 shadow-2xl border border-red-100 dark:border-rose-900/50 animate-in fade-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 bg-red-100 dark:bg-rose-950/60 text-red-600 dark:text-rose-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3">
-              ⚠️
+          <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100 text-center mb-1">
+            Xác Nhận Xoá Toàn Bộ Dữ Liệu?
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4 leading-relaxed">
+            Hành động này <span className="font-bold text-red-600 dark:text-rose-400">KHÔNG THỂ hoàn tác</span>. Toàn bộ danh mục đầu tư của tài khoản <b>{currentUser?.email || currentUser?.name}</b> sẽ được đưa về số 0.
+          </p>
+
+          <div className="bg-red-50 dark:bg-rose-950/30 border border-red-200/80 dark:border-rose-900/40 rounded-xl p-3.5 mb-4 text-xs text-red-800 dark:text-rose-200 space-y-1.5">
+            <div className="flex justify-between font-semibold">
+              <span>Lệnh mua & bán sẽ xoá:</span>
+              <span>{(data.buyOrders?.length || 0) + (data.sellOrders?.length || 0)} lệnh</span>
             </div>
-
-            <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100 text-center mb-1">
-              Xác Nhận Xoá Toàn Bộ Dữ Liệu?
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4 leading-relaxed">
-              Hành động này <span className="font-bold text-red-600 dark:text-rose-400">KHÔNG THỂ hoàn tác</span>. Toàn bộ danh mục đầu tư của tài khoản <b>{currentUser?.email || currentUser?.name}</b> sẽ được đưa về số 0.
-            </p>
-
-            <div className="bg-red-50 dark:bg-rose-950/30 border border-red-200/80 dark:border-rose-900/40 rounded-xl p-3.5 mb-4 text-xs text-red-800 dark:text-rose-200 space-y-1.5">
-              <div className="flex justify-between font-semibold">
-                <span>Lệnh mua & bán sẽ xoá:</span>
-                <span>{(data.buyOrders?.length || 0) + (data.sellOrders?.length || 0)} lệnh</span>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <span>Cổ phiếu đang nắm giữ:</span>
-                <span>{data.portfolio?.length || 0} mã</span>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <span>Danh sách theo dõi & Cổ tức:</span>
-                <span>{(data.watchlist?.length || 0) + (data.dividends?.length || 0)} mục</span>
-              </div>
+            <div className="flex justify-between font-semibold">
+              <span>Cổ phiếu đang nắm giữ:</span>
+              <span>{data.portfolio?.length || 0} mã</span>
             </div>
-
-            <div className="mb-4">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                Vui lòng nhập chữ <span className="font-mono font-bold text-red-600 dark:text-rose-400 px-1.5 py-0.5 bg-red-100 dark:bg-rose-950/60 rounded">XOA</span> vào ô dưới để xác nhận:
-              </label>
-              <input
-                type="text"
-                value={confirmInput}
-                onChange={(e) => setConfirmInput(e.target.value)}
-                placeholder="Nhập XOA"
-                className="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-red-500 font-mono font-bold text-center tracking-wider"
-                disabled={resetLoading}
-                autoFocus
-              />
-            </div>
-
-            {resetError && (
-              <div className="mb-4 text-xs p-2.5 rounded-lg bg-red-50 dark:bg-rose-950/30 text-red-700 dark:text-rose-300 border border-red-200 dark:border-rose-900/40">
-                {resetError}
-              </div>
-            )}
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setIsResetModalOpen(false)}
-                disabled={resetLoading}
-                className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-bold text-xs transition-colors cursor-pointer disabled:opacity-50"
-              >
-                Huỷ bỏ
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClearAllData}
-                disabled={confirmInput.trim().toUpperCase() !== 'XOA' || resetLoading}
-                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
-              >
-                {resetLoading ? 'Đang xoá...' : 'Xác Nhận Xoá'}
-              </button>
+            <div className="flex justify-between font-semibold">
+              <span>Danh sách theo dõi & Cổ tức:</span>
+              <span>{(data.watchlist?.length || 0) + (data.dividends?.length || 0)} mục</span>
             </div>
           </div>
+
+          <div className="mb-4">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+              Vui lòng nhập chữ <span className="font-mono font-bold text-red-600 dark:text-rose-400 px-1.5 py-0.5 bg-red-100 dark:bg-rose-950/60 rounded">XOA</span> vào ô dưới để xác nhận:
+            </label>
+            <input
+              type="text"
+              value={confirmInput}
+              onChange={(e) => setConfirmInput(e.target.value)}
+              placeholder="Nhập XOA"
+              className="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-red-500 font-mono font-bold text-center tracking-wider"
+              disabled={resetLoading}
+              autoFocus
+            />
+          </div>
+
+          {resetError && (
+            <div className="mb-4 text-xs p-2.5 rounded-lg bg-red-50 dark:bg-rose-950/30 text-red-700 dark:text-rose-300 border border-red-200 dark:border-rose-900/40">
+              {resetError}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsResetModalOpen(false)}
+              disabled={resetLoading}
+              className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-bold text-xs transition-colors cursor-pointer disabled:opacity-50"
+            >
+              Huỷ bỏ
+            </button>
+
+            <button
+              type="button"
+              onClick={handleClearAllData}
+              disabled={confirmInput.trim().toUpperCase() !== 'XOA' || resetLoading}
+              className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+            >
+              {resetLoading ? 'Đang xoá...' : 'Xác Nhận Xoá'}
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
 
       {/* 4. Thông Tin Môi Trường & Hạ Tầng (Environment & Connection Status) */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">

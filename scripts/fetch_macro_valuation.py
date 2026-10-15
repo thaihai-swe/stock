@@ -344,6 +344,31 @@ def fetch_and_save_macro():
     if not sector_transmission and ai_cache_data.get("sectorTransmission"):
         sector_transmission = ai_cache_data.get("sectorTransmission")
 
+    # Bảo lưu các phân hệ AI vĩ mô mở rộng (Scenarios, Clock Dynamics, Yield Curve, Multi-Asset, Style, Tail Risks)
+    ai_scenarios = prev_cached_doc.get("aiScenarios") if MACRO_FILE.exists() else None
+    if not ai_scenarios and ai_cache_data.get("aiScenarios"):
+        ai_scenarios = ai_cache_data.get("aiScenarios")
+
+    ai_clock_dynamics = prev_cached_doc.get("aiClockDynamics") if MACRO_FILE.exists() else None
+    if not ai_clock_dynamics and ai_cache_data.get("aiClockDynamics"):
+        ai_clock_dynamics = ai_cache_data.get("aiClockDynamics")
+
+    ai_yield_curve_diag = prev_cached_doc.get("aiYieldCurveDiagnosis") if MACRO_FILE.exists() else None
+    if not ai_yield_curve_diag and ai_cache_data.get("aiYieldCurveDiagnosis"):
+        ai_yield_curve_diag = ai_cache_data.get("aiYieldCurveDiagnosis")
+
+    ai_multi_asset = prev_cached_doc.get("aiMultiAssetStrategy") if MACRO_FILE.exists() else None
+    if not ai_multi_asset and ai_cache_data.get("aiMultiAssetStrategy"):
+        ai_multi_asset = ai_cache_data.get("aiMultiAssetStrategy")
+
+    ai_style_rotation = prev_cached_doc.get("aiStyleRotation") if MACRO_FILE.exists() else None
+    if not ai_style_rotation and ai_cache_data.get("aiStyleRotation"):
+        ai_style_rotation = ai_cache_data.get("aiStyleRotation")
+
+    ai_tail_risk = prev_cached_doc.get("aiTailRiskAnalysis") if MACRO_FILE.exists() else None
+    if not ai_tail_risk and ai_cache_data.get("aiTailRiskAnalysis"):
+        ai_tail_risk = ai_cache_data.get("aiTailRiskAnalysis")
+
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -428,6 +453,19 @@ def fetch_and_save_macro():
 
     if sector_transmission:
         macro_doc["sectorTransmission"] = sector_transmission
+
+    if ai_scenarios:
+        macro_doc["aiScenarios"] = ai_scenarios
+    if ai_clock_dynamics:
+        macro_doc["aiClockDynamics"] = ai_clock_dynamics
+    if ai_yield_curve_diag:
+        macro_doc["aiYieldCurveDiagnosis"] = ai_yield_curve_diag
+    if ai_multi_asset:
+        macro_doc["aiMultiAssetStrategy"] = ai_multi_asset
+    if ai_style_rotation:
+        macro_doc["aiStyleRotation"] = ai_style_rotation
+    if ai_tail_risk:
+        macro_doc["aiTailRiskAnalysis"] = ai_tail_risk
 
     with open(MACRO_FILE, "w", encoding="utf-8") as f:
         json.dump(macro_doc, f, ensure_ascii=False, indent=2)

@@ -37,6 +37,9 @@ if (shouldUseTurso) {
     console.error('❌ Chưa cấu hình biến môi trường TURSO_DATABASE_URL trên Vercel!');
     throw new Error('Chưa cấu hình TURSO_DATABASE_URL và TURSO_AUTH_TOKEN trên Vercel! Vui lòng vào Vercel Dashboard -> Settings -> Environment Variables để thêm.');
   }
+  if (dbMode === 'turso' && !tursoUrl) {
+    console.warn('⚠️ CẢNH BÁO: DB_MODE=turso được cấu hình nhưng biến TURSO_DATABASE_URL trong .env đang trống hoặc bị comment (#). Hệ thống tự động chuyển về Local SQLite (data/stock.db).');
+  }
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }

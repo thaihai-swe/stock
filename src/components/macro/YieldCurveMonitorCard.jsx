@@ -189,6 +189,58 @@ export default function YieldCurveMonitorCard({ data }) {
         </table>
       </div>
 
+      {/* ── 4B. AI CHẨN ĐOÁN THỊ TRƯỜNG NỢ & THANH KHOẢN HỆ THỐNG ── */}
+      {data?.aiYieldCurveDiagnosis && (
+        <div className="mt-5 p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/40 to-white dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-900 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3.5 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 dark:border-indigo-900/50 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🧠</span>
+              <span className="text-xs font-black uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
+                Chẩn Đoán Sức Khỏe Thị Trường Nợ & Thanh Khoản Hệ Thống (AI Yield Strategist)
+              </span>
+              <IntelligenceBadge type="ai" tooltip="Phân tích định tính hình thái đường cong lợi suất & rủi ro thanh khoản ngân hàng từ AI" />
+            </div>
+            {data.aiYieldCurveDiagnosis.curveStatus && (
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200">
+                {data.aiYieldCurveDiagnosis.curveStatus}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-indigo-100 dark:border-slate-700/60 space-y-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                <span>🏦</span>
+                <span>Thanh Khoản & NIM Ngân Hàng:</span>
+              </div>
+              <p className="text-xs text-gray-700 dark:text-slate-300 leading-relaxed font-medium">
+                {data.aiYieldCurveDiagnosis.bankingLiquidityImpact}
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-indigo-100 dark:border-slate-700/60 space-y-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                <span>📑</span>
+                <span>Thị Trường Trái Phiếu DN:</span>
+              </div>
+              <p className="text-xs text-gray-700 dark:text-slate-300 leading-relaxed font-medium">
+                {data.aiYieldCurveDiagnosis.corporateDebtStress}
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-indigo-100 dark:border-slate-700/60 space-y-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span>📈</span>
+                <span>Phần Bù ERP & Cổ Phiếu:</span>
+              </div>
+              <p className="text-xs text-gray-700 dark:text-slate-300 leading-relaxed font-medium">
+                {data.aiYieldCurveDiagnosis.equityMarketSignal}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 5. FOOTER GHI CHÚ BẢO VỆ NHÀ ĐẦU TƯ ── */}
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-gray-400 dark:text-slate-400 gap-2">
         <div>

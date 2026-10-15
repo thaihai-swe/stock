@@ -126,6 +126,24 @@ router.get('/valuation/macro', (req, res) => {
           if (!macroData.aiInsight && aiCache.aiInsight) {
             macroData.aiInsight = aiCache.aiInsight;
           }
+          if (!macroData.aiScenarios && aiCache.aiScenarios) {
+            macroData.aiScenarios = aiCache.aiScenarios;
+          }
+          if (!macroData.aiClockDynamics && aiCache.aiClockDynamics) {
+            macroData.aiClockDynamics = aiCache.aiClockDynamics;
+          }
+          if (!macroData.aiYieldCurveDiagnosis && aiCache.aiYieldCurveDiagnosis) {
+            macroData.aiYieldCurveDiagnosis = aiCache.aiYieldCurveDiagnosis;
+          }
+          if (!macroData.aiMultiAssetStrategy && aiCache.aiMultiAssetStrategy) {
+            macroData.aiMultiAssetStrategy = aiCache.aiMultiAssetStrategy;
+          }
+          if (!macroData.aiStyleRotation && aiCache.aiStyleRotation) {
+            macroData.aiStyleRotation = aiCache.aiStyleRotation;
+          }
+          if (!macroData.aiTailRiskAnalysis && aiCache.aiTailRiskAnalysis) {
+            macroData.aiTailRiskAnalysis = aiCache.aiTailRiskAnalysis;
+          }
         } catch (e) {
           console.warn('⚠️ Lỗi nạp fallback AI cache:', e.message);
         }

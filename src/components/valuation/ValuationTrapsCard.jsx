@@ -1,7 +1,7 @@
 import React from 'react';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
-export default function ValuationTrapsCard({ valuationTraps, symbol }) {
+export default function ValuationTrapsCard({ valuationTraps, symbol, aiAuditComment = null }) {
   if (!valuationTraps) return null;
 
   const {
@@ -35,7 +35,10 @@ export default function ValuationTrapsCard({ valuationTraps, symbol }) {
             <span className="text-xs font-black uppercase tracking-wider text-rose-600 dark:text-rose-400">
               Kiểm Toán Rủi Ro Định Giá
             </span>
-            <IntelligenceBadge type="heuristic" tooltip="Hệ quy tắc 7 bẫy định giá & kiểm toán rủi ro" />
+            <IntelligenceBadge
+              type={aiAuditComment ? 'ai' : 'heuristic'}
+              tooltip={aiAuditComment ? 'Hệ quy tắc 7 bẫy định giá kết hợp thẩm định kế toán pháp y AI' : 'Hệ quy tắc 7 bẫy định giá & kiểm toán rủi ro'}
+            />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
               7 Bẫy Định Giá Kinh Điển
             </span>
@@ -94,6 +97,62 @@ export default function ValuationTrapsCard({ valuationTraps, symbol }) {
           <div>
             <span className="font-bold">An Toàn Toàn Diện:</span> Không ghi nhận bẫy giá rẻ giả tạo. Tăng trưởng doanh thu, chất lượng vốn và dòng tiền tự do FCF đồng thuận tích cực.
           </div>
+        </div>
+      )}
+
+      {/* ── AI CHẨN ĐOÁN PHÁP Y & BẪY GIÁ RẺ GIẢ TẠO ── */}
+      {aiAuditComment && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-gray-900 border border-indigo-200/70 dark:border-indigo-800/60 space-y-3.5 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 dark:border-indigo-900/50 pb-2.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-lg">🕵️</span>
+              <span className="text-xs font-black uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
+                Thẩm Định Pháp Y & Chất Lượng Lợi Nhuận (AI Value Trap Auditor)
+              </span>
+            </div>
+            {aiAuditComment.auditVerdict && (
+              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                aiAuditComment.auditVerdict.includes('Sạch')
+                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
+                  : aiAuditComment.auditVerdict.includes('Lưu Ý')
+                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300'
+                  : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
+              }`}>
+                {aiAuditComment.auditVerdict}
+              </span>
+            )}
+          </div>
+
+          {aiAuditComment.forensicDiagnosis && (
+            <p className="text-xs text-gray-700 dark:text-gray-200 leading-relaxed font-medium">
+              {aiAuditComment.forensicDiagnosis}
+            </p>
+          )}
+
+          {aiAuditComment.dupontEarningsQuality && (
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-gray-800/80 border border-indigo-100/60 dark:border-indigo-900/40 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              <strong className="text-indigo-700 dark:text-indigo-300 block mb-0.5 font-bold">
+                🔬 Đánh giá chất lượng ROE:
+              </strong>
+              {aiAuditComment.dupontEarningsQuality}
+            </div>
+          )}
+
+          {Array.isArray(aiAuditComment.auditorChecklist) && aiAuditComment.auditorChecklist.length > 0 && (
+            <div className="p-3 rounded-xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/40 space-y-1.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                <span>📋</span> Điểm Cần Chất Vấn Ban Điều Hành Tại ĐHCĐ
+              </span>
+              <ul className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                {aiAuditComment.auditorChecklist.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-1.5">
+                    <span className="text-purple-600 font-bold">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 

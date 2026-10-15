@@ -84,6 +84,8 @@ class PythonAiService:
     def resolve_provider(self, requested_provider: Optional[str] = None) -> str:
         self.refresh_env()
         prov = (requested_provider or self.provider or "auto").lower()
+        if prov in ("heuristic", "offline", "fallback"):
+            return "heuristic_fallback"
         if prov == "openai" and self.openai_key:
             return "openai"
         if prov == "gemini" and self.gemini_key:
@@ -227,9 +229,10 @@ class PythonAiService:
 
         # Exponential Backoff Retry (up to 3 attempts on HTTP 429)
         max_retries = 3
+        timeout_s = int(os.environ.get("OPENAI_TIMEOUT", 75))
         for attempt in range(max_retries):
             try:
-                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                resp = requests.post(url, headers=headers, json=payload, timeout=timeout_s)
                 if resp.status_code == 200:
                     content_type = resp.headers.get("content-type", "")
                     raw = ""
@@ -310,13 +313,26 @@ class PythonAiService:
                 ]
             }
 
+        vnindex_raw = macro_data.get("marketIndex", {})
+        compact_market = {
+            "currentPoint": vnindex_raw.get("currentPoint") or vnindex_raw.get("close") or 1250,
+            "currentPE": vnindex_raw.get("currentPE") or 13.5,
+            "currentPB": vnindex_raw.get("currentPB") or 1.6,
+            "peZone": vnindex_raw.get("historicalBands", {}).get("pe", {}).get("zone", "Hợp lý"),
+        }
+        dual_raw = macro_data.get("dualMatrix", {})
+        compact_sectors = {
+            "sweetSpot": [item.get("sectorName") for item in dual_raw.get("items", []) if item.get("quadrant") == "sweetSpot"],
+            "avoid": [item.get("sectorName") for item in dual_raw.get("items", []) if item.get("quadrant") in ("avoid", "valueTrap")],
+        }
+
         macro_summary = {
             "regime": macro_data.get("regime", {}),
             "riskAssessment": macro_data.get("riskAssessment", {}),
-            "marketIndex": macro_data.get("marketIndex", {}),
+            "marketIndex": compact_market,
             "yieldCurveSummary": macro_data.get("yieldCurveMonitor", {}).get("summary", {}),
             "assetAllocation": macro_data.get("assetAllocation", {}),
-            "dualMatrix": macro_data.get("dualMatrix", {}),
+            "sectors": compact_sectors,
             "goldAdvisor": macro_data.get("goldAdvisor", {}),
         }
 
@@ -695,6 +711,265 @@ class PythonAiService:
             "}"
         )
         user_prompt = f"Bức tranh vĩ mô và ngành:\n{json.dumps(context, ensure_ascii=False, indent=2)}"
+
+        return self.generate_json(sys_prompt, user_prompt, fallback_fn=fallback, model=model, provider=provider)
+
+    # =========================================================================
+    # 7B. COMPREHENSIVE MACRO INTELLIGENCE SUITE (SCENARIOS, CLOCK, YIELD, GOLD, STYLE)
+    # =========================================================================
+    def generate_macro_intelligence_suite(
+        self,
+        macro_data: Dict[str, Any],
+        model: Optional[str] = None,
+        provider: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Sinh trọn gói toàn bộ phân hệ phân tích vĩ mô nâng cấp trong đúng 1 request duy nhất:
+        1. aiScenarios: 3 Kịch bản VN-Index định lượng động & phân bổ ngành
+        2. aiClockDynamics: Đồng hồ vĩ mô, kim chỉ giờ, vận tốc chuyển pha & tương quan lịch sử
+        3. aiYieldCurveDiagnosis: Chẩn đoán thị trường nợ & thanh khoản hệ thống
+        4. aiMultiAssetStrategy: Chiến lược phân bổ 4 tài sản & tư vấn vàng
+        5. aiStyleRotation: Xu hướng luân chuyển dòng vốn giữa 4 phân khúc (VN30, Diamond, Midcap)
+        6. aiTailRiskAnalysis: Chuỗi dẫn truyền rủi ro đuôi khi có cảnh báo kích hoạt
+        """
+        macro_data = macro_data or {}
+        vnindex = macro_data.get("marketIndex", {})
+        cur_pt = float(vnindex.get("currentPoint") or vnindex.get("close") or 1250.0)
+        cur_pe = float(vnindex.get("currentPE") or 13.5)
+        regime = macro_data.get("regime", {})
+        clock_base = macro_data.get("macroClock", {})
+        risk = macro_data.get("riskAssessment", {})
+        risk_score = float(risk.get("riskScore", 45))
+        yc = macro_data.get("yieldCurveMonitor", {}).get("summary", {})
+        macro_indicators = macro_data.get("macro", {})
+        gold_adv = macro_data.get("goldAdvisor", {})
+        tail_risks = macro_data.get("tailRisks", [])
+        has_active_tail = bool(macro_data.get("hasActiveTailRisk", False))
+
+        # Phân bổ xác suất cơ sở động theo Risk Score
+        if risk_score <= 40.0:
+            prob_base, prob_bull, prob_bear = 55, 30, 15
+        elif risk_score <= 60.0:
+            prob_base, prob_bull, prob_bear = 50, 25, 25
+        else:
+            prob_base, prob_bull, prob_bear = 45, 20, 35
+
+        def fallback():
+            # Base ranges calculated around current point
+            base_min = int(round(cur_pt * 0.98))
+            base_max = int(round(cur_pt * 1.04))
+            bull_min = int(round(cur_pt * 1.03))
+            bull_max = int(round(cur_pt * 1.10))
+            bear_min = int(round(cur_pt * 0.90))
+            bear_max = int(round(cur_pt * 0.97))
+
+            gdp_val = float(macro_indicators.get("gdpGrowthYoY", 6.8))
+            cpi_val = float(macro_indicators.get("cpi", 3.8))
+            prem_sjc = float(gold_adv.get("spreadSjcVsWorldPct", 12.5))
+
+            return {
+                "aiScenarios": {
+                    "marketVerdict": f"VN-Index dao động tích lũy quanh vùng {cur_pt:,.0f} điểm (P/E {cur_pe:.1f}x), phân hóa theo năng lực tăng trưởng EPS thực tế của từng nhóm ngành.",
+                    "scenarios": {
+                        "base": {
+                            "name": "Kịch Bản Cơ Sở (Base Case)",
+                            "probability": prob_base,
+                            "vnIndexTargetRange": f"{base_min:,} - {base_max:,}",
+                            "targetPeRange": f"{max(11.5, cur_pe - 0.5):.1f}x - {cur_pe + 0.8:.1f}x",
+                            "projectedEpsGrowth": "+10.0% – 12.5%",
+                            "macroCatalysts": [
+                                "SBV duy trì mặt bằng lãi suất điều hành hỗ trợ, tín dụng tăng trưởng mục tiêu 14-15%.",
+                                "Tỷ giá USD/VND dao động trong biên độ quản lý, thanh khoản hệ thống liên ngân hàng giữ mức cân bằng.",
+                                "Tháo gỡ pháp lý dự án bất động sản và đẩy mạnh giải ngân đầu tư công trọng điểm."
+                            ],
+                            "leadingSectors": [
+                                {"sector": "Ngân Hàng", "thesis": "Tăng trưởng tín dụng ổn định, NIM giữ vững, trích lập dự phòng trong tầm kiểm soát."},
+                                {"sector": "Bán Lẻ", "thesis": "Hưởng lợi trực tiếp từ sự phục hồi sức mua tiêu dùng nội địa và chính sách kích cầu."}
+                            ],
+                            "laggingSectors": [
+                                {"sector": "Bất Động Sản Dân Dụng", "risk": "Tiến độ bán hàng và cấp phép dự án mới phân hóa mạnh giữa các chủ đầu tư."}
+                            ],
+                            "tacticalAllocation": {"equity": 60, "bond": 25, "cash": 10, "gold": 5},
+                            "actionSummary": "Ưu tiên tích lũy từng phần các cổ phiếu đầu ngành có định giá rẻ và P/E chu kỳ hấp dẫn."
+                        },
+                        "bull": {
+                            "name": "Kịch Bản Tích Cực (Bull Case)",
+                            "probability": prob_bull,
+                            "vnIndexTargetRange": f"{bull_min:,} - {bull_max:,}",
+                            "targetPeRange": f"{cur_pe + 0.8:.1f}x - {cur_pe + 2.2:.1f}x",
+                            "projectedEpsGrowth": "+14.0% – 18.0%",
+                            "macroCatalysts": [
+                                "Fed tiếp tục chu kỳ nới lỏng chính sách tiền tệ, khối ngoại đảo chiều mua ròng mạnh mẽ.",
+                                "Hệ thống KRX và cơ chế Non-prefunding vận hành trơn tru, đẩy nhanh tiến trình nâng hạng FTSE Emerging Markets.",
+                                "Lợi nhuận ròng toàn thị trường bứt phá vượt kỳ vọng của các định chế tài chính."
+                            ],
+                            "leadingSectors": [
+                                {"sector": "Chứng Khoán", "thesis": "Thanh khoản thị trường bùng nổ vượt 25.000 tỷ/phiên, mảng tự doanh và cho vay margin tăng vọt."},
+                                {"sector": "Công Nghệ Thông Tin", "thesis": "Đơn hàng xuất khẩu phần mềm bằng ngoại tệ tăng trưởng cao, hưởng lợi từ sóng AI và bán dẫn."}
+                            ],
+                            "laggingSectors": [
+                                {"sector": "Tiện Ích Phòng Thủ", "risk": "Dòng tiền thông minh rút khỏi nhóm phòng thủ để luân chuyển sang cổ phiếu Beta cao."}
+                            ],
+                            "tacticalAllocation": {"equity": 75, "bond": 15, "cash": 7, "gold": 3},
+                            "actionSummary": "Tận dụng đà tăng mở rộng tỷ trọng nhóm ngành dẫn dắt High-Beta và nắm giữ theo xu hướng."
+                        },
+                        "bear": {
+                            "name": "Kịch Bản Thận Trọng (Bear Case)",
+                            "probability": prob_bear,
+                            "vnIndexTargetRange": f"{bear_min:,} - {bear_max:,}",
+                            "targetPeRange": "11.2x - 12.3x",
+                            "projectedEpsGrowth": "+2.0% – 5.0%",
+                            "macroCatalysts": [
+                                "Căng thẳng địa chính trị quốc tế đẩy giá dầu thô và cước vận tải tăng cao, gây áp lực lạm phát chi phí đẩy.",
+                                "Chỉ số DXY tăng vọt buộc SBV phải phát hành tín phiếu hút ròng thanh khoản tiền đồng hoặc can thiệp bán ngoại tệ.",
+                                "Áp lực đáo hạn trái phiếu doanh nghiệp gia tăng cục bộ tại một số tổ chức phát hành."
+                            ],
+                            "leadingSectors": [
+                                {"sector": "Năng Lượng & Dầu Khí", "thesis": "Giá dầu thế giới neo cao hỗ trợ trực tiếp biên lợi nhuận nhóm thượng nguồn PVD, PVS."},
+                                {"sector": "Tiêu Dùng Thiết Yếu", "thesis": "Nhu cầu hàng thiết yếu ít co giãn theo thu nhập, dòng tiền phòng thủ trú ẩn an toàn."}
+                            ],
+                            "laggingSectors": [
+                                {"sector": "Bất Động Sản", "risk": "Áp lực chi phí tài chính gia tăng và thanh khoản dòng tiền suy yếu."},
+                                {"sector": "Thép & Vật Liệu", "risk": "Biến động chi phí đầu vào và sức cầu tiêu thụ công trình chậm lại."}
+                            ],
+                            "tacticalAllocation": {"equity": 35, "bond": 35, "cash": 20, "gold": 10},
+                            "actionSummary": "Nâng tỷ trọng tiền mặt và tài sản phòng thủ, kiên nhẫn chờ đợi điểm cân bằng định giá sâu."
+                        }
+                    }
+                },
+                "aiClockDynamics": {
+                    "clockHandPosition": "2:30 (Cuối pha Mở Rộng — Chớm Tăng Nhiệt)",
+                    "transitionVelocity": "TRUNG BÌNH (Moderate Drift)",
+                    "dynamicsAnalysis": f"Kinh tế Việt Nam tiếp tục duy trì đà tăng trưởng cao với GDP {gdp_val:.1f}%. Tuy nhiên, áp lực lạm phát CPI ({cpi_val:.1f}%) và tỷ giá USD/VND đang đặt chính sách tiền tệ vào trạng thái cân bằng thận trọng.",
+                    "historicalAnalog": {
+                        "period": "Giai đoạn Quý 4/2017 – Quý 1/2018",
+                        "similarity": "Sản xuất và xuất khẩu tăng tốc ấn tượng, tín dụng mở rộng mạnh nhưng lãi suất bắt đầu tạo đáy và chuẩn bị bước vào giai đoạn phân hóa."
+                    },
+                    "sectorPlaybook": {
+                        "favored": ["Ngân Hàng Chất Lượng Cao", "Bán Lẻ", "Công Nghệ Thông Tin", "Khu Công Nghiệp FDI"],
+                        "cautious": ["Bất Động Sản Đòn Bẩy Cao", "Xây Dựng Nhạy Chi Phí Lãi Vay", "Vật Liệu Nhạy Giá"]
+                    }
+                },
+                "aiYieldCurveDiagnosis": {
+                    "curveStatus": f"Đường cong lợi suất TPCP Việt Nam nằm ở trạng thái {yc.get('vnYcLabel', 'Bình thường dốc lên')}, chênh lệch 10Y-2Y phản ánh tâm lý ổn định của thị trường trái phiếu.",
+                    "bankingLiquidityImpact": "Thanh khoản hệ thống ngân hàng được hỗ trợ bởi các công cụ OMO của SBV, biên lãi ròng NIM có dư địa phục hồi nhẹ.",
+                    "corporateDebtStress": "Áp lực đáo hạn trái phiếu doanh nghiệp đang được các ngân hàng thương mại tái cơ cấu có chọn lọc, rủi ro vỡ nợ hệ thống ở mức thấp.",
+                    "equityMarketSignal": "Lợi tức thu nhập E/P thị trường cổ phiếu (~7.4%) duy trì mức chênh lệch dương hấp dẫn so với lợi suất TPCP 10 năm (~4.4%)."
+                },
+                "aiMultiAssetStrategy": {
+                    "multiAssetThesis": "Môi trường vĩ mô ủng hộ chiến lược phân bổ tập trung vào Cổ phiếu giá trị (60%) và Trái phiếu/Tiền gửi (25-30%), duy trì tỷ trọng Vàng ở mức phòng vệ hợp lý (5-10%).",
+                    "goldArbitrageRationale": f"Chênh lệch giá vàng SJC so với vàng thế giới quy đổi đang ở mức {prem_sjc:.1f}%. Mức chênh lệch này cảnh báo nhà đầu tư cá nhân không nên mua đuổi vàng miếng SJC ở vùng giá chênh lệch cao.",
+                    "policyRiskAlert": "Ngân hàng Nhà nước có thể tiếp tục can thiệp thị trường vàng qua các biện pháp quản lý hành chính và thanh tra giao dịch.",
+                    "recommendedAllocation": {"equity": 60, "bond": 25, "cash": 10, "gold": 5}
+                },
+                "aiStyleRotation": {
+                    "rotationHeadline": "Dòng vốn tổ chức ưu tiên rổ Kim Cương VN Diamond và Blue-chips VN30 có nền tảng phòng thủ vững chắc",
+                    "largeCapVsMidcap": "Nhóm Large-Cap VN30 đóng vai trò giữ nhịp chỉ số trong khi VN Midcap có sự phân hóa cao, chỉ những mã có câu chuyện tăng trưởng EPS riêng biệt mới thu hút dòng tiền.",
+                    "diamondForeignRoom": "Các cổ phiếu rổ VN Diamond tiếp tục được định giá cao hơn mặt bằng chung nhờ tỷ lệ sở hữu của khối ngoại luôn chạm trần (FSR).",
+                    "actionableStrategy": "Chiến lược phân bổ: 50% VN30 đầu ngành, 30% VN Diamond hết room ngoại và 20% VN Midcap chọn lọc."
+                },
+                "aiTailRiskAnalysis": {
+                    "contingencyPlan": "Duy trì kỷ luật dừng lỗ tại các ngưỡng hỗ trợ kỹ thuật trọng yếu và chủ động hạ tỷ lệ margin khi thị trường xuất hiện tín hiệu căng thẳng thanh khoản liên ngân hàng.",
+                    "contagionChain": "Nếu tỷ giá USD/VND vượt đỉnh, áp lực rút vốn ròng của khối ngoại sẽ tác động trực tiếp lên nhóm cổ phiếu vốn hóa lớn VN30, sau đó lan tỏa sang tâm lý thị trường chung."
+                }
+            }
+
+        sys_prompt = (
+            "Bạn là Giám Đốc Chiến Lược Vĩ Mô & Thị Trường Vốn (Chief Macro & Capital Markets Strategist) hàng đầu tại Việt Nam.\n"
+            "Dựa trên các số liệu vĩ mô, định giá VN-Index, đường cong lợi suất TPCP, phong cách thị trường và dữ liệu vàng được cung cấp, "
+            "hãy lập Bản Phân Tích Vĩ Mô & Định Lượng Đa Kịch Bản (Macro Intelligence Suite) theo đúng cấu trúc JSON quy chuẩn.\n"
+            "QUY TẮC BẮT BUỘC:\n"
+            "- Viết bằng Tiếng Việt chuẩn mực, sắc sảo, ngôn từ tài chính chuyên nghiệp cấp quỹ đầu tư ngoại.\n"
+            "- Phân tích sâu sắc cơ chế dẫn truyền kinh tế, chỉ ra đúng nguyên nhân và tác động thực tế.\n"
+            "- Trả về DUY NHẤT một JSON object hợp lệ (không kèm markdown ```json hay giải thích ngoài lề) theo đúng schema sau:\n"
+            "{\n"
+            '  "aiScenarios": {\n'
+            '    "marketVerdict": "Nhận định tổng quan 1-2 câu về xu hướng VN-Index",\n'
+            '    "scenarios": {\n'
+            '      "base": {\n'
+            '        "name": "Kịch Bản Cơ Sở (Base Case)",\n'
+            '        "probability": 55,\n'
+            '        "vnIndexTargetRange": "1.280 - 1.340",\n'
+            '        "targetPeRange": "13.2x - 14.0x",\n'
+            '        "projectedEpsGrowth": "+10% - 12%",\n'
+            '        "macroCatalysts": ["3 chất xúc tác vĩ mô/dòng tiền kích hoạt kịch bản"],\n'
+            '        "leadingSectors": [{"sector": "Tên ngành", "thesis": "Luận điểm hưởng lợi"}],\n'
+            '        "laggingSectors": [{"sector": "Tên ngành", "risk": "Luận điểm rủi ro"}],\n'
+            '        "tacticalAllocation": {"equity": 60, "bond": 25, "cash": 10, "gold": 5},\n'
+            '        "actionSummary": "Khuyến nghị hành động cô đọng"\n'
+            '      },\n'
+            '      "bull": { ...cùng cấu trúc... },\n'
+            '      "bear": { ...cùng cấu trúc... }\n'
+            '    }\n'
+            '  },\n'
+            '  "aiClockDynamics": {\n'
+            '    "clockHandPosition": "Vị trí kim đồng hồ (ví dụ: 2:30 - Cuối pha Mở Rộng, Chớm Tăng Nhiệt)",\n'
+            '    "transitionVelocity": "Vận tốc dịch chuyển (CHẬM / TRUNG BÌNH / NHANH)",\n'
+            '    "dynamicsAnalysis": "Phân tích chi tiết động lực học từ GDP, CPI, PMI, Lãi suất và Tỷ giá",\n'
+            '    "historicalAnalog": {\n'
+            '      "period": "Giai đoạn lịch sử TTCK VN tương đồng nhất (ví dụ: Q4/2017 – Q1/2018)",\n'
+            '      "similarity": "Điểm tương đồng chính về vĩ mô và diễn biến dòng tiền"\n'
+            '    },\n'
+            '    "sectorPlaybook": {\n'
+            '      "favored": ["3 ngành đón đầu chu kỳ"],\n'
+            '      "cautious": ["2 ngành nên thận trọng"]\n'
+            '    }\n'
+            '  },\n'
+            '  "aiYieldCurveDiagnosis": {\n'
+            '    "curveStatus": "Nhận định hình dạng và độ dốc đường cong TPCP Việt Nam",\n'
+            '    "bankingLiquidityImpact": "Tác động đến thanh khoản ngân hàng, chi phí vốn và NIM",\n'
+            '    "corporateDebtStress": "Áp lực đáo hạn trái phiếu doanh nghiệp và khả năng tái tài trợ",\n'
+            '    "equityMarketSignal": "Tín hiệu phần bù rủi ro vốn chủ sở hữu ERP đối với thị trường cổ phiếu"\n'
+            '  },\n'
+            '  "aiMultiAssetStrategy": {\n'
+            '    "multiAssetThesis": "Luận điểm phân bổ 4 lớp tài sản tối ưu",\n'
+            '    "goldArbitrageRationale": "Nhận định độ lệch giá vàng SJC vs thế giới và thời điểm mua/bán",\n'
+            '    "policyRiskAlert": "Cảnh báo rủi ro chính sách đối với vàng hoặc tỷ giá",\n'
+            '    "recommendedAllocation": {"equity": 60, "bond": 25, "cash": 10, "gold": 5}\n'
+            '  },\n'
+            '  "aiStyleRotation": {\n'
+            '    "rotationHeadline": "Thông điệp xu hướng luân chuyển giữa các phong cách vốn hóa",\n'
+            '    "largeCapVsMidcap": "So sánh tương quan giữa VN30 và VN Midcap",\n'
+            '    "diamondForeignRoom": "Nhận định về nhóm cổ phiếu kín room ngoại VN Diamond",\n'
+            '    "actionableStrategy": "Chiến lược phân bổ tỷ trọng khuyến nghị"\n'
+            '  },\n'
+            '  "aiTailRiskAnalysis": {\n'
+            '    "contingencyPlan": "Kế hoạch ứng phó kịch bản thiên nga đen / rủi ro đuôi",\n'
+            '    "contagionChain": "Chuỗi tác động lan truyền vào các nhóm ngành"\n'
+            '  }\n'
+            "}"
+        )
+
+        compact_market = {
+            "currentPoint": cur_pt,
+            "currentPE": cur_pe,
+            "currentPB": vnindex.get("currentPB"),
+            "peZone": (vnindex.get("peBands") or {}).get("currentZone", "Fair Value"),
+            "zScore": (vnindex.get("peBands") or {}).get("zScore"),
+        }
+        compact_yc = {
+            "summary": yc,
+            "links": macro_data.get("yieldCurveMonitor", {}).get("links", {}),
+        }
+        si = macro_data.get("styleIndices", [])
+        compact_styles = [
+            {"code": s.get("code"), "name": s.get("name"), "pe": s.get("pe"), "pb": s.get("pb"), "strategy": s.get("strategy")}
+            for s in si
+        ] if isinstance(si, list) else si
+
+        context = {
+            "marketIndex": compact_market,
+            "regime": regime,
+            "macroClock": clock_base,
+            "riskAssessment": risk,
+            "macroIndicators": macro_indicators,
+            "yieldCurve": compact_yc,
+            "goldAdvisor": gold_adv,
+            "styleIndices": compact_styles,
+            "hasActiveTailRisk": has_active_tail,
+            "tailRisks": tail_risks,
+        }
+        user_prompt = f"Bức tranh vĩ mô, thị trường và định giá Việt Nam thực tế:\n{json.dumps(context, ensure_ascii=False, indent=2)}"
 
         return self.generate_json(sys_prompt, user_prompt, fallback_fn=fallback, model=model, provider=provider)
 

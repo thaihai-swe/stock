@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { fmtMoney, fmtDate, plColor, plBg, getStockColor, getMatchMethodInfo } from '../utils/format.js';
 import { computeStockPerformance } from '../utils/stockAnalytics.js';
+import Modal from './common/Modal.jsx';
 
 export default function StockDetailModal({
   symbol,
@@ -14,17 +15,6 @@ export default function StockDetailModal({
 }) {
   const { buyOrders = [], sellOrders = [], dividends = [] } = data;
   const [filterType, setFilterType] = useState('all'); // 'all' | 'BUY' | 'SELL' | 'DIVIDEND'
-
-  // Đóng modal bằng phím ESC
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
 
   // Tính toán chỉ số tích luỹ của mã này
   const stockSummary = useMemo(() => {
@@ -61,10 +51,11 @@ export default function StockDetailModal({
         date: s.date || '',
         quantity: s.quantity,
         price: s.price,
-        total: s.netProceeds || (s.quantity * s.price),
+        netPrice: s.netPrice || (s.quantity > 0 ? (s.netRevenue ?? s.totalRevenue ?? (s.grossRevenue ? s.grossRevenue - (s.fee || 0) : s.quantity * s.price)) / s.quantity : s.price),
+        total: s.netRevenue ?? s.totalRevenue ?? (s.grossRevenue ? s.grossRevenue - (s.fee || 0) : s.quantity * s.price),
         fee: s.fee || 0,
         tax: s.tax || 0,
-        costBasis: s.costBasis,
+        costBasis: s.totalCost ?? s.costBasis,
         profitLoss: s.profitLoss,
         profitLossPct: s.profitLossPct,
         matchedLots: s.matchedLots || [],
@@ -111,70 +102,113 @@ export default function StockDetailModal({
   const stockColor = getStockColor(stockSummary.symbol);
   const isProfit = stockSummary.cumulativePL >= 0;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      {/* Backdrop */}
-      <div
-        className="modal-backdrop"
-        onClick={onClose}
-      />
+  const header = (
+    <div className="flex items-center gap-3">
+      <span
+        className="inline-flex items-center px-3 py-1.5 rounded-2xl text-sm font-extrabold shadow-2xs border"
+        style={{
+          backgroundColor: `${stockColor}18`,
+          borderColor: `${stockColor}50`,
+          color: stockColor,
+        }}
+      >
+        <span
+          className="w-2.5 h-2.5 rounded-full mr-2 shrink-0 shadow-2xs"
+          style={{ backgroundColor: stockColor }}
+        />
+        {stockSummary.symbol}
+      </span>
 
-      {/* Modal Container */}
-      <div className="modal-dialog max-w-3xl max-h-[94vh] flex flex-col">
-        {/* 1. Modal Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-slate-900/80">
-          <div className="flex items-center gap-3">
-            <span
-              className="inline-flex items-center px-3 py-1.5 rounded-2xl text-sm font-extrabold shadow-2xs border"
-              style={{
-                backgroundColor: `${stockColor}18`,
-                borderColor: `${stockColor}50`,
-                color: stockColor,
-              }}
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-full mr-2 shrink-0 shadow-2xs"
-                style={{ backgroundColor: stockColor }}
-              />
-              {stockSummary.symbol}
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+            Sổ Cái Lãi/Lỗ — {stockSummary.symbol}
+          </h3>
+          {stockSummary.isHolding ? (
+            <span className="badge-gain text-[10px]">
+              🟢 Đang giữ {stockSummary.holdingQty.toLocaleString()} cp
             </span>
-
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
-                  Sổ Cái Lãi/Lỗ — {stockSummary.symbol}
-                </h3>
-                {stockSummary.isHolding ? (
-                  <span className="badge-gain text-[10px]">
-                    🟢 Đang giữ {stockSummary.holdingQty.toLocaleString()} cp
-                  </span>
-                ) : (
-                  <span className="badge-neutral text-[10px]">
-                    ⚪ Đã tất toán vị thế
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Toàn bộ lịch sử giao dịch Mua / Bán / Nhận cổ tức và tổng kết lãi lỗ
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-300 transition-colors flex items-center justify-center font-bold text-sm cursor-pointer"
-              title="Đóng cửa sổ"
-            >
-              ✕
-            </button>
-          </div>
+          ) : (
+            <span className="badge-neutral text-[10px]">
+              ⚪ Đã tất toán vị thế
+            </span>
+          )}
         </div>
+        <p className="text-[11px] text-slate-400 mt-0.5">
+          Toàn bộ lịch sử giao dịch Mua / Bán / Nhận cổ tức và tổng kết lãi lỗ
+        </p>
+      </div>
+    </div>
+  );
 
-        {/* 2. Modal Body (Scrollable Sổ Cái) */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-5">
-          {/* Hero Card: Lãi / Lỗ Tích Luỹ Toàn Thời Gian */}
+  const footer = (
+    <div className="flex flex-wrap items-center justify-between gap-2.5">
+      <div className="flex items-center gap-2">
+        {onNavigateBuy && (
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onNavigateBuy({ symbol: stockSummary.symbol, quantity: '100', price: stockSummary.livePrice ? String(stockSummary.livePrice / 1000) : '' });
+            }}
+            className="btn-primary !text-xs !px-3.5 !py-1.5 flex items-center gap-1 shadow-2xs"
+          >
+            <span>🛒</span> Mua thêm
+          </button>
+        )}
+
+        {onNavigateSell && stockSummary.isHolding && (
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              const sellPrice = stockSummary.livePrice ? String(stockSummary.livePrice / 1000) : (stockSummary.avgCost ? String(stockSummary.avgCost / 1000) : '');
+              onNavigateSell({
+                symbol: stockSummary.symbol,
+                quantity: String(stockSummary.holdingQty),
+                price: sellPrice,
+              });
+            }}
+            className="btn-danger !text-xs !px-3.5 !py-1.5 flex items-center gap-1 shadow-2xs"
+          >
+            <span>💸</span> Bán bớt
+          </button>
+        )}
+
+        {onSwitchTab && (
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onSwitchTab('valuation', stockSummary.symbol);
+            }}
+            className="btn-secondary !text-xs !px-3.5 !py-1.5 !bg-indigo-50 dark:!bg-indigo-950/60 !text-indigo-700 dark:!text-indigo-300 !border-indigo-200 dark:!border-indigo-800 hover:!bg-indigo-100 flex items-center gap-1"
+          >
+            <span>🎯</span> Sang Tab Định Giá
+          </button>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={onClose}
+        className="btn-secondary !text-xs !px-4 !py-1.5"
+      >
+        Đóng
+      </button>
+    </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="3xl"
+      headerContent={header}
+      footer={footer}
+    >
+      <div className="p-5 sm:p-6 space-y-5">
+        {/* Hero Card: Lãi / Lỗ Tích Luỹ Toàn Thời Gian */}
           <div className={`p-4 sm:p-5 rounded-2xl border ${
             isProfit
               ? 'bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-teal-500/10 border-emerald-200/80 dark:border-emerald-800'
@@ -385,7 +419,14 @@ export default function StockDetailModal({
                           </span>
                           <div>
                             <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5 flex-wrap">
-                              <span>Bán {item.quantity?.toLocaleString()} cp @ {fmtMoney(item.price)}đ</span>
+                              <span>
+                                Bán {item.quantity?.toLocaleString()} cp @ {fmtMoney(item.netPrice || item.price)}đ
+                                {Math.round(item.price) !== Math.round(item.netPrice || item.price) && (
+                                  <span className="text-[10px] font-normal text-gray-400 ml-1">
+                                    (khớp {fmtMoney(item.price)}đ)
+                                  </span>
+                                )}
+                              </span>
                               {methodInfo && (
                                 <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${methodInfo.badgeBg}`} title={`Khớp theo chiến lược: ${methodInfo.label}`}>
                                   {methodInfo.shortLabel}
@@ -439,60 +480,7 @@ export default function StockDetailModal({
               </div>
             )}
           </div>
-        </div>
-
-        {/* 4. Modal Footer (Actions) */}
-        <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            {onNavigateBuy && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onNavigateBuy({ symbol: stockSummary.symbol, quantity: '100', price: stockSummary.livePrice ? String(stockSummary.livePrice / 1000) : '' });
-                }}
-                className="btn-primary !text-xs !px-3.5 !py-1.5 flex items-center gap-1 shadow-2xs"
-              >
-                <span>🛒</span> Mua thêm
-              </button>
-            )}
-
-            {onNavigateSell && stockSummary.isHolding && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onNavigateSell(stockSummary.symbol);
-                }}
-                className="btn-danger !text-xs !px-3.5 !py-1.5 flex items-center gap-1 shadow-2xs"
-              >
-                <span>💸</span> Bán bớt
-              </button>
-            )}
-
-            {onSwitchTab && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onSwitchTab('valuation', stockSummary.symbol);
-                }}
-                className="btn-secondary !text-xs !px-3.5 !py-1.5 !bg-indigo-50 dark:!bg-indigo-950/60 !text-indigo-700 dark:!text-indigo-300 !border-indigo-200 dark:!border-indigo-800 hover:!bg-indigo-100 flex items-center gap-1"
-              >
-                <span>🎯</span> Sang Tab Định Giá
-              </button>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn-secondary !text-xs !px-4 !py-1.5"
-          >
-            Đóng
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

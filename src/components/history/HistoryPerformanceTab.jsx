@@ -1,15 +1,22 @@
 import { useState, useMemo } from 'react';
 import { fmtMoney, plColor, plBg, getStockColor } from '../../utils/format.js';
 import { computeStockPerformance } from '../../utils/stockAnalytics.js';
+import TimeHorizonFilter from '../common/TimeHorizonFilter.jsx';
+import SubTabNav from '../common/SubTabNav.jsx';
 
 export default function HistoryPerformanceTab({
   data = {},
   marketPrices = {},
   onSelectSymbol,
   timePreset = 'all',
+  setTimePreset,
   handleSelectTimePreset,
   startDate = '',
+  setStartDate,
   endDate = '',
+  setEndDate,
+  mobileViewMode: propMobileViewMode,
+  setMobileViewMode: propSetMobileViewMode,
 }) {
   const { buyOrders = [], sellOrders = [], dividends = [] } = data;
 
@@ -18,7 +25,9 @@ export default function HistoryPerformanceTab({
   const [pnlFilter, setPnlFilter] = useState('all'); // 'all' | 'profit' | 'loss'
   const [sortField, setSortField] = useState('cumulativePL');
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' | 'desc'
-  const [mobileViewMode, setMobileViewMode] = useState('card'); // 'card' | 'table'
+  const [internalViewMode, setInternalViewMode] = useState('card');
+  const mobileViewMode = propMobileViewMode ?? internalViewMode;
+  const setMobileViewMode = propSetMobileViewMode ?? setInternalViewMode;
 
   // Tính toán toàn bộ chỉ số từ engine theo chu kỳ thời gian
   const performanceData = useMemo(() => {
@@ -116,6 +125,25 @@ export default function HistoryPerformanceTab({
       setSortField(field);
       setSortDirection('desc');
     }
+  }
+
+  const hasFilterActive = Boolean(
+    textSearch ||
+    statusFilter !== 'all' ||
+    pnlFilter !== 'all' ||
+    startDate ||
+    endDate ||
+    timePreset !== 'all'
+  );
+
+  function handleResetFilters() {
+    setTextSearch('');
+    setStatusFilter('all');
+    setPnlFilter('all');
+    if (setTimePreset) setTimePreset('all');
+    if (setStartDate) setStartDate('');
+    if (setEndDate) setEndDate('');
+    if (handleSelectTimePreset) handleSelectTimePreset('all', '', '');
   }
 
   function renderSortIcon(field) {
@@ -250,13 +278,18 @@ export default function HistoryPerformanceTab({
             <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">
               Win Rate: <b className="text-indigo-600 dark:text-indigo-400">{overallWinRate}%</b> ({holdingSymbolsCount} đang giữ)
             </p>
+            {(startDate || endDate || timePreset !== 'all') && (
+              <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5 truncate">
+                ⏱️ Trong kỳ: {timePreset === 'ytd' ? 'Năm nay (YTD)' : timePreset === '1y' ? '1 Năm gần nhất' : timePreset === 'mtd' ? 'Tháng này (MTD)' : `${startDate} → ${endDate}`}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
       {/* 2. THANH BỘ LỌC DỮ LIỆU HIỆU SUẤT */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-gray-100 dark:border-slate-800 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-gray-100 dark:border-slate-800">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-gray-100 dark:border-slate-800 shadow-sm space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-extrabold text-gray-800 dark:text-slate-100 text-sm sm:text-base flex items-center gap-2">
               <span>🎯</span> Sổ Hiệu Suất Theo Mã Cổ Phiếu
@@ -264,7 +297,7 @@ export default function HistoryPerformanceTab({
             <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-bold border border-indigo-100 dark:border-indigo-900/40">
               {stockList.length} mã
             </span>
-            {(startDate || endDate) && (
+            {(startDate || endDate || timePreset !== 'all') && (
               <span className="text-[11px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-2.5 py-0.5 rounded-full font-bold border border-amber-200 dark:border-amber-800/40 flex items-center gap-1">
                 <span>⏱️</span>
                 <span>
@@ -274,28 +307,41 @@ export default function HistoryPerformanceTab({
             )}
           </div>
 
-          {/* Ô Tìm Kiếm */}
-          <div className="relative">
-            <input
-              type="text"
-              value={textSearch}
-              onChange={e => setTextSearch(e.target.value)}
-              placeholder="🔍 Tìm mã cổ phiếu..."
-              className="w-full sm:w-56 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs uppercase font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 pr-7"
-            />
-            {textSearch && (
+          <div className="flex items-center gap-2">
+            {/* Ô Tìm Kiếm */}
+            <div className="relative flex-1 sm:w-56">
+              <input
+                type="text"
+                value={textSearch}
+                onChange={e => setTextSearch(e.target.value)}
+                placeholder="🔍 Tìm mã cổ phiếu..."
+                className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs uppercase font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 pr-7"
+              />
+              {textSearch && (
+                <button
+                  type="button"
+                  onClick={() => setTextSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 text-xs font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Nút đặt lại bộ lọc */}
+            {hasFilterActive && (
               <button
                 type="button"
-                onClick={() => setTextSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 text-xs font-bold"
+                onClick={handleResetFilters}
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 transition-colors cursor-pointer shrink-0 border border-indigo-200/60 dark:border-indigo-900/40"
               >
-                ✕
+                ✕ Đặt lại
               </button>
             )}
           </div>
         </div>
 
-        {/* Bộ lọc trạng thái & P&L */}
+        {/* Bộ lọc trạng thái & P&L & Thời gian & View Toggle */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs pt-1">
           <div className="flex items-center gap-2 flex-wrap">
             {/* Lọc Trạng Thái */}
@@ -359,33 +405,35 @@ export default function HistoryPerformanceTab({
                 Thua lỗ (-)
               </button>
             </div>
+
+            {/* Presets Chu Kỳ Thời Gian & Khoảng Ngày Dùng Chung */}
+            <TimeHorizonFilter
+              preset={timePreset}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={({ preset, startDate: s, endDate: e }) => {
+                if (setTimePreset) setTimePreset(preset);
+                if (setStartDate) setStartDate(s);
+                if (setEndDate) setEndDate(e);
+              }}
+              customLabel="Khoảng Ngày Hiệu Suất:"
+              showCustomToggle={true}
+              allowExpand={true}
+            />
           </div>
 
-          {/* Toggle Thẻ / Bảng */}
-          <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl">
-            <button
-              type="button"
-              onClick={() => setMobileViewMode('card')}
-              className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                mobileViewMode === 'card'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-xs'
-                  : 'text-gray-500 dark:text-gray-400'
-              }`}
-            >
-              📱 Thẻ
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileViewMode('table')}
-              className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                mobileViewMode === 'table'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-xs'
-                  : 'text-gray-500 dark:text-gray-400'
-              }`}
-            >
-              📊 Bảng
-            </button>
-          </div>
+          {/* Toggle Thẻ / Bảng qua SubTabNav chuẩn hóa */}
+          <SubTabNav
+            tabs={[
+              { id: 'card', label: 'Thẻ', icon: '📱' },
+              { id: 'table', label: 'Bảng', icon: '📊' },
+            ]}
+            activeTab={mobileViewMode}
+            onChange={setMobileViewMode}
+            size="sm"
+            layout="inline"
+            className="w-auto shrink-0"
+          />
         </div>
       </div>
 

@@ -423,7 +423,10 @@ export default function DashboardHoldingsTable({
                         <div className="flex items-center justify-center gap-1 sm:gap-1.5">
                           <button
                             type="button"
-                            onClick={() => onNavigateBuy && onNavigateBuy(p.symbol, '', marketPrice || p.avgCost)}
+                            onClick={() => {
+                              const buyPrice = (marketPrice || p.avgCost) ? String((marketPrice || p.avgCost) / 1000) : '';
+                              onNavigateBuy && onNavigateBuy(p.symbol, '', buyPrice);
+                            }}
                             className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold cursor-pointer transition-colors border border-emerald-200/60 dark:border-emerald-800/40 active:scale-95 shrink-0"
                             title={`Mua thêm ${p.symbol}`}
                           >
@@ -431,7 +434,14 @@ export default function DashboardHoldingsTable({
                           </button>
                           <button
                             type="button"
-                            onClick={() => onNavigateSell && onNavigateSell(p.symbol)}
+                            onClick={() => {
+                              const sellPrice = (marketPrice || p.avgCost) ? String((marketPrice || p.avgCost) / 1000) : '';
+                              onNavigateSell && onNavigateSell({
+                                symbol: p.symbol,
+                                quantity: String(p.totalQty),
+                                price: sellPrice,
+                              });
+                            }}
                             className="px-2 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold cursor-pointer transition-colors border border-rose-200/60 dark:border-rose-800/40 active:scale-95 shrink-0"
                             title={`Bán chốt ${p.symbol}`}
                           >

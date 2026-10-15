@@ -353,7 +353,10 @@ export default function SectorValuationHeatmap({
               <h4 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
                 Dẫn Truyền Vĩ Mô Vào 10 Nhóm Ngành (AI Sector Transmission)
               </h4>
-              <IntelligenceBadge provider={sectorTransmission.provider} />
+              <IntelligenceBadge
+                type={sectorTransmission?.transmissionHeadline ? 'ai' : 'heuristic'}
+                provider={sectorTransmission?.provider}
+              />
             </div>
           </div>
 

@@ -10,8 +10,11 @@ import MacroIntermarketGrid from './macro/MacroIntermarketGrid.jsx';
 import MacroRegimeRadarSection from './macro/MacroRegimeRadarSection.jsx';
 import MacroAllocationGoldSection from './macro/MacroAllocationGoldSection.jsx';
 import MacroTradingEconomicsTable from './macro/MacroTradingEconomicsTable.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import LoadingState from './common/LoadingState.jsx';
 
-export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
+export default function MacroDashboard({ refreshKey, onSwitchTab }) {
+  const { showToast } = useToast();
   const [macroData, setMacroData] = useState(null);
   const [indicatorsData, setIndicatorsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,10 +50,9 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
     try {
       const res = await triggerValuationSync();
       await loadAllMacroData();
-      if (showToast) showToast(res?.message || '✅ Đồng bộ dữ liệu vĩ mô thành công!', 'info');
+      showToast(res?.message || '✅ Đồng bộ dữ liệu vĩ mô thành công!', 'info');
     } catch (e) {
-      if (showToast) showToast('❌ ' + e.message, 'error');
-      else alert('Lỗi đồng bộ: ' + e.message);
+      showToast('❌ ' + e.message, 'error');
     } finally {
       setSyncing(false);
     }
@@ -58,10 +60,11 @@ export default function MacroDashboard({ refreshKey, onSwitchTab, showToast }) {
 
   if (loading && !macroData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-gray-500 font-medium text-sm">Đang nạp toàn cảnh kinh tế vĩ mô & chu kỳ...</p>
-      </div>
+      <LoadingState
+        message="Đang nạp toàn cảnh kinh tế vĩ mô & chu kỳ..."
+        subMessage="Đồng bộ chu kỳ 5 pha, đường cong lợi suất TPCP 17 kỳ hạn và 95 chỉ số TradingEconomics"
+        minHeight="min-h-[400px]"
+      />
     );
   }
 

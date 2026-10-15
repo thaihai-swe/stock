@@ -140,7 +140,10 @@ export default function ExtendedDupontCard({ extendedDupont, aiAuditComment }) {
             <span className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
               Chẩn Đoán Lợi Nhuận Thuần Túy vs Đòn Bẩy Ảo (AI DuPont Diagnostician)
             </span>
-            <IntelligenceBadge provider={aiAuditComment?.provider || extendedDupont?.provider} />
+            <IntelligenceBadge
+              type={aiAuditComment?.dupontEarningsQuality || extendedDupont?.dupontEarningsQuality ? 'ai' : 'heuristic'}
+              provider={aiAuditComment?.provider || extendedDupont?.provider}
+            />
           </div>
           <p className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
             {aiAuditComment?.dupontEarningsQuality || extendedDupont?.dupontEarningsQuality}

@@ -97,7 +97,10 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
                 <h5 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
                   Phân Tích Ngữ Nghĩa & Động Lực Tăng Trưởng (Semantic News NLP)
                 </h5>
-                <IntelligenceBadge provider={newsDigest.aiNewsAnalysis.provider} />
+                <IntelligenceBadge
+                  type={newsDigest?.aiNewsAnalysis ? 'ai' : 'heuristic'}
+                  provider={newsDigest?.aiNewsAnalysis?.provider}
+                />
               </div>
               <div className="flex items-center gap-2">
                 <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${

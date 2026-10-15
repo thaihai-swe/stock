@@ -7,6 +7,7 @@ import HistoryLotInspectorModal from './history/HistoryLotInspectorModal.jsx';
 import HistoryOrdersTable from './history/HistoryOrdersTable.jsx';
 import HistoryPerformanceTab from './history/HistoryPerformanceTab.jsx';
 import { calculateDateRange } from './common/TimeHorizonFilter.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
 export default function TransactionHistory({
   data,
@@ -14,8 +15,8 @@ export default function TransactionHistory({
   onNavigateBuy,
   onNavigateSell,
   onSwitchTab,
-  showToast,
 }) {
+  const { showToast } = useToast();
   const { buyOrders = [], sellOrders = [] } = data;
 
   // Sub-Tab: 'orders' (Nhật Ký Từng Lệnh) | 'performance' (Hiệu Suất Theo Mã)
@@ -55,8 +56,8 @@ export default function TransactionHistory({
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Hàm chọn preset thời gian nhanh (Chuẩn hóa múi giờ địa phương GMT+7)
-  function handleSelectTimePreset(preset) {
-    const res = calculateDateRange(preset, startDate, endDate);
+  function handleSelectTimePreset(preset, customStart, customEnd) {
+    const res = calculateDateRange(preset, customStart ?? startDate, customEnd ?? endDate);
     setTimePreset(res.preset);
     setStartDate(res.startDate);
     setEndDate(res.endDate);
@@ -208,11 +209,10 @@ export default function TransactionHistory({
     try {
       if (tx.type === 'BUY') await deleteBuy(tx.id);
       else await deleteSell(tx.id);
-      if (showToast) showToast(`✅ Đã xóa lệnh ${tx.type === 'BUY' ? 'mua' : 'bán'} ${tx.symbol}`, 'success');
+      showToast(`✅ Đã xóa lệnh ${tx.type === 'BUY' ? 'mua' : 'bán'} ${tx.symbol}`, 'success');
       onSuccess();
     } catch (err) {
-      if (showToast) showToast('❌ ' + err.message, 'error');
-      else alert('❌ ' + err.message);
+      showToast('❌ ' + err.message, 'error');
     } finally {
       setDeletingId(null);
     }
@@ -282,9 +282,14 @@ export default function TransactionHistory({
           marketPrices={marketPrices}
           onSelectSymbol={setSelectedSymbolModal}
           timePreset={timePreset}
+          setTimePreset={setTimePreset}
           handleSelectTimePreset={handleSelectTimePreset}
           startDate={startDate}
+          setStartDate={setStartDate}
           endDate={endDate}
+          setEndDate={setEndDate}
+          mobileViewMode={mobileViewMode}
+          setMobileViewMode={setMobileViewMode}
         />
       ) : (
         <HistoryOrdersTable

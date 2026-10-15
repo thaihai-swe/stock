@@ -40,7 +40,7 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
             <IntelligenceBadge
               source={aiDividendAudit}
               provider={aiDividendAudit?.provider}
-              type={aiDividendAudit ? undefined : 'heuristic'}
+              type={(aiDividendAudit?.safetyComment || aiDividendAudit?.strengths) ? 'ai' : 'heuristic'}
               tooltip="Mô hình kiểm toán độ bền vững cổ tức bằng dòng tiền FCF và kỷ luật phân bổ vốn"
             />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">

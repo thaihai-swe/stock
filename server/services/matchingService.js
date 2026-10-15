@@ -46,8 +46,9 @@ export function matchSellOrder(symbol, quantity, sellPrice, buyOrders, sellFeePc
   }
 
   const grossRevenue = quantity * sellPrice;
-  const sellFee = grossRevenue * (sellFeePct / 100);
+  const sellFee = Math.round(grossRevenue * (sellFeePct / 100));
   const totalRevenue = grossRevenue - sellFee; // Tiền thực nhận
+  const netPrice = quantity > 0 ? (totalRevenue / quantity) : sellPrice;
   const profitLoss = totalRevenue - totalCost;
   const profitLossPct = totalCost > 0 ? parseFloat(((profitLoss / totalCost) * 100).toFixed(2)) : 0;
 
@@ -55,9 +56,11 @@ export function matchSellOrder(symbol, quantity, sellPrice, buyOrders, sellFeePc
     matchedLots,
     totalCost: Math.round(totalCost),
     grossRevenue: Math.round(grossRevenue),
-    fee: Math.round(sellFee),
+    netPrice: Math.round(netPrice * 100) / 100,
+    fee: sellFee,
     feePct: sellFeePct,
     totalRevenue: Math.round(totalRevenue),
+    netRevenue: Math.round(totalRevenue),
     profitLoss: Math.round(profitLoss),
     profitLossPct,
     matchMethod,

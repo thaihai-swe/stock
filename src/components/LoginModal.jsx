@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
+import Modal from './common/Modal.jsx';
 
 export default function LoginModal({
   isOpen,
@@ -53,19 +54,8 @@ export default function LoginModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div 
-        className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 overflow-hidden relative text-slate-900 dark:text-slate-100"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Nút đóng */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label="Đóng"
-        >
-          ✕
-        </button>
+    <Modal isOpen={isOpen} onClose={onClose} size="md">
+      <div className="p-6 text-slate-900 dark:text-slate-100">
 
         <div className="text-center mb-6">
           <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-2xs">
@@ -174,6 +164,6 @@ export default function LoginModal({
           </p>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

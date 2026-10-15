@@ -18,16 +18,43 @@ export function getIntelligenceSource(item) {
   }
 
   const provider = (item.provider || '').toLowerCase();
-  const isAi = provider === 'openai' || provider === 'gemini' || provider === 'anthropic' || provider === 'deepseek';
+  const isKnownAiProvider = (
+    provider === 'openai' ||
+    provider === 'gemini' ||
+    provider === 'anthropic' ||
+    provider === 'deepseek' ||
+    provider === 'openrouter' ||
+    provider.includes('ai') ||
+    provider.includes('gpt') ||
+    provider.includes('claude') ||
+    provider.includes('super-vip')
+  );
+
+  // Nhận diện nếu đối tượng mang payload phân tích AI đặc thù
+  const hasAiPayload = Boolean(
+    item.headline ||
+    item.executiveSummary ||
+    item.transmissionHeadline ||
+    item.aiScenarios ||
+    item.thesisHeadline ||
+    item.aiAuditComment ||
+    item.convergenceHeadline ||
+    item.pulseHeadline ||
+    item.auditVerdict
+  );
+
+  const isExplicitHeuristic = provider === 'heuristic' || provider === 'offline-heuristic-engine';
+  const isAi = (isKnownAiProvider || hasAiPayload) && !isExplicitHeuristic;
 
   if (isAi) {
     const updatedStr = item.updatedAt ? ` • Cập nhật: ${new Date(item.updatedAt).toLocaleDateString('vi-VN')}` : '';
+    const provStr = provider && provider !== 'heuristic' ? ` • ${provider.toUpperCase()}` : '';
     return {
       type: 'ai',
       label: 'AI',
-      provider,
+      provider: provider || 'ai',
       updatedAt: item.updatedAt,
-      tooltip: `Trí tuệ nhân tạo (AI Copilot${updatedStr})`
+      tooltip: `Trí tuệ nhân tạo (AI Copilot${provStr}${updatedStr})`
     };
   }
 
@@ -75,11 +102,19 @@ export default function IntelligenceBadge({
     if (!finalTooltip) finalTooltip = intel.tooltip;
   } else if (provider) {
     const p = provider.toLowerCase();
-    if (p === 'openai' || p === 'gemini' || p === 'anthropic' || p === 'deepseek') {
-      resolvedType = 'ai';
-    } else {
-      resolvedType = 'heuristic';
-    }
+    const isExplicitHeuristic = p === 'heuristic' || p === 'offline-heuristic-engine';
+    const isKnownAi = (
+      p === 'openai' ||
+      p === 'gemini' ||
+      p === 'anthropic' ||
+      p === 'deepseek' ||
+      p === 'openrouter' ||
+      p.includes('ai') ||
+      p.includes('gpt') ||
+      p.includes('claude') ||
+      p.includes('super-vip')
+    );
+    resolvedType = (isKnownAi && !isExplicitHeuristic) ? 'ai' : 'heuristic';
   }
 
   const isAi = resolvedType === 'ai';
