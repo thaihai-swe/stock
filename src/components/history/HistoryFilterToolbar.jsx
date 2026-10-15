@@ -1,5 +1,6 @@
 import TimeHorizonFilter from '../common/TimeHorizonFilter.jsx';
 import SubTabNav from '../common/SubTabNav.jsx';
+import { TIMEFRAME_IDS } from '../../utils/constants.js';
 
 export default function HistoryFilterToolbar({
   subTab = 'orders',
@@ -18,7 +19,7 @@ export default function HistoryFilterToolbar({
   tagFilter = '',
   setTagFilter,
   uniqueTags = [],
-  timePreset = 'all',
+  timePreset = TIMEFRAME_IDS.ALL,
   setTimePreset,
   handleSelectTimePreset,
   startDate = '',

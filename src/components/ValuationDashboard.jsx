@@ -36,6 +36,7 @@ import StockRiskMetricsCard from './valuation/StockRiskMetricsCard.jsx';
 import NewsSentimentCard from './valuation/NewsSentimentCard.jsx';
 import FullResearchReportModal from './valuation/FullResearchReportModal.jsx';
 import InteractiveValuationSandboxCard from './valuation/InteractiveValuationSandboxCard.jsx';
+import ClassicInvestmentPhilosophiesCard from './valuation/ClassicInvestmentPhilosophiesCard.jsx';
 
 // Định nghĩa 4 Không Gian Phân Tích Chuyên Sâu
 const WORKSPACES = [
@@ -43,8 +44,8 @@ const WORKSPACES = [
     id: 'valuation-models',
     label: '1. Định Giá & Quyết Định',
     icon: '🎯',
-    badge: '7 Công Cụ',
-    desc: '7 Vùng Giá, Sandbox Giả Định, 7 Bẫy, Bands 5Y, DCF, Giải Phẫu Toán & FinVal Lab'
+    badge: '8 Công Cụ',
+    desc: '7 Vùng Giá, Sandbox Giả Định, 6 Triết Lý Đầu Tư, 7 Bẫy, Bands 5Y, DCF, Giải Phẫu Toán & FinVal Lab'
   },
   {
     id: 'financial-statements',
@@ -347,8 +348,17 @@ export default function ValuationDashboard({ data, refreshKey, onSwitchTab, init
           {/* Phòng Thí Nghiệm Giả Định Định Giá (Interactive Valuation Sandbox) */}
           <InteractiveValuationSandboxCard
             valuation={currentStock?.valuation || financials?.valuationMultiples}
+            currentStock={currentStock}
             financials={financials}
             currentPrice={currentStock?.close}
+            symbol={selectedSymbol}
+          />
+
+          {/* Thẩm Định Cổ Phiếu Theo 6 Triết Lý Đầu Tư Kinh Điển */}
+          <ClassicInvestmentPhilosophiesCard
+            currentStock={currentStock}
+            financials={financials}
+            valuation={currentStock?.valuation || financials?.valuationMultiples}
             symbol={selectedSymbol}
           />
 

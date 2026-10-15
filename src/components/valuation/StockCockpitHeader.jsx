@@ -1,5 +1,6 @@
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 import StockSymbolInput from '../common/StockSymbolInput.jsx';
+import { TIMEFRAME_PRESETS } from '../../utils/constants.js';
 
 // Format tiền VND
 function formatVND(val) {
@@ -489,32 +490,28 @@ export default function StockCockpitHeader({
           </div>
         )}
 
-        {/* 7 Chu Kỳ Hiệu Suất Giá */}
+        {/* 7 Chu Kỳ Hiệu Suất Giá Thống Nhất */}
         <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700/60">
-          {[
-            { label: '1 Tuần', val: currentStock.performance?.w1 },
-            { label: '1 Tháng', val: currentStock.performance?.m1 },
-            { label: '3 Tháng', val: currentStock.performance?.m3 },
-            { label: '6 Tháng', val: currentStock.performance?.m6 },
-            { label: 'Đầu năm', val: currentStock.performance?.ytd },
-            { label: '1 Năm', val: currentStock.performance?.y1 },
-            { label: '5 Năm', val: currentStock.performance?.y5 },
-          ].map((cycle, i) => (
-            <div
-              key={i}
-              className="p-2 rounded-xl bg-gray-50/80 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700 text-center"
-            >
-              <span className="text-[10px] text-gray-400 font-bold block">{cycle.label}</span>
-              <span
-                className={`text-xs font-black block mt-0.5 ${(cycle.val || 0) >= 0
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-rose-600 dark:text-rose-400'
-                  }`}
+          {TIMEFRAME_PRESETS.STOCK_PERFORMANCE.map((tf) => {
+            const val = currentStock.performance?.[tf.perfKey];
+            return (
+              <div
+                key={tf.id}
+                className="p-2 rounded-xl bg-gray-50/80 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-700 text-center"
+                title={`${tf.label}: ${tf.desc || ''}`}
               >
-                {cycle.val != null ? `${cycle.val >= 0 ? '+' : ''}${cycle.val}%` : '—'}
-              </span>
-            </div>
-          ))}
+                <span className="text-[10px] text-gray-400 font-bold block">{tf.label}</span>
+                <span
+                  className={`text-xs font-black block mt-0.5 ${(val || 0) >= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                >
+                  {val != null ? `${val >= 0 ? '+' : ''}${val}%` : '—'}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

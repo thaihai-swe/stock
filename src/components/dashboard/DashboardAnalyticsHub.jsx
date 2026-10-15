@@ -4,6 +4,7 @@ import PortfolioChart from '../charts/PortfolioChart.jsx';
 import StockContributionChart from '../charts/StockContributionChart.jsx';
 import WaterfallReturnChart from '../charts/WaterfallReturnChart.jsx';
 import BenchmarkComparisonChart from '../charts/BenchmarkComparisonChart.jsx';
+import { TIMEFRAME_IDS } from '../../utils/timeframe.js';
 
 export default function DashboardAnalyticsHub({
   portfolio = [],
@@ -12,7 +13,7 @@ export default function DashboardAnalyticsHub({
   dividends = [],
   marketPrices = {},
   fundamentalsMap = {},
-  timeWindow = 'all',
+  timeWindow = TIMEFRAME_IDS.ALL,
   periodLabel = 'Toàn Thời Gian',
   onSelectSymbolModal,
 }) {
@@ -32,7 +33,7 @@ export default function DashboardAnalyticsHub({
       label: 'Lãi/Lỗ & Quỹ Đạo Vốn',
       shortLabel: 'Quỹ Đạo Vốn',
       icon: '📊',
-      desc: `Lợi nhuận thực nhận từng tháng và đường tích lũy ${timeWindow !== 'all' ? `(${periodLabel})` : ''}`,
+      desc: `Lợi nhuận thực nhận từng tháng và đường tích lũy ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
     },
     {
       id: 'allocation',
@@ -46,14 +47,14 @@ export default function DashboardAnalyticsHub({
       label: 'Thác Nước Dòng Tiền',
       shortLabel: 'Thác Nước',
       icon: '🌊',
-      desc: `Dòng chảy vốn: Vốn gốc → Lãi chốt → Cổ tức → Tạm tính ${timeWindow !== 'all' ? `(${periodLabel})` : ''}`,
+      desc: `Dòng chảy vốn: Vốn gốc → Lãi chốt → Cổ tức → Tạm tính ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
     },
     {
       id: 'contribution',
       label: 'Đóng Góp Hiệu Suất Mã',
       shortLabel: 'Đóng Góp Mã',
       icon: '🎯',
-      desc: `Xếp hạng Top cổ phiếu đóng góp lãi/lỗ nhiều nhất ${timeWindow !== 'all' ? `(${periodLabel})` : ''}`,
+      desc: `Xếp hạng Top cổ phiếu đóng góp lãi/lỗ nhiều nhất ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
     },
   ];
 
@@ -68,7 +69,7 @@ export default function DashboardAnalyticsHub({
             <h3 className="font-extrabold text-gray-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2">
               <span>📈</span> Trung Tâm Phân Tích Kỹ Thuật & Hiệu Suất
             </h3>
-            {timeWindow !== 'all' && (
+            {timeWindow !== TIMEFRAME_IDS.ALL && (
               <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-bold border border-indigo-100 dark:border-indigo-900/40">
                 {periodLabel}
               </span>

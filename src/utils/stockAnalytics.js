@@ -3,6 +3,7 @@ import {
   VNINDEX_VOLATILITY,
   SHARPE_BRACKETS,
   DOWNSIDE_DEVIATION_PARAMS,
+  calculateDateRange,
 } from './constants.js';
 
 /**
@@ -404,31 +405,15 @@ export function computeBenchmarkComparison({
   const now = new Date();
   const nowIso = now.toISOString().slice(0, 10);
 
-  // 1. Xác định ngày bắt đầu T0 theo chu kỳ được chọn
-  let startDate = '';
-  if (timeframe === '1M') {
-    const d = new Date(now);
-    d.setDate(d.getDate() - 30);
-    startDate = d.toISOString().slice(0, 10);
-  } else if (timeframe === '3M') {
-    const d = new Date(now);
-    d.setDate(d.getDate() - 90);
-    startDate = d.toISOString().slice(0, 10);
-  } else if (timeframe === '6M') {
-    const d = new Date(now);
-    d.setDate(d.getDate() - 180);
-    startDate = d.toISOString().slice(0, 10);
-  } else if (timeframe === 'YTD') {
-    startDate = `${now.getFullYear()}-01-01`;
-  } else if (timeframe === '1Y') {
-    const d = new Date(now);
-    d.setDate(d.getDate() - 365);
-    startDate = d.toISOString().slice(0, 10);
-  } else {
-    // 'ALL' - Lấy từ ngày giao dịch mua đầu tiên
-    const buyDates = buyOrders.map(b => b.date ? String(b.date).slice(0, 10) : '').filter(Boolean).sort();
-    startDate = buyDates.length > 0 ? buyDates[0] : `${now.getFullYear() - 1}-01-01`;
-  }
+  // 1. Xác định ngày bắt đầu T0 theo chu kỳ được chọn qua bộ động cơ Timeframe thống nhất
+  const buyDates = buyOrders.map(b => b.date ? String(b.date).slice(0, 10) : '').filter(Boolean).sort();
+  const firstTradeDate = buyDates.length > 0 ? buyDates[0] : `${now.getFullYear() - 1}-01-01`;
+
+  const dateRange = calculateDateRange(timeframe, null, null, {
+    firstTradeDate,
+    now,
+  });
+  const startDate = dateRange.startDate;
 
   // 2. Bóc tách dữ liệu nến ngày VN-Index
   const rawCandles = vnindexData?.data || vnindexData || {};

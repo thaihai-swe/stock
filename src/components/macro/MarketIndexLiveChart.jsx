@@ -8,13 +8,9 @@ import {
   Tooltip,
 } from 'recharts';
 import { fetchDnseOhlc } from '../../utils/api.js';
+import { TIMEFRAME_PRESETS, TIMEFRAME_IDS } from '../../utils/constants.js';
 
-const TIMEFRAMES = [
-  { id: '1D', label: '1 ngày', resolution: '1', days: 5 },
-  { id: '1M', label: '1 tháng', resolution: '1D', days: 30 },
-  { id: '6M', label: '6 tháng', resolution: '1D', days: 180 },
-  { id: '1Y', label: '1 năm', resolution: '1D', days: 365 },
-];
+const MARKET_TIMEFRAMES = TIMEFRAME_PRESETS.MARKET_CHART;
 
 const INDEX_OPTIONS = [
   { id: 'VNINDEX', name: 'VN-Index', label: 'Toàn sàn HOSE', icon: '🏛️', isIndex: true },
@@ -26,7 +22,7 @@ const INDEX_OPTIONS = [
 
 export default function MarketIndexLiveChart() {
   const [selectedSymbol, setSelectedSymbol] = useState('VNINDEX');
-  const [activeTimeframe, setActiveTimeframe] = useState('1D');
+  const [activeTimeframe, setActiveTimeframe] = useState(TIMEFRAME_IDS.ONE_DAY);
   const [chartData, setChartData] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,13 +36,13 @@ export default function MarketIndexLiveChart() {
   const loadMarketChart = useCallback(async (symId, tfId) => {
     setLoading(true);
     try {
-      const tf = TIMEFRAMES.find((t) => t.id === tfId) || TIMEFRAMES[0];
+      const tf = MARKET_TIMEFRAMES.find((t) => t.id === tfId) || MARKET_TIMEFRAMES[0];
       const now = Math.floor(Date.now() / 1000);
-      const from = now - tf.days * 86400;
+      const from = now - (tf.days || 30) * 86400;
 
       const res = await fetchDnseOhlc({
         symbol: symId,
-        resolution: tf.resolution,
+        resolution: tf.dnseResolution || tf.resolution || '1D',
         from: String(from),
         to: String(now),
       });
@@ -215,7 +211,7 @@ export default function MarketIndexLiveChart() {
           <div className="flex items-center gap-3">
             {/* Timeframe Tabs */}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700/80 p-1 rounded-xl">
-              {TIMEFRAMES.map((tf) => (
+              {MARKET_TIMEFRAMES.map((tf) => (
                 <button
                   key={tf.id}
                   onClick={() => setActiveTimeframe(tf.id)}

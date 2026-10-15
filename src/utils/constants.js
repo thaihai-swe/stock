@@ -173,3 +173,7 @@ export const DIVIDEND_CASH_TAX_PCT = TAX_CONFIG.dividendCashTaxPct ?? 5.0;
 export const DEFAULT_TRADE_FEE_PCT = TAX_CONFIG.defaultTradeFeePct ?? 0.1;
 export const PRESET_FEE_PCTS = Array.isArray(TAX_CONFIG.presetFeePcts) ? TAX_CONFIG.presetFeePcts : ['0', '0.1', '0.15'];
 export const TAX_LEGAL_NOTE = TAX_CONFIG.legalNote || 'Theo quy định thuế TNCN tại Việt Nam, thuế chuyển nhượng chứng khoán được CTCK tự động khấu trừ 0.1% trên giá trị chuyển nhượng từng lần, thuế cổ tức tiền mặt là 5.0%.';
+
+// 6. Phân hệ Khung Thời Gian (Timeframes, Horizons & Periods)
+export * from './timeframe.js';
+

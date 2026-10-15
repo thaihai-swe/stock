@@ -12,6 +12,7 @@ import OpportunityCostCard from './OpportunityCostCard.jsx';
 import TimeHorizonFilter, { calculateDateRange } from './common/TimeHorizonFilter.jsx';
 import Modal from './common/Modal.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { TIMEFRAME_IDS } from '../utils/constants.js';
 
 const StockDetailModal = lazy(() => import('./StockDetailModal.jsx'));
 
@@ -71,12 +72,12 @@ export default function Dashboard({
   const realizedPL = sellOrders.reduce((s, o) => s + o.profitLoss, 0);
   const totalCashDividends = (dividends || []).filter(d => d.type === 'CASH').reduce((sum, d) => sum + (d.netAmount || 0), 0);
 
-  // State Chu kỳ thời gian (Time Horizon Filter): 'all' | 'ytd' | '1y' | 'mtd' | 'custom'
-  const [timePreset, setTimePreset] = useState('all');
+  // State Chu kỳ thời gian (Time Horizon Filter): 'ALL' | 'YTD' | '1Y' | 'MTD' | 'CUSTOM'
+  const [timePreset, setTimePreset] = useState(TIMEFRAME_IDS.ALL);
   const [periodStartDate, setPeriodStartDate] = useState('');
   const [periodEndDate, setPeriodEndDate] = useState('');
   const [periodLabel, setPeriodLabel] = useState('Toàn thời gian');
-  const timeWindow = timePreset; // Alias tương thích ngược cho các component con kế thừa
+  const timeWindow = timePreset;
 
   const handleTimeRangeChange = useCallback(({ preset, startDate, endDate, label }) => {
     setTimePreset(preset);
@@ -87,7 +88,7 @@ export default function Dashboard({
 
   // Lọc các giao dịch bán và cổ tức theo chu kỳ thời gian
   const sellOrdersInPeriod = useMemo(() => {
-    if (timePreset === 'all' && !periodStartDate && !periodEndDate) return sellOrders;
+    if (timePreset === TIMEFRAME_IDS.ALL && !periodStartDate && !periodEndDate) return sellOrders;
     return sellOrders.filter(s => {
       const d = s.date ? String(s.date).slice(0, 10) : '';
       return (!periodStartDate || d >= periodStartDate) && (!periodEndDate || d <= periodEndDate);
@@ -95,7 +96,7 @@ export default function Dashboard({
   }, [sellOrders, timePreset, periodStartDate, periodEndDate]);
 
   const dividendsInPeriod = useMemo(() => {
-    if (timePreset === 'all' && !periodStartDate && !periodEndDate) return dividends;
+    if (timePreset === TIMEFRAME_IDS.ALL && !periodStartDate && !periodEndDate) return dividends;
     return (dividends || []).filter(d => {
       const dateVal = d.date ? String(d.date).slice(0, 10) : '';
       return (!periodStartDate || dateVal >= periodStartDate) && (!periodEndDate || dateVal <= periodEndDate);
@@ -466,7 +467,7 @@ export default function Dashboard({
           <span className="badge-indigo text-xs">
             {periodLabel}
           </span>
-          {timePreset !== 'all' && (
+          {timePreset !== TIMEFRAME_IDS.ALL && (
             <span className="text-[11px] text-slate-400 dark:text-slate-500 hidden sm:inline">
               (Lọc theo ngày chốt lệnh bán & nhận cổ tức)
             </span>
@@ -636,7 +637,7 @@ export default function Dashboard({
         <OpportunityCostCard
           buyOrders={buyOrders}
           totalCumulativePL={
-            timePreset === 'all'
+            timePreset === TIMEFRAME_IDS.ALL
               ? totalCumulativePL
               : (periodRealizedPL + periodCashDividends + totalUnrealizedPL)
           }

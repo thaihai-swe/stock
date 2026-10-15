@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { fmtMoney, plColor, plBg, getStockColor } from '../../utils/format.js';
 import { computeStockPerformance } from '../../utils/stockAnalytics.js';
+import { getTimeframeLabel, TIMEFRAME_IDS } from '../../utils/constants.js';
 import TimeHorizonFilter from '../common/TimeHorizonFilter.jsx';
 import SubTabNav from '../common/SubTabNav.jsx';
 
@@ -8,7 +9,7 @@ export default function HistoryPerformanceTab({
   data = {},
   marketPrices = {},
   onSelectSymbol,
-  timePreset = 'all',
+  timePreset = TIMEFRAME_IDS.ALL,
   setTimePreset,
   handleSelectTimePreset,
   startDate = '',
@@ -133,17 +134,17 @@ export default function HistoryPerformanceTab({
     pnlFilter !== 'all' ||
     startDate ||
     endDate ||
-    timePreset !== 'all'
+    timePreset !== TIMEFRAME_IDS.ALL
   );
 
   function handleResetFilters() {
     setTextSearch('');
     setStatusFilter('all');
     setPnlFilter('all');
-    if (setTimePreset) setTimePreset('all');
+    if (setTimePreset) setTimePreset(TIMEFRAME_IDS.ALL);
     if (setStartDate) setStartDate('');
     if (setEndDate) setEndDate('');
-    if (handleSelectTimePreset) handleSelectTimePreset('all', '', '');
+    if (handleSelectTimePreset) handleSelectTimePreset(TIMEFRAME_IDS.ALL, '', '');
   }
 
   function renderSortIcon(field) {
@@ -278,9 +279,9 @@ export default function HistoryPerformanceTab({
             <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">
               Win Rate: <b className="text-indigo-600 dark:text-indigo-400">{overallWinRate}%</b> ({holdingSymbolsCount} đang giữ)
             </p>
-            {(startDate || endDate || timePreset !== 'all') && (
+            {(startDate || endDate || timePreset !== TIMEFRAME_IDS.ALL) && (
               <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5 truncate">
-                ⏱️ Trong kỳ: {timePreset === 'ytd' ? 'Năm nay (YTD)' : timePreset === '1y' ? '1 Năm gần nhất' : timePreset === 'mtd' ? 'Tháng này (MTD)' : `${startDate} → ${endDate}`}
+                ⏱️ Trong kỳ: {getTimeframeLabel(timePreset, startDate, endDate)}
               </p>
             )}
           </div>
@@ -297,11 +298,11 @@ export default function HistoryPerformanceTab({
             <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-bold border border-indigo-100 dark:border-indigo-900/40">
               {stockList.length} mã
             </span>
-            {(startDate || endDate || timePreset !== 'all') && (
+            {(startDate || endDate || timePreset !== TIMEFRAME_IDS.ALL) && (
               <span className="text-[11px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-2.5 py-0.5 rounded-full font-bold border border-amber-200 dark:border-amber-800/40 flex items-center gap-1">
                 <span>⏱️</span>
                 <span>
-                  {timePreset === 'ytd' ? 'Năm nay (YTD)' : timePreset === '1y' ? '1 Năm gần nhất' : timePreset === 'mtd' ? 'Tháng này (MTD)' : `${startDate} → ${endDate}`}
+                  {getTimeframeLabel(timePreset, startDate, endDate)}
                 </span>
               </span>
             )}

@@ -4,15 +4,16 @@ import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function InteractiveValuationSandboxCard({
   valuation,
+  currentStock,
   financials,
   currentPrice,
   symbol,
 }) {
-  const valData = valuation || financials?.valuationMultiples || {};
-  const closePrice = currentPrice || valData.close || 0;
-  const bvps = valData.bvps || 0;
-  const eps = valData.eps || financials?.quarterly?.[financials.quarterly.length - 1]?.eps || 0;
-  const roe = financials?.financialRatios?.profitability?.roe ?? valData.dupont?.roe ?? 15.0;
+  const valData = valuation || currentStock?.valuation || financials?.valuationMultiples || {};
+  const closePrice = currentPrice || currentStock?.close || valData.close || 0;
+  const bvps = valData.bvps || currentStock?.valuation?.bvps || currentStock?.bvps || 0;
+  const eps = valData.eps || currentStock?.profitability?.eps || currentStock?.eps || financials?.quarterly?.[financials.quarterly.length - 1]?.eps || 0;
+  const roe = currentStock?.profitability?.roe ?? financials?.financialRatios?.profitability?.roe ?? valData.dupont?.roe ?? 15.0;
 
   // Lấy các tham số chuẩn ban đầu từ hệ thống
   const rawWacc = valData.dcfScenarios?.wacc ?? financials?.dcfScenarios?.wacc ?? financials?.dcfAnalysis?.sectorWacc ?? 11.5;
@@ -22,12 +23,12 @@ export default function InteractiveValuationSandboxCard({
   const initTerminalG = Number(rawG > 1 ? rawG : rawG * 100) || 3.5;
 
   const initProjGrowth = 10.0; // Dự phóng tăng trưởng trung hạn mặc định
-  const initTargetPe = Number(valData.pe || financials?.financialRatios?.valuation?.pe || 12.0);
-  const initTargetPb = Number(valData.pb || financials?.financialRatios?.valuation?.pb || 1.35);
+  const initTargetPe = Number(valData.pe || currentStock?.valuation?.pe || currentStock?.pe || financials?.financialRatios?.valuation?.pe || 12.0);
+  const initTargetPb = Number(valData.pb || currentStock?.valuation?.pb || currentStock?.pb || financials?.financialRatios?.valuation?.pb || 1.35);
   const initMos = Number(valData.marginOfSafety ? (valData.marginOfSafety > 1 ? valData.marginOfSafety : valData.marginOfSafety * 100) : 20.0);
 
-  const baseFairValue = Number(valData.fairValue || 0);
-  const baseSafeBuyPrice = Number(valData.safeBuyPrice || (baseFairValue * (1 - initMos / 100)));
+  const baseFairValue = Number(valData.fairValue || valData.consensusFairValue || 0);
+  const baseSafeBuyPrice = Number(valData.safeBuyPrice || valData.sevenPriceZones?.safeBuyPrice || valData.sevenPriceZones?.acceptableBuyPrice || (baseFairValue * (1 - initMos / 100)));
 
   // ── IN-MEMORY REACTIVE STATE (Không lưu LocalStorage, hoàn toàn linh hoạt trong phiên) ──
   const [wacc, setWacc] = useState(initWacc);

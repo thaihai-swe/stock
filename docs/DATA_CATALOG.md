@@ -1097,6 +1097,11 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
    - `httpTimeoutSeconds`: 30.
    - `httpMaxRetries`: 2.
    - `rateLimitsPerMinute`: VCI: 45, TCBS: 45, TRADINGVIEW: 60, DEFAULT: 45.
+6. **`timeframeConfig` (Quản Trị Khung Thời Gian & Bộ Lọc Thống Nhất)**:
+   - `defaultTimeframe`: `"ALL"`.
+   - `definitions`: 13 mốc định nghĩa chuẩn (`1D`, `1W`, `1M`, `3M`, `6M`, `MTD`, `YTD`, `1Y`, `3Y`, `5Y`, `10Y`, `ALL`, `CUSTOM`) kèm số ngày, độ phân giải nến DNSE (`dnseResolution`: `'1'`, `'1D'`, `'1W'`, `'1M'`) và khóa hiệu suất TradingView (`perfKey`: `'w1'`, `'m1'`, `'m3'`, `'m6'`, `'ytd'`, `'y1'`, `'y5'`).
+   - `presets`: Nhóm chu kỳ tùy biến cho từng phân hệ UI (`benchmark`, `portfolio`, `portfolioExtended`, `marketChart`, `valuationHistory`, `stockPerformance`).
+   - Bộ điều phối: `src/utils/timeframe.js` & `src/utils/constants.js`.
 
 ---
 

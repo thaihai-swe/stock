@@ -14,15 +14,9 @@ import { fetchDnseOhlc } from '../../utils/api.js';
 import { computeBenchmarkComparison } from '../../utils/stockAnalytics.js';
 import { useChartTheme } from '../../utils/useChartTheme.js';
 import { fmtMoney } from '../../utils/format.js';
+import { TIMEFRAME_PRESETS, TIMEFRAME_IDS } from '../../utils/constants.js';
 
-const TIMEFRAME_PRESETS = [
-  { id: '1M', label: '1 Tháng', days: 30 },
-  { id: '3M', label: '3 Tháng', days: 90 },
-  { id: '6M', label: '6 Tháng', days: 180 },
-  { id: 'YTD', label: 'Từ đầu năm', days: null },
-  { id: '1Y', label: '1 Năm', days: 365 },
-  { id: 'ALL', label: 'Toàn bộ', days: null },
-];
+const BENCHMARK_TIMEFRAMES = TIMEFRAME_PRESETS.BENCHMARK;
 
 export default function BenchmarkComparisonChart({
   buyOrders = [],
@@ -32,7 +26,7 @@ export default function BenchmarkComparisonChart({
   marketPrices = {},
   fundamentalsMap = {},
 }) {
-  const [timeframe, setTimeframe] = useState('1Y');
+  const [timeframe, setTimeframe] = useState(TIMEFRAME_IDS['1Y']);
   const [vnindexCandles, setVnindexCandles] = useState(null);
   const [loading, setLoading] = useState(false);
   const chartTheme = useChartTheme();
@@ -163,7 +157,7 @@ export default function BenchmarkComparisonChart({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="inline-flex items-center gap-1 bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-gray-200/70 dark:border-slate-700/60 text-xs">
-            {TIMEFRAME_PRESETS.map((p) => (
+            {BENCHMARK_TIMEFRAMES.map((p) => (
               <button
                 key={p.id}
                 type="button"

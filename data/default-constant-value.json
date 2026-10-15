@@ -957,6 +957,32 @@
     "presetFeePcts": ["0", "0.1", "0.15"],
     "legalNote": "Theo quy định thuế TNCN tại Việt Nam, thuế chuyển nhượng chứng khoán được CTCK tự động khấu trừ 0.1% trên giá trị chuyển nhượng từng lần, thuế cổ tức tiền mặt là 5.0%."
   },
+  "timeframeConfig": {
+    "defaultTimeframe": "ALL",
+    "definitions": {
+      "1D": { "id": "1D", "label": "1 Ngày", "shortLabel": "1D", "days": 1, "dnseResolution": "1" },
+      "1W": { "id": "1W", "label": "1 Tuần", "shortLabel": "1W", "days": 7, "dnseResolution": "1D", "perfKey": "w1" },
+      "1M": { "id": "1M", "label": "1 Tháng", "shortLabel": "1M", "days": 30, "dnseResolution": "1D", "perfKey": "m1" },
+      "3M": { "id": "3M", "label": "3 Tháng", "shortLabel": "3M", "days": 90, "dnseResolution": "1D", "perfKey": "m3" },
+      "6M": { "id": "6M", "label": "6 Tháng", "shortLabel": "6M", "days": 180, "dnseResolution": "1D", "perfKey": "m6" },
+      "MTD": { "id": "MTD", "label": "Tháng Này (MTD)", "shortLabel": "MTD", "days": null, "dnseResolution": "1D" },
+      "YTD": { "id": "YTD", "label": "Từ Đầu Năm (YTD)", "shortLabel": "YTD", "days": null, "dnseResolution": "1D", "perfKey": "ytd" },
+      "1Y": { "id": "1Y", "label": "1 Năm", "shortLabel": "1Y", "days": 365, "dnseResolution": "1D", "perfKey": "y1" },
+      "3Y": { "id": "3Y", "label": "3 Năm", "shortLabel": "3Y", "days": 1095, "dnseResolution": "1W" },
+      "5Y": { "id": "5Y", "label": "5 Năm", "shortLabel": "5Y", "days": 1825, "dnseResolution": "1W", "perfKey": "y5" },
+      "10Y": { "id": "10Y", "label": "10 Năm", "shortLabel": "10Y", "days": 3650, "dnseResolution": "1M" },
+      "ALL": { "id": "ALL", "label": "Toàn Thời Gian", "shortLabel": "Tất Cả", "days": null, "dnseResolution": "1D" },
+      "CUSTOM": { "id": "CUSTOM", "label": "Tùy Chỉnh", "shortLabel": "Tùy Chọn", "days": null, "dnseResolution": "1D" }
+    },
+    "presets": {
+      "benchmark": ["1M", "3M", "6M", "YTD", "1Y", "ALL"],
+      "portfolio": ["ALL", "YTD", "1Y", "MTD"],
+      "portfolioExtended": ["ALL", "YTD", "1Y", "6M", "3M", "1M", "MTD"],
+      "marketChart": ["1D", "1M", "6M", "1Y"],
+      "valuationHistory": ["1Y", "3Y", "5Y", "10Y"],
+      "stockPerformance": ["1W", "1M", "3M", "6M", "YTD", "1Y", "5Y"]
+    }
+  },
   "systemAndNetwork": {
     "serverPort": 3001,
     "inSessionTtlMs": 3600000,

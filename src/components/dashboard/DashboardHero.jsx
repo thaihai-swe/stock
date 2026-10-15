@@ -1,5 +1,5 @@
 import { fmtMoney, plColor } from '../../utils/format.js';
-import { RISK_POSTURES } from '../../utils/constants.js';
+import { RISK_POSTURES, TIMEFRAME_IDS } from '../../utils/constants.js';
 
 export default function DashboardHero({
   totalNAV = 0,
@@ -12,7 +12,7 @@ export default function DashboardHero({
   periodRealizedPL = 0,
   periodCashDividends = 0,
   totalUnrealizedPL = 0,
-  timeWindow = 'all',
+  timeWindow = TIMEFRAME_IDS.ALL,
   periodLabel = 'Toàn Thời Gian',
   pricesSession = null,
   lastUpdated = '',
@@ -51,7 +51,7 @@ export default function DashboardHero({
   };
 
   const posture = getRiskPosture();
-  const isAllTime = timeWindow === 'all';
+  const isAllTime = timeWindow === TIMEFRAME_IDS.ALL;
   const displayPL = isAllTime ? totalCumulativePL : (periodRealizedPL + periodCashDividends);
   const displayRealized = isAllTime ? periodRealizedPL : periodRealizedPL;
   const displayDividends = isAllTime ? periodCashDividends : periodCashDividends;
