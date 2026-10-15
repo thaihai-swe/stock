@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ExecutiveSummaryCard from './ExecutiveSummaryCard.jsx';
+import SbvOmoInterbankRadarCard from './SbvOmoInterbankRadarCard.jsx';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function MacroRegimeRadarSection({
@@ -35,6 +36,9 @@ export default function MacroRegimeRadarSection({
         aiInsight={macroData?.aiInsight}
         weeklyPulse={macroData?.weeklyPulse}
       />
+
+      {/* ── 2. RADAR BƠM/HÚT TIỀN SBV & THANH KHOẢN LIÊN NGÂN HÀNG (OMO RADAR) ── */}
+      <SbvOmoInterbankRadarCard macroData={macroData} />
 
       {/* ── 2. CẢNH BÁO TAIL-RISKS NẾU ĐƯỢC KÍCH HOẠT ── */}
       {hasActiveTailRisk && tailRisks?.length > 0 && (

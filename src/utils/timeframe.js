@@ -3,7 +3,7 @@
  * Quản trị tập trung các khung thời gian (Timeframes, Horizons, Periods)
  * Single Source of Truth cho toàn bộ ứng dụng (Bộ lọc, Biểu đồ, Phân tích hiệu suất).
  */
-import defaultConstantsJson from '../../data/default-constant-value.json';
+import defaultConstantsJson from '../../data/default-constant-value.json' with { type: 'json' };
 
 // 1. CANONICAL TIMEFRAME IDS (ENUM)
 export const TIMEFRAME_IDS = {

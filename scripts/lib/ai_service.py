@@ -871,6 +871,25 @@ class PythonAiService:
                 "aiTailRiskAnalysis": {
                     "contingencyPlan": "Duy trì kỷ luật dừng lỗ tại các ngưỡng hỗ trợ kỹ thuật trọng yếu và chủ động hạ tỷ lệ margin khi thị trường xuất hiện tín hiệu căng thẳng thanh khoản liên ngân hàng.",
                     "contagionChain": "Nếu tỷ giá USD/VND vượt đỉnh, áp lực rút vốn ròng của khối ngoại sẽ tác động trực tiếp lên nhóm cổ phiếu vốn hóa lớn VN30, sau đó lan tỏa sang tâm lý thị trường chung."
+                },
+                "aiSbvOmoDiagnosis": {
+                    "liquidityPosture": "TIGHTENING" if float(macro_indicators.get("interbankOvernight", 6.47)) > 6.0 else "NEUTRAL",
+                    "headline": "Áp Lực Tỷ Giá Buộc SBV Duy Trì Lãi Suất Liên Ngân Hàng Neo Cao",
+                    "strategicNarrative": "Chênh lệch lãi suất USD-VND và tỷ giá neo cao khiến SBV duy trì trạng thái kiểm soát thanh khoản liên ngân hàng thận trọng qua kênh OMO.",
+                    "bankingNIMImpact": "Chi phí vốn thị trường 2 tăng nhẹ tạo sự phân hóa rõ nét giữa ngân hàng có CASA cao và các ngân hàng nhỏ.",
+                    "equityMarketVerdict": "Dòng tiền trên TTCK sẽ phân hóa mạnh, ưu tiên các cổ phiếu có lượng tiền mặt ròng dồi dào và đòn bẩy thấp.",
+                    "actionableAdvice": "Duy trì tỷ trọng cổ phiếu ở mức 50-65%, hạn chế sử dụng Margin cao trong giai đoạn thanh khoản liên ngân hàng neo cao."
+                },
+                "aiInflationDiagnosis": {
+                    "cpiAssessment": f"Lạm phát CPI ở mức {cpi_val:.2f}% YoY, phản ánh áp lực chi phí đẩy từ nhiên liệu và dịch vụ công.",
+                    "purchasingPowerVerdict": "Lãi suất tiền gửi tiết kiệm thực tế bị bào mòn đáng kể sau khi trừ lạm phát, việc nắm giữ tiền mặt kéo dài gây suy giảm sức mua.",
+                    "assetProtectionRanking": [
+                        {"asset": "Cổ Phiếu Cơ Bản Tốt", "rating": "Tối Ưu", "note": "Khả năng chuyển giao chi phí lạm phát vào giá bán giúp bảo toàn EPS."},
+                        {"asset": "Vàng SJC / PNJ", "rating": "Khá Tốt", "note": "Kênh trú ẩn an toàn truyền thống chống mất giá tiền tệ."},
+                        {"asset": "Trái Phiếu DN Chất Lượng", "rating": "Trung Bình", "note": "Lợi suất cố định bù đắp vừa đủ lạm phát."},
+                        {"asset": "Tiền Gửi Ngân Hàng", "rating": "Yếu", "note": "Lãi suất thực sau lạm phát chỉ tiệm cận 0 - 0.5%."}
+                    ],
+                    "hedgingStrategy": "Phân bổ tối thiểu 60-70% vốn vào cổ phiếu chất lượng cao và Vàng vật chất để bảo vệ sức mua thực tế vượt trên lạm phát."
                 }
             }
 
@@ -936,6 +955,22 @@ class PythonAiService:
             '  "aiTailRiskAnalysis": {\n'
             '    "contingencyPlan": "Kế hoạch ứng phó kịch bản thiên nga đen / rủi ro đuôi",\n'
             '    "contagionChain": "Chuỗi tác động lan truyền vào các nhóm ngành"\n'
+            '  },\n'
+            '  "aiSbvOmoDiagnosis": {\n'
+            '    "liquidityPosture": "FLUSH | NEUTRAL | TIGHTENING",\n'
+            '    "headline": "Tiêu đề nhận định về thanh khoản liên ngân hàng và trạng thái điều hành OMO của SBV",\n'
+            '    "strategicNarrative": "Phân tích áp lực tỷ giá USD/VND và định hướng can thiệp của Ngân hàng Nhà nước",\n'
+            '    "bankingNIMImpact": "Tác động đến chi phí vốn và biên lãi ròng NIM của các nhóm ngân hàng",\n'
+            '    "equityMarketVerdict": "Tác động đến thanh khoản và dòng tiền vào thị trường chứng khoán",\n'
+            '    "actionableAdvice": "Khuyến nghị tỷ trọng cổ phiếu và quản trị rủi ro đòn bẩy Margin"\n'
+            '  },\n'
+            '  "aiInflationDiagnosis": {\n'
+            '    "cpiAssessment": "Đánh giá diễn biến CPI và lạm phát lõi",\n'
+            '    "purchasingPowerVerdict": "Nhận định mức độ bào mòn sức mua của tiền mặt và tiền gửi tiết kiệm",\n'
+            '    "assetProtectionRanking": [\n'
+            '      {"asset": "Tên kênh tài sản", "rating": "Tối Ưu | Khá Tốt | Trung Bình | Yếu", "note": "Lý giải ngắn gọn"}\n'
+            '    ],\n'
+            '    "hedgingStrategy": "Chiến lược phân bổ bảo vệ sức mua thực tế vượt trên đà lạm phát"\n'
             '  }\n'
             "}"
         )

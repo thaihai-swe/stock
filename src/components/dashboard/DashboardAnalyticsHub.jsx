@@ -4,6 +4,7 @@ import PortfolioChart from '../charts/PortfolioChart.jsx';
 import StockContributionChart from '../charts/StockContributionChart.jsx';
 import WaterfallReturnChart from '../charts/WaterfallReturnChart.jsx';
 import BenchmarkComparisonChart from '../charts/BenchmarkComparisonChart.jsx';
+import RealPurchasingPowerCard from './RealPurchasingPowerCard.jsx';
 import { TIMEFRAME_IDS } from '../../utils/timeframe.js';
 
 export default function DashboardAnalyticsHub({
@@ -17,7 +18,7 @@ export default function DashboardAnalyticsHub({
   periodLabel = 'Toàn Thời Gian',
   onSelectSymbolModal,
 }) {
-  const [activeTab, setActiveTab] = useState('benchmark'); // 'benchmark' | 'monthly' | 'allocation' | 'waterfall' | 'contribution'
+  const [activeTab, setActiveTab] = useState('benchmark'); // 'benchmark' | 'monthly' | 'allocation' | 'waterfall' | 'contribution' | 'real_return'
   const [viewMode, setViewMode] = useState('tabs'); // 'tabs' | 'grid'
 
   const tabs = [
@@ -55,6 +56,13 @@ export default function DashboardAnalyticsHub({
       shortLabel: 'Đóng Góp Mã',
       icon: '🎯',
       desc: `Xếp hạng Top cổ phiếu đóng góp lãi/lỗ nhiều nhất ${timeWindow !== TIMEFRAME_IDS.ALL ? `(${periodLabel})` : ''}`,
+    },
+    {
+      id: 'real_return',
+      label: 'Sức Mua Thực Tế vs Lạm Phát',
+      shortLabel: 'Sức Mua Thực',
+      icon: '🛡️',
+      desc: 'Khấu trừ lạm phát CPI theo phương trình Fisher, đo lường lượng tiền bị bào mòn và đối chiếu 4 kênh tài sản',
     },
   ];
 
@@ -183,6 +191,16 @@ export default function DashboardAnalyticsHub({
               onSelectSymbol={onSelectSymbolModal}
             />
           )}
+
+          {activeTab === 'real_return' && (
+            <RealPurchasingPowerCard
+              portfolio={portfolio}
+              buyOrders={buyOrders}
+              sellOrders={sellOrders}
+              dividends={dividends}
+              marketPrices={marketPrices}
+            />
+          )}
         </div>
       ) : (
         /* CHẾ ĐỘ LƯỚI BENTO GRID: Render biểu đồ tương quan VN-Index nổi bật và 4 biểu đồ bổ trợ */
@@ -253,6 +271,17 @@ export default function DashboardAnalyticsHub({
                 dividends={dividends}
                 marketPrices={marketPrices}
                 onSelectSymbol={onSelectSymbolModal}
+              />
+            </div>
+
+            {/* Card 5: Real Purchasing Power vs Inflation */}
+            <div className="bg-gray-50/60 dark:bg-slate-950/60 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 lg:col-span-2">
+              <RealPurchasingPowerCard
+                portfolio={portfolio}
+                buyOrders={buyOrders}
+                sellOrders={sellOrders}
+                dividends={dividends}
+                marketPrices={marketPrices}
               />
             </div>
           </div>

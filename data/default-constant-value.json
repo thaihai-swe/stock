@@ -1040,6 +1040,51 @@
       }
     ]
   },
+  "sbvOmoRadarConfig": {
+    "interbankStressThreshold": 6.0,
+    "interbankComfortThreshold": 3.0,
+    "interbankSpreadWarning": 1.5,
+    "usdVndInterventionThreshold": 25500,
+    "stressScoreWeights": {
+      "interbankRate": 0.40,
+      "interbankSpread": 0.30,
+      "usdVndPressure": 0.20,
+      "m2Growth": 0.10
+    },
+    "postures": {
+      "FLUSH": {
+        "maxScore": 35,
+        "label": "Dồi Dào",
+        "description": "Thanh khoản liên ngân hàng dồi dào, tiền rẻ hỗ trợ mạnh mẽ thị trường chứng khoán",
+        "badge": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+        "equityGuidance": "Môi trường tiền tệ lý tưởng để nắm giữ tỷ trọng cổ phiếu cao (70-90%)."
+      },
+      "NEUTRAL": {
+        "maxScore": 65,
+        "label": "Cân Bằng",
+        "description": "Thanh khoản ở mức ổn định, SBV điều tiết nhịp nhàng, thị trường phân hóa theo kết quả kinh doanh",
+        "badge": "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+        "equityGuidance": "Duy trì tỷ trọng cân bằng (50-70%), tập trung chọn lọc cổ phiếu cơ bản tốt."
+      },
+      "TIGHTENING": {
+        "maxScore": 100,
+        "label": "Căng Thẳng",
+        "description": "Thanh khoản liên ngân hàng thắt chặt, SBV có xu hướng hút ròng để kiềm chế tỷ giá, cảnh báo rủi ro rung lắc",
+        "badge": "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800",
+        "equityGuidance": "Hạn chế dùng Margin, nâng tỷ trọng tiền mặt (30-50%), phòng thủ danh mục."
+      }
+    }
+  },
+  "inflationReturnConfig": {
+    "defaultBenchmarkSavingsRate": 5.5,
+    "defaultAnnualCpi": 5.08,
+    "realReturnBrackets": [
+      { "minRealReturn": 10.0, "rating": "OUTPERFORM", "label": "Đại Thắng Lạm Phát (> +10%)", "color": "text-emerald-600 dark:text-emerald-400", "badge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" },
+      { "minRealReturn": 3.0, "rating": "BEAT_INFLATION", "label": "Vượt Trội Lạm Phát (+3% đến +10%)", "color": "text-blue-600 dark:text-blue-400", "badge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300" },
+      { "minRealReturn": 0.0, "rating": "PRESERVED", "label": "Bảo Toàn Sức Mua (0% đến +3%)", "color": "text-amber-600 dark:text-amber-400", "badge": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" },
+      { "minRealReturn": -999.0, "rating": "EROSION", "label": "Bị Lạm Phát Bào Mòn (< 0%)", "color": "text-rose-600 dark:text-rose-400", "badge": "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300" }
+    ]
+  },
   "systemAndNetwork": {
     "serverPort": 3001,
     "inSessionTtlMs": 3600000,

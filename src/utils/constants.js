@@ -1,4 +1,4 @@
-import defaultConstantsJson from '../../data/default-constant-value.json';
+import defaultConstantsJson from '../../data/default-constant-value.json' with { type: 'json' };
 
 /**
  * Single Source of Truth cho các hằng số, ngưỡng kỹ thuật và nhận định mặc định ở Frontend
@@ -179,4 +179,8 @@ export * from './timeframe.js';
 
 // 7. Phân hệ Cố Vấn Khóa Lợi Nhuận & Thước Đo R:R (Smart Trailing Stop & Risk-Reward)
 export * from './riskRewardAdvisor.js';
+
+// 8. Phân hệ Radar Bơm/Hút Tiền SBV OMO & Sức Mua Thực Tế
+export * from './sbvOmoRadar.js';
+export * from './inflationAdjuster.js';
 

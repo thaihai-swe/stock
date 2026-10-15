@@ -630,6 +630,18 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
           * **`aiTailRiskAnalysis` (Kế Hoạch Dự Phòng & Chuỗi Dẫn Truyền Rủi Ro Đuôi)**:
             * `contingencyPlan`: Kế hoạch hành động ứng phó dự phòng khi các cảnh báo rủi ro đuôi kích hoạt.
             * `contagionChain`: Cơ chế dẫn truyền và mức độ lan tỏa rủi ro xuyên thị trường (Tỷ giá $\to$ Khối ngoại $\to$ Large-Cap $\to$ Thị trường chung).
+          * **`aiSbvOmoDiagnosis` (Chẩn Đoán Thanh Khoản OMO & Liên Ngân Hàng Hàng Tuần)**:
+            * `liquidityPosture`: Trạng thái thanh khoản hệ thống (`FLUSH`, `NEUTRAL`, `TIGHTENING`).
+            * `headline`: Tiêu đề cô đọng về tình trạng bơm/hút tiền và tỷ giá USD/VND.
+            * `strategicNarrative`: Phân tích sâu sắc cơ chế điều hành OMO, áp lực tỷ giá và thanh khoản tiền tệ.
+            * `bankingNIMImpact`: Tác động chi phí vốn liên ngân hàng lên biên lãi ròng NIM ngành ngân hàng.
+            * `equityMarketVerdict`: Tác động cụ thể đến thanh khoản và dòng tiền trên thị trường cổ phiếu.
+            * `actionableAdvice`: Khuyến nghị tỷ trọng danh mục và quản trị đòn bẩy Margin.
+          * **`aiInflationDiagnosis` (Kiểm Toán Sức Mua & Áp Lực Lạm Phát Hàng Tuần)**:
+            * `cpiAssessment`: Đánh giá diễn biến CPI YoY và lạm phát lõi Core Inflation.
+            * `purchasingPowerVerdict`: Nhận định về mức độ bào mòn sức mua của tiền mặt và tiền gửi tiết kiệm.
+            * `assetProtectionRanking`: Bảng xếp hạng 4 kênh tài sản (Cổ phiếu, Vàng, Trái phiếu, Tiền gửi) theo khả năng phòng thủ lạm phát.
+            * `hedgingStrategy`: Chiến lược phân bổ vốn dài hạn bảo toàn và tăng trưởng sức mua thực tế.
 
 ---
 
@@ -1520,6 +1532,43 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
   | `tier3BubblePremiumPct`| `number` | `20.0%` | Mức thặng dư quá nhiệt của Tầng 3 ($\text{FairValue} \times 1.20$). Điểm bán của 30% này theo Trailing Stop. |
   | `defaultFallbackGainPct` | `number` | `25.0%` | Mức tăng giả định mặc định nếu cổ phiếu chưa có dữ liệu định giá Consensus (+25%). |
   | `tiers` | `array` | 3 tầng | Mảng định nghĩa siêu dữ liệu cho 3 tầng: `tier` (1,2,3), `name`, `label`, `description`, `defaultSellPct`, `badge`. |
+
+---
+
+### PHÂN HỆ 13: RADAR BƠM/HÚT TIỀN NGÂN HÀNG NHÀ NƯỚC & THANH KHOẢN LIÊN NGÂN HÀNG (SBV OMO & INTERBANK RADAR)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`sbvOmoRadarConfig`).
+  - Dữ liệu nguồn: `data/macro_valuation.json` (`macro.interbankOvernight`, `macro.sbvRefinancingRate`, `macro.usdVndRate`, `aiSbvOmoDiagnosis`) và `data/macro_indicators.json`.
+  - Runtime Module: `src/utils/sbvOmoRadar.js` (Re-exported qua `src/utils/constants.js`).
+  - Giao diện trực quan: `src/components/macro/SbvOmoInterbankRadarCard.jsx` (Nhúng tại `src/components/macro/MacroRegimeRadarSection.jsx`).
+* **Mục đích**: Nhận diện sớm các pha thắt chặt/nới lỏng thanh khoản tiền tệ của Ngân hàng Nhà nước Việt Nam (SBV), đo lường mức độ căng thẳng thị trường 2 và phát tín hiệu định hướng cho danh mục cổ phiếu.
+* **Đặc tả Schema chi tiết (`sbvOmoRadarConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `interbankStressThreshold` | `number` | `6.0%` | Ngưỡng lãi suất liên ngân hàng qua đêm căng thẳng (Stress Threshold). |
+  | `interbankComfortThreshold`| `number` | `3.0%` | Ngưỡng lãi suất liên ngân hàng thoải mái, tiền rẻ dồi dào. |
+  | `interbankSpreadWarning` | `number` | `1.5%` | Chênh lệch cảnh báo giữa Lãi suất qua đêm LNH và Lãi suất tái cấp vốn SBV ($\text{ON} - \text{Refinancing} \ge 1.5\%$). |
+  | `usdVndInterventionThreshold`| `number`| `25500` | Ngưỡng tỷ giá USD/VND nhạy cảm kích hoạt can thiệp OMO/bán ngoại tệ của SBV. |
+  | `stressScoreWeights` | `object` | 4 trọng số | Trọng số chấm điểm Điểm Căng Thẳng Thanh Khoản: Lãi suất LNH (40%), Chênh lệch Spread (30%), Tỷ giá USD/VND (20%), Cung tiền M2 (10%). |
+  | `postures` | `object` | 3 trạng thái | Phân loại trạng thái thanh khoản: `FLUSH` ($\le 35$ điểm - Dồi dào tiền rẻ), `NEUTRAL` (36-65 điểm - Cân bằng nhịp nhàng), `TIGHTENING` ($> 65$ điểm - Thắt chặt/hút tiền). |
+
+---
+
+### PHÂN HỆ 14: THƯỚC ĐO TĂNG TRƯỞNG SỨC MUA THỰC TẾ (INFLATION-ADJUSTED REAL RETURN)
+
+* **Vị trí lưu trữ**:
+  - Cấu hình gốc: `data/default-constant-value.json` (`inflationReturnConfig`).
+  - Dữ liệu nguồn: `data/macro_valuation.json` (`macro.inflationCpi`, `macro.coreInflation`, `aiInflationDiagnosis`) và Sổ lệnh giao dịch cá nhân.
+  - Runtime Module: `src/utils/inflationAdjuster.js` (Re-exported qua `src/utils/constants.js`).
+  - Giao diện trực quan: `src/components/dashboard/RealPurchasingPowerCard.jsx` (Nhúng tại `src/components/dashboard/DashboardAnalyticsHub.jsx` qua tab `real_return`).
+* **Mục đích**: Ứng dụng phương trình kinh tế lượng Fisher ($r_{\text{real}} = \frac{1 + r_{\text{nominal}}}{1 + i_{\text{cpi}}} - 1$), bóc tách lượng tiền bị lạm phát bào mòn (VNĐ Drag), và thiết lập bảng so sánh 4 kênh tài sản lớn (Danh mục cá nhân, VN-Index, Vàng SJC, Tiết kiệm ngân hàng).
+* **Đặc tả Schema chi tiết (`inflationReturnConfig`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Giá Trị Mặc Định | Ý Nghĩa Nghiệp Vụ & Cơ Chế Toán Học |
+  | :--- | :--- | :--- | :--- |
+  | `defaultBenchmarkSavingsRate`| `number` | `5.5%` | Lãi suất tiền gửi tiết kiệm 12 tháng bình quân của các NHTM để làm benchmark phi rủi ro. |
+  | `defaultAnnualCpi` | `number` | `5.08%` | Tỷ lệ lạm phát CPI hàng năm mặc định dùng trong các phép tính chiết khấu sức mua. |
+  | `realReturnBrackets` | `array` | 4 bậc | Thang đánh giá thành quả sức mua: `OUTPERFORM` ($> +10\%$), `BEAT_INFLATION` ($+3\%$ đến $+10\%$), `PRESERVED` ($0\%$ đến $+3\%$), `EROSION` ($< 0\%$ - Bị lạm phát bào mòn). |
 
 
 

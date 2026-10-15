@@ -134,6 +134,14 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
         ai_tail["updatedAt"] = now_iso
         ai_tail["provider"] = active_prov
 
+        ai_sbv_omo = macro_suite.get("aiSbvOmoDiagnosis", {})
+        ai_sbv_omo["updatedAt"] = now_iso
+        ai_sbv_omo["provider"] = active_prov
+
+        ai_inflation = macro_suite.get("aiInflationDiagnosis", {})
+        ai_inflation["updatedAt"] = now_iso
+        ai_inflation["provider"] = active_prov
+
         if dry_run:
             print(f"   [DRY-RUN] Headline: {briefing.get('headline')}")
             print(f"   [DRY-RUN] Sector Transmission: {sector_trans.get('transmissionHeadline')}")
@@ -142,6 +150,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             print(f"   [DRY-RUN] Yield Curve Status: {ai_yield.get('curveStatus')}")
             print(f"   [DRY-RUN] Multi-Asset Thesis: {ai_asset.get('multiAssetThesis')}")
             print(f"   [DRY-RUN] Style Rotation: {ai_style.get('rotationHeadline')}")
+            print(f"   [DRY-RUN] SBV OMO Diagnosis: {ai_sbv_omo.get('headline')}")
+            print(f"   [DRY-RUN] Inflation Diagnosis: {ai_inflation.get('cpiAssessment')}")
         else:
             macro_data["aiInsight"] = briefing
             macro_data["sectorTransmission"] = sector_trans
@@ -151,6 +161,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             macro_data["aiMultiAssetStrategy"] = ai_asset
             macro_data["aiStyleRotation"] = ai_style
             macro_data["aiTailRiskAnalysis"] = ai_tail
+            macro_data["aiSbvOmoDiagnosis"] = ai_sbv_omo
+            macro_data["aiInflationDiagnosis"] = ai_inflation
 
             with open(MACRO_FILE, "w", encoding="utf-8") as f:
                 json.dump(macro_data, f, ensure_ascii=False, indent=2)
@@ -172,6 +184,8 @@ def generate_macro_insights(dry_run: bool = False, model: Optional[str] = None, 
             cache["aiMultiAssetStrategy"] = ai_asset
             cache["aiStyleRotation"] = ai_style
             cache["aiTailRiskAnalysis"] = ai_tail
+            cache["aiSbvOmoDiagnosis"] = ai_sbv_omo
+            cache["aiInflationDiagnosis"] = ai_inflation
 
             with open(AI_CACHE_FILE, "w", encoding="utf-8") as f:
                 json.dump(cache, f, ensure_ascii=False, indent=2)
