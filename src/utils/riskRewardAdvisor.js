@@ -264,17 +264,24 @@ export function calculateRiskRewardRatio({
 export function calculateTakeProfitGrid({
   avgCost = 0,
   marketPrice = 0,
+  currentPrice = 0,
   totalQty = 0,
   fairValue = null,
+  consensusFairValue = null,
   config = TAKE_PROFIT_GRID_CONFIG,
 }) {
   const cost = Number(avgCost) || 0;
-  const current = Number(marketPrice) || cost;
+  const current = Number(marketPrice) || Number(currentPrice) || cost;
   const qty = Number(totalQty) || 0;
+  const targetFair = (fairValue && Number(fairValue) > 0)
+    ? Number(fairValue)
+    : (consensusFairValue && Number(consensusFairValue) > 0)
+      ? Number(consensusFairValue)
+      : null;
 
   // 1. Xác định mốc Giá Trị Hợp Lý (Fair Value)
-  const resolvedFairValue = fairValue && Number(fairValue) > 0
-    ? Number(fairValue)
+  const resolvedFairValue = targetFair
+    ? targetFair
     : Math.round(cost * (1 + (Number(config?.defaultFallbackGainPct) || 25) / 100));
 
   // 2. Tính toán giá mục tiêu từng tầng từ cấu hình
@@ -313,9 +320,13 @@ export function calculateTakeProfitGrid({
         badge: t1Meta.badge || 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800',
         targetPrice: tier1Price,
         targetGainPct: calcGainPct(tier1Price),
+        gainPct: calcGainPct(tier1Price),
         distancePct: calcDistPct(tier1Price),
         suggestedQty: tier1Qty,
+        sharesToSell: tier1Qty,
         suggestedRatioPct: config?.tier1RatioPct || 30,
+        sellPct: config?.tier1RatioPct || 30,
+        estimatedProfitVnd: Math.max(0, Math.round((tier1Price - cost) * tier1Qty)),
         isReached: current >= tier1Price,
       },
       {
@@ -326,9 +337,13 @@ export function calculateTakeProfitGrid({
         badge: t2Meta.badge || 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
         targetPrice: tier2Price,
         targetGainPct: calcGainPct(tier2Price),
+        gainPct: calcGainPct(tier2Price),
         distancePct: calcDistPct(tier2Price),
         suggestedQty: tier2Qty,
+        sharesToSell: tier2Qty,
         suggestedRatioPct: config?.tier2RatioPct || 40,
+        sellPct: config?.tier2RatioPct || 40,
+        estimatedProfitVnd: Math.max(0, Math.round((tier2Price - cost) * tier2Qty)),
         isReached: current >= tier2Price,
       },
       {
@@ -339,9 +354,13 @@ export function calculateTakeProfitGrid({
         badge: t3Meta.badge || 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800',
         targetPrice: tier3Price,
         targetGainPct: calcGainPct(tier3Price),
+        gainPct: calcGainPct(tier3Price),
         distancePct: calcDistPct(tier3Price),
         suggestedQty: tier3Qty,
+        sharesToSell: tier3Qty,
         suggestedRatioPct: config?.tier3RatioPct || 30,
+        sellPct: config?.tier3RatioPct || 30,
+        estimatedProfitVnd: Math.max(0, Math.round((tier3Price - cost) * tier3Qty)),
         isReached: current >= tier3Price,
       },
     ],

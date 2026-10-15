@@ -12,6 +12,15 @@ export default function SmartProfitProtectionAdvisor({
   const [filterMode, setFilterMode] = useState('all'); // 'all' | 'loss' | 'profit'
   const [showExplanation, setShowExplanation] = useState(false);
   const [expandedGrids, setExpandedGrids] = useState({});
+  const [isCollapsed, setIsCollapsed] = useState(() => localStorage.getItem('collapse_trailing_advisor') === 'true');
+
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => {
+      const next = !prev;
+      try { localStorage.setItem('collapse_trailing_advisor', String(next)); } catch {}
+      return next;
+    });
+  };
 
   const toggleGrid = (symbol) => {
     setExpandedGrids(prev => ({
@@ -41,7 +50,7 @@ export default function SmartProfitProtectionAdvisor({
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 sm:p-6 space-y-5 transition-colors">
-      {/* ── 1. HEADER: TIÊU ĐỀ & NÚT HƯỚNG DẪN ── */}
+      {/* ── 1. HEADER: TIÊU ĐỀ & NÚT HƯỚNG DẪN / THU GỌN ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -58,14 +67,32 @@ export default function SmartProfitProtectionAdvisor({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowExplanation(!showExplanation)}
-          className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto shrink-0 bg-indigo-50/70 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-900/40"
-        >
-          <span>{showExplanation ? 'Ẩn Giải Thích' : '❓ Cách Hoạt Động'}</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          <button
+            type="button"
+            onClick={() => setShowExplanation(!showExplanation)}
+            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer bg-indigo-50/70 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-900/40"
+          >
+            <span>{showExplanation ? 'Ẩn Giải Thích' : '❓ Cách Hoạt Động'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            className="text-xs font-bold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center gap-1.5 cursor-pointer bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
+            title={isCollapsed ? 'Mở rộng phân hệ' : 'Thu gọn phân hệ'}
+          >
+            <span>{isCollapsed ? 'Mở Rộng ▼' : 'Thu Gọn ▲'}</span>
+          </button>
+        </div>
       </div>
+
+      {isCollapsed ? (
+        <div className="flex items-center justify-between text-xs py-1 text-slate-500 dark:text-slate-400">
+          <span>Trạng thái: <b className="text-slate-800 dark:text-slate-200">{summary.safePositionsCount} mã an toàn</b>, {summary.triggeredCount > 0 ? <b className="text-rose-600">{summary.triggeredCount} mã chạm dừng</b> : '0 mã chạm dừng'}</span>
+          <span className="font-bold text-indigo-600 dark:text-indigo-400">R:R Trung bình: {summary.avgRiskRewardRatio} : 1</span>
+        </div>
+      ) : (
+        <>
 
       {/* GIẢI THÍCH DỄ HIỂU (BÌNH DÂN, KHÔNG DÙNG THUẬT NGỮ RƯỜM RÀ) */}
       {showExplanation && (
@@ -214,7 +241,7 @@ export default function SmartProfitProtectionAdvisor({
                   ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800 ring-1 ring-rose-400/40'
                   : item.isWarning
                   ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-300 dark:border-amber-800'
-                  : 'bg-slate-50/40 dark:bg-slate-850/60 border-slate-200/70 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-slate-700'
+                  : 'bg-slate-50/40 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-slate-700'
               }`}
             >
               <div>
@@ -387,6 +414,8 @@ export default function SmartProfitProtectionAdvisor({
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -22,6 +22,7 @@ const METRIC_DEFINITIONS = [
 
 export default function FinValLabCard({ finvalLab, symbol, financials, currentStock }) {
   const [filterType, setFilterType] = useState('all'); // 'all' | 'improved' | 'worse'
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Reconciliation layer: Kết hợp dữ liệu từ finvalLab, financials và currentStock
   const items = useMemo(() => {
@@ -143,6 +144,12 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
   const unratedCount = items.filter(it => it.status === 'Chưa đủ dữ liệu LS').length;
 
   const filteredItems = items.filter(it => {
+    if (searchTerm.trim()) {
+      const term = searchTerm.trim().toLowerCase();
+      if (!it.label.toLowerCase().includes(term) && !it.key.toLowerCase().includes(term)) {
+        return false;
+      }
+    }
     if (filterType === 'improved') return it.status === 'Cải thiện rõ rệt';
     if (filterType === 'worse') return it.status === 'Suy giảm so với TB';
     return true;
@@ -151,7 +158,7 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
   return (
     <div className="p-5 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xs space-y-5">
       {/* ── HEADER ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -167,43 +174,67 @@ export default function FinValLabCard({ finvalLab, symbol, financials, currentSt
           </h3>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 self-start sm:self-auto text-xs">
-          <button
-            type="button"
-            onClick={() => setFilterType('all')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
-              filterType === 'all'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
-            }`}
-          >
-            Tất cả ({items.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilterType('improved')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1 ${
-              filterType === 'improved'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100'
-            }`}
-          >
-            <span>▲ Cải thiện</span>
-            <span className="text-[10px] opacity-80">({improvedCount})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilterType('worse')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1 ${
-              filterType === 'worse'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100'
-            }`}
-          >
-            <span>▼ Suy giảm</span>
-            <span className="text-[10px] opacity-80">({worseCount})</span>
-          </button>
+        {/* Ô Tìm Kiếm & Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {/* Ô Tìm kiếm */}
+          <div className="relative w-44 sm:w-48">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Lọc chỉ tiêu..."
+              className="w-full pl-7 pr-6 py-1.5 bg-gray-50 dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 rounded-xl text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <span className="absolute left-2 top-2 text-[10px] text-gray-400">🔍</span>
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1.5 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setFilterType('all')}
+              className={`px-2.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                filterType === 'all'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+              }`}
+            >
+              Tất cả ({items.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterType('improved')}
+              className={`px-2.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                filterType === 'improved'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100'
+              }`}
+            >
+              <span>▲ Cải thiện</span>
+              <span className="text-[10px] opacity-80">({improvedCount})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterType('worse')}
+              className={`px-2.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                filterType === 'worse'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100'
+              }`}
+            >
+              <span>▼ Suy giảm</span>
+              <span className="text-[10px] opacity-80">({worseCount})</span>
+            </button>
+          </div>
         </div>
       </div>
 

@@ -198,7 +198,8 @@ export const fetchFundamentals = (symbols = [], force = false) =>
   request(`/fundamentals?symbols=${encodeURIComponent(symbols.join(','))}&force=${force ? 'true' : 'false'}`);
 export const fetchSupportedStocks = () => request('/fundamentals/supported-stocks');
 export const updateSupportedStocks = (body) => request('/fundamentals/supported-stocks', { method: 'POST', body: JSON.stringify(body) });
-export const triggerFundamentalsSync = () => request('/fundamentals/sync', { method: 'POST' });
+export const triggerFundamentalsSync = (cadence = 'all') =>
+  request('/fundamentals/sync', { method: 'POST', body: JSON.stringify({ cadence }) });
 
 // Quản lý số dư tiền mặt & thị trường
 export const fetchCashBalance  = ()       => request('/cash-balance');

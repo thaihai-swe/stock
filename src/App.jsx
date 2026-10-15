@@ -57,7 +57,7 @@ const TABS = [
 
   // Cụm 3: Tiện Ích & Cấu Hình Hệ Thống
   { id: 'watchlist', label: '👁️ Theo dõi', shortLabel: 'Theo dõi', icon: '👁️', group: 'tools' },
-  { id: 'settings', label: '⚙️ Cài đặt & Báo cáo', shortLabel: 'Cài đặt', icon: '⚙️', group: 'tools' },
+  { id: 'settings', label: '⚙️ Cài đặt', shortLabel: 'Cài đặt', icon: '⚙️', group: 'tools' },
 ];
 
 const TAB_GROUPS = [
@@ -857,7 +857,7 @@ export default function App({ hasGoogleClientId = false }) {
             onClick={() => setIsDrawerOpen(true)}
             className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['trade', 'market', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab)
               ? 'text-indigo-600 font-bold'
-              : 'text-gray-400 hover:text-gray-600 font-medium'
+              : 'text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-slate-200 font-medium'
               }`}
           >
             <span className="text-xl leading-none">☰</span>
@@ -949,7 +949,7 @@ export default function App({ hasGoogleClientId = false }) {
           {/* Drawer Panel */}
           <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 h-full shadow-2xl z-10 flex flex-col animate-in slide-in-from-right duration-250">
             {/* Header Drawer */}
-            <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white dark:from-slate-850 dark:to-slate-900">
+            <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white dark:from-slate-900 dark:to-slate-950">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">📈</span>
                 <div>

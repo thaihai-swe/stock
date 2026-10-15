@@ -1,10 +1,12 @@
+import React, { useState, Fragment } from 'react';
 import { fmtMoney, getAllocationTier, getStockColor, plBg, plColor } from '../../utils/format.js';
-import { calculateSmartTrailingStop } from '../../utils/riskRewardAdvisor.js';
+import { calculateSmartTrailingStop, calculateTakeProfitGrid } from '../../utils/riskRewardAdvisor.js';
 
 export default function DashboardHoldingsTable({
   portfolio = [],
   displayedPortfolio = [],
   pricesData = {},
+  fundamentalsMap = {},
   holdingCost = 0,
   symbolFilter = '',
   setSymbolFilter,
@@ -27,6 +29,7 @@ export default function DashboardHoldingsTable({
   onNavigateSell,
   onNavigateDca,
 }) {
+  const [expandedGridSymbol, setExpandedGridSymbol] = useState(null);
   return (
     <div className="card-base rounded-3xl overflow-hidden">
       {/* 1. HEADER: TIÊU ĐỀ & TOOLBAR ĐIỀU HƯỚNG */}
@@ -264,6 +267,16 @@ export default function DashboardHoldingsTable({
                             <span className={`font-mono font-bold px-1.5 py-0.2 rounded border ${trailingInfo.badgeBg}`}>
                               🛡️ {fmtMoney(trailingInfo.trailingStopPrice)}đ
                             </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedGridSymbol(expandedGridSymbol === p.symbol ? null : p.symbol);
+                              }}
+                              className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 cursor-pointer"
+                            >
+                              {expandedGridSymbol === p.symbol ? 'Ẩn Lưới ▲' : '🎯 Lưới ▼'}
+                            </button>
                           </div>
                         )}
                       </div>
@@ -271,6 +284,44 @@ export default function DashboardHoldingsTable({
                       <span className="text-xs text-gray-400">—</span>
                     )}
                   </div>
+
+                  {/* Lưới chốt lời dạng mobile accordion */}
+                  {expandedGridSymbol === p.symbol && marketPrice && (() => {
+                    const fund = fundamentalsMap?.[p.symbol] || {};
+                    const consensusFairValue = fund.consensusFairValue || fund.targetPrice || null;
+                    const gridInfo = calculateTakeProfitGrid({
+                      avgCost: p.avgCost,
+                      marketPrice,
+                      fairValue: consensusFairValue,
+                      totalQty: p.totalQty
+                    });
+                    return (
+                      <div className="p-3 bg-indigo-50/70 dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 rounded-xl space-y-2 text-xs mt-2" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between">
+                          <span className="font-extrabold text-indigo-900 dark:text-indigo-200 text-xs flex items-center gap-1.5">
+                            <span>🎯</span> Lưới Chốt Lời 3 Tầng ({p.symbol})
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setExpandedGridSymbol(null); }}
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 font-bold px-1.5 py-0.5"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="space-y-1.5">
+                          {gridInfo.tiers.map((t) => (
+                            <div key={t.tier} className="p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-indigo-100 dark:border-indigo-900/40 text-[11px] flex items-center justify-between">
+                              <span className="font-bold text-gray-800 dark:text-gray-200">{t.name}: {fmtMoney(t.targetPrice)}đ</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-black">
+                                +{t.targetGainPct ?? t.gainPct ?? 0}% (Bán {(t.suggestedQty ?? t.sharesToSell ?? 0).toLocaleString()} cp - {t.suggestedRatioPct ?? t.sellPct ?? 0}%)
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })}
@@ -352,10 +403,8 @@ export default function DashboardHoldingsTable({
                     : null;
 
                   return (
-                    <tr
-                      key={p.symbol}
-                      className="table-row-hover group"
-                    >
+                    <Fragment key={p.symbol}>
+                      <tr className="table-row-hover group">
                       {/* Mã CP - Sticky Column */}
                       <td className="px-5 py-4 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/80 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
                         <button
@@ -430,11 +479,22 @@ export default function DashboardHoldingsTable({
                               {unrealizedPL >= 0 ? '▲ +' : '▼ '}{unrealizedPLPct}%
                             </span>
                             {trailingInfo && (
-                              <div className="mt-1" title={trailingInfo.tierRationale}>
-                                <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.2 rounded border ${trailingInfo.badgeBg}`}>
+                              <div className="mt-1 flex items-center justify-end gap-1 flex-wrap">
+                                <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.2 rounded border ${trailingInfo.badgeBg}`} title={trailingInfo.tierRationale}>
                                   <span>🛡️</span>
                                   <span>{fmtMoney(trailingInfo.trailingStopPrice)}đ</span>
                                 </span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedGridSymbol(expandedGridSymbol === p.symbol ? null : p.symbol);
+                                  }}
+                                  className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 cursor-pointer transition-all"
+                                  title="Xem kế hoạch chốt lời 3 tầng"
+                                >
+                                  {expandedGridSymbol === p.symbol ? 'Ẩn Lưới ▲' : '🎯 Lưới ▼'}
+                                </button>
                               </div>
                             )}
                           </div>
@@ -475,11 +535,99 @@ export default function DashboardHoldingsTable({
                         </div>
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+
+                    {/* Accordion Expand Row: Lưới Chốt Lời 3 Tầng Cho Mã */}
+                    {expandedGridSymbol === p.symbol && marketPrice && (() => {
+                      const fund = fundamentalsMap?.[p.symbol] || {};
+                      const consensusFairValue = fund.consensusFairValue || fund.targetPrice || null;
+                      const gridInfo = calculateTakeProfitGrid({
+                        avgCost: p.avgCost,
+                        marketPrice,
+                        fairValue: consensusFairValue,
+                        totalQty: p.totalQty
+                      });
+                      return (
+                        <tr className="bg-gradient-to-r from-indigo-50/50 via-purple-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-indigo-950/40 dark:to-slate-900 border-y-2 border-indigo-200 dark:border-indigo-800/60">
+                          <td colSpan="9" className="px-5 py-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-black text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
+                                  <span>🎯</span> Lưới Chốt Lời Khoa Học 3 Tầng ({p.symbol})
+                                  <span className="text-[11px] text-gray-500 dark:text-gray-400 font-normal hidden sm:inline">— Kế hoạch thu hoạch lợi nhuận 30% - 40% - 30%</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedGridSymbol(null)}
+                                  className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer font-bold px-2 py-0.5 rounded hover:bg-gray-200/50 dark:hover:bg-slate-700"
+                                >
+                                  Đóng ✕
+                                </button>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                {gridInfo.tiers.map((t) => (
+                                  <div key={t.tier} className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/40 shadow-xs space-y-1.5 text-xs">
+                                    <div className="flex items-center justify-between">
+                                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${t.badge}`}>{t.name}: {t.label}</span>
+                                      <span className="font-extrabold text-indigo-600 dark:text-indigo-400">
+                                        Bán {(t.suggestedQty ?? t.sharesToSell ?? 0).toLocaleString()} cp ({t.suggestedRatioPct ?? t.sellPct ?? 0}%)
+                                      </span>
+                                    </div>
+                                    <div className="flex items-baseline justify-between pt-1 border-t border-gray-100 dark:border-slate-800">
+                                      <span className="text-gray-400 text-[11px]">Giá mục tiêu:</span>
+                                      <span className="font-black text-gray-900 dark:text-white text-sm">{fmtMoney(t.targetPrice)}đ</span>
+                                    </div>
+                                    <div className="flex items-baseline justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                                      <span>Ước tính lãi:</span>
+                                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                        +{fmtMoney(t.estimatedProfitVnd ?? Math.max(0, Math.round((t.targetPrice - p.avgCost) * (t.suggestedQty || 0))))}đ (+{t.targetGainPct ?? t.gainPct ?? 0}%)
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })()}
+                  </Fragment>
+                );
+              })}
+            </tbody>
+
+            {/* Sticky Summary Footer Bar */}
+            <tfoot className="sticky bottom-0 bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur z-20 border-t-2 border-slate-300 dark:border-slate-700 text-xs font-black shadow-[0_-2px_6px_rgba(0,0,0,0.06)]">
+              <tr>
+                <td className="px-5 py-3 sticky left-0 bg-slate-100/95 dark:bg-slate-800/95 z-30 text-slate-900 dark:text-slate-100 font-extrabold shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
+                  Tổng ({displayedPortfolio.length} mã)
+                </td>
+                <td className="px-4 py-3 text-right text-slate-800 dark:text-slate-100 font-extrabold">
+                  {displayedHoldingQty.toLocaleString()}
+                </td>
+                <td className="px-4 py-3 text-right text-indigo-600 dark:text-indigo-400 font-bold">
+                  100.0%
+                </td>
+                <td className="px-4 py-3 text-right text-slate-400">—</td>
+                <td className="px-4 py-3 text-right text-slate-900 dark:text-slate-100 font-extrabold">
+                  {fmtMoney(displayedHoldingCost)}đ
+                </td>
+                <td className="px-4 py-3 text-right text-slate-400">—</td>
+                <td className="px-4 py-3 text-right text-indigo-700 dark:text-indigo-400 font-black">
+                  {fmtMoney(displayedMarketValue)}đ
+                </td>
+                <td className="px-5 py-3 text-right bg-indigo-50/50 dark:bg-slate-800/60">
+                  <div className={`font-black ${plColor(displayedUnrealizedPL)}`}>
+                    {displayedUnrealizedPL >= 0 ? '+' : ''}{fmtMoney(displayedUnrealizedPL)}đ
+                  </div>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full inline-block ${plBg(displayedUnrealizedPL)}`}>
+                    {displayedUnrealizedPL >= 0 ? '▲ +' : '▼ '}{displayedUnrealizedPLPct}%
+                  </span>
+                </td>
+                <td className="px-3 sm:px-4 py-3 text-center text-slate-400">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
 
           {/* 4. FOOTER TỔNG KẾT DANH MỤC */}
           <div className="px-5 sm:px-6 py-3.5 bg-slate-50/90 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">

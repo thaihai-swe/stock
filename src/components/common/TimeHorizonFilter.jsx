@@ -135,7 +135,7 @@ export default function TimeHorizonFilter({
     <div className={`space-y-2 ${className}`}>
       {/* ── 1. HÀNG NÚT BẤM PILL SEGMENTS ── */}
       <div className="flex items-center gap-1.5 flex-wrap">
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 sm:p-1 rounded-xl text-xs border border-slate-200/50 dark:border-slate-750">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 sm:p-1 rounded-xl text-xs border border-slate-200/50 dark:border-slate-700">
           {PRESET_BUTTONS.map((item) => {
             const isActive = internalPreset === item.id && (item.id !== TIMEFRAME_IDS.ALL || (!customStart && !customEnd));
             return (
@@ -196,7 +196,7 @@ export default function TimeHorizonFilter({
 
       {/* ── 2. KHU VỰC CHỌN NGÀY TÙY CHỈNH (EXPANDABLE DATE PICKER) ── */}
       {allowExpand && isCustomExpanded && (
-        <div className="p-2.5 sm:p-3 bg-slate-50/90 dark:bg-slate-850/80 rounded-xl border border-slate-200/70 dark:border-slate-750 flex flex-col sm:flex-row sm:items-center gap-2.5 text-xs animate-in fade-in duration-200 shadow-2xs">
+        <div className="p-2.5 sm:p-3 bg-slate-50/90 dark:bg-slate-800/80 rounded-xl border border-slate-200/70 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-2.5 text-xs animate-in fade-in duration-200 shadow-2xs">
           <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 shrink-0 flex items-center gap-1">
             <span>🗓️</span> {customLabel}
           </span>

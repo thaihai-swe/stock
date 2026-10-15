@@ -223,20 +223,36 @@ export default function Dashboard({
   const [cashInput, setCashInput] = useState('');
   const [savingCash, setSavingCash] = useState(false);
 
+  // State chế độ hiển thị Dashboard: 'holdings' (Danh Mục & Sổ Cái - Mặc định) | 'analytics' (Phân Tích Chuyên Sâu)
+  const [dashboardMode, setDashboardMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stock_dashboard_mode');
+      return saved === 'analytics' ? 'analytics' : 'holdings';
+    } catch {
+      return 'holdings';
+    }
+  });
+
+  const handleSelectDashboardMode = (modeId) => {
+    setDashboardMode(modeId);
+    try {
+      localStorage.setItem('stock_dashboard_mode', modeId);
+    } catch {}
+  };
+
   useEffect(() => {
     if (data.settings?.cashBalance !== undefined) {
       setCashBalance(data.settings.cashBalance);
     }
   }, [data.settings?.cashBalance]);
 
-  async function handleSaveCash(e) {
-    e?.preventDefault();
-    const val = Number(cashInput);
-    if (isNaN(val)) return;
+  async function handleDirectSaveCash(val) {
+    const num = Number(val);
+    if (isNaN(num)) return;
     setSavingCash(true);
     try {
-      await updateCashBalance(val);
-      setCashBalance(val);
+      await updateCashBalance(num);
+      setCashBalance(num);
       setIsEditingCash(false);
       showToast('✅ Đã cập nhật số dư tiền mặt thành công!', 'success');
       if (onSuccess) onSuccess();
@@ -245,6 +261,11 @@ export default function Dashboard({
     } finally {
       setSavingCash(false);
     }
+  }
+
+  async function handleSaveCash(e) {
+    e?.preventDefault();
+    await handleDirectSaveCash(cashInput);
   }
 
   // Tổng tài sản ròng (NAV) & Tỷ lệ phân bổ tiền mặt / cổ phiếu
@@ -453,212 +474,277 @@ export default function Dashboard({
           setCashInput(cashBalance > 0 ? cashBalance.toString() : '');
           setIsEditingCash(true);
         }}
+        onSaveCash={handleDirectSaveCash}
         onNavigateBuy={onNavigateBuy}
         onNavigateSell={onNavigateSell}
         onNavigateDca={onNavigateDca}
         onSwitchTab={onSwitchTab}
       />
 
-      {/* 🌟 2. BỘ LỌC CHU KỲ THỜI GIAN (TIME HORIZON SELECTOR) */}
-      <div className="card-base p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-            <span>⏳</span> Chu Kỳ Hiệu Suất:
-          </span>
-          <span className="badge-indigo text-xs">
-            {periodLabel}
-          </span>
-          {timePreset !== TIMEFRAME_IDS.ALL && (
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 hidden sm:inline">
-              (Lọc theo ngày chốt lệnh bán & nhận cổ tức)
-            </span>
-          )}
-        </div>
-        <TimeHorizonFilter
-          preset={timePreset}
-          startDate={periodStartDate}
-          endDate={periodEndDate}
-          onChange={handleTimeRangeChange}
-          customLabel="Khoảng Thời Gian:"
-        />
-      </div>
-
-      {/* 🌟 3. CẢNH BÁO MỤC TIÊU WATCHLIST (NẾU CÓ) */}
-      {watchlistAlerts.length > 0 && !dismissAlerts && (
-        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-emerald-500/10 dark:from-amber-500/20 dark:via-slate-900/60 dark:to-emerald-500/20 border border-amber-300/80 dark:border-amber-700/60 rounded-2xl p-4 shadow-sm animate-in fade-in duration-300">
-          <div className="flex items-center justify-between gap-2 mb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-lg animate-bounce">🔔</span>
-              <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                <span>Tín Hiệu Mục Tiêu Watchlist</span>
-                <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-                  {watchlistAlerts.length}
-                </span>
-              </h4>
-            </div>
+      {/* 🌟 2. BỘ ĐIỀU PHỐI GIAO DIỆN 2 PHÂN HỆ & BỘ LỌC CHU KỲ */}
+      <div className="card-base p-3 sm:p-4 space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Segmented Control 2 Phân Hệ */}
+          <div className="inline-flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
             <button
               type="button"
-              onClick={() => setDismissAlerts(true)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs px-2 py-0.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-              title="Tạm ẩn cảnh báo"
+              onClick={() => handleSelectDashboardMode('holdings')}
+              title="Bàn làm việc danh mục: Bảng lệnh chi tiết, Lưới chốt lời, Chặn lãi & Lịch sử bán"
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                dashboardMode === 'holdings'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
             >
-              ✕ Đóng
+              <span>💼</span>
+              <span>Danh Mục & Sổ Cái</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectDashboardMode('analytics')}
+              title="Trung tâm phân tích: 6 biểu đồ chuyên sâu, AI Stress-test & Chi phí cơ hội"
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                dashboardMode === 'analytics'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+            >
+              <span>📊</span>
+              <span>Phân Tích Chuyên Sâu</span>
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {watchlistAlerts.map((alt, idx) => (
-              <div
-                key={`${alt.symbol}-${alt.type}-${idx}`}
-                className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs ${alt.type === 'BUY'
-                    ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200'
-                    : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60 text-rose-900 dark:text-rose-200'
-                  }`}
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-black text-sm">{alt.symbol}</span>
-                    <span
-                      className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${alt.type === 'BUY' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
-                        }`}
-                    >
-                      {alt.type === 'BUY' ? '🛒 VÙNG MUA' : '💸 VÙNG BÁN'}
-                    </span>
-                  </div>
-                  <p className="text-[11px] opacity-85 mt-0.5 truncate">{alt.message}</p>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {alt.type === 'BUY' ? (
-                    <button
-                      type="button"
-                      onClick={() => onNavigateBuy && onNavigateBuy(alt.symbol, '', alt.currentPrice)}
-                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[11px] shadow-xs cursor-pointer transition-transform active:scale-95"
-                    >
-                      Mua ngay
-                    </button>
-                  ) : alt.isHolding ? (
-                    <button
-                      type="button"
-                      onClick={() => onNavigateSell && onNavigateSell(alt.symbol)}
-                      className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[11px] shadow-xs cursor-pointer transition-transform active:scale-95"
-                    >
-                      Chốt lời
-                    </button>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => onSwitchTab && onSwitchTab('watchlist')}
-                    className="text-[11px] text-gray-500 dark:text-gray-400 hover:underline px-1 cursor-pointer"
-                  >
-                    Xem
-                  </button>
-                </div>
-              </div>
-            ))}
+
+          {/* Bộ lọc chu kỳ thời gian */}
+          <div className="flex items-center gap-2 justify-between lg:justify-end flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:inline">Chu kỳ:</span>
+              <span className="badge-indigo text-xs">{periodLabel}</span>
+            </div>
+            <TimeHorizonFilter
+              preset={timePreset}
+              startDate={periodStartDate}
+              endDate={periodEndDate}
+              onChange={handleTimeRangeChange}
+              customLabel="Khoảng Thời Gian:"
+            />
           </div>
         </div>
+      </div>
+
+      {/* ─── PHÂN HỆ 1: DANH MỤC & SỔ CÁI (HOLDINGS DESK) ─── */}
+      {dashboardMode === 'holdings' && (
+        <>
+          {/* Cảnh Báo Mục Tiêu Watchlist (nếu có) */}
+          {watchlistAlerts.length > 0 && !dismissAlerts && (
+            <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-emerald-500/10 dark:from-amber-500/20 dark:via-slate-900/60 dark:to-emerald-500/20 border border-amber-300/80 dark:border-amber-700/60 rounded-2xl p-4 shadow-sm animate-in fade-in duration-300">
+              <div className="flex items-center justify-between gap-2 mb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg animate-bounce">🔔</span>
+                  <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                    <span>Tín Hiệu Mục Tiêu Watchlist</span>
+                    <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                      {watchlistAlerts.length}
+                    </span>
+                  </h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDismissAlerts(true)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs px-2 py-0.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                  title="Tạm ẩn cảnh báo"
+                >
+                  ✕ Đóng
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {watchlistAlerts.map((alt, idx) => (
+                  <div
+                    key={`${alt.symbol}-${alt.type}-${idx}`}
+                    className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs ${alt.type === 'BUY'
+                        ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200'
+                        : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60 text-rose-900 dark:text-rose-200'
+                      }`}
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-black text-sm">{alt.symbol}</span>
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${alt.type === 'BUY' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                            }`}
+                        >
+                          {alt.type === 'BUY' ? '🛒 VÙNG MUA' : '💸 VÙNG BÁN'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] opacity-85 mt-0.5 truncate">{alt.message}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {alt.type === 'BUY' ? (
+                        <button
+                          type="button"
+                          onClick={() => onNavigateBuy && onNavigateBuy(alt.symbol, '', alt.currentPrice)}
+                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[11px] shadow-xs cursor-pointer transition-transform active:scale-95"
+                        >
+                          Mua ngay
+                        </button>
+                      ) : alt.isHolding ? (
+                        <button
+                          type="button"
+                          onClick={() => onNavigateSell && onNavigateSell(alt.symbol)}
+                          className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[11px] shadow-xs cursor-pointer transition-transform active:scale-95"
+                        >
+                          Chốt lời
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => onSwitchTab && onSwitchTab('watchlist')}
+                        className="text-[11px] text-gray-500 dark:text-gray-400 hover:underline px-1 cursor-pointer"
+                      >
+                        Xem
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Ma Trận Tài Chính 3 Trụ Cột (3-Pillar KPI Matrix) */}
+          <DashboardKpiMatrix
+            totalInvested={totalInvested}
+            holdingCost={holdingCost}
+            totalMarketValue={totalMarketValue}
+            totalUnrealizedPL={totalUnrealizedPL}
+            totalUnrealizedPLPct={totalUnrealizedPLPct}
+            buyOrdersCount={buyOrders.length}
+            timeWindow={timePreset}
+            periodLabel={periodLabel}
+            periodRealizedPL={periodRealizedPL}
+            periodCashDividends={periodCashDividends}
+            periodDividendsCount={(dividendsInPeriod || []).length}
+            sellOrdersInPeriodCount={sellOrdersInPeriod.length}
+            totalCumulativePL={totalCumulativePL}
+            totalCumulativePLPct={totalCumulativePLPct}
+            winRate={winRate}
+            winCount={winCount}
+            lossCount={lossCount}
+            avgWin={avgWin}
+            avgLoss={avgLoss}
+            profitFactor={profitFactor}
+            portfolioBeta={portfolioBeta}
+            portfolioDividendYield={portfolioDividendYield}
+            riskRatios={riskRatios}
+          />
+
+          {/* Sổ Cái Danh Mục Nắm Giữ (Holdings Ledger) */}
+          <DashboardHoldingsTable
+            portfolio={portfolio}
+            displayedPortfolio={displayedPortfolio}
+            pricesData={pricesData}
+            fundamentalsMap={fundamentalsMap}
+            holdingCost={holdingCost}
+            symbolFilter={symbolFilter}
+            setSymbolFilter={setSymbolFilter}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            filterCounts={filterCounts}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            handleSort={handleSort}
+            renderSortIcon={renderSortIcon}
+            mobileViewMode={mobileViewMode}
+            setMobileViewMode={setMobileViewMode}
+            displayedHoldingQty={displayedHoldingQty}
+            displayedHoldingCost={displayedHoldingCost}
+            displayedMarketValue={displayedMarketValue}
+            displayedUnrealizedPL={displayedUnrealizedPL}
+            displayedUnrealizedPLPct={displayedUnrealizedPLPct}
+            onSelectSymbol={setSelectedSymbolModal}
+            onNavigateBuy={onNavigateBuy}
+            onNavigateSell={onNavigateSell}
+            onNavigateDca={onNavigateDca}
+          />
+
+          {/* Cố Vấn Khóa Lợi Nhuận & Trailing Stop */}
+          <SmartProfitProtectionAdvisor
+            portfolio={displayedPortfolio}
+            marketPrices={pricesData?.prices || {}}
+            fundamentalsMap={fundamentalsMap}
+            watchlist={watchlist}
+            onSelectSymbolModal={setSelectedSymbolModal}
+          />
+
+          {/* Lịch Sử Lệnh Bán Đã Chốt Gần Nhất */}
+          <DashboardRecentSales
+            sellOrders={sellOrdersInPeriod}
+            timeWindow={timePreset}
+            periodLabel={periodLabel}
+            onSwitchTab={onSwitchTab}
+          />
+        </>
       )}
 
-      {/* 🌟 4. MA TRẬN TÀI CHÍNH 3 TRỤ CỘT (3-PILLAR FINANCIAL MATRIX) */}
-      <DashboardKpiMatrix
-        totalInvested={totalInvested}
-        holdingCost={holdingCost}
-        totalMarketValue={totalMarketValue}
-        totalUnrealizedPL={totalUnrealizedPL}
-        totalUnrealizedPLPct={totalUnrealizedPLPct}
-        buyOrdersCount={buyOrders.length}
-        timeWindow={timePreset}
-        periodLabel={periodLabel}
-        periodRealizedPL={periodRealizedPL}
-        periodCashDividends={periodCashDividends}
-        periodDividendsCount={(dividendsInPeriod || []).length}
-        sellOrdersInPeriodCount={sellOrdersInPeriod.length}
-        totalCumulativePL={totalCumulativePL}
-        totalCumulativePLPct={totalCumulativePLPct}
-        winRate={winRate}
-        winCount={winCount}
-        lossCount={lossCount}
-        avgWin={avgWin}
-        avgLoss={avgLoss}
-        profitFactor={profitFactor}
-        portfolioBeta={portfolioBeta}
-        portfolioDividendYield={portfolioDividendYield}
-        riskRatios={riskRatios}
-      />
+      {/* ─── PHÂN HỆ 2: PHÂN TÍCH CHUYÊN SÂU (ANALYTICS HUB) ─── */}
+      {dashboardMode === 'analytics' && (
+        <>
+          {/* Ma Trận Tài Chính 3 Trụ Cột Tóm Tắt */}
+          <DashboardKpiMatrix
+            totalInvested={totalInvested}
+            holdingCost={holdingCost}
+            totalMarketValue={totalMarketValue}
+            totalUnrealizedPL={totalUnrealizedPL}
+            totalUnrealizedPLPct={totalUnrealizedPLPct}
+            buyOrdersCount={buyOrders.length}
+            timeWindow={timePreset}
+            periodLabel={periodLabel}
+            periodRealizedPL={periodRealizedPL}
+            periodCashDividends={periodCashDividends}
+            periodDividendsCount={(dividendsInPeriod || []).length}
+            sellOrdersInPeriodCount={sellOrdersInPeriod.length}
+            totalCumulativePL={totalCumulativePL}
+            totalCumulativePLPct={totalCumulativePLPct}
+            winRate={winRate}
+            winCount={winCount}
+            lossCount={lossCount}
+            avgWin={avgWin}
+            avgLoss={avgLoss}
+            profitFactor={profitFactor}
+            portfolioBeta={portfolioBeta}
+            portfolioDividendYield={portfolioDividendYield}
+            riskRatios={riskRatios}
+          />
 
-      {/* 🌟 5. SỔ CÁI DANH MỤC NẮM GIỮ (HOLDINGS LEDGER) */}
-      <DashboardHoldingsTable
-        portfolio={portfolio}
-        displayedPortfolio={displayedPortfolio}
-        pricesData={pricesData}
-        holdingCost={holdingCost}
-        symbolFilter={symbolFilter}
-        setSymbolFilter={setSymbolFilter}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        filterCounts={filterCounts}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        handleSort={handleSort}
-        renderSortIcon={renderSortIcon}
-        mobileViewMode={mobileViewMode}
-        setMobileViewMode={setMobileViewMode}
-        displayedHoldingQty={displayedHoldingQty}
-        displayedHoldingCost={displayedHoldingCost}
-        displayedMarketValue={displayedMarketValue}
-        displayedUnrealizedPL={displayedUnrealizedPL}
-        displayedUnrealizedPLPct={displayedUnrealizedPLPct}
-        onSelectSymbol={setSelectedSymbolModal}
-        onNavigateBuy={onNavigateBuy}
-        onNavigateSell={onNavigateSell}
-        onNavigateDca={onNavigateDca}
-      />
+          {/* Trung Tâm Phân Tích 6 Đồ Thị Tương Tác */}
+          <DashboardAnalyticsHub
+            portfolio={portfolio}
+            buyOrders={buyOrders}
+            sellOrders={sellOrders}
+            dividends={dividends}
+            marketPrices={pricesData?.prices || {}}
+            fundamentalsMap={fundamentalsMap}
+            timeWindow={timePreset}
+            periodLabel={periodLabel}
+            onSelectSymbolModal={setSelectedSymbolModal}
+          />
 
-      {/* 🌟 5b. CỐ VẤN KHÓA LỢI NHUẬN LINH HOẠT & THƯỚC ĐO R:R (SMART TRAILING STOP ADVISOR) */}
-      <SmartProfitProtectionAdvisor
-        portfolio={displayedPortfolio}
-        marketPrices={pricesData?.prices || {}}
-        fundamentalsMap={fundamentalsMap}
-        watchlist={watchlist}
-        onSelectSymbolModal={setSelectedSymbolModal}
-      />
+          {/* Đo Lường Sức Khỏe Danh Mục & Chịu Tải Vĩ Mô AI */}
+          <PortfolioStressTestCard
+            holdings={displayedPortfolio}
+            cashBalance={data?.cashBalance || 0}
+            onRefreshSuccess={onSuccess}
+          />
 
-      {/* 🌟 5c. ĐO LƯỜNG SỨC KHỎE DANH MỤC & CHỊU TẢI VĨ MÔ (AI PORTFOLIO STRESS-TEST) */}
-      <PortfolioStressTestCard
-        holdings={displayedPortfolio}
-        cashBalance={data?.cashBalance || 0}
-        onRefreshSuccess={onSuccess}
-      />
-
-      {/* 🌟 6. TRUNG TÂM PHÂN TÍCH THỊ GIÁ & LỢI NHUẬN 4-TRONG-1 (ANALYTICS HUB) */}
-      <DashboardAnalyticsHub
-        portfolio={portfolio}
-        buyOrders={buyOrders}
-        sellOrders={sellOrders}
-        dividends={dividends}
-        marketPrices={pricesData?.prices || {}}
-        fundamentalsMap={fundamentalsMap}
-        timeWindow={timePreset}
-        periodLabel={periodLabel}
-        onSelectSymbolModal={setSelectedSymbolModal}
-      />
-
-      {/* 🌟 7. BOTTOM DUAL DOCK: CHI PHÍ CƠ HỘI & LỆNH BÁN GẦN NHẤT */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-        <OpportunityCostCard
-          buyOrders={buyOrders}
-          totalCumulativePL={
-            timePreset === TIMEFRAME_IDS.ALL
-              ? totalCumulativePL
-              : (periodRealizedPL + periodCashDividends + totalUnrealizedPL)
-          }
-        />
-        <DashboardRecentSales
-          sellOrders={sellOrdersInPeriod}
-          timeWindow={timePreset}
-          periodLabel={periodLabel}
-          onSwitchTab={onSwitchTab}
-        />
-      </div>
+          {/* Chi Phí Cơ Hội vs Gửi Tiết Kiệm Ngân Hàng */}
+          <OpportunityCostCard
+            buyOrders={buyOrders}
+            totalCumulativePL={
+              timePreset === TIMEFRAME_IDS.ALL
+                ? totalCumulativePL
+                : (periodRealizedPL + periodCashDividends + totalUnrealizedPL)
+            }
+          />
+        </>
+      )}
 
       {/* 🌟 8. MODAL SỔ CÁI TÍCH LUỸ TỪNG MÃ (FIFO P/L LEDGER) */}
       {selectedSymbolModal && (
@@ -718,7 +804,7 @@ export default function Dashboard({
                   key={amt}
                   type="button"
                   onClick={() => setCashInput(amt.toString())}
-                  className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer border border-transparent dark:border-slate-750"
+                  className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer border border-transparent dark:border-slate-700"
                 >
                   {amt === 0 ? '0đ' : `${amt / 1000000} Triệu`}
                 </button>

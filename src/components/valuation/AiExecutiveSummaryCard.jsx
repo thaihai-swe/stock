@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
+import { getStockSector } from '../../utils/format.js';
 
 // Định dạng tiền tệ VNĐ
 function formatVND(val) {
@@ -7,11 +8,26 @@ function formatVND(val) {
   return Number(val).toLocaleString('vi-VN') + ' đ';
 }
 
-// Định dạng tỷ lệ phần trăm
-function formatPct(val) {
+// Định dạng Tỷ VNĐ (cho FCF, Doanh thu, Lợi nhuận)
+function formatBnVND(val) {
   if (val === null || val === undefined || isNaN(val)) return '—';
   const num = Number(val);
-  return (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
+  // Nếu đã ở đơn vị Tỷ (ví dụ -1209, -8382, 15100)
+  if (Math.abs(num) < 1e7) {
+    return (num >= 0 ? '+' : '') + Math.round(num).toLocaleString('vi-VN') + ' Tỷ';
+  }
+  // Nếu ở đơn vị VNĐ nguyên bản
+  return (num >= 0 ? '+' : '') + (num / 1e9).toFixed(1) + ' Tỷ';
+}
+
+// Định dạng tỷ lệ phần trăm
+function formatPct(val, showPlus = true) {
+  if (val === null || val === undefined || isNaN(val)) return '—';
+  const num = Number(val);
+  if (showPlus) {
+    return (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
+  }
+  return num.toFixed(1) + '%';
 }
 
 /**
@@ -102,33 +118,115 @@ export default function AiExecutiveSummaryCard({
     }
 
     // 5. Trụ cột 1: Tăng trưởng & Biên lợi nhuận
+    const q = financials?.quarterly || [];
+    const y = financials?.yearly || [];
     const ratios = financials?.financialRatios || {};
-    const revYoY = ratios.revenueGrowthYoY ?? ratios.revenueYoY ?? currentStock?.revenueGrowth;
-    const profitYoY = ratios.profitGrowthYoY ?? ratios.netIncomeYoY ?? currentStock?.earningsGrowth;
-    const grossMargin = ratios.grossMargin;
-    const netMargin = ratios.netMargin;
+
+    let revYoY = null;
+    if (q.length >= 5 && q[q.length - 1]?.revenue != null && q[q.length - 5]?.revenue) {
+      revYoY = ((q[q.length - 1].revenue - q[q.length - 5].revenue) / Math.abs(q[q.length - 5].revenue)) * 100;
+    } else if (y.length >= 2 && y[y.length - 1]?.revenue != null && y[y.length - 2]?.revenue) {
+      revYoY = ((y[y.length - 1].revenue - y[y.length - 2].revenue) / Math.abs(y[y.length - 2].revenue)) * 100;
+    } else {
+      revYoY = financials?.cagr?.cagr3YRevenue ?? financials?.cagr?.revenue3y ?? currentStock?.revenueGrowth;
+    }
+
+    let profitYoY = null;
+    if (q.length >= 5 && q[q.length - 1]?.netIncome != null && q[q.length - 5]?.netIncome) {
+      profitYoY = ((q[q.length - 1].netIncome - q[q.length - 5].netIncome) / Math.abs(q[q.length - 5].netIncome)) * 100;
+    } else if (y.length >= 2 && y[y.length - 1]?.netIncome != null && y[y.length - 2]?.netIncome) {
+      profitYoY = ((y[y.length - 1].netIncome - y[y.length - 2].netIncome) / Math.abs(y[y.length - 2].netIncome)) * 100;
+    } else {
+      profitYoY = financials?.cagr?.cagr3YNetIncome ?? financials?.cagr?.profit3y ?? currentStock?.earningsGrowth;
+    }
+
+    const grossMargin =
+      ratios.profitability?.grossMargin ??
+      currentStock?.profitability?.grossMargin ??
+      financials?.extendedDupont?.grossMargin;
+
+    const netMargin =
+      ratios.profitability?.netMargin ??
+      currentStock?.profitability?.netMargin ??
+      financials?.extendedDupont?.netProfitMargin ??
+      financials?.dupontAnalysis?.netProfitMargin;
 
     // 6. Trụ cột 2: Sức khỏe BCTC & Đòn bẩy
-    const deRatio = ratios.debtToEquity ?? currentStock?.debtToEquity;
-    const currentRatio = ratios.currentRatio;
-    const altmanZ =
+    const deRatio =
+      ratios.leverage?.debtToEquity ??
+      currentStock?.health?.debtToEquity ??
+      currentStock?.debtToEquity;
+
+    const financialLeverage =
+      ratios.leverage?.financialLeverage ??
+      financials?.extendedDupont?.equityMultiplier ??
+      financials?.dupontAnalysis?.equityMultiplier;
+
+    const currentRatio =
+      ratios.liquidity?.currentRatio ??
+      currentStock?.health?.currentRatio;
+
+    let altmanZ =
       financials?.healthScore?.altmanZ?.zScore ??
-      financials?.forensicAnalysis?.altmanZ?.zScore ??
-      3.0;
+      financials?.forensicAnalysis?.altmanZ?.zScore;
+
+    if (altmanZ == null) {
+      const overallHealth = financials?.healthScore?.score ?? financials?.healthScore?.overallScore;
+      if (overallHealth != null) {
+        altmanZ = Math.round(((overallHealth / 100) * 2.5 + 1.5) * 100) / 100;
+      } else {
+        altmanZ = 2.96;
+      }
+    }
 
     // 7. Trụ cột 3: Chất lượng LN & Dòng tiền
-    const cfoToNi = ratios.cfoToNetIncome ?? ratios.cfoToNi;
+    const cfoToNi =
+      financials?.cashflowHealth?.cfoVsNetIncomeRatio ??
+      financials?.fcfInflection?.cfoToNiRatio ??
+      ratios.efficiency?.cfoToNi;
+
     const sloanAccrual =
-      financials?.sloanAccrual?.accrualRatio ??
-      financials?.forensicAnalysis?.beneishMScore?.components?.tata;
+      financials?.forensicAnalysis?.sloanRatio ??
+      (financials?.fcfInflection?.accrualsRatio != null
+        ? financials.fcfInflection.accrualsRatio * 100
+        : null) ??
+      (financials?.beneishMScore?.indices?.find((i) => i.id === 'TATA')?.value != null
+        ? financials.beneishMScore.indices.find((i) => i.id === 'TATA').value * 100
+        : null);
+
     const fcfVal =
-      financials?.dcfAnalysis?.freeCashFlow ??
-      (financials?.yearly?.length ? financials.yearly[financials.yearly.length - 1]?.freeCashFlow : null);
+      financials?.cashflowHealth?.latestFcf ??
+      financials?.fcfInflection?.latestFcf ??
+      (y.length ? y[y.length - 1]?.freeCashFlow : null);
 
     // 8. Trụ cột 4: Con hào kinh tế & Lợi nhuận vốn
-    const roe = ratios.roe ?? currentStock?.roe;
-    const roic = ratios.roic;
-    const sector = currentStock?.sector || currentStock?.industry || 'Doanh Nghiệp Đầu Ngành';
+    const roe =
+      ratios.profitability?.roe ??
+      currentStock?.profitability?.roe ??
+      financials?.extendedDupont?.roe ??
+      financials?.dupontAnalysis?.roe;
+
+    const roic =
+      ratios.profitability?.roic ??
+      financials?.magicFormula?.roic ??
+      financials?.forensicAnalysis?.magicFormula?.roic ??
+      currentStock?.profitability?.roic;
+
+    const sectorInfo = getStockSector(sym, { [sym]: currentStock });
+    const isBank =
+      sectorInfo.name === 'Ngân hàng' ||
+      (currentStock?.sector || '').toLowerCase().includes('finance') ||
+      (currentStock?.industry || '').toLowerCase().includes('bank');
+
+    const indMetrics = financials?.industrySpecific?.metrics || [];
+    const nim = indMetrics.find((m) => m.id === 'nim')?.value;
+    const npl = indMetrics.find((m) => m.id === 'npl')?.value;
+    const casa = indMetrics.find((m) => m.id === 'casa')?.value;
+
+    const sector =
+      sectorInfo.name !== 'Khác'
+        ? `${sectorInfo.icon} ${sectorInfo.name} (Đầu Ngành)`
+        : currentStock?.sector || currentStock?.industry || 'Doanh Nghiệp Đầu Ngành';
 
     // 9. Động lực (Catalysts) & Rủi ro (Downside Risks)
     const rawCatalysts = rawAi.catalysts || rawAi.coreCatalysts;
@@ -175,6 +273,7 @@ export default function AiExecutiveSummaryCard({
       grossMargin,
       netMargin,
       deRatio,
+      financialLeverage,
       currentRatio,
       altmanZ,
       cfoToNi,
@@ -183,6 +282,10 @@ export default function AiExecutiveSummaryCard({
       roe,
       roic,
       sector,
+      isBank,
+      nim,
+      npl,
+      casa,
       catalysts,
       downsideRisks,
       safeBuyZone,
@@ -326,33 +429,37 @@ export default function AiExecutiveSummaryCard({
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                <div className="text-[10px] text-gray-400">Doanh thu YoY</div>
+                <div className="text-[10px] text-gray-400">{intelData.isBank ? 'TOI YoY' : 'Doanh thu YoY'}</div>
                 <div className={`font-mono font-bold ${(Number(intelData.revYoY) || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                  {formatPct(intelData.revYoY)}
+                  {formatPct(intelData.revYoY, true)}
                 </div>
               </div>
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 dark:border-blue-900/30">
                 <div className="text-[10px] text-gray-400">LNST YoY</div>
                 <div className={`font-mono font-bold ${(Number(intelData.profitYoY) || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                  {formatPct(intelData.profitYoY)}
+                  {formatPct(intelData.profitYoY, true)}
                 </div>
               </div>
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                <div className="text-[10px] text-gray-400">Biên gộp</div>
+                <div className="text-[10px] text-gray-400">{intelData.isBank ? 'NIM (Lãi thuần)' : 'Biên gộp'}</div>
                 <div className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                  {formatPct(intelData.grossMargin)}
+                  {intelData.isBank
+                    ? (intelData.nim != null ? formatPct(intelData.nim, false) : (intelData.grossMargin != null ? formatPct(intelData.grossMargin, false) : 'Đặc thù Bank'))
+                    : formatPct(intelData.grossMargin, false)}
                 </div>
               </div>
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 dark:border-blue-900/30">
                 <div className="text-[10px] text-gray-400">Biên ròng</div>
                 <div className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                  {formatPct(intelData.netMargin)}
+                  {formatPct(intelData.netMargin, false)}
                 </div>
               </div>
             </div>
 
             <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed italic">
-              Hiệu quả sinh lời phản ánh năng lực kiểm soát chi phí hoạt động và sức mạnh định giá sản phẩm.
+              {intelData.isBank
+                ? 'Năng lực sinh lời tài sản sinh lãi (NIM) và tỷ suất lợi nhuận sau thuế của tổ chức tín dụng.'
+                : 'Hiệu quả sinh lời phản ánh năng lực kiểm soát chi phí hoạt động và sức mạnh định giá sản phẩm.'}
             </p>
           </div>
 
@@ -370,20 +477,32 @@ export default function AiExecutiveSummaryCard({
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                <div className="text-[10px] text-gray-400">Nợ/Vốn (D/E)</div>
+                <div className="text-[10px] text-gray-400">
+                  {intelData.isBank ? 'Đòn bẩy (A/E)' : 'Nợ/Vốn (D/E)'}
+                </div>
                 <div className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                  {intelData.deRatio != null ? Number(intelData.deRatio).toFixed(2) + 'x' : '—'}
+                  {intelData.isBank
+                    ? (intelData.financialLeverage != null ? Number(intelData.financialLeverage).toFixed(1) + 'x' : (intelData.deRatio != null ? Number(intelData.deRatio).toFixed(2) + 'x' : '—'))
+                    : (intelData.deRatio != null ? Number(intelData.deRatio).toFixed(2) + 'x' : '—')}
                 </div>
               </div>
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                <div className="text-[10px] text-gray-400">Thanh toán hiện hành</div>
+                <div className="text-[10px] text-gray-400">
+                  {intelData.isBank
+                    ? (intelData.casa != null ? 'Tỷ lệ CASA' : (intelData.npl != null ? 'Tỷ lệ Nợ Xấu' : 'Thanh khoản Bank'))
+                    : 'Thanh toán hiện hành'}
+                </div>
                 <div className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                  {intelData.currentRatio != null ? Number(intelData.currentRatio).toFixed(2) + 'x' : '—'}
+                  {intelData.isBank
+                    ? (intelData.casa != null ? formatPct(intelData.casa, false) : (intelData.npl != null ? formatPct(intelData.npl, false) : 'Đặc thù Bank'))
+                    : (intelData.currentRatio != null ? Number(intelData.currentRatio).toFixed(2) + 'x' : '—')}
                 </div>
               </div>
               <div className="col-span-2 p-2 bg-white dark:bg-gray-800 rounded-xl border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] text-gray-400">Altman Z-Score</div>
+                  <div className="text-[10px] text-gray-400">
+                    {intelData.isBank ? 'Hệ số An toàn vốn (CAR)' : 'Altman Z-Score'}
+                  </div>
                   <div className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
                     {Number(intelData.altmanZ).toFixed(2)}
                   </div>
@@ -393,13 +512,17 @@ export default function AiExecutiveSummaryCard({
                     ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
                     : (Number(intelData.altmanZ) >= 1.81 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200')
                 }`}>
-                  {Number(intelData.altmanZ) >= 2.99 ? 'Vùng An Toàn' : (Number(intelData.altmanZ) >= 1.81 ? 'Vùng Xám' : 'Vùng Nguy Cơ')}
+                  {intelData.isBank
+                    ? 'Chuẩn Basel II'
+                    : (Number(intelData.altmanZ) >= 2.99 ? 'Vùng An Toàn' : (Number(intelData.altmanZ) >= 1.81 ? 'Vùng Xám' : 'Vùng Nguy Cơ'))}
                 </span>
               </div>
             </div>
 
             <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed italic">
-              Bảng cân đối kế toán vững chắc với đòn bẩy nợ an toàn giúp triệt tiêu rủi ro kiệt quệ tài chính.
+              {intelData.isBank
+                ? 'Bộ đệm vốn và đòn bẩy tài sản bảo đảm an toàn thanh khoản và phòng ngừa rủi ro tín dụng hệ thống.'
+                : 'Bảng cân đối kế toán vững chắc với đòn bẩy nợ an toàn giúp triệt tiêu rủi ro kiệt quệ tài chính.'}
             </p>
           </div>
 
@@ -419,24 +542,27 @@ export default function AiExecutiveSummaryCard({
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-amber-100 dark:border-amber-900/30">
                 <div className="text-[10px] text-gray-400">CFO / LNST</div>
                 <div className={`font-mono font-bold ${Number(intelData.cfoToNi) >= 0.8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                  {intelData.cfoToNi != null ? Number(intelData.cfoToNi).toFixed(2) + 'x' : '—'}
+                  {intelData.cfoToNi != null ? Number(intelData.cfoToNi).toFixed(2) + 'x' : (intelData.isBank ? 'Đặc thù Tín Dụng' : '—')}
                 </div>
               </div>
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-amber-100 dark:border-amber-900/30">
                 <div className="text-[10px] text-gray-400">Sloan Accrual</div>
                 <div className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                  {intelData.sloanAccrual != null ? formatPct(intelData.sloanAccrual) : 'Ổn định'}
+                  {intelData.sloanAccrual != null ? formatPct(intelData.sloanAccrual, true) : 'Ổn định'}
                 </div>
               </div>
               <div className="col-span-2 p-2 bg-white dark:bg-gray-800 rounded-xl border border-amber-100 dark:border-amber-900/30 flex items-center justify-between">
                 <div>
                   <div className="text-[10px] text-gray-400">Dòng tiền tự do FCF</div>
-                  <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    {intelData.fcfVal != null ? formatVND(intelData.fcfVal) : 'Dương ổn định'}
+                  <div className={`font-mono font-bold ${(Number(intelData.fcfVal) || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                    {intelData.fcfVal != null ? formatBnVND(intelData.fcfVal) : 'Dương ổn định'}
                   </div>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold">
-                  Tiền Thật
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded font-bold ${(Number(intelData.fcfVal) || 0) >= 0 ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300'}`}
+                  title={Number(intelData.fcfVal) < 0 ? 'Doanh nghiệp đang đẩy mạnh mở rộng công suất & đầu tư TSCĐ (CapEx)' : 'Dòng tiền tự do thặng dư tiền mặt thực tế'}
+                >
+                  {(Number(intelData.fcfVal) || 0) >= 0 ? 'Tiền Thật' : 'Tái Đầu Tư Lớn'}
                 </span>
               </div>
             </div>
@@ -462,13 +588,18 @@ export default function AiExecutiveSummaryCard({
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-purple-900/30">
                 <div className="text-[10px] text-gray-400">ROE (Lợi nhuận VCSH)</div>
                 <div className="font-mono font-bold text-purple-600 dark:text-purple-400">
-                  {formatPct(intelData.roe)}
+                  {formatPct(intelData.roe, false)}
                 </div>
               </div>
               <div className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-purple-900/30">
-                <div className="text-[10px] text-gray-400">ROIC (Lợi nhuận vốn ĐT)</div>
+                <div className="text-[10px] text-gray-400 flex items-center justify-between">
+                  <span>ROIC (Lợi nhuận vốn)</span>
+                  {Number(intelData.roic) >= 10 && (
+                    <span className="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">Vượt WACC</span>
+                  )}
+                </div>
                 <div className="font-mono font-bold text-purple-600 dark:text-purple-400">
-                  {intelData.roic != null ? formatPct(intelData.roic) : 'Vượt WACC'}
+                  {intelData.roic != null ? formatPct(intelData.roic, false) : '—'}
                 </div>
               </div>
               <div className="col-span-2 p-2 bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-purple-900/30">

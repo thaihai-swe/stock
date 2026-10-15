@@ -267,7 +267,7 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
                 href={articleUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700/60 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-gray-750 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 group cursor-pointer text-left no-underline"
+                className="block p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700/60 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 group cursor-pointer text-left no-underline"
                 title={`Mở bài viết gốc từ ${item.source || 'Báo chí'} (Mở tab mới)`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">

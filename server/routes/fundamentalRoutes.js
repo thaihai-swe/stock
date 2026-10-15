@@ -38,53 +38,58 @@ router.post('/fundamentals/supported-stocks', (req, res) => {
 });
 
 /**
- * 4. Kích hoạt đồng bộ nền bằng Python (kèm fallback JS an toàn)
+ * 4. Kích hoạt đồng bộ toàn bộ dữ liệu nền bằng Python (Chỉ khả dụng ở Local)
+ * Hỗ trợ cadence: 'all' (mặc định), 'daily', 'weekly', 'quarterly'
  */
 router.post('/fundamentals/sync', asyncHandler(async (req, res) => {
   if (!isPythonAvailable()) {
-    const config = loadSupportedStocks();
-    return res.json({
-      success: true,
-      message: 'Hệ thống đang hoạt động trên dữ liệu đồng bộ định kỳ mới nhất. Để cập nhật dữ liệu thị trường mới, vui lòng thông báo cho người quản lý.',
-      syncedCount: config.syncedCount || 0,
-      lastSyncedAt: config.lastSyncedAt,
-      runner: 'Cached'
+    return res.status(403).json({
+      success: false,
+      error: 'Chức năng đồng bộ dữ liệu pipeline chỉ có thể thực thi trên máy Local có môi trường Python virtualenv (.venv).'
     });
   }
 
-  // Chạy Python sync script qua unified pythonRunner
-  const { success, stdout, stderr } = await runPythonScript('scripts/sync_fundamentals.py');
+  const rawCadence = (req.body?.cadence || 'all').toLowerCase();
+  const validCadences = ['all', 'daily', 'weekly', 'quarterly'];
+  const cadence = validCadences.includes(rawCadence) ? rawCadence : 'all';
+
+  const args = ['--cadence', cadence];
+  if (req.body?.symbols && typeof req.body.symbols === 'string') {
+    args.push('--symbols', req.body.symbols.trim().toUpperCase());
+  }
+
+  const startTime = Date.now();
+  // Chạy Python unified pipeline orchestrator với timeout 10 phút (600.000ms)
+  const { success, stdout, stderr } = await runPythonScript('scripts/run_pipeline.py', args, {
+    timeout: 600000
+  });
+
+  const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
 
   if (success) {
     const config = loadSupportedStocks();
+    config.lastSyncedAt = new Date().toISOString();
+    config.lastSyncedCadence = cadence;
+    saveSupportedStocks(config);
+
     return res.json({
       success: true,
-      message: `Đã chạy xong đồng bộ Python thành công cho ${config.syncedCount || 0} mã!`,
-      syncedCount: config.syncedCount || 0,
+      message: `Đã hoàn tất đồng bộ Pipeline [${cadence.toUpperCase()}] thành công trong ${elapsedSeconds}s!`,
+      cadence,
+      elapsedSeconds,
+      syncedCount: config.syncedCount || (config.symbols || []).length,
       lastSyncedAt: config.lastSyncedAt,
-      runner: 'Python 3',
+      runner: 'Python Unified Pipeline',
       output: stdout
     });
   }
 
-  console.warn('⚠️ Không thể chạy python3 (fallback sang JS service):', stderr);
-
-  // Fallback: Thực hiện fetch trực tiếp nếu script Python gặp lỗi
-  const config = loadSupportedStocks();
-  const allSymbols = config.symbols || [];
-  const results = await getMultipleFundamentals(allSymbols, true);
-  const successCount = Object.keys(results).filter(k => !results[k]?.error).length;
-
-  config.lastSyncedAt = new Date().toISOString();
-  config.syncedCount = successCount;
-  saveSupportedStocks(config);
-
-  return res.json({
-    success: true,
-    message: `Đã đồng bộ thành công ${successCount}/${allSymbols.length} mã cổ phiếu!`,
-    syncedCount: successCount,
-    lastSyncedAt: config.lastSyncedAt,
-    runner: 'JavaScript Fallback'
+  console.error(`⚠️ Lỗi thực thi Python Pipeline [${cadence}]:`, stderr);
+  return res.status(500).json({
+    success: false,
+    error: `Lỗi thực thi pipeline [${cadence}]: ${stderr || 'Tiến trình bị gián đoạn'}`,
+    output: stdout,
+    stderr: stderr
   });
 }));
 

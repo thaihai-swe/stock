@@ -197,7 +197,7 @@ export default function MarketValuationHistoryChart() {
         {/* ── 2. 4 THẺ THỐNG KÊ (CURRENT, AVERAGE, STD. DEVIATION, OBSERVATIONS) ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6">
           {/* Card 1: Current */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               CURRENT
             </span>
@@ -221,7 +221,7 @@ export default function MarketValuationHistoryChart() {
           </div>
 
           {/* Card 2: Average */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               AVERAGE (MEAN)
             </span>
@@ -233,7 +233,7 @@ export default function MarketValuationHistoryChart() {
           </div>
 
           {/* Card 3: Std. Deviation */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               STD. DEVIATION (1 SD)
             </span>
@@ -245,7 +245,7 @@ export default function MarketValuationHistoryChart() {
           </div>
 
           {/* Card 4: Observations */}
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-750/70 border border-gray-100 dark:border-gray-700/60 space-y-1">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-slate-800/60 border border-gray-100 dark:border-gray-700/60 space-y-1">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
               OBSERVATIONS
             </span>

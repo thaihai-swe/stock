@@ -216,7 +216,27 @@ portResult.items.forEach((item) => {
   assert.strictEqual(totalItemQty, item.totalQty, `Mã ${item.symbol}: Tổng khối lượng 3 tầng (${totalItemQty}) phải bằng ${item.totalQty}`);
 });
 
-console.log('✅ Test 6 PASS: Lưới Chốt Lời 3 Tầng hoạt động chuẩn xác từ cấu hình động JSON!\n');
+// Case 6d: Kiểm thử Tính Tương Thích Ngược & Aliases Thuộc Tính (Tránh Lỗi TypeError t.sharesToSell)
+const gridCompat = calculateTakeProfitGrid({
+  avgCost: 10000,
+  currentPrice: 12000, // dùng alias currentPrice
+  consensusFairValue: 15000, // dùng alias consensusFairValue
+  totalQty: 500,
+});
+
+assert.strictEqual(gridCompat.fairValue, 15000, 'Phải nhận diện được consensusFairValue alias');
+gridCompat.tiers.forEach((t) => {
+  assert(t.sharesToSell !== undefined, 't.sharesToSell alias phải tồn tại');
+  assert.strictEqual(t.sharesToSell, t.suggestedQty, 'sharesToSell phải bằng suggestedQty');
+  assert(t.sellPct !== undefined, 't.sellPct alias phải tồn tại');
+  assert.strictEqual(t.sellPct, t.suggestedRatioPct, 'sellPct phải bằng suggestedRatioPct');
+  assert(t.gainPct !== undefined, 't.gainPct alias phải tồn tại');
+  assert.strictEqual(t.gainPct, t.targetGainPct, 'gainPct phải bằng targetGainPct');
+  assert(t.estimatedProfitVnd !== undefined, 't.estimatedProfitVnd alias phải tồn tại');
+  assert(typeof t.sharesToSell.toLocaleString === 'function', 'sharesToSell phải gọi được .toLocaleString()');
+});
+
+console.log('✅ Test 6 PASS: Lưới Chốt Lời 3 Tầng hoạt động chuẩn xác từ cấu hình động JSON và bảo đảm tương thích alias 100%!\n');
 
 console.log('🎉 TẤT CẢ 6 BÀI KIỂM THỬ ĐÃ PASS 100% THÀNH CÔNG!');
 

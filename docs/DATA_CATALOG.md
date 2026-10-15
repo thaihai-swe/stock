@@ -45,8 +45,7 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 | Cấp Độ Nút | Biểu Tượng & Tên Nút Chuẩn | API Endpoint | Phạm Vi & Thao Tác Kỹ Thuật | Tầng Dữ Liệu Tác Động |
 | :--- | :--- | :--- | :--- | :--- |
 | **CẤP 1: Sổ Cái Nội Bộ** | 🔄 *(Header)*<br>`Tải lại sổ lệnh cá nhân từ Database` | `GET /api/data` | Đọc lại SQLite `stock.db` (lệnh mua/bán, cổ tức, ví tiền). Phản hồi ~50ms. | **Tầng 1 (ACID DB)** |
-| **CẤP 2: Thị Giá Live Sàn** | ⚡ **Cập nhật giá sàn** / **Làm mới nến Live** | `GET /api/prices?force=true`<br>`GET /api/valuation/dnse-ohlc` | Bỏ qua cache 1h, lấy giá khớp lệnh thời gian thực từ sàn HOSE/HNX (VPS/DNSE). Phản hồi ~300ms. | **Tầng 2 (Ephemeral Cache)** |
-| **CẤP 3: Python Pipeline** | 🔄 **Cập nhật BCTC & Định Giá [MÃ]** (3-5s)<br>🔄 **Đồng Bộ Vĩ Mô (Python)** (~20s)<br>🔄 **Đồng bộ EOD ngay** (~5s) | `POST /api/valuation/sync-single/:sym`<br>`POST /api/valuation/sync`<br>`POST /api/fundamentals/sync` | Kích hoạt Python crawler (TradingView, vnstock, BCTC 8Q&5Y, Yield TPCP, Vàng, Ngoại tệ). Có thông báo thời gian rõ ràng. | **Tầng 3, 4, 5 (JSON Repositories)** |
+| **CẤP 3: Python Pipeline** | 🔄 **Cập nhật BCTC & Định Giá [MÃ]** (3-5s)<br>🔄 **Đồng Bộ Vĩ Mô (Python)** (~20s)<br>⚡ **Đồng Bộ Dữ Liệu Định Giá Chạy Nền** *(Local Only)* | `POST /api/valuation/sync-single/:sym`<br>`POST /api/valuation/sync`<br>`POST /api/fundamentals/sync` (`{ cadence: 'all' \| 'daily' \| 'weekly' \| 'quarterly' }`) | Kích hoạt Python crawler hoặc bộ điều phối toàn diện (`scripts/run_pipeline.py --cadence <cadence>`) trên máy Local để tải trọn vẹn dữ liệu EOD, Vĩ mô, BCTC và tối ưu AI Local. Nút bấm chỉ hiển thị khi chạy ở Local và có xem Terminal Logs trực tiếp. | **Tầng 3, 4, 5 (JSON Repositories)** |
 
 ---
 

@@ -258,7 +258,7 @@ export default function SectorValuationHeatmap({
         {/* Khối Điểm Vĩ Mô & Khuyến Nghị Hành Động */}
         <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700/60">
           <div className="flex items-center gap-1.5">
-            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black border ${sec.colorClass || 'text-gray-700 bg-gray-100'}`}>
+            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black border ${sec.colorClass || 'text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}>
               {sec.actionTag || sec.macroAction || 'Trung Lập'}
             </span>
             <span
@@ -630,7 +630,7 @@ export default function SectorValuationHeatmap({
                         </td>
 
                         <td className="p-3.5 text-center">
-                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${sec.colorClass || 'text-gray-600 bg-gray-100'}`}>
+                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${sec.colorClass || 'text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}>
                             {sec.actionTag || sec.macroAction || 'Neutral'}
                           </span>
                         </td>

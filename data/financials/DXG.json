@@ -2,14 +2,14 @@
   "_meta": {
     "symbol": "DXG",
     "companyName": "Bluemarq Group Joint Stock Company",
-    "updatedAt": "2026-10-14T16:27:34Z",
+    "updatedAt": "2026-10-15T16:02:56Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance & vnstock Guest Mode Official Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 1491,
+    "grahamNumber": 1481,
     "ddmTarget": null,
     "peTarget": 7475,
     "pbTarget": 20811,
@@ -17,9 +17,9 @@
     "pcfFairPrice": 4340,
     "psFairPrice": 4054,
     "consensusFairValue": 7311,
-    "marginOfSafety": -36.8,
-    "upside": -26.9,
-    "consensusDiffPercent": -26.9,
+    "marginOfSafety": -40.2,
+    "upside": -28.7,
+    "consensusDiffPercent": -28.7,
     "valuationRating": "🟠 AVOID",
     "valuationRatingText": "Thị giá cao hơn định giá cơ sở",
     "valuationRatingBadge": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
@@ -30,17 +30,17 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 1491,
-        "targetPrice": 1491,
-        "diffPercent": -85.1,
+        "value": 1481,
+        "targetPrice": 1481,
+        "diffPercent": -85.6,
         "weight": 0.05,
         "baseWeight": 0.05,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": true,
-        "outlierGapPct": 80.6,
+        "outlierGapPct": 80.7,
         "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-        "formulaDetail": "V = 169 × (7.0x + 0.8 × 3.5%) × (4.5% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.900",
+        "formulaDetail": "V = 169 × (7.0x + 0.8 × 3.5%) × (4.47% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.894",
         "parameters": {
           "eps": 169.0,
           "epsAvg": 298,
@@ -48,9 +48,9 @@
           "peMedian": 44.23,
           "hs": 0.8,
           "gCagr": 3.5,
-          "constantVn": 4.5,
+          "constantVn": 4.47,
           "yVn": 5.0,
-          "vn10yYield": 4.5
+          "vn10yYield": 4.47
         },
         "statusNote": "Phù hợp"
       },
@@ -61,7 +61,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 7475,
         "targetPrice": 7475,
-        "diffPercent": -25.2,
+        "diffPercent": -27.1,
         "weight": 0.1,
         "baseWeight": 0.1,
         "suitability": 1.0,
@@ -87,7 +87,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 20811,
         "targetPrice": 20811,
-        "diffPercent": 108.1,
+        "diffPercent": 103.0,
         "weight": 0.18,
         "baseWeight": 0.18,
         "suitability": 1.0,
@@ -116,7 +116,7 @@
         "cleanName": "DCF Đa Giai Đoạn",
         "value": 7907,
         "targetPrice": 7907,
-        "diffPercent": -20.9,
+        "diffPercent": -22.9,
         "weight": 0.1,
         "baseWeight": 0.1,
         "suitability": 1.0,
@@ -164,7 +164,7 @@
         "cleanName": "FCFF Doanh Nghiệp",
         "value": 2438,
         "targetPrice": 2438,
-        "diffPercent": -75.6,
+        "diffPercent": -76.2,
         "weight": 0.07,
         "baseWeight": 0.07,
         "suitability": 1.0,
@@ -198,7 +198,7 @@
         "cleanName": "FCFE Cổ Đông",
         "value": 5243,
         "targetPrice": 5243,
-        "diffPercent": -47.6,
+        "diffPercent": -48.8,
         "weight": 0.05,
         "baseWeight": 0.05,
         "suitability": 1.0,
@@ -222,7 +222,7 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 660574,
         "targetPrice": 660574,
-        "diffPercent": 6505.7,
+        "diffPercent": 6344.6,
         "weight": 0.044,
         "baseWeight": 0.08,
         "suitability": 0.55,
@@ -247,7 +247,7 @@
         "cleanName": "Book NAV / P/B Chuẩn Hóa",
         "value": 20811,
         "targetPrice": 20811,
-        "diffPercent": 108.1,
+        "diffPercent": 103.0,
         "weight": 0.32,
         "baseWeight": 0.32,
         "suitability": 1.0,
@@ -309,9 +309,9 @@
       ]
     },
     "valuationTraps": {
-      "trapScore": 2.5,
-      "trapLabel": "TB",
-      "trapReason": "Book Trap (ROE thấp hơn Chi phí vốn CoE)",
+      "trapScore": 0.0,
+      "trapLabel": "THẤP",
+      "trapReason": "Không phát hiện bẫy định giá",
       "isCapPenalized": false,
       "trapsList": [
         {
@@ -323,7 +323,7 @@
         {
           "id": "book_trap",
           "name": "Book Trap",
-          "active": true,
+          "active": false,
           "desc": "P/B rẻ nhưng ROE thấp hơn chi phí vốn CoE (phá hủy giá trị)."
         },
         {
@@ -402,7 +402,7 @@
         "p50": 44.23,
         "p75": 49.71,
         "mean": 44.68,
-        "current": 59.17,
+        "current": 60.65,
         "yearsUsed": 4
       },
       "pbBand": {
@@ -410,7 +410,7 @@
         "p50": 1.25,
         "p75": 1.32,
         "mean": 1.18,
-        "current": 0.6,
+        "current": 0.62,
         "yearsUsed": 4
       },
       "priceBands": {
@@ -457,9 +457,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 59.01,
+          "current": 60.48,
           "sma5y": 44.68,
-          "deltaPct": 32.1,
+          "deltaPct": 35.4,
           "status": "Suy giảm so với TB",
           "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": true
@@ -468,9 +468,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 0.89,
+          "current": 0.91,
           "sma5y": 1.18,
-          "deltaPct": -24.3,
+          "deltaPct": -22.6,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -611,19 +611,21 @@
     },
     "impliedFcfYieldPrice": 6576,
     "aiConvergence": {
-      "convergenceHeadline": "Xung Đột Giữa Định Giá Quỹ Đất (RNAV) Và Thực Tế Dòng Tiền Hoạt Động (DCF)",
-      "divergenceExplanation": "Mô hình RNAV định giá cao quỹ đất tiềm năng chưa khai thác của DXG, tạo ra khoảng cách lớn so với định giá dòng tiền chiết khấu (DCF) và P/E khi doanh nghiệp đang chịu biên an toàn âm (-36.8%) do dòng tiền tự do FCF âm triền miên và lợi nhuận kế toán bị bào mòn.",
-      "sensitivityStory": "Khi chi phí vốn WACC tăng thêm 1.5% do rủi ro chậm cấp phép dự án và lãi suất vay nợ thực tế neo cao, giá trị định giá nội tại của DXG sẽ chịu mức sụt giảm định giá từ 18% đến 22%, nới rộng biên an toàn âm.",
-      "preferredModelRecommendation": "Mô hình RNAV có chiết khấu rủi ro thanh khoản & pháp lý (Haircut RNAV 25-30%) kết hợp P/B mục tiêu theo chu kỳ ngành.",
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "convergenceHeadline": "Xung đột giữa kỳ vọng quỹ đất (RNAV) và thực tế dòng tiền tự do chiết khấu (DCF)",
+      "divergenceExplanation": "Mô hình RNAV thường gán giá trị lạc quan dựa trên diện tích đất thương phẩm kỳ vọng, trong khi mô hình DCF và P/E lại phản ánh biên an toàn âm (-40.2%) do dòng tiền bị âm kéo dài và rủi ro thời gian phát triển dự án kéo dài làm bào mòn giá trị hiện tại ròng.",
+      "sensitivityStory": "Khi chi phí vốn WACC tăng thêm 1.5% trong kịch bản lãi suất huy động và phần bù rủi ro vốn chủ tăng, định giá ròng dự án giảm từ 18% đến 22%, đặt gánh nặng chi phí vốn rất lớn lên quỹ đất đang bị đóng băng pháp lý.",
+      "preferredModelRecommendation": "Mô hình Định giá Giá trị Tài sản ròng có điều chỉnh (Adjusted RNAV) có chiết khấu rủi ro thanh khoản 25% kết hợp DCF từng dự án độc lập.",
+      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "financialRatios": {
     "valuation": {
-      "pe": 59.01,
-      "pb": 0.89,
-      "ps": 2.87,
-      "pCf": -3.6,
+      "pe": 60.48,
+      "pb": 0.91,
+      "ps": 2.94,
+      "pCf": -3.7,
       "evEbitda": null,
       "dividendYield": 0.0
     },
@@ -1903,7 +1905,7 @@
     "sharpeRatio": 0.8,
     "sortinoRatio": 1.14,
     "beta": 1.0,
-    "riskFreeRate": 4.5,
+    "riskFreeRate": 4.47,
     "ratings": {
       "volatility": "Cao",
       "drawdown": "Trung bình",
@@ -1977,7 +1979,7 @@
           "priceHigh": 9859,
           "priceMid": 9734,
           "volume": 23187200.0,
-          "volumePercent": 3.7
+          "volumePercent": 3.8
         },
         {
           "index": 1,
@@ -1985,15 +1987,15 @@
           "priceHigh": 10108,
           "priceMid": 9984,
           "volume": 83686200.0,
-          "volumePercent": 13.5
+          "volumePercent": 13.6
         },
         {
           "index": 2,
           "priceLow": 10108,
           "priceHigh": 10357,
           "priceMid": 10232,
-          "volume": 75997800.0,
-          "volumePercent": 12.3
+          "volume": 89616900.0,
+          "volumePercent": 14.6
         },
         {
           "index": 3,
@@ -2024,8 +2026,8 @@
           "priceLow": 11104,
           "priceHigh": 11353,
           "priceMid": 11228,
-          "volume": 41888500.0,
-          "volumePercent": 6.8
+          "volume": 24473400.0,
+          "volumePercent": 4.0
         },
         {
           "index": 7,
@@ -2033,7 +2035,7 @@
           "priceHigh": 11602,
           "priceMid": 11478,
           "volume": 70656300.0,
-          "volumePercent": 11.4
+          "volumePercent": 11.5
         },
         {
           "index": 8,
@@ -2049,16 +2051,16 @@
           "priceHigh": 12100,
           "priceMid": 11976,
           "volume": 29874900.0,
-          "volumePercent": 4.8
+          "volumePercent": 4.9
         }
       ],
       "poc": {
-        "index": 4,
-        "priceLow": 10606,
-        "priceHigh": 10855,
-        "priceMid": 10730,
-        "volume": 88805400.0,
-        "volumePercent": 14.4
+        "index": 2,
+        "priceLow": 10108,
+        "priceHigh": 10357,
+        "priceMid": 10232,
+        "volume": 89616900.0,
+        "volumePercent": 14.6
       },
       "hvn": [
         {
@@ -2067,7 +2069,15 @@
           "priceHigh": 10108,
           "priceMid": 9984,
           "volume": 83686200.0,
-          "volumePercent": 13.5
+          "volumePercent": 13.6
+        },
+        {
+          "index": 2,
+          "priceLow": 10108,
+          "priceHigh": 10357,
+          "priceMid": 10232,
+          "volume": 89616900.0,
+          "volumePercent": 14.6
         },
         {
           "index": 4,
@@ -2085,7 +2095,15 @@
           "priceHigh": 9859,
           "priceMid": 9734,
           "volume": 23187200.0,
-          "volumePercent": 3.7
+          "volumePercent": 3.8
+        },
+        {
+          "index": 6,
+          "priceLow": 11104,
+          "priceHigh": 11353,
+          "priceMid": 11228,
+          "volume": 24473400.0,
+          "volumePercent": 4.0
         },
         {
           "index": 9,
@@ -2093,19 +2111,19 @@
           "priceHigh": 12100,
           "priceMid": 11976,
           "volume": 29874900.0,
-          "volumePercent": 4.8
+          "volumePercent": 4.9
         }
       ],
       "priceRange": {
         "min": 9610,
         "max": 12100
       },
-      "totalVolume": 618849900
+      "totalVolume": 615053900
     },
     "moneyFlow": {
-      "vpci": 0.84,
-      "vpciStatus": "VOLUME_FADING",
-      "cmf": -0.034,
+      "vpci": 1.02,
+      "vpciStatus": "NORMAL",
+      "cmf": -0.004,
       "cmfStatus": "BALANCED",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -2115,8 +2133,8 @@
       "state": "BALANCED_MARKET"
     },
     "tailRisk": {
-      "skewness": 0.5,
-      "kurtosis": 1.02,
+      "skewness": 0.44,
+      "kurtosis": 0.96,
       "var95": 4.25,
       "var99": 4.66,
       "es95": 4.55,
@@ -2247,6 +2265,20 @@
       },
       {
         "id": "news-DXG-9",
+        "title": "DXG dừng đầu tư hai khu đô thị ngàn tỷ ở Cần Thơ và Phú Thọ",
+        "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-08-05.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-08-05",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOejdlLWVHTVEtLVAwQU5QTVJ3ckxMVDV0VXJlRXEySzlwNzVfQ1FERlRxWWlRX3ZCRzZPQkpRaWxYaE9BODZxVGg1TlczX0MxYkQzakV3Mjc2bFlnTUtpRVZLS2J1QUpPelRKN2w2R3dKcWVHZVhueWNjRzE0X0RDUTJrRHEtenVvRVkyYUQ2UGg3V1ZsMm1zWUlEbTFlUjNPNFMwanluYw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-10",
         "title": "Cổ phiếu DXG có diễn biến mới",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-08-03.",
         "category": "biz",
@@ -2260,21 +2292,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-10",
+        "id": "news-DXG-11",
         "title": "Bluemarq Group công bố KQKD quý II: Hé lộ “điểm tựa” đáng chú ý cho giai đoạn phục hồi sắp tới",
         "summary": "Bản tin phân tích về DXG từ nguồn MoneyF. Cập nhật ngày 2026-08-03.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-08-03",
         "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQZ1ozWXJ0a1h3SkprYU5Xd05FMHBNZ240MTlvWWNzQ0tSYlNxYUZmWVMwbXBxQ1U1ekI3UkszcDRPYW93NjhEWTNyQUE2TzdpN1kzVlJyajVlNjdDNzZQNVotNEJ3SDk4WUx2bmFkZEpjR0tTUTJvQmpCOEJSaWNJbDhn?oc=5",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQcEk2TGZJcTgwUEhTcmtheElqZUZTTHZ6ZkhyVy03eGlsVWtfRW9nU0daZWNYYTB4b1BtVWlYdWtWNXFlMS1paDFYcXJaaHpEa2RYNUpaUkpzYmlELUM2T3BKMGIybHlkeXptTm1rYml6THJldmtXX3FidVRxbXZnc3g1aw?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
         "impact": "Rất cao",
         "weight": 2.0
       },
       {
-        "id": "news-DXG-11",
+        "id": "news-DXG-12",
         "title": "Chi phí tăng cao khiến lợi nhuận DXG giảm sâu",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -2288,7 +2320,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-12",
+        "id": "news-DXG-13",
         "title": "DXG cập nhật kết quả kinh doanh đáng chú ý trong quý II/2026",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2302,7 +2334,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-13",
+        "id": "news-DXG-14",
         "title": "Bluemarq Group đạt 93% kế hoạch lợi nhuận sau nửa năm, cắt giảm gần 330 nhân sự",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2316,7 +2348,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-14",
+        "id": "news-DXG-15",
         "title": "Cổ phiếu bất động sản 'rơi' mạnh, có mã rẻ như trà đá",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-07-28.",
         "category": "sector",
@@ -2330,7 +2362,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-15",
+        "id": "news-DXG-16",
         "title": "Cổ phiếu DXG giảm sàn sau khi mất cổ đông lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn VnBusiness. Cập nhật ngày 2026-07-20.",
         "category": "disclosure",
@@ -2344,7 +2376,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-16",
+        "id": "news-DXG-17",
         "title": "Dragon Capital tiếp tục bán cổ phiếu DXG, không còn là cổ đông lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn Znews. Cập nhật ngày 2026-07-19.",
         "category": "disclosure",
@@ -2358,7 +2390,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-17",
+        "id": "news-DXG-18",
         "title": "Dragon Capital không còn là cổ đông lớn tại Bluemarq Group (DXG)",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-17.",
         "category": "disclosure",
@@ -2372,7 +2404,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-18",
+        "id": "news-DXG-19",
         "title": "Dự báo lợi nhuận quý II/2026 nhóm bất động sản: 2 ông lớn tăng 6x%, KDH, DXG hụt hơi",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-08.",
         "category": "biz",
@@ -2386,7 +2418,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-19",
+        "id": "news-DXG-20",
         "title": "Dự báo lợi nhuận quý 2/2026 nhóm doanh nghiệp bất động sản lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-06-20.",
         "category": "biz",
@@ -2400,7 +2432,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-20",
+        "id": "news-DXG-21",
         "title": "Nhóm quỹ Dragon Capital tiếp tục bán hàng triệu cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-06-18.",
         "category": "biz",
@@ -2414,7 +2446,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-21",
+        "id": "news-DXG-22",
         "title": "Dragon Capital giảm sở hữu tại DXG xuống dưới 6% sau giao dịch lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn VnEconomy. Cập nhật ngày 2026-06-18.",
         "category": "disclosure",
@@ -2428,7 +2460,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-22",
+        "id": "news-DXG-23",
         "title": "Nhóm Dragon Capital bán ra 2,6 triệu cổ phiếu Bluemarq Group (DXG)",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-06-17.",
         "category": "disclosure",
@@ -2442,7 +2474,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-23",
+        "id": "news-DXG-24",
         "title": "DXG tăng vốn lên gần 12.700 tỷ đồng: Vì sao cổ phiếu vẫn chưa thuyết phục dòng tiền?",
         "summary": "Bản tin phân tích về DXG từ nguồn Thế giới ảnh. Cập nhật ngày 2026-06-05.",
         "category": "biz",
@@ -2456,7 +2488,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-24",
+        "id": "news-DXG-25",
         "title": "Cổ phiếu DXG mất gần 20% trong nửa tháng, vì sao vẫn được khuyến nghị MUA với kỳ vọng tăng hơn 32%?",
         "summary": "Bản tin phân tích về DXG từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-06-04.",
         "category": "analyst",
@@ -2470,7 +2502,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-25",
+        "id": "news-DXG-26",
         "title": "DXG tăng vốn lên gần 12.700 tỷ đồng sau đợt chia cổ phiếu thưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-06-04.",
         "category": "disclosure",
@@ -2484,7 +2516,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-26",
+        "id": "news-DXG-27",
         "title": "Cổ phiếu DXG bất ngờ giảm sàn",
         "summary": "Bản tin phân tích về DXG từ nguồn Laodong.vn. Cập nhật ngày 2026-05-20.",
         "category": "biz",
@@ -2498,7 +2530,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-27",
+        "id": "news-DXG-28",
         "title": "Cổ phiếu DXG “lau sàn” dư bán gần 5 triệu cp",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-05-20.",
         "category": "biz",
@@ -2512,7 +2544,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-28",
+        "id": "news-DXG-29",
         "title": "DXG chốt quyền nhận cổ phiếu thưởng 14%, tăng vốn lên gần 12.700 tỷ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Tạp chí điện tử Thương Trường. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2526,7 +2558,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-29",
+        "id": "news-DXG-30",
         "title": "DXG chốt quyền phân bổ 155,7 triệu cổ phiếu thưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2540,7 +2572,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-30",
+        "id": "news-DXG-31",
         "title": "DXG chốt phát hành gần 156 triệu cổ phiếu thưởng ngay sau màn “thay tên đổi họ”",
         "summary": "Bản tin phân tích về DXG từ nguồn 24HMoney. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2554,7 +2586,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-31",
+        "id": "news-DXG-32",
         "title": "Vừa đổi tên, Bluemarq (DXG) đã dành hơn 1.500 tỷ đồng phát hành cổ phiếu trả cổ tức tỷ lệ 14%",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-05-20.",
         "category": "disclosure",
@@ -2568,7 +2600,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-32",
+        "id": "news-DXG-33",
         "title": "Tập đoàn Đất Xanh công bố tái cấu trúc và giới thiệu thương hiệu mới",
         "summary": "Bản tin phân tích về DXG từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-05-20.",
         "category": "biz",
@@ -2582,7 +2614,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-33",
+        "id": "news-DXG-34",
         "title": "DXG triển khai phát hành hơn 155 triệu cổ phiếu thưởng sau đổi tên",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-05-13.",
         "category": "disclosure",
@@ -2596,7 +2628,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-34",
+        "id": "news-DXG-35",
         "title": "Bluemarq Group (DXG) muốn phát hành hơn 155 triệu cổ phiếu thưởng, dự tăng vốn lên gần 12.700 tỷ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-05-10.",
         "category": "disclosure",
@@ -2610,7 +2642,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-35",
+        "id": "news-DXG-36",
         "title": "DXG triển khai phương án phát hành cổ phiếu thưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-05-09.",
         "category": "disclosure",
@@ -2624,7 +2656,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-36",
+        "id": "news-DXG-37",
         "title": "Đất Xanh (DXG) báo lãi quý I/2026 tăng 173% lên 214 tỷ đồng, lộ diện 'gà đẻ trứng vàng' mới",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-05-04.",
         "category": "biz",
@@ -2638,7 +2670,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-37",
+        "id": "news-DXG-38",
         "title": "Nhờ đâu lợi nhuận quý 1/2026 của Đất Xanh gấp gần 3 lần cùng kỳ",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-05-03.",
         "category": "biz",
@@ -2652,7 +2684,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-38",
+        "id": "news-DXG-39",
         "title": "Đất Xanh đạt 80% kế hoạch lợi nhuận năm sau quý 1, cho vay bí ẩn hơn 3.3 ngàn tỷ",
         "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-05-01.",
         "category": "biz",
@@ -2666,7 +2698,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-39",
+        "id": "news-DXG-40",
         "title": "Tập đoàn Đất Xanh (DXG): Hoàn thành 80% kế hoạch lợi nhuận quý I/2026, xuất hiện khoản cho vay hơn 3.300 tỷ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-05-01.",
         "category": "biz",
@@ -2680,7 +2712,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-40",
+        "id": "news-DXG-41",
+        "title": "Tổng Giám đốc Đất Xanh bán toàn bộ cổ phiếu DXG",
+        "summary": "Bản tin phân tích về DXG từ nguồn Chứng khoán DNSE. Cập nhật ngày 2026-04-30.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-30",
+        "source": "Chứng khoán DNSE",
+        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNbzVKYTI4QVd5enRTSVdtLUNPN2RMOEhWaXZOb3hRbjhicm5NNzJsdGFJU0NwNm9kdHZ0QzFOdy1tX3NHZzVPVnNHWE1KM2RMdlNtUkJLZnE5c2pwMkxoT3RhdDJnWG1JZW9PcEJ3RE1VdHQwdGxaZkVLM0pqMlpFRDduTFpCdkpZYjFmcmN2RFo0MXBVcmZmUjc5Yw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-42",
         "title": "ĐHĐCĐ Đất Xanh (DXG) 2026: Đặt mục tiêu doanh thu 5.000 tỷ, tái cấu trúc cho chiến lược tăng trưởng bền vững",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-04-17.",
         "category": "biz",
@@ -2694,7 +2740,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-41",
+        "id": "news-DXG-43",
         "title": "ĐHĐCĐ Đất Xanh: Thưởng cổ phiếu, đổi tên công ty",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-17.",
         "category": "disclosure",
@@ -2708,7 +2754,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-42",
+        "id": "news-DXG-44",
         "title": "ĐHĐCĐ Tập đoàn Đất Xanh 2026: Đặt mục tiêu doanh thu 5.000 tỉ đồng",
         "summary": "Bản tin phân tích về DXG từ nguồn Laodong.vn. Cập nhật ngày 2026-04-17.",
         "category": "biz",
@@ -2722,7 +2768,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-43",
+        "id": "news-DXG-45",
         "title": "ĐHĐCĐ Đất Xanh 2026: Chuẩn bị “bứt tốc”, đặt mục tiêu lãi tối thiểu 2.000 tỷ đồng mỗi năm từ 2027",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-04-17.",
         "category": "disclosure",
@@ -2736,7 +2782,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-44",
+        "id": "news-DXG-46",
         "title": "ĐHĐCĐ 2026: Đất Xanh (DXG) lên kế hoạch thu 5.000 tỷ đồng, chia thưởng cổ phiếu tỷ lệ 14%",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-04-17.",
         "category": "disclosure",
@@ -2750,7 +2796,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-45",
+        "id": "news-DXG-47",
         "title": "ĐHĐCĐ 2026 Đất Xanh (DXG): Nắm trong tay 10 dự án trung tâm TP.HCM, tái cấu trúc thương hiệu tiến lên quy mô toàn cầu",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-04-17.",
         "category": "sector",
@@ -2764,7 +2810,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-46",
+        "id": "news-DXG-48",
         "title": "ĐHĐCĐ Đất Xanh: Mở bán The Privé giai đoạn 3 vào cuối năm, công bố thời điểm ra mắt thương hiệu mới, mục tiêu lãi tối thiểu 2.000 tỷ mỗi năm giai đoạn 2027 - 2031",
         "summary": "Bản tin phân tích về DXG từ nguồn VietnamBiz. Cập nhật ngày 2026-04-17.",
         "category": "disclosure",
@@ -2778,7 +2824,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-47",
+        "id": "news-DXG-49",
         "title": "Đất Xanh có chủ tịch và tổng giám đốc mới trước thềm đại hội",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-16.",
         "category": "disclosure",
@@ -2792,7 +2838,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-48",
+        "id": "news-DXG-50",
         "title": "Giao dịch trái chiều của cổ đông lớn và lãnh đạo doanh nghiệp tại DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn VnEconomy. Cập nhật ngày 2026-04-15.",
         "category": "disclosure",
@@ -2800,34 +2846,6 @@
         "date": "2026-04-15",
         "source": "VnEconomy",
         "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPbmliYzN6TGFyRF9DOFZucWpXaUI2by1DeGVsTS1PVHpzdzdqbzQteXNfTE5HOVlTbkZ4U3dQU2VCSjV1LW1CRU9GSW1zUG1BcTBmOEdjRldqVklkdkNnN2UwNnBfXzNwSm1Yazl4N1BxWHhGaU4xTzZYZlVqQTYtdW1yay1GUk9oLW9OMFItY29Wd1N4YzZHVUVn?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-49",
-        "title": "VinaCapital mua thêm 3,8 triệu cổ phiếu DXG",
-        "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-13.",
-        "category": "analyst",
-        "categoryLabel": "Phân Tích CTCK",
-        "date": "2026-04-13",
-        "source": "Mekong ASEAN",
-        "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPTlI0emxnYzJFYnFhRnp6RHJTQkM3SWp5UWVybmVmSG13V0tBWk44eFdnRG1kRURHVGxIT3BSaFYyTGxYVldvaTNKbVVXOFNyNlFLMnVCQ2VTQnAyWWFIaUJ2c2hPaS16b2J6c0NEcTVkdGxmSEl6alE1RWd6aFpSSE9B?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-50",
-        "title": "Đất Xanh (DXG) muốn đổi tên, đặt mục tiêu doanh thu 5.000 tỷ đồng năm 2026",
-        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-04-11.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-11",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNbTN5Q1NrclV2cHFlTzlLdWNHYWRuNzl5SWNNN2VjcjI3dHZvNy14cnA4a1NrOFgxMEFDb21VTFByanpJMllPd2ctM0JUeG1zQnV5c25wZllQQXdKU2Jhekx0MlNNMjhBeGZCTFB6b3FoNW82bWhfWVUxN1p4LTZBMDd1X3BnazRyMktXX2lmc3duaDRWVl9zdDNFbkNYQTVtWlNiYV9ZLW9hUl9vV0pV?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -2845,9 +2863,9 @@
       "totalCount": 50,
       "categoryScores": {
         "biz": 26.3,
-        "analyst": 80.0,
+        "analyst": 100.0,
         "sector": 0.0,
-        "disclosure": 4.8
+        "disclosure": 4.5
       }
     },
     "tldr": {
@@ -2878,16 +2896,20 @@
     },
     "aiNewsAnalysis": {
       "overallSentiment": "Trung Tính",
-      "sentimentScore": 48,
-      "executiveSummary": "Dòng thông tin thời gian qua tập trung chủ yếu vào nỗ lực tái cấu trúc nghĩa vụ nợ trái phiếu và hoàn thiện pháp lý để tái khởi động Datxanh Homes Riverside. Mặc dù tâm lý ngành bất động sản có dấu hiệu hồi phục dần, tiến độ hiện thực hóa doanh số bán hàng tại các dự án vùng ven vẫn diễn biến thận trọng.",
+      "sentimentScore": 50,
+      "executiveSummary": "Dòng chảy thông tin gần đây tập trung vào nỗ lực tái cấu trúc nợ trái phiếu và các động thái pháp lý liên quan đến tháo gỡ vướng mắc dự án trọng điểm Gem Riverside. Tâm lý thị trường phản ánh sự thận trọng cân bằng giữa kỳ vọng tạo đáy của ngành bất động sản và lo ngại áp lực phát hành tăng vốn.",
       "catalysts": [
-        "Kỳ vọng tái khởi động và cấp phép xây dựng hoàn chỉnh cho dự án Datxanh Homes Riverside trong các quý tới."
+        "Thông điệp hỗ trợ pháp lý quyết liệt từ các cơ quan quản lý đối với các vướng mắc phân lô bán nền và tiền sử dụng đất.",
+        "Thanh khoản thị trường giao dịch căn hộ tại khu vực phía Nam có dấu hiệu hồi phục cục bộ."
       ],
       "keyRisks": [
-        "Áp lực dòng tiền trả nợ gốc và tiến độ hấp thụ chậm tại phân khúc đất nền dự án Gem Sky World (Đồng Nai)."
+        "Áp lực dư luận và tiến độ giải quyết quyền lợi khách hàng tại dự án Gem Sky World (Đồng Nai).",
+        "Kế hoạch phát hành cổ phiếu riêng lẻ hoặc quyền mua có thể tạo áp lực cung ngắn hạn lên giá cổ phiếu."
       ],
       "catalystTimeline": "Trung hạn (3-6 tháng)",
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -3129,58 +3151,64 @@
     },
     "aiAuditComment": {
       "auditVerdict": "Cần Lưu Ý Kế Toán",
-      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.91 tuy nằm dưới ngưỡng gian lận (-1.78) nhưng đã tiệm cận vùng xám (grey zone), phản ánh độ nhạy cao trong việc vốn hóa chi phí dở dang và ghi nhận doanh thu. Chất lượng tài sản cần được giám sát chặt chẽ ở các khoản tạm ứng, đặt cọc nhận chuyển nhượng dự án kéo dài nhiều kỳ.",
-      "dupontEarningsQuality": "Chất lượng ROE (0.25%) ở mức suy kiệt nghiêm trọng; nguyên nhân cốt lõi không nằm ở áp lực nợ (đòn bẩy 1.88x ở ngưỡng an toàn) mà do vòng quay tài sản tê liệt (0.08x) và biên EBIT teo tóp (1.65%), chứng minh quy mô tài sản lớn nhưng hiệu quả chuyển hóa thành dòng tiền lợi nhuận gần như bằng không.",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score đạt -1.91 nằm dưới ngưỡng thao túng danh nghĩa (-1.78) nhưng thuộc vùng cận biên (grey zone), đòi hỏi giám sát chặt chẽ các khoản mục chi phí dở dang và biến động phải thu. Tỷ số Gánh nặng Lãi vay bằng 1.0x là chỉ dấu rõ ràng của việc vốn hóa phần lớn chi phí lãi vay vào giá trị tồn kho dự án thay vì ghi nhận vào báo cáo kết quả kinh doanh.",
+      "dupontEarningsQuality": "Chất lượng ROE (0.25%) cực kỳ yếu, được cấu thành từ biên EBIT mỏng (1.65%) và vòng quay tài sản rất chậm (0.08 lần), cho thấy năng lực biến tài sản thành dòng tiền và lợi nhuận thực tế chưa tương xứng với quy mô bảng cân đối.",
       "auditorChecklist": [
-        "Tiêu chí đánh giá suy giảm giá trị và khả năng trích lập dự phòng đối với hàng tồn kho tại các dự án chậm tiến độ (Gem Sky World, Datxanh Homes Riverside)?",
-        "Thực trạng dòng tiền thu hồi từ các khoản phải thu hợp tác đầu tư và tạm ứng phát triển dự án cho các bên liên quan?"
+        "Thuyết minh chi tiết giá trị chi phí lãi vay được vốn hóa trong kỳ lũy kế vào các dự án Gem Riverside và Gem Sky World là bao nhiêu?",
+        "Tiến độ thu hồi và rủi ro trích lập dự phòng đối với các khoản tạm ứng, đặt cọc nhận chuyển nhượng dự án cho các bên đối tác?"
       ],
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "aiDeepDive": {
-    "thesisHeadline": "Định Giá Vượt Trước Năng Lực Sinh Lời: Tồn Kho Đóng Băng Đè Nặng Hiệu Suất Vốn",
-    "cfaSummary": "DXG đang đối mặt với sự suy giảm nghiêm trọng về chất lượng sinh lời khi ROE chạm mức 0.25% do vòng quay tài sản đình trệ (0.08x) và biên hoạt động mỏng (1.65%). Mức biên an toàn âm (-36.8%) phản ánh thị trường đang định giá quá sớm triển vọng tháo gỡ pháp lý của các dự án trọng điểm so với dòng tiền thực tế doanh nghiệp có thể tạo ra.",
+    "thesisHeadline": "Tồn kho luân chuyển chậm và biên lợi nhuận mỏng; Kỳ vọng phục hồi phụ thuộc hoàn toàn vào pháp lý Gem Riverside",
+    "cfaSummary": "DXG đang đối mặt với giai đoạn hiệu quả sinh lời chạm đáy khi ROE chỉ đạt 0.25% và biên hoạt động mỏng manh 1.65%, hệ quả của việc dòng vốn bị giam tại các dự án tồn kho dở dang kéo dài. Mặc dù cấu trúc đòn bẩy tài chính (1.88x) chưa ở mức báo động đỏ, định giá thị trường hiện tại đang phản ánh quá sớm kỳ vọng phục hồi khiến biên an toàn bị âm sâu (-40.2%).",
     "coreCatalysts": [
-      "Tiến trình khơi thông pháp lý và mở bán lại dự án Datxanh Homes Riverside (Gem Riverside) tại TP. Thủ Đức.",
-      "Sự phục hồi thanh khoản giao dịch bất động sản sơ cấp thúc đẩy doanh thu mảng dịch vụ môi giới qua DXS."
+      "Nút thắt pháp lý dự án Datxanhhomes Riverside (Gem Riverside - TP. Thủ Đức) được tháo gỡ triệt để để mở bán lại.",
+      "Sự ấm lên của thị trường bất động sản sơ cấp kích hoạt doanh thu mảng môi giới thông qua công ty con Dat Xanh Services (DXS)."
     ],
     "investmentRisks": [
-      "Hiệu suất luân chuyển tài sản tê liệt (0.08x) làm gia tăng chi phí cơ hội vốn và gánh nặng chi phí vốn hóa vào hàng tồn kho.",
-      "Rủi ro pha loãng giá trị cổ phiếu từ các đợt chào bán tăng vốn để giải quyết áp lực nợ gốc và tài trợ dự án."
+      "Tiến độ cấp phép và phê duyệt nghĩa vụ tài chính bổ sung tại các đại dự án tiếp tục bị trì hoãn.",
+      "Rủi ro pha loãng giá trị cổ phiếu từ các kế hoạch chào bán tăng vốn để tài trợ dòng tiền hoạt động và tái cơ cấu nợ."
     ],
-    "recommendation": "CÂN NHẮC CHỐT LỜI",
+    "recommendation": "THEO DÕI NẮM GIỮ",
     "targetHorizon": "12 - 24 Tháng",
-    "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+    "updatedAt": "2026-10-15T16:05:54.289047+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   },
   "dividendSustainability": {
     "aiDividendAudit": {
       "safetyRating": "Nguy Cơ Bẫy Cổ Tức (Trap Risk)",
-      "fcfCoverageVerdict": "Doanh nghiệp không có năng lực chi trả cổ tức bằng tiền mặt do dòng tiền tự do (FCF) bị thâm hụt liên tục để tài trợ hàng tồn kho, đền bù giải phóng mặt bằng và thanh toán các nghĩa vụ nợ đến hạn.",
+      "fcfCoverageVerdict": "Doanh nghiệp không có khả năng bảo chứng cổ tức bằng tiền mặt do dòng tiền tự do (FCF) thâm hụt liên tục để phục vụ tích lũy hàng tồn kho và nghĩa vụ nợ vay.",
       "trapRiskLevel": "Cao",
       "capitalAllocationScore": 4.0,
-      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn kém hiệu quả; doanh nghiệp liên tục phụ thuộc vào việc huy động vốn từ cổ đông đại chúng qua phát hành thêm để bù đắp thiếu hụt dòng tiền hoạt động, thay vì tích lũy dòng tiền hữu hình để hoàn trả cho nhà đầu tư.",
-      "outlook3Y": "Dự kiến DXG sẽ tiếp tục chính sách không chia cổ tức tiền mặt hoặc chỉ chia cổ tức bằng cổ phiếu trong 1-3 năm tới nhằm giữ lại toàn bộ thanh khoản phục vụ tái cơ cấu tài chính.",
+      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn tập trung tuyệt đối vào việc giữ lại lợi nhuận và huy động thêm vốn cổ phần/nợ vay để phát triển quỹ đất, không ưu tiên trả cổ tức tiền mặt cho cổ đông.",
+      "outlook3Y": "Dự phóng trong 1-3 năm tới doanh nghiệp sẽ tiếp tục không chi trả hoặc chỉ chi trả cổ tức bằng cổ phiếu để bảo toàn thanh khoản phục vụ triển khai các dự án quy mô lớn.",
       "redFlags": [
-        "Dòng tiền tự do (FCF) và dòng tiền thuần từ hoạt động kinh doanh (CFO) liên tục âm hoặc bấp bênh.",
-        "Tỷ suất sinh lời trên vốn chủ sở hữu (ROE) sụt giảm sâu về 0.25%, mất khả năng bảo toàn sức mua cho vốn cổ đông.",
-        "Tần suất phát hành tăng vốn và pha loãng cổ phiếu diễn ra thường xuyên để bù đắp dòng tiền tài trợ dự án."
+        "Dòng tiền tự do FCF âm kéo dài do chu kỳ phát triển dự án bị tắc nghẽn.",
+        "Ưu tiên chiến lược phân bổ vốn là tăng vốn điều lệ và trả nợ thay vì chia sẻ dòng tiền thực tế cho nhà đầu tư."
       ],
-      "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+      "updatedAt": "2026-10-15T16:05:54.289047+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "aiDividendAudit": {
     "safetyRating": "Nguy Cơ Bẫy Cổ Tức (Trap Risk)",
-    "fcfCoverageVerdict": "Doanh nghiệp không có năng lực chi trả cổ tức bằng tiền mặt do dòng tiền tự do (FCF) bị thâm hụt liên tục để tài trợ hàng tồn kho, đền bù giải phóng mặt bằng và thanh toán các nghĩa vụ nợ đến hạn.",
+    "fcfCoverageVerdict": "Doanh nghiệp không có khả năng bảo chứng cổ tức bằng tiền mặt do dòng tiền tự do (FCF) thâm hụt liên tục để phục vụ tích lũy hàng tồn kho và nghĩa vụ nợ vay.",
     "trapRiskLevel": "Cao",
     "capitalAllocationScore": 4.0,
-    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn kém hiệu quả; doanh nghiệp liên tục phụ thuộc vào việc huy động vốn từ cổ đông đại chúng qua phát hành thêm để bù đắp thiếu hụt dòng tiền hoạt động, thay vì tích lũy dòng tiền hữu hình để hoàn trả cho nhà đầu tư.",
-    "outlook3Y": "Dự kiến DXG sẽ tiếp tục chính sách không chia cổ tức tiền mặt hoặc chỉ chia cổ tức bằng cổ phiếu trong 1-3 năm tới nhằm giữ lại toàn bộ thanh khoản phục vụ tái cơ cấu tài chính.",
+    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn tập trung tuyệt đối vào việc giữ lại lợi nhuận và huy động thêm vốn cổ phần/nợ vay để phát triển quỹ đất, không ưu tiên trả cổ tức tiền mặt cho cổ đông.",
+    "outlook3Y": "Dự phóng trong 1-3 năm tới doanh nghiệp sẽ tiếp tục không chi trả hoặc chỉ chi trả cổ tức bằng cổ phiếu để bảo toàn thanh khoản phục vụ triển khai các dự án quy mô lớn.",
     "redFlags": [
-      "Dòng tiền tự do (FCF) và dòng tiền thuần từ hoạt động kinh doanh (CFO) liên tục âm hoặc bấp bênh.",
-      "Tỷ suất sinh lời trên vốn chủ sở hữu (ROE) sụt giảm sâu về 0.25%, mất khả năng bảo toàn sức mua cho vốn cổ đông.",
-      "Tần suất phát hành tăng vốn và pha loãng cổ phiếu diễn ra thường xuyên để bù đắp dòng tiền tài trợ dự án."
+      "Dòng tiền tự do FCF âm kéo dài do chu kỳ phát triển dự án bị tắc nghẽn.",
+      "Ưu tiên chiến lược phân bổ vốn là tăng vốn điều lệ và trả nợ thay vì chia sẻ dòng tiền thực tế cho nhà đầu tư."
     ],
-    "updatedAt": "2026-10-14T16:29:17.048697+00:00"
+    "updatedAt": "2026-10-15T16:05:54.289047+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   }
 }

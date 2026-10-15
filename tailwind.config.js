@@ -10,8 +10,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Chuẩn hoá hệ màu trung tính: Map gray sang slate để triệt tiêu 100% lệch màu giữa các component
-        gray: colors.slate,
+        gray: {
+          ...colors.slate,
+          750: '#243044',
+          850: '#172033',
+        },
+        slate: {
+          ...colors.slate,
+          750: '#243044',
+          850: '#172033',
+        },
         gain: colors.emerald,
         loss: colors.rose,
         theme: {
