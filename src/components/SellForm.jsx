@@ -1,60 +1,100 @@
 import { useEffect, useMemo, useState } from 'react';
 import { addSellOrder } from '../utils/api.js';
 import { DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate, fmtMoney, getTodayDate, plBg, plColor } from '../utils/format.js';
+import { DEFAULT_TRADE_FEE_PCT } from '../utils/constants.js';
+import TagSelector from './common/TagSelector.jsx';
 
 export default function SellForm({
   onSuccess,
   portfolio = [],
   initialSymbol = '',
   initialQuantity = null,
+  initialPrice = '',
+  marketPrices = {},
 }) {
-  const [form, setForm] = useState({
-    symbol: initialSymbol || '',
-    quantity: initialQuantity ? String(initialQuantity) : '100',
-    price: '',
-    feePct: '0.1',
-    note: '',
-    date: getTodayDate(),
-    matchMethod: 'lowest', // 'lowest' | 'highest' | 'fifo'
+  const [form, setForm] = useState(() => {
+    const sym = initialSymbol ? initialSymbol.toUpperCase() : '';
+    const p = sym ? portfolio.find(item => item.symbol === sym) : null;
+    const mPrice = sym ? marketPrices[sym]?.price : null;
+    const resolvedPrice = initialPrice
+      ? String(initialPrice)
+      : (mPrice || p?.avgCost ? String((mPrice || p.avgCost) / 1000) : '');
+
+    return {
+      symbol: sym,
+      quantity: initialQuantity ? String(initialQuantity) : (p ? String(p.totalQty) : '100'),
+      price: resolvedPrice,
+      feePct: '0.1',
+      note: '',
+      date: getTodayDate(),
+      matchMethod: 'lowest', // 'lowest' | 'highest' | 'fifo'
+    };
   });
 
   useEffect(() => {
     if (initialSymbol) {
-      setForm(f => ({ ...f, symbol: initialSymbol.toUpperCase() }));
-    }
-  }, [initialSymbol]);
+      const sym = initialSymbol.toUpperCase();
+      const p = portfolio.find(item => item.symbol === sym);
+      const mPrice = marketPrices[sym]?.price;
+      const resolvedPrice = initialPrice
+        ? String(initialPrice)
+        : (mPrice || p?.avgCost ? String((mPrice || p.avgCost) / 1000) : '');
 
-  useEffect(() => {
-    if (initialQuantity) {
+      setForm(f => ({
+        ...f,
+        symbol: sym,
+        quantity: initialQuantity ? String(initialQuantity) : (p ? String(p.totalQty) : f.quantity),
+        price: resolvedPrice || f.price,
+      }));
+    } else if (initialQuantity) {
       setForm(f => ({ ...f, quantity: String(initialQuantity) }));
     }
-  }, [initialQuantity]);
+    if (initialPrice) {
+      setForm(f => ({ ...f, price: String(initialPrice) }));
+    }
+  }, [initialSymbol, initialQuantity, initialPrice, marketPrices]);
 
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedDiscipline, setSelectedDiscipline] = useState('');
-  const [customTag, setCustomTag] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null); // kết quả lãi/lỗ sau khi bán
 
+  // Giá tham chiếu cho mã bán đang chọn
+  const currentSellRefPrices = useMemo(() => {
+    if (!form.symbol) return null;
+    const sym = form.symbol.toUpperCase();
+    const marketPrice = marketPrices[sym]?.price;
+    const portfolioStock = portfolio.find(p => p.symbol === sym);
+    const avgCost = portfolioStock?.avgCost;
+    const breakEven = portfolioStock?.breakEvenPrice || avgCost;
+
+    return {
+      marketPrice: marketPrice ? marketPrice / 1000 : null,
+      avgCost: avgCost ? avgCost / 1000 : null,
+      breakEven: breakEven ? breakEven / 1000 : null,
+    };
+  }, [form.symbol, marketPrices, portfolio]);
+
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: name === 'symbol' ? value.toUpperCase() : value }));
+    if (name === 'symbol') {
+      const upper = value.toUpperCase();
+      const p = portfolio.find(item => item.symbol === upper);
+      const mPrice = marketPrices[upper]?.price;
+      const resolvedPrice = (mPrice || p?.avgCost) ? String((mPrice || p.avgCost) / 1000) : '';
+
+      setForm(f => ({
+        ...f,
+        symbol: upper,
+        quantity: p ? String(p.totalQty) : f.quantity,
+        price: resolvedPrice || f.price,
+      }));
+    } else {
+      setForm(f => ({ ...f, [name]: value }));
+    }
     setResult(null);
     setError('');
-  }
-
-  function selectTag(tag) {
-    setSelectedTag(prev => (prev === tag ? '' : tag));
-  }
-
-  function handleAddCustomTag(e) {
-    e.preventDefault();
-    const trimmed = customTag.trim();
-    if (trimmed) {
-      setSelectedTag(trimmed);
-      setCustomTag('');
-    }
   }
 
   // Tìm số lượng khả dụng và các lô trong portfolio
@@ -107,13 +147,17 @@ export default function SellForm({
     let grossRevenue = 0;
     let fee = 0;
     let netRevenue = 0;
+    let netSellPrice = null;
+    let diffPerShare = 0;
     let estPL = 0;
     let estPLPct = 0;
 
     if (sellPrice) {
       grossRevenue = requestedQty * sellPrice;
-      fee = grossRevenue * (feePercent / 100);
+      fee = Math.round(grossRevenue * (feePercent / 100));
       netRevenue = grossRevenue - fee;
+      netSellPrice = requestedQty > 0 ? (netRevenue / requestedQty) : sellPrice;
+      diffPerShare = netSellPrice - avgCost;
       estPL = netRevenue - totalCost;
       estPLPct = totalCost > 0 ? ((estPL / totalCost) * 100).toFixed(2) : 0;
     }
@@ -124,6 +168,9 @@ export default function SellForm({
       totalCost,
       matched,
       sellPrice,
+      netSellPrice,
+      feePercent,
+      diffPerShare,
       grossRevenue,
       fee,
       netRevenue,
@@ -204,20 +251,30 @@ export default function SellForm({
                 ⚡ Chọn nhanh mã trong tài khoản:
               </span>
               <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-                {portfolio.filter(p => p.totalQty > 0).map(p => (
-                  <button
-                    key={p.symbol}
-                    type="button"
-                    onClick={() => setForm(f => ({ ...f, symbol: p.symbol, quantity: String(p.totalQty) }))}
-                    className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all cursor-pointer ${
-                      form.symbol === p.symbol
-                        ? 'bg-rose-600 text-white border-rose-600 shadow-2xs'
-                        : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-600 hover:border-rose-400'
-                    }`}
-                  >
-                    {p.symbol} ({p.totalQty.toLocaleString()})
-                  </button>
-                ))}
+                {portfolio.filter(p => p.totalQty > 0).map(p => {
+                  const pPrice = (marketPrices[p.symbol]?.price || p.avgCost)
+                    ? String((marketPrices[p.symbol]?.price || p.avgCost) / 1000)
+                    : '';
+                  return (
+                    <button
+                      key={p.symbol}
+                      type="button"
+                      onClick={() => setForm(f => ({
+                        ...f,
+                        symbol: p.symbol,
+                        quantity: String(p.totalQty),
+                        price: pPrice || f.price,
+                      }))}
+                      className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all cursor-pointer ${
+                        form.symbol === p.symbol
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-2xs'
+                          : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-600 hover:border-rose-400'
+                      }`}
+                    >
+                      {p.symbol} ({p.totalQty.toLocaleString()})
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -320,48 +377,126 @@ export default function SellForm({
             </div>
           </div>
 
-          {/* GIÁ BÁN (x1.000đ) */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
-                Giá Bán (x1.000đ) <span className="text-red-500">*</span>
-              </label>
-              <span className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold">
-                Đơn vị: Nghìn đồng (VNĐ)
-              </span>
-            </div>
-            <div className="relative">
-              <input
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                inputMode="decimal"
-                type="number"
-                step="any"
-                min="0.001"
-                placeholder="VD: 26.5 (= 26.500đ)"
-                className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all pr-24"
-              />
-              <span className="absolute right-3 top-2.5 text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-100/80 dark:bg-rose-950 px-2.5 py-1 rounded-xl">
-                × 1.000đ
-              </span>
+          {/* GIÁ BÁN (x1.000đ) & PHÍ BÁN (%) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
+                  Giá Bán (x1.000đ) <span className="text-red-500">*</span>
+                </label>
+                <span className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold">
+                  Đơn vị: Nghìn đồng (VNĐ)
+                </span>
+              </div>
+              <div className="relative">
+                <input
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  inputMode="decimal"
+                  type="number"
+                  step="any"
+                  min="0.001"
+                  placeholder="VD: 26.5 (= 26.500đ)"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all pr-24"
+                />
+                <span className="absolute right-3 top-2.5 text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-100/80 dark:bg-rose-950 px-2.5 py-1 rounded-xl">
+                  × 1.000đ
+                </span>
+              </div>
+
+              {/* Quick Price Helper Chips */}
+              {currentSellRefPrices && (currentSellRefPrices.marketPrice || currentSellRefPrices.avgCost || currentSellRefPrices.breakEven) && (
+                <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                  <span className="text-[11px] font-semibold text-gray-500 dark:text-slate-400">Gợi ý giá:</span>
+                  {currentSellRefPrices.marketPrice && (
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, price: String(currentSellRefPrices.marketPrice) }))}
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                        Number(form.price) === currentSellRefPrices.marketPrice
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-2xs'
+                          : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100'
+                      }`}
+                      title="Điền giá theo thị giá sàn hiện tại"
+                    >
+                      <span>⚡ Thị giá:</span>
+                      <span>{currentSellRefPrices.marketPrice} (= {fmtMoney(currentSellRefPrices.marketPrice * 1000)}đ)</span>
+                    </button>
+                  )}
+                  {currentSellRefPrices.avgCost && (
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, price: String(currentSellRefPrices.avgCost) }))}
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                        Number(form.price) === currentSellRefPrices.avgCost
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
+                          : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                      }`}
+                      title="Điền giá theo giá vốn bình quân"
+                    >
+                      <span>💼 Vốn TB:</span>
+                      <span>{currentSellRefPrices.avgCost} (= {fmtMoney(currentSellRefPrices.avgCost * 1000)}đ)</span>
+                    </button>
+                  )}
+                  {currentSellRefPrices.breakEven && currentSellRefPrices.breakEven !== currentSellRefPrices.avgCost && (
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, price: String(currentSellRefPrices.breakEven) }))}
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                        Number(form.price) === currentSellRefPrices.breakEven
+                          ? 'bg-amber-600 text-white border-amber-600 shadow-2xs'
+                          : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100'
+                      }`}
+                      title="Điền giá hòa vốn sau khi trừ phí"
+                    >
+                      <span>⚖️ Hòa vốn:</span>
+                      <span>{currentSellRefPrices.breakEven} (= {fmtMoney(currentSellRefPrices.breakEven * 1000)}đ)</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Cảnh báo nhập giá nhầm */}
+              {form.price && Number(form.price) >= 1000 && (
+                <div className="mt-2 text-xs bg-amber-50 dark:bg-amber-950/40 p-3 rounded-2xl border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 flex items-center justify-between gap-2">
+                  <div>
+                    ⚠️ Bạn đang nhập <b>{form.price}</b> (Hệ thống sẽ nhân thành <b>{fmtMoney(Number(form.price) * 1000)}đ</b>).
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, price: String(Number(f.price) / 1000) }))}
+                    className="shrink-0 font-bold px-2 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer"
+                  >
+                    Sửa thành {Number(form.price) / 1000}
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Cảnh báo nhập giá nhầm */}
-            {form.price && Number(form.price) >= 1000 && (
-              <div className="mt-2 text-xs bg-amber-50 dark:bg-amber-950/40 p-3 rounded-2xl border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 flex items-center justify-between gap-2">
-                <div>
-                  ⚠️ Bạn đang nhập <b>{form.price}</b> (Hệ thống sẽ nhân thành <b>{fmtMoney(Number(form.price) * 1000)}đ</b>).
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, price: String(Number(f.price) / 1000) }))}
-                  className="shrink-0 font-bold px-2 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer"
-                >
-                  Sửa thành {Number(form.price) / 1000}
-                </button>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
+                  Phí Bán (%)
+                </label>
+                <span className="text-[11px] text-gray-400 dark:text-slate-500">
+                  Trừ trực tiếp vào giá bán
+                </span>
               </div>
-            )}
+              <div className="relative">
+                <input
+                  name="feePct"
+                  value={form.feePct}
+                  onChange={handleChange}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder={String(DEFAULT_TRADE_FEE_PCT)}
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 pr-9 transition-all"
+                />
+                <span className="absolute right-3.5 top-3 text-gray-400 text-xs font-bold">%</span>
+              </div>
+            </div>
           </div>
 
           {/* 3 PHƯƠNG THỨC ƯU TIÊN KHỚP LÔ MUA */}
@@ -512,23 +647,23 @@ export default function SellForm({
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-500 dark:text-slate-400">So sánh đơn giá:</span>
                     <span className="font-bold text-gray-800 dark:text-slate-200">
-                      Bán: <b className="text-rose-600 dark:text-rose-400">{fmtMoney(costPreview.sellPrice)}đ</b>
+                      Bán thực nhận: <b className="text-rose-600 dark:text-rose-400">{fmtMoney(costPreview.netSellPrice)}đ</b>
                       {' vs '}
-                      Vốn: <b className="text-amber-700 dark:text-amber-300">{fmtMoney(costPreview.avgCost)}đ</b>
+                      Vốn gốc: <b className="text-amber-700 dark:text-amber-300">{fmtMoney(costPreview.avgCost)}đ</b>
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-slate-400">Chênh lệch giá (chưa phí):</span>
-                    <span className={`font-bold ${costPreview.sellPrice >= costPreview.avgCost ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                      {costPreview.sellPrice >= costPreview.avgCost ? '+' : ''}
-                      {fmtMoney(costPreview.sellPrice - costPreview.avgCost)}đ / cp
+                    <span className="text-gray-500 dark:text-slate-400">Chênh lệch thực tế / cp:</span>
+                    <span className={`font-bold ${costPreview.diffPerShare >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                      {costPreview.diffPerShare >= 0 ? '+' : ''}
+                      {fmtMoney(costPreview.diffPerShare)}đ / cp
                     </span>
                   </div>
 
                   <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center text-xs sm:text-sm">
                     <span className="font-bold text-gray-700 dark:text-slate-300">
-                      Dự kiến Lãi/Lỗ ròng (sau phí {form.feePct || 0.1}%):
+                      Dự kiến Lãi/Lỗ ròng (sau phí {costPreview.feePercent}%):
                     </span>
                     <span className={`font-extrabold text-sm sm:text-base ${plColor(costPreview.estPL)}`}>
                       {costPreview.estPL >= 0 ? '+' : ''}{fmtMoney(costPreview.estPL)}đ
@@ -540,109 +675,31 @@ export default function SellForm({
             </div>
           )}
 
-          {/* PHÍ BÁN & NGÀY GIAO DỊCH */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300 mb-1.5">
-                Phí Bán (%)
-              </label>
-              <div className="relative">
-                <input
-                  name="feePct"
-                  value={form.feePct}
-                  onChange={handleChange}
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.1"
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 pr-9 transition-all"
-                />
-                <span className="absolute right-3.5 top-3 text-gray-400 text-xs font-bold">%</span>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300 mb-1.5">
-                Ngày Giao Dịch
-              </label>
-              <input
-                name="date"
-                value={form.date}
-                onChange={handleChange}
-                type="date"
-                className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all"
-              />
-            </div>
+          {/* NGÀY GIAO DỊCH */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300 mb-1.5">
+              Ngày Giao Dịch
+            </label>
+            <input
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              type="date"
+              className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+            />
           </div>
 
           {/* THẺ CHIẾN LƯỢC / LÝ DO BÁN */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
-                🏷️ Lý Do Bán / Chiến Lược <span className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold">(Chọn 1 thẻ)</span>
-              </label>
-              {selectedTag && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedTag('')}
-                  className="text-[11px] text-rose-500 hover:text-rose-600 font-bold transition-colors cursor-pointer"
-                >
-                  ✕ Bỏ chọn
-                </button>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {DEFAULT_TAGS.map(t => {
-                const isSelected = selectedTag === t;
-                return (
-                  <button
-                    type="button"
-                    key={t}
-                    onClick={() => selectTag(t)}
-                    className={`text-xs px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer border ${
-                      isSelected
-                        ? 'bg-rose-600 text-white border-rose-600 shadow-2xs ring-2 ring-rose-500/20'
-                        : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200/80 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {isSelected ? '✓ ' : ''}{t}
-                  </button>
-                );
-              })}
-              {selectedTag && !DEFAULT_TAGS.includes(selectedTag) && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedTag('')}
-                  className="text-xs px-3 py-1.5 rounded-xl font-bold bg-rose-600 text-white border-rose-600 shadow-2xs ring-2 ring-rose-500/20 cursor-pointer"
-                >
-                  ✓ {selectedTag}
-                </button>
-              )}
-            </div>
-
-            <div className="flex gap-2 pt-1">
-              <input
-                value={customTag}
-                onChange={(e) => setCustomTag(e.target.value)}
-                placeholder="Nhập lý do khác..."
-                className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddCustomTag(e);
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={handleAddCustomTag}
-                className="text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-3 py-2 rounded-xl font-bold border border-gray-200 dark:border-slate-700 transition-colors cursor-pointer"
-              >
-                + Thêm
-              </button>
-            </div>
-          </div>
+          <TagSelector
+            tags={DEFAULT_TAGS}
+            selectedTag={selectedTag}
+            onSelect={setSelectedTag}
+            onClear={() => setSelectedTag('')}
+            label="🏷️ Lý Do Bán / Chiến Lược"
+            labelHint="(Chọn 1 thẻ)"
+            placeholder="Nhập lý do khác..."
+            colorTheme="rose"
+          />
 
           {/* ĐÁNH GIÁ TÂM LÝ & KỶ LUẬT (TRADE REVIEW JOURNAL) */}
           <div className="space-y-2">
@@ -662,7 +719,7 @@ export default function SellForm({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {DISCIPLINE_TAGS.map(item => {
+              {(Array.isArray(DISCIPLINE_TAGS) ? DISCIPLINE_TAGS : Object.values(DISCIPLINE_TAGS || {})).map(item => {
                 const isSelected = selectedDiscipline === item.label;
                 return (
                   <button
@@ -740,7 +797,7 @@ export default function SellForm({
               {/* Con số Lãi/Lỗ trung tâm cực đại */}
               <div className="py-3 sm:py-4 text-center">
                 <span className="text-[11px] sm:text-xs opacity-75 font-semibold block mb-0.5">
-                  Lãi / Lỗ Ròng Dự Kiến (Sau phí {form.feePct || 0.1}%):
+                  Lãi / Lỗ Ròng Dự Kiến (Đã trừ phí {costPreview.feePercent}%):
                 </span>
                 <span className={`text-2xl sm:text-4xl font-black tracking-tight ${
                   costPreview.estPL >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
@@ -766,9 +823,9 @@ export default function SellForm({
                 <div className="bg-white/70 dark:bg-slate-800/70 p-2 sm:p-2.5 rounded-2xl border border-current/10">
                   <span className="text-[10px] sm:text-[11px] opacity-75 block font-medium">Chênh Lệch / CP</span>
                   <span className={`text-xs sm:text-sm font-extrabold mt-0.5 block truncate ${
-                    costPreview.sellPrice >= costPreview.avgCost ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
+                    costPreview.diffPerShare >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
                   }`}>
-                    {costPreview.sellPrice >= costPreview.avgCost ? '+' : ''}{fmtMoney(costPreview.sellPrice - costPreview.avgCost)}đ
+                    {costPreview.diffPerShare >= 0 ? '+' : ''}{fmtMoney(costPreview.diffPerShare)}đ
                   </span>
                 </div>
               </div>
@@ -789,11 +846,15 @@ export default function SellForm({
               </div>
               <button
                 type="button"
-                onClick={() => setForm(f => ({ ...f, price: String((costPreview.avgCost / 1000).toFixed(2)) }))}
+                onClick={() => {
+                  const feePct = form.feePct !== '' && !isNaN(Number(form.feePct)) ? Number(form.feePct) : 0.1;
+                  const bePrice = feePct < 100 ? costPreview.avgCost / (1 - feePct / 100) : costPreview.avgCost;
+                  setForm(f => ({ ...f, price: String((bePrice / 1000).toFixed(2)) }));
+                }}
                 className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-bold shrink-0 cursor-pointer shadow-xs transition-colors"
-                title="Lấy giá vốn làm giá bán tham khảo (Hòa vốn)"
+                title="Lấy giá bán để hòa vốn sau khi trừ phí giao dịch"
               >
-                Lấy Giá Vốn
+                Lấy Giá Hòa Vốn
               </button>
             </div>
           )}
@@ -844,12 +905,12 @@ export default function SellForm({
           {/* So sánh giá bán vs Vốn */}
           <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-slate-700">
-              <span className="text-gray-500 dark:text-slate-400 text-xs block">💵 Giá bán thực tế</span>
+              <span className="text-gray-500 dark:text-slate-400 text-xs block">💵 Giá bán thực nhận</span>
               <span className="text-base sm:text-lg font-extrabold text-gray-900 dark:text-slate-100 mt-0.5 block">
-                {fmtMoney(result.price)}đ / cp
+                {fmtMoney(result.netPrice || (result.totalRevenue / result.quantity))}đ / cp
               </span>
               <span className="text-[11px] text-gray-400 dark:text-slate-500 mt-1 block">
-                Doanh thu: {fmtMoney(result.grossRevenue || result.quantity * result.price)}đ
+                Giá khớp: {fmtMoney(result.price)}đ (Phí: {result.feePct}%)
               </span>
             </div>
 
@@ -875,7 +936,7 @@ export default function SellForm({
               <span className="text-gray-700 dark:text-slate-300">-{fmtMoney(result.fee || 0)}đ</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 dark:text-slate-400">Tiền thực nhận sau phí:</span>
+              <span className="text-gray-500 dark:text-slate-400">Tiền thực nhận vào tài khoản:</span>
               <span className="font-extrabold text-indigo-700 dark:text-indigo-300">{fmtMoney(result.totalRevenue)}đ</span>
             </div>
             <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">

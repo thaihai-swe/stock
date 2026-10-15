@@ -1,8 +1,10 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import BuyForm from './BuyForm.jsx';
-import SellForm from './SellForm.jsx';
 import DividendManager from './DividendManager.jsx';
+import SellForm from './SellForm.jsx';
 import TradeSidebarContext from './trade/TradeSidebarContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import { fetchPrices } from '../utils/api.js';
 
 export default function TradeOrderView({
   initialType = 'buy',
@@ -11,13 +13,14 @@ export default function TradeOrderView({
   dividends = [],
   watchlist = [],
   buyInitial = { symbol: '', quantity: '', price: '' },
+  sellInitial = { symbol: '', quantity: '', price: '' },
   sellInitialSymbol = '',
   onSuccess,
   onBuySuccess,
   onSellSuccess,
   onDividendSuccess,
-  showToast,
 }) {
+  const { showToast } = useToast();
   const [activeType, setActiveType] = useState(initialType || 'buy');
 
   // Trạng thái tự động điền (Quick-fill state)
@@ -25,8 +28,31 @@ export default function TradeOrderView({
   const [currentBuyQuantity, setCurrentBuyQuantity] = useState(buyInitial?.quantity || '');
   const [currentBuyPrice, setCurrentBuyPrice] = useState(buyInitial?.price || '');
 
-  const [currentSellSymbol, setCurrentSellSymbol] = useState(sellInitialSymbol || '');
-  const [currentSellQuantity, setCurrentSellQuantity] = useState(null);
+  const [currentSellSymbol, setCurrentSellSymbol] = useState(sellInitial?.symbol || sellInitialSymbol || '');
+  const [currentSellQuantity, setCurrentSellQuantity] = useState(sellInitial?.quantity || null);
+  const [currentSellPrice, setCurrentSellPrice] = useState(sellInitial?.price || '');
+
+  // Live market prices cache
+  const [marketPrices, setMarketPrices] = useState({});
+
+  useEffect(() => {
+    const symbols = Array.from(new Set([
+      ...(portfolio || []).map(p => p.symbol),
+      ...(watchlist || []).map(w => w.symbol),
+      currentBuySymbol,
+      currentSellSymbol,
+    ].filter(Boolean)));
+
+    if (symbols.length > 0) {
+      fetchPrices(symbols, false)
+        .then(res => {
+          if (res?.prices) {
+            setMarketPrices(prev => ({ ...prev, ...res.prices }));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [portfolio, watchlist, currentBuySymbol, currentSellSymbol]);
 
   // Mở/đóng panel danh mục trên màn hình mobile
   const [showMobileContext, setShowMobileContext] = useState(false);
@@ -44,8 +70,12 @@ export default function TradeOrderView({
   }, [buyInitial]);
 
   useEffect(() => {
-    if (sellInitialSymbol) setCurrentSellSymbol(sellInitialSymbol);
-  }, [sellInitialSymbol]);
+    if (sellInitial?.symbol) setCurrentSellSymbol(sellInitial.symbol);
+    else if (sellInitialSymbol) setCurrentSellSymbol(sellInitialSymbol);
+
+    if (sellInitial?.quantity) setCurrentSellQuantity(sellInitial.quantity);
+    if (sellInitial?.price) setCurrentSellPrice(sellInitial.price);
+  }, [sellInitial, sellInitialSymbol]);
 
   const handleSwitch = (type) => {
     setActiveType(type);
@@ -57,8 +87,11 @@ export default function TradeOrderView({
   // Callback khi chọn mã mua từ sidebar hoặc chip
   const handleSelectBuyFromSidebar = (symbol, price) => {
     setCurrentBuySymbol(symbol);
-    if (price !== undefined) {
-      setCurrentBuyPrice(String(price));
+    const resolvedPrice = price !== undefined
+      ? String(price)
+      : (marketPrices[symbol]?.price ? String(marketPrices[symbol].price / 1000) : '');
+    if (resolvedPrice) {
+      setCurrentBuyPrice(resolvedPrice);
     }
     if (activeType !== 'buy') {
       handleSwitch('buy');
@@ -68,10 +101,16 @@ export default function TradeOrderView({
   };
 
   // Callback khi chọn mã bán từ sidebar hoặc chip
-  const handleSelectSellFromSidebar = (symbol, qty) => {
+  const handleSelectSellFromSidebar = (symbol, qty, price) => {
     setCurrentSellSymbol(symbol);
     if (qty) {
       setCurrentSellQuantity(qty);
+    }
+    const resolvedPrice = price !== undefined
+      ? String(price)
+      : (marketPrices[symbol]?.price ? String(marketPrices[symbol].price / 1000) : '');
+    if (resolvedPrice) {
+      setCurrentSellPrice(resolvedPrice);
     }
     if (activeType !== 'sell') {
       handleSwitch('sell');
@@ -80,19 +119,19 @@ export default function TradeOrderView({
   };
 
   const handleBuySuccess = () => {
-    if (showToast) showToast('✅ Khớp lệnh mua thành công!', 'success');
+    showToast('✅ Khớp lệnh mua thành công!', 'success');
     if (onBuySuccess) onBuySuccess();
     else if (onSuccess) onSuccess();
   };
 
   const handleSellSuccess = () => {
-    if (showToast) showToast('✅ Khớp lệnh bán thành công!', 'success');
+    showToast('✅ Khớp lệnh bán thành công!', 'success');
     if (onSellSuccess) onSellSuccess();
     else if (onSuccess) onSuccess();
   };
 
   const handleDividendSuccess = () => {
-    if (showToast) showToast('✅ Cập nhật cổ tức thành công!', 'success');
+    showToast('✅ Cập nhật cổ tức thành công!', 'success');
     if (onDividendSuccess) onDividendSuccess();
     else if (onSuccess) onSuccess();
   };
@@ -110,20 +149,18 @@ export default function TradeOrderView({
         <button
           type="button"
           onClick={() => handleSwitch('buy')}
-          className={`flex-1 py-3 px-2 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
-            activeType === 'buy'
+          className={`flex-1 py-3 px-2 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${activeType === 'buy'
               ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 ring-2 ring-emerald-500/20'
               : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-800/60'
-          }`}
+            }`}
         >
           <span className="text-base sm:text-lg">🛒</span>
           <span>Mua Vào</span>
           <span
-            className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${
-              activeType === 'buy'
+            className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${activeType === 'buy'
                 ? 'bg-white/20 text-white'
                 : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
-            }`}
+              }`}
           >
             {portfolio.length} mã
           </span>
@@ -133,20 +170,18 @@ export default function TradeOrderView({
         <button
           type="button"
           onClick={() => handleSwitch('sell')}
-          className={`flex-1 py-3 px-2 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
-            activeType === 'sell'
+          className={`flex-1 py-3 px-2 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${activeType === 'sell'
               ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 ring-2 ring-rose-500/20'
               : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-800/60'
-          }`}
+            }`}
         >
           <span className="text-base sm:text-lg">💸</span>
           <span>Bán Ra</span>
           <span
-            className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${
-              activeType === 'sell'
+            className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${activeType === 'sell'
                 ? 'bg-white/20 text-white'
                 : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
-            }`}
+              }`}
           >
             {availableToSellCount} khả dụng
           </span>
@@ -156,20 +191,18 @@ export default function TradeOrderView({
         <button
           type="button"
           onClick={() => handleSwitch('dividend')}
-          className={`flex-1 py-3 px-2 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
-            activeType === 'dividend'
+          className={`flex-1 py-3 px-2 sm:px-4 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${activeType === 'dividend'
               ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30 ring-2 ring-amber-400/20'
               : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-800/60'
-          }`}
+            }`}
         >
           <span className="text-base sm:text-lg">🎁</span>
           <span>Cổ Tức</span>
           <span
-            className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${
-              activeType === 'dividend'
+            className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${activeType === 'dividend'
                 ? 'bg-white/20 text-white'
                 : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
-            }`}
+              }`}
           >
             {dividends.length} đợt
           </span>
@@ -201,6 +234,7 @@ export default function TradeOrderView({
               portfolio={portfolio}
               watchlist={watchlist}
               dividends={dividends}
+              marketPrices={marketPrices}
               onSelectBuy={handleSelectBuyFromSidebar}
               onSelectSell={handleSelectSellFromSidebar}
             />
@@ -217,12 +251,13 @@ export default function TradeOrderView({
             portfolio={portfolio}
             watchlist={watchlist}
             dividends={dividends}
+            marketPrices={marketPrices}
             onSelectBuy={handleSelectBuyFromSidebar}
             onSelectSell={handleSelectSellFromSidebar}
           />
         </div>
 
-        {/* Cột Phải: Form Đặt Lệnh Tương Ứng */}
+        {/* Cột Phải: Form Nhật Ký Tương Ứng */}
         <div className="lg:col-span-7 xl:col-span-8">
           {activeType === 'buy' && (
             <BuyForm
@@ -232,6 +267,7 @@ export default function TradeOrderView({
               initialPrice={currentBuyPrice}
               portfolio={portfolio}
               watchlist={watchlist}
+              marketPrices={marketPrices}
             />
           )}
 
@@ -241,6 +277,8 @@ export default function TradeOrderView({
               portfolio={portfolio}
               initialSymbol={currentSellSymbol}
               initialQuantity={currentSellQuantity}
+              initialPrice={currentSellPrice}
+              marketPrices={marketPrices}
             />
           )}
 
@@ -249,7 +287,6 @@ export default function TradeOrderView({
               dividends={dividends}
               portfolio={portfolio}
               onSuccess={handleDividendSuccess}
-              showToast={showToast}
             />
           )}
         </div>

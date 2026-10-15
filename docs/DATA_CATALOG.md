@@ -15,7 +15,7 @@ Toàn bộ hệ thống được phân định rạch ròi theo triết lý **Hy
 | **TẦNG 1: ACID Relational Database** | Sổ lệnh Mua/Bán (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, hàng đợi yêu cầu (`requested_stocks`), cấu hình | `data/stock.db` (Local) / Turso Cloud (Vercel) | **GITIGNORED (100%)** | Realtime khi user thao tác. Sao lưu/khôi phục qua `scripts/db_manager.py`. | Đảm bảo toàn vẹn giao dịch (ACID), bảo mật thông tin cá nhân. |
 | **TẦNG 2: Ephemeral Intraday Cache** | Thị giá khớp lệnh realtime, điểm số VNINDEX & VN30 trong phiên | RAM Node.js + `data/prices_cache.json` | **GITIGNORED (100%)** | Trong phiên (9:00 - 15:00 T2-T6). Cache TTL 1h (`priceService.js`). | Phục vụ realtime UI mà không gây ô nhiễm lịch sử Git. |
 | **TẦNG 3: Daily EOD Snapshot JSON** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE, Snapshot Hàng đợi yêu cầu | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json`, `data/requested_stocks.json`, `data/supported_stocks.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` (`run_pipeline.py --cadence daily`). | Đảm bảo web Vercel có số liệu EOD mới nhất và tự động nạp mã yêu cầu mới. |
-| **TẦNG 4: Weekly Macro & Sector JSON** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS Vietstock, Lịch sử Simply Wall St, Tin tức 30 ngày | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` (`run_pipeline.py --cadence weekly`). | Cung cấp dữ liệu vĩ mô và luân chuyển ngành 1 tuần/lần. |
+| **TẦNG 4: Weekly Macro, Sector & AI Suite** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS, Simply Wall St, Tin tức 30 ngày, AI Portfolio Stress-Tester, AI Stock Suite (Delta 6d) | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json`, `data/portfolio_ai_insights.json`, `data/financials/<MÃ>.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` (`run_pipeline.py --cadence weekly`). | Cung cấp dữ liệu vĩ mô, luân chuyển ngành và toàn bộ nhận định AI 1 tuần/lần. |
 | **TẦNG 5: Quarterly BCTC Repository** | 122+ chỉ tiêu BCTC 8 quý & 5 năm, 54 Ratios, Extended DuPont, DCF 3 kịch bản, Cổ đông | `data/financials/<MÃ>.json`, `data/vnindex_valuation_cache/` | **COMMIT VỀ GIT** | **Quarterly (Mùa BCTC)**: GitHub Actions `quarterly-bctc-sync.yml` (`run_pipeline.py --cadence quarterly`). | Kho tri thức phân tích chuyên sâu doanh nghiệp cho từng mã. |
 
 ### Bộ Điều Phối Dữ Liệu Thống Nhất (`scripts/run_pipeline.py`):
@@ -330,7 +330,7 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 ---
 
 ### PHÂN HỆ 3: CỔ TỨC, CỔ ĐÔNG & BAN LÃNH ĐẠO (CORPORATE PROFILE)
-* **Nguồn cung cấp**: 
+* **Nguồn cung cấp**:
   * *Tầng 1 (`vnstock 4.0` Guest Mode — VCI Official)*: Trích xuất trực tiếp danh sách 60+ cổ đông lớn thật (`Company.shareholders()`) và lịch sử 50+ sự kiện doanh nghiệp, giao dịch nội bộ, chia cổ tức tiền mặt/cổ phiếu (`Company.events()`).
   * *Tầng 2 (Live NLP News Extraction)*: Trích xuất bổ sung các sự kiện cổ tức mới nhất từ feed tin tức thời gian thực của doanh nghiệp qua NLP Event Extractor (`scripts/lib/news_sentiment_engine.py`).
   * *Tầng 3 (Dynamic Annual Milestones)*: Các mốc sự kiện động năm hiện hành (VD: 2026), cam kết không tồn tại ngày cũ 2023–2024.
@@ -594,6 +594,42 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
           * *Giao diện người dùng (`SectorValuationHeatmap.jsx`)*: Hợp nhất toàn bộ dữ liệu định giá P/E và 6 động lực vĩ mô vào đúng **2 chế độ xem trực quan & bảng số liệu chuyên sâu**:
             1. **`💎 Ma Trận Thiên Thời & Bản Đồ Nhiệt`**: 4 Phân vùng chiến lược, tích hợp thẻ P/E Heatmap so sánh % chênh lệch với VN-Index, P/E Rank, Macro Rank và widget bung mở xem 6 động lực vĩ mô.
             2. **`📋 Bảng Toàn Diện & Phân Rã Vĩ Mô`**: Bảng tổng hợp đa chiều BCTC & vĩ mô, hỗ trợ mở rộng dòng (Expandable Row) phân tích chi tiết 6 động lực chu kỳ.
+    21. **Bộ Phân Tích Vĩ Mô & Thị Trường Đa Kịch Bản Trí Tuệ Nhân Tạo (Macro Intelligence Suite - AI Enhanced)**:
+        * *Nguồn sinh dữ liệu*: `scripts/generate_ai_insights.py --scope macro` (gọi phương thức `generate_macro_intelligence_suite` trong `scripts/lib/ai_service.py` bằng 1 request gộp duy nhất).
+        * *Cơ chế lưu trữ & 2-tier Fallback*:
+          * Tầng 1: `data/macro_valuation.json` lưu trực tiếp vào các key chuyên biệt.
+          * Tầng 2: Đồng bộ song song vào `data/ai_insights_cache.json` để API `/api/valuation/macro` tự động merge nếu file chính bị làm mới bởi EOD pipeline.
+          * Offline Heuristic Fallback: Nếu không có API Key AI hoặc kết nối proxy bị gián đoạn, hệ thống tự động sinh dữ liệu định lượng chất lượng cao từ các biến số vĩ mô thực tế mà không làm gián đoạn UI.
+        * *Các trường dữ liệu cấu trúc chi tiết*:
+          * **`aiScenarios` (3 Kịch Bản VN-Index Định Lượng Động)**:
+            * `marketVerdict`: Nhận định tổng quan 1-2 câu về xu hướng chỉ số và tương quan P/E thị trường.
+            * `scenarios.base` (Kịch bản Cơ sở): Xác suất động (phụ thuộc Risk Score), dải điểm mục tiêu, dải P/E kỳ vọng, dự phóng tăng trưởng EPS, các chất xúc tác vĩ mô (`macroCatalysts`), nhóm ngành dẫn dắt (`leadingSectors` kèm `thesis`), nhóm ngành thận trọng (`laggingSectors` kèm `risk`), tỷ trọng phân bổ tài sản chiến thuật (`tacticalAllocation`), khuyến nghị hành động (`actionSummary`).
+            * `scenarios.bull` (Kịch bản Tích cực): Cấu trúc tương tự cho kịch bản hưng phấn & nới lỏng tiền tệ.
+            * `scenarios.bear` (Kịch bản Thận trọng): Cấu trúc tương tự cho kịch bản phòng thủ & thắt chặt thanh khoản.
+          * **`aiClockDynamics` (Động Lực Học Đồng Hồ Vĩ Mô)**:
+            * `clockHandPosition`: Vị trí kim đồng hồ (VD: "2:30 (Cuối pha Mở Rộng — Chớm Tăng Nhiệt)").
+            * `transitionVelocity`: Vận tốc chuyển dịch pha chu kỳ (CHẬM, TRUNG BÌNH, NHANH).
+            * `dynamicsAnalysis`: Phân tích cơ chế xung lực giữa tăng trưởng GDP, lạm phát và thanh khoản SBV.
+            * `historicalAnalog`: Thời kỳ lịch sử tương đồng (`period`) và bản chất tương đồng (`similarity`).
+            * `sectorPlaybook`: Cẩm nang ngành (`favored`: các ngành ưu tiên, `cautious`: các ngành cần thận trọng).
+          * **`aiYieldCurveDiagnosis` (Chẩn Đoán Thị Trường Nợ & Thanh Khoản Hệ Thống)**:
+            * `curveStatus`: Trạng thái hình thái đường cong lợi suất TPCP và chênh lệch 10Y-2Y.
+            * `bankingLiquidityImpact`: Tác động thanh khoản hệ thống NHTM và biên lãi ròng NIM.
+            * `corporateDebtStress`: Mức độ áp lực đáo hạn trái phiếu doanh nghiệp và rủi ro tín dụng.
+            * `equityMarketSignal`: Tương quan lợi tức thu nhập cổ phiếu (E/P) so với lợi suất trái phiếu 10Y (ERP).
+          * **`aiMultiAssetStrategy` (Chiến Lược Phân Bổ Đa Tài Sản & Nhận Định Vàng)**:
+            * `multiAssetThesis`: Luận điểm phân bổ tài sản tổng thể giữa Cổ phiếu, Trái phiếu, Vàng và Tiền mặt.
+            * `goldArbitrageRationale`: Luận giải mức độ chênh lệch vàng SJC/PNJ so với thế giới và khuyến nghị đầu tư vàng.
+            * `policyRiskAlert`: Cảnh báo rủi ro chính sách quản lý thị trường vàng từ Ngân hàng Nhà nước.
+            * `recommendedAllocation`: Tỷ lệ phân bổ 4 lớp tài sản tối ưu.
+          * **`aiStyleRotation` (Chiến Lược Luân Chuyển Phong Cách Đầu Tư)**:
+            * `rotationHeadline`: Tiêu đề luận điểm dòng vốn tổ chức giữa các phân khúc.
+            * `largeCapVsMidcap`: Phân tích đối chiếu giữa Large-Cap Blue-chips (VN30) và Midcap tăng trưởng.
+            * `diamondForeignRoom`: Nhận định nhóm cổ phiếu kín room ngoại (VN Diamond) và định giá tương đối.
+            * `actionableStrategy`: Khuyến nghị tỷ trọng phân bổ cụ thể giữa các phong cách đầu tư.
+          * **`aiTailRiskAnalysis` (Kế Hoạch Dự Phòng & Chuỗi Dẫn Truyền Rủi Ro Đuôi)**:
+            * `contingencyPlan`: Kế hoạch hành động ứng phó dự phòng khi các cảnh báo rủi ro đuôi kích hoạt.
+            * `contagionChain`: Cơ chế dẫn truyền và mức độ lan tỏa rủi ro xuyên thị trường (Tỷ giá $\to$ Khối ngoại $\to$ Large-Cap $\to$ Thị trường chung).
 
 ---
 
@@ -637,14 +673,16 @@ Nhằm đảm bảo tính minh bạch, tránh gây nhầm lẫn giữa việc đ
 1. **Sổ Lệnh Mua (`buy_orders`)**:
    * Quản lý giá mua, phí môi giới, tổng vốn đầu tư và số lượng cổ phiếu còn khả dụng (`remaining_qty`).
 2. **Sổ Lệnh Bán (`sell_orders`)**:
-   * Khi phát sinh lệnh bán, thuật toán **FIFO (First-In, First-Out)** tự động quét tìm các lô mua cũ nhất để đối trừ giá vốn.
-   * Tính toán doanh thu thuần sau thuế TNCN 0.1% và phí môi giới, từ đó xác định chính xác số tiền **Lãi/Lỗ Đã Thực Hiện (Realized P/L)**.
-   * Ghi nhận lịch sử chi tiết vào cột `matched_lots` dạng JSON.
+   * Khi phát sinh lệnh bán, thuật toán **Khớp Lô Đa Chiến Lược (FIFO / Giá Vốn Cao Nhất / Giá Vốn Thấp Nhất)** tự động quét tìm các lô mua để đối trừ giá vốn.
+   * Cơ chế phí đơn giản hóa: Phí bán được trừ trực tiếp vào đơn giá bán thực nhận (`net_price`), doanh thu thuần thực nhận (`net_revenue`), và tự động cộng vào số dư tiền mặt (`cash_balance`).
+   * Xác định chính xác số tiền **Lãi/Lỗ Đã Thực Hiện (Realized P/L)** = `Khối lượng × (Giá bán thực nhận - Giá vốn gốc)` — đối soát hoàn hảo 100% trên toàn bộ giao diện.
+   * Ghi nhận lịch sử chi tiết từng lô khớp vào cột `matched_lots` dạng JSON.
 3. **Sổ Cổ Tức (`dividends`)**:
-   * Ghi nhận cổ tức tiền mặt (tự động khấu trừ 5% thuế TNCN theo luật chứng khoán Việt Nam).
+   * Ghi nhận cổ tức tiền mặt (tự động cộng tiền thực nhận vào số dư tiền mặt `cash_balance`).
    * Ghi nhận cổ tức bằng cổ phiếu (làm tăng số lượng nắm giữ và tự động điều chỉnh giá vốn bình quân).
-4. **Sổ Theo Dõi & Kế Hoạch (`watchlist` & `app_settings`)**:
-   * Lưu trữ số dư tiền mặt danh mục (`cash_balance`).
+4. **Sổ Theo Dõi & Quản Lý Vốn (`watchlist` & `app_settings`)**:
+   * Lưu trữ số dư tiền mặt danh mục (`cash_balance`), hỗ trợ cả số âm (dư nợ Margin / ký quỹ).
+   * Tự động điều chỉnh `cash_balance` khi phát sinh giao dịch Mua (-), Bán (+), Nhận Cổ Tức (+), hoặc Xóa/Undo lệnh.
    * Mục tiêu tỷ trọng cổ phiếu và cảnh báo vùng giá mua/bán gom tích lũy.
 
 ---
@@ -1077,4 +1115,354 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   - Python Engine: `scripts/lib/requested_stocks_manager.py` (API: `get_pending_requested_symbols`, `filter_missing_financials`, `mark_symbol_synced`, `mark_symbol_failed`, `add_to_supported_stocks`).
   - Daily EOD Sync: `scripts/run_pipeline.py --cadence daily` tự động rà soát hàng đợi lúc 18:00 T2-T6, kích hoạt cào TradingView + BCTC + DCF, tự động thêm vào `data/supported_stocks.json` và commit & push về Git.
   - Quarterly BCTC Sync: `.github/workflows/quarterly-bctc-sync.yml` kích hoạt `scripts/run_pipeline.py --cadence quarterly` định kỳ ngày 1 và ngày 15 các tháng 1, 4, 7, 10 lúc 09:00 sáng VN.
+
+---
+
+### PHÂN HỆ 9: TRUNG TÂM CẤU HÌNH VĨ MÔ & NỀN TẢNG AI STRATEGIC COPILOT (`macroConstants` & `aiMacroConfig`)
+* **Vị trí lưu trữ**:
+  - Gốc Single Source of Truth: `data/default-constant-value.json` (`macro.macroThresholds`, `macro.macroNarratives`, `macro.aiMacroConfig`).
+  - Cổng nạp Node.js: `server/config/configLoader.js` & `server/config/constants.js` (`MACRO_THRESHOLDS`, `MACRO_NARRATIVES`, `AI_MACRO_CONFIG`).
+  - Cổng nạp Python: `scripts/lib/config_loader.py` (`get_macro_thresholds()`, `get_macro_narratives()`, `get_ai_macro_config()`).
+  - Snapshot Cache Runtime: `data/macro_valuation.json` -> trường `aiInsight`.
+
+* **1. Bóc tách 100% Ngưỡng Số Liệu Đo Lường (`macroThresholds`)**:
+  - `usdvnd`: `criticalHigh: 25900`, `high: 25600`, `bearishDriver: 26000`, `bullishDriver: 25000`, `externalShock: 25700`, `fallback: 25400`.
+  - `interbankRate`: `criticalHigh: 6.5`, `high: 5.0`, `bearishDriver: 6.0`, `tightening: 5.5`, `bullishDriver: 3.0`, `liquidityCrisisSpread: 2.0`, `fallback: 4.5`.
+  - `cpi`: `criticalHigh: 5.5`, `ceilingTarget: 4.5`, `bullish: 4.0`, `cool: 3.5`, `fallback: 3.63`.
+  - `gdp`: `highGrowth: 6.5`, `moderateGrowth: 6.0`, `slowdown: 5.5`, `recessionAlert: 4.0`, `fallback: 6.5`.
+  - `pmi`: `expansion: 51.0`, `neutral: 50.0`, `contraction: 49.0`, `fallback: 50.5`.
+  - `credit`: `crunchThreshold: 10.0`, `optimalMin: 12.0`, `optimalMax: 16.5`, `fallback: 14.0`.
+  - `oilBrent`: `criticalHigh: 95.0`, `extremeHigh: 105.0`, `low: 50.0`, `optimalMin: 65.0`, `optimalMax: 90.0`, `fallback: 75.0`.
+  - `yieldCurve`: `vnFallback` (VN02Y, VN05Y, VN10Y, SBV rate, ON INBR, CPI, USD/VND, P/E), `usFallback` (US02Y, US05Y, US10Y, Fed Funds, US CPI), `slopeThresholds`, `levelThresholds`, `stressScores`, `transmissionLinks` (A, B, C), `assetDecisionErp`.
+  - `marketValuation`: `meanPe: 14.2`, `stdPe: 2.1`, `grahamPePbThreshold: 22.5`, `zScoreExtreme: 2.0`.
+
+* **2. Bóc tách Toàn Bộ Chuỗi Mô Tả & Luận Điểm Định Lượng (`macroNarratives`)**:
+  - `phaseMeta`: Định danh, mô tả chi tiết, badge màu sắc của 5 pha kinh tế (Recovery, Expansion, Overheating, Slowdown, Recession).
+  - `macroClock`: 4 góc phần tư chu kỳ kinh tế (Goldilocks/Expansion, Overheating, Stagflation, Reflation).
+  - `scenarios`: 3 kịch bản dự phóng thị trường VN-Index (Cơ sở Base 55%, Tích cực Bull 25%, Thận trọng Bear 20%).
+  - `tailRisks`: Danh mục các sự kiện rủi ro đuôi (Áp lực tỷ giá, Căng thẳng liên ngân hàng, Lạm phát đình trệ, Lợi suất TPCP bùng nổ).
+  - `sectorQuadrants`: 4 vùng ma trận thiên thời & định giá GICS (Sweet Spot, Value Trap, Momentum, Defense).
+  - `peBandsAdvice`: Khuyến nghị tỷ trọng Cổ phiếu vs Tiền mặt theo 5 dải P/E lịch sử VN-Index.
+  - `compositeSignals`: 5 mức độ tín hiệu hội tụ định lượng (DEEP VALUE, VALUE BUY, HOLD, TRIM, DEFENSIVE).
+  - `valuationWindows`: Định danh 4 cửa sổ thời gian (5 Năm, 10 Năm, Từ 2007, Toàn Bộ 25 Năm).
+  - `yieldCurveRegimes`: 5 hình thái đường cong lợi suất TPCP (YC0 - YC4).
+  - `transmissionStages`: 5 nấc chuỗi truyền dẫn rủi ro 3 mắt xích (FULL_TRANSMISSION, LIQUIDITY_SQUEEZE, EXTERNAL_TRAPPED, LOCAL_BOTTLENECK, BENIGN_MACRO).
+  - `styleIndices`: 5 phân khúc phong cách đầu tư (VNINDEX, VN30, VNDIAMOND, VNMIDCAP, VN100).
+
+* **3. Động Cơ AI Macro Strategist Copilot 2 Tầng (Two-Tier AI Engine)**:
+  - **Tier 1: Cloud LLM (Gemini 1.5 Pro / OpenAI)**:
+    - Kích hoạt khi có biến môi trường `GEMINI_API_KEY` hoặc `OPENAI_API_KEY`.
+    - Truyền tải toàn bộ bối cảnh vĩ mô thời gian thực vào prompt điều hành, ràng buộc chặt chẽ theo JSON schema chuẩn hóa.
+  - **Tier 2: Built-in Heuristic Quantitative CIO Engine (Offline 100%, 0ms, 0 chi phí)**:
+    - Tự động kích hoạt làm fallback dự phòng khi không có API key hoặc kết nối mạng bị gián đoạn.
+    - Tổng hợp tự động các mối tương quan liên thị trường giữa P/E, Z-Score, Lợi suất thực, Áp lực tỷ giá, Chuỗi truyền dẫn nợ và Nhóm ngành Sweet Spot, sinh bản tin CIO chuyên nghiệp.
+  - **REST API Endpoints (Phục vụ dữ liệu 0ms từ Local JSON)**:
+    - `GET /api/valuation/macro-summary`: Trả về toàn bộ dữ liệu vĩ mô kèm trường `aiInsight` đã tính toán sẵn.
+    - `GET /api/valuation/macro/config`: Trả về toàn bộ thresholds, narratives và cấu hình vĩ mô.
+  - **Cấu trúc trường `aiInsight` trong `macro_valuation.json`**:
+    ```json
+    {
+      "status": "success",
+      "provider": "gemini | openai | offline-heuristic-engine",
+      "model": "Tên mô hình AI (vd: gemini-3.1-flash-lite) hoặc heuristic version",
+      "updatedAt": "ISO 8601 timestamp",
+      "headline": "Tiêu đề chiến lược cô đọng",
+      "executiveSummary": "Đoạn văn 3-4 câu tóm tắt bức tranh vĩ mô và định hướng hành động",
+      "macroRegimeAssessment": "Nhận định về pha chu kỳ, tăng trưởng GDP và lạm phát",
+      "yieldCurveDiagnosis": "Chẩn đoán đường cong lợi suất, chi phí vốn và thanh khoản hệ thống",
+      "sectorActionStrategy": "Chiến lược ngành và nhóm cổ phiếu ưu tiên đón sóng",
+      "assetAllocationAdvice": "Khuyến nghị tỷ trọng Cổ phiếu vs Tiền mặt vs Vàng",
+      "strategicTakeaways": ["Luận điểm 1", "Luận điểm 2", "Luận điểm 3"],
+      "actionPlan": ["Hành động 1", "Hành động 2", "Hành động 3"],
+      "riskAlerts": ["Cảnh báo rủi ro 1", "Cảnh báo rủi ro 2"]
+    }
+    ```
+
+---
+
+### PHÂN HỆ 10: HỆ SINH THÁI AI COPILOT CHUYÊN SÂU & BỘ ĐIỀU PHỐI NỀN (BACKGROUND AI SERVICE)
+> 📘 **Đặc tả chi tiết nguyên lý suy luận, prompts và JSON schemas:** Xem tại [`docs/AI_INSIGHTS_ARCHITECTURE_AND_PROMPTS.md`](file:///Users/thaihai-swe/Desktop/stock/docs/AI_INSIGHTS_ARCHITECTURE_AND_PROMPTS.md).
+
+* **Vị trí lưu trữ**:
+  - Tầng 3 (Daily/Weekly Snapshot JSON): `data/macro_valuation.json` -> trường `aiInsight` (Báo cáo điều hành vĩ mô CIO) và `weeklyPulse` (Bản tin nhịp đập thị trường cuối tuần, commit về Git, phục vụ 0ms).
+  - Tầng 4 (Weekly Market Pulse Cache Backup): `data/ai_insights_cache.json` -> trường `weeklyPulse`.
+  - Tầng 5 (BCTC Snapshot): `data/financials/<MÃ>.json` -> trường `aiDeepDive` (Commit về Git, phục vụ phân tích định giá doanh nghiệp 0ms).
+* **Mục đích & Kiến trúc tối ưu chi phí (Cost-Optimized Background Generation)**:
+  - **Không gọi LLM thời gian thực theo từng cú nhấp chuột trên Client / Web**: Toàn bộ nội dung phân tích vĩ mô, nhịp đập tuần và thẩm định cổ phiếu được sinh trước trong các tác vụ nền định kỳ qua GitHub Actions (`weekly-macro-sync.yml`, `quarterly-bctc-sync.yml`) hoặc CLI `scripts/generate_ai_insights.py`. Daily EOD pipeline không gọi AI để loại bỏ nhiễu ngắn hạn và hoàn tất trong ~5s.
+  - Frontend React đọc kết quả pre-computed ở tốc độ 0ms mà không tốn chi phí API hay chịu rủi ro nghẽn mạng/rate limit/timeout.
+* **Hỗ trợ Đa Nhà Cung Cấp Chuẩn Mực (Multi-Provider Support)**:
+  - **Google Gemini**: Direct REST API (`gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-1.5-flash`, `gemini-3.1-flash-lite`, v.v.) kèm cơ chế **Smart Model Cascade** tự động chuyển model dự phòng khi gặp HTTP 503 / 429.
+  - **OpenAI Standard API**: Hỗ trợ chuẩn `POST /v1/chat/completions`, tương thích 100% với OpenAI (GPT-4o, GPT-4o-mini), DeepSeek, Groq, OpenRouter, vLLM, và Ollama cục bộ. Hỗ trợ tự động xử lý cả JSON và Server-Sent Events (SSE).
+  - **Cấu hình qua Biến Môi Trường (.env & GitHub Actions)**:
+    - `AI_PROVIDER`: `auto` | `gemini` | `openai` | `heuristic`.
+    - `GEMINI_API_KEY`: API key Google Gemini (Lấy miễn phí tại Google AI Studio).
+    - `GEMINI_MODEL`: Tên mô hình Gemini ưu tiên (mặc định: `gemini-2.5-flash`).
+    - `OPENAI_API_KEY`: API key OpenAI / DeepSeek / Groq / OpenRouter.
+    - `OPENAI_MODEL`: Tên mô hình khi sử dụng OpenAI Standard API (ví dụ: `gpt-4o-mini`, `super-vip`).
+    - `OPENAI_BASE_URL`: Base URL chuẩn OpenAI (mặc định: `https://api.openai.com/v1`).
+    - `AI_MODEL`: Tên mô hình LLM chung (dự phòng cho cả hai provider).
+  - **Động cơ Fallback Heuristic 2 Tầng**: Nếu không có API key hoặc LLM gặp sự cố, hệ thống tự động sinh báo cáo phân tích định lượng dựa trên các quy tắc tài chính học thuật (0ms, 0 chi phí, không bao giờ crash).
+
+* **Cấu Trúc Chi Tiết Thẩm Định Cổ Phiếu Chuyên Sâu (`aiDeepDive` trong `data/financials/<MÃ>.json`)**:
+  ```json
+  {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ | 🟡 NẮM GIỮ THEO DÕI | 🔴 CÂN NHẮC HẠ TỶ TRỌNG",
+    "convictionScore": 85,
+    "thesisHeadline": "Tiêu đề luận điểm đầu tư cốt lõi",
+    "valuationConvergenceAnalysis": "Nhận định về biên an toàn MoS% và sự đồng thuận giữa 10 mô hình",
+    "financialHealthCheck": "Đánh giá chất lượng BCTC: F-Score, M-Score, cấu trúc vốn, đòn bẩy D/E",
+    "growthAndMoatAnalysis": "Lợi thế cạnh tranh kinh tế (Economic Moat), động lực tăng trưởng ROE/EPS",
+    "catalysts": [
+      "Động lực xúc tác 1 trong 6-12 tháng tới",
+      "Động lực xúc tác 2"
+    ],
+    "downsideRisks": [
+      "Rủi ro giảm giá 1 cần lưu ý",
+      "Rủi ro giảm giá 2"
+    ],
+    "actionStrategy": "Chiến lược hành động: vùng giá gom, phương pháp DCA, phân bổ tỷ trọng NAV",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "model": "Tên model thực tế",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Nhịp Đập Thị Trường Cuối Tuần (`weeklyPulse` trong `data/macro_valuation.json` & `data/ai_insights_cache.json`)**:
+  ```json
+  {
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "model": "Tên model thực tế",
+    "updatedAt": "ISO 8601 timestamp",
+    "pulseHeadline": "Tiêu đề nhịp đập thị trường tuần cô đọng, bao quát xu hướng tuần",
+    "weeklySummary": "Đoạn văn 3-4 câu tóm tắt bức tranh giao dịch tuần, biến động điểm số VN-Index, thanh khoản và tâm lý chung",
+    "institutionalFlow": "Đánh giá chi tiết dòng tiền tổ chức (Khối ngoại, tự doanh) trong cả tuần",
+    "keyDevelopments": [
+      "Diễn biến 1 trọng yếu trong tuần",
+      "Diễn biến 2",
+      "Diễn biến 3"
+    ],
+    "weeklyLeadingSectors": [
+      "Nhóm ngành dẫn dắt hút tiền mạnh nhất tuần",
+      "Nhóm ngành phòng thủ / điều chỉnh"
+    ],
+    "nextWeekOutlook": "Kịch bản dự phóng và xu hướng vận động của thị trường cho tuần giao dịch tiếp theo",
+    "actionableAdvice": "Chiến lược hành động khuyến nghị cho nhà đầu tư (tỷ trọng cổ phiếu, phương pháp DCA, quản trị rủi ro)"
+  }
+  ```
+
+* **Cấu Trúc Phân Tích Tin Tức & Động Lực Tăng Trưởng NLP (`aiNewsAnalysis` trong `financials.newsDigest`)**:
+  ```json
+  {
+    "overallSentiment": "Tích Cực | Trung Tính | Thận Trọng",
+    "sentimentScore": 65,
+    "executiveSummary": "Đoạn văn 2-3 câu tổng hợp sắc thái truyền thông 30 ngày qua",
+    "catalysts": [
+      "Động lực tăng trưởng kinh doanh 1",
+      "Động lực 2"
+    ],
+    "keyRisks": [
+      "Rủi ro pháp lý/thị trường 1",
+      "Rủi ro 2"
+    ],
+    "catalystTimeline": "Ngắn hạn (1-3 tháng) | Trung hạn (6-12 tháng)",
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Chẩn Đoán Kiểm Toán Pháp Y & Chất Lượng ROE (`aiAuditComment` trong `financials.forensicAnalysis`)**:
+  ```json
+  {
+    "auditVerdict": "Sạch Sẽ & Minh Bạch | Cần Lưu Ý Kế Toán | Rủi Ro Thao Túng BCTC",
+    "forensicDiagnosis": "Chẩn đoán chi tiết các biến số Beneish M-Score bất thường (DSRI, AQI, TATA) và tính minh bạch của BCTC",
+    "dupontEarningsQuality": "Đánh giá chất lượng ROE: Thực chất từ biên ròng & vòng quay tài sản hay từ thủ thuật đòn bẩy nợ vay",
+    "auditorChecklist": [
+      "Câu hỏi kiểm toán chất vấn Ban Điều Hành tại ĐHCĐ 1",
+      "Câu hỏi chất vấn 2"
+    ],
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Luận Giải Hội Tụ Định Giá & Độ Nhạy (`aiConvergence` trong `financials.valuationMultiples`)**:
+  ```json
+  {
+    "convergenceHeadline": "Tiêu đề luận điểm hội tụ định giá ngắn gọn",
+    "divergenceExplanation": "Giải thích lý do phân kỳ giữa DCF và các bội số P/E, P/B dựa trên chu kỳ tái đầu tư CapEx",
+    "sensitivityStory": "Mô phỏng thử tải: Nếu chi phí vốn WACC tăng 1.5% do lãi suất thì biên an toàn MoS biến động ra sao",
+    "preferredModelRecommendation": "Khuyến nghị mô hình định giá tin cậy nhất cho phân ngành đặc thù",
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Cấu Trúc Dẫn Truyền Vĩ Mô Vào 10 Nhóm Ngành (`sectorTransmission` trong `data/macro_valuation.json`)**:
+  ```json
+  {
+    "transmissionHeadline": "Tiêu đề thông điệp dẫn truyền vĩ mô vào ngành",
+    "beneficiarySectors": [
+      "Nhóm ngành hưởng lợi 1 kèm lý do dẫn truyền",
+      "Nhóm ngành 2"
+    ],
+    "pressuredSectors": [
+      "Nhóm ngành chịu áp lực chi phí vốn/tỷ giá 1",
+      "Nhóm ngành 2"
+    ],
+    "portfolioAction": "Khuyến nghị luân chuyển danh mục thực chiến",
+    "status": "success",
+    "provider": "gemini | openai | offline-heuristic-engine",
+    "updatedAt": "ISO 8601 timestamp"
+  }
+  ```
+
+* **Danh Sách API Endpoints Backend Express (Phục vụ tĩnh 0ms từ JSON)**:
+  - `GET /api/valuation/macro-summary`: Đọc `data/macro_valuation.json`, trả về kèm `aiInsight`, `weeklyPulse`, và `sectorTransmission`.
+  - `GET /api/valuation/financials/:symbol`: Đọc `data/financials/<MÃ>.json`, trả về kèm `aiDeepDive`, `newsDigest.aiNewsAnalysis`, `forensicAnalysis.aiAuditComment`, và `valuationMultiples.aiConvergence`.
+
+* **CLI Python Đồng Bộ Dữ Liệu AI (`scripts/generate_ai_insights.py`)**:
+  ```bash
+  # 1. Sinh nhận định Vĩ mô CIO
+  .venv/bin/python scripts/generate_ai_insights.py --scope macro
+
+  # 2. Sinh nhận định Nhịp Đập Thị Trường Cuối Tuần
+  .venv/bin/python scripts/generate_ai_insights.py --scope weekly_market
+
+  # 3. Sinh cả Vĩ mô CIO + Nhịp Đập Cuối Tuần
+  .venv/bin/python scripts/generate_ai_insights.py --scope weekly
+
+  # 4. Sinh nhận định Cổ phiếu Deep-Dive (cho 1 hoặc nhiều mã)
+  .venv/bin/python scripts/generate_ai_insights.py --scope stocks --symbols HPG,VNM,TCB
+
+  # 5. Sinh toàn bộ (Vĩ mô + Nhịp đập tuần + Tất cả cổ phiếu trong danh mục)
+  .venv/bin/python scripts/generate_ai_insights.py --scope all
+  ```
+
+---
+
+### PHÂN HỆ 9: QUY CHUẨN ĐỊNH DANH TRÍ TUỆ NHÂN TẠO & THUẬT TOÁN ĐỊNH LƯỢNG TRÊN GIAO DIỆN (UI INTELLIGENCE BADGING: AI VS HEURISTIC)
+
+Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử dụng, hệ thống phân định rạch ròi 100% nguồn gốc của mọi nhận định, phân tích và khuyến nghị hiển thị trên giao diện:
+
+| Thẻ Định Danh (Badge) | Màu Sắc & Nhận Diện | Định Nghĩa & Phạm Vi Áp Dụng | Cơ Chế Phân Giải Dữ Liệu |
+| :--- | :--- | :--- | :--- |
+| **`AI`** *(Trí Tuệ Nhân Tạo)* | Tím / Indigo (`bg-purple-100 text-purple-700 dark:bg-purple-950/90 dark:text-purple-300 border-purple-300/80`) | Nhận định ngôn ngữ tự nhiên được sinh bởi Large Language Model (OpenAI hoặc Google Gemini). Giao diện hiển thị nhãn tinh gọn `AI`, không hiển thị tên vendor hay model để giữ giao diện trung lập và chuyên nghiệp. Tooltip: *"Trí tuệ nhân tạo (AI Copilot)"*. | Đọc trường `provider`: chỉ hiển thị khi `provider === 'openai'` hoặc `provider === 'gemini'`. |
+| **`H`** *(Heuristic & Định Lượng)* | Hổ phách / Amber (`bg-amber-100 text-amber-800 dark:bg-amber-950/90 dark:text-amber-300 border-amber-300/80`) | Công thức toán học định lượng tài chính, mô hình xác suất thống kê (DCF, Graham, Beneish, Altman Z, Dupont, Volume Profile, VaR), thuật toán phân loại dữ liệu, hoặc kịch bản dự phòng offline engine. Tooltip: *"Mô hình định lượng Heuristic / Thuật toán tài chính quy tắc"*. | Hiển thị cố định cho các khối định lượng toán học, hoặc **tự động chuyển đổi động** khi AI gặp sự cố (`provider === 'offline-heuristic-engine'`). |
+
+#### Cơ Chế Tự Động Chuyển Đổi Động (Dynamic Fallback Detection):
+* Component chuẩn [`src/components/common/IntelligenceBadge.jsx`](file:///Users/thaihai-swe/Desktop/stock/src/components/common/IntelligenceBadge.jsx) cung cấp hàm trợ năng `getIntelligenceSource(data)`:
+  * Nếu `data?.provider === 'openai' || data?.provider === 'gemini'` -> Trả về `{ type: 'ai', provider, isFallback: false }` -> Hiển thị badge `AI` kèm tooltip *"Trí tuệ nhân tạo (AI Copilot)"*.
+  * Nếu `data?.provider === 'offline-heuristic-engine'` hoặc không có AI metadata -> Trả về `{ type: 'heuristic', isFallback: true }` -> Tự động chuyển sang badge `H` kèm tooltip *"Mô hình định lượng Heuristic & Thuật toán tài chính quy tắc"*.
+  * **Lưu ý**: Thông tin kỹ thuật `provider` và `model` được bảo toàn nguyên vẹn trong JSON cho mục đích kiểm toán dữ liệu và phân giải fallback, nhưng được loại bỏ 100% khỏi lớp hiển thị UI người dùng.
+
+#### Bản Đồ Phân Phối Thẻ Trí Tuệ Trên Toàn Giao Diện:
+1. **Tab VN-Index (`MarketDashboard.jsx`)**:
+   - `MarketHeroStatusBar.jsx`: *4 KPI VN-Index, Nhiệt Kế Định Giá, Benjamin Graham & Vốn Hóa* -> `H`.
+   - `MacroValuationWindowCard.jsx`: *Định Giá P/E Bands 4 Chu Kỳ & Nhiệt Kế Thị Trường* -> `H`.
+   - `MarketValuationHistoryChart.jsx`: *Lịch Sử Định Giá 25 Năm Vietstock* -> `H`.
+   - `StyleValuationComparison.jsx`: *So Sánh 4 Phân Khúc Vốn Hóa & Chỉ Số Benjamin Graham* -> `H`.
+   - `SectorValuationHeatmap.jsx`: *Bản Đồ Nhiệt & Luân Chuyển 10 Ngành GICS* -> `H`.
+
+2. **Tab Phân Tích Kinh Tế Vĩ Mô (`MacroDashboard.jsx`)**:
+   - `MacroHeroStatusBar.jsx`: *4 KPI Pha Chu Kỳ, Khẩu Vị Thị Trường, Điểm Rủi Ro 4 Tầng & Phân Bổ 4 Lớp Tài Sản* -> `H`.
+   - `ExecutiveSummaryCard.jsx`:
+     - Tab 1: *Chiến Lược CIO* -> `AI` / `H` động.
+     - Tab 2: *Nhịp Đập Tuần* -> `AI` / `H` động.
+     - Tab 3: *Tổng Hợp 4 Trụ Cột* -> `H` (Tổng hợp quy chuẩn kinh tế).
+   - `MacroRegimeRadarSection.jsx`: *Ma Trận Kịch Bản, Đồng Hồ Chu Kỳ, Pha Tăng Trưởng & Độ Lệch Pha* -> `H`.
+   - `YieldCurveMonitorCard.jsx`: *Đường Cong Lợi Suất 17 Kỳ Hạn & Rủi Ro Đảo Ngược* -> `H`.
+   - `MacroYieldCurveStressBox.jsx`: *Căng Thẳng Thanh Khoản Thị Trường Nợ LSS* -> `H`.
+   - `MacroAllocationGoldSection.jsx`: *Phân Bổ Tài Sản Động & Arbitrage Giá Vàng* -> `H`.
+   - `ScenarioAllocationMatrix.jsx`: *Ma Trận Phân Bổ Danh Mục 3 Kịch Bản* -> `H`.
+   - `MacroIntermarketGrid.jsx`: *Lưới 6 Chỉ Số Liên Thị Trường* -> `H`.
+   - `MacroTradingEconomicsTable.jsx`: *Thư Viện 95 Chỉ Số Kinh Tế TradingEconomics* -> `H`.
+   - `OpportunityCostCard.jsx`: *So Sánh Chi Phí Cơ Hội Lãi Suất Tiết Kiệm* -> `H`.
+
+3. **Tab Định Giá & Phân Tích Chuyên Sâu Cổ Phiếu (`ValuationDashboard.jsx`)**:
+   - `StockCockpitHeader.jsx`:
+     - *CFA Equity Research Copilot* -> `AI` / `H` động.
+     - *Consensus Fair Value (Giá trị nội tại hội tụ)* -> `H`.
+   - `FullResearchReportModal.jsx`:
+     - Chương 1: *CFA Investment Thesis* -> `AI` / `H` động.
+     - Chương 2: *10 Mô Hình Định Lượng & Độ Nhạy* -> `H`.
+     - Chương 3: *Gian Lận BCTC Beneish M-Score* -> `H`.
+     - Chương 4: *Công Thức Kỳ Diệu Joel Greenblatt* -> `H`.
+     - Chương 5: *Dòng Tiền Tự Do FCF & Biến Số Kế Toán Accruals* -> `H`.
+     - Chương 6: *Extended DuPont 5-Factor CFA* -> `H`.
+     - Chương 7: *Sức Khỏe Tài Chính (Altman Z & Piotroski F)* -> `H`.
+     - Chương 8: *Cấu Trúc Khối Lượng Volume Profile & Wyckoff* -> `H`.
+     - Chương 9: *Đo Lường Rủi Ro Định Lượng (VaR & Sharpe)* -> `H`.
+     - Chương 10: *Tổng Hợp Tin Tức & Khảo Sát Tâm Lý NLP* -> `H`.
+   - Các Thẻ Định Lượng Độc Lập:
+     - `ValuationSevenZonesCard.jsx`: *7 Vùng Biên An Toàn* -> `H`.
+     - `ValuationTrapsCard.jsx`: *Nhận Diện 5 Bẫy Giá Trị* -> `H`.
+     - `DcfValuationCard.jsx`: *DCF Chiết Khấu Dòng Tiền 3 Kịch Bản* -> `H`.
+     - `ForensicAccountingCard.jsx`: *Kế Toán Pháp Y & M-Score* -> `H`.
+     - `FinancialHealthCard.jsx`: *Khám Sức Khỏe Altman Z & Piotroski F* -> `H`.
+     - `ExtendedDupontCard.jsx`: *DuPont 5 Nhân Tố Phân Rã ROE* -> `H`.
+     - `FinValLabCard.jsx`: *Phòng Thí Nghiệm Tài Chính Định Lượng* -> `H`.
+     - `DividendSustainabilityCard.jsx`: *Bền Vững Cổ Tức Tiền Mặt* -> `H`.
+     - `NewsSentimentCard.jsx`: *Phân Tích Cảm Xúc Tin Tức Báo Chí* -> `H`.
+     - `HistoricalValuationBandCard.jsx`: *Dải Băng Phân Vị P25-P50-P75 5Y* -> `H`.
+     - `IndustrySpecificCard.jsx`: *Chỉ Số Đặc Thù Ngành Nghề GICS* -> `H`.
+     - `StockRiskMetricsCard.jsx`: *Đo Lường Biến Động, VaR & Drawdown* -> `H`.
+     - `MarketProfileCard.jsx`: *15-Block Market Profile & VAP* -> `H`.
+     - `ValuationFormulasDeconstructionCard.jsx`: *Giải Phẫu 10 Công Thức Toán Học* -> `H`.
+
+
+
+
+
+
+3. **Tab Tổng Quan Danh Mục (`Dashboard.jsx`)**:
+   - `PortfolioStressTestCard.jsx`: *Đo Lường Sức Khỏe Danh Mục & Chịu Tải Vĩ Mô* -> `AI` / `H` động.
+   - `OpportunityCostCard.jsx`: *So Sánh Chi Phí Cơ Hội Lãi Suất Tiết Kiệm* -> `H`.
+   - `DashboardKpiMatrix.jsx`: *Chỉ Số Hiệu Quả & Rủi Ro Danh Mục (Sharpe, Beta, MaxDD)* -> `H`.
+   - `DashboardHoldingsTable.jsx`: *Sổ Cái Vị Thế Nắm Giữ & P/L Tạm Tính* -> `H`.
+
+---
+
+### PHÂN HỆ 10: BÁO CÁO SỨC KHỎE DANH MỤC & CHỊU TẢI VĨ MÔ (PORTFOLIO AI STRESS-TEST)
+
+* **Vị trí lưu trữ chính thức**: Bảng `portfolio_ai_insights` trong `data/stock.db` (Local) / Turso Cloud (Prod) — **TẦNG 1: ACID DATABASE (100% Phân Quyền Theo `user_id`)**.
+* **Vị trí lưu trữ dự phòng (Fallback)**: `data/portfolio_ai_insights.json` (dành cho tài khoản demo & môi trường serverless).
+* **Chu kỳ & Điều phối**:
+  - **On-Demand**: Người dùng chủ động bấm *"⚡ Làm Mới AI"* trên Dashboard (`POST /api/portfolio/ai-stress-test/refresh`), cập nhật riêng danh mục của `user_id` đó trong 2-3s.
+  - **Batch Job Hàng Tuần**: Sáng Thứ Bảy (10:00 AM) qua `run_pipeline.py --cadence weekly` (quét toàn bộ các user đang nắm giữ cổ phiếu, áp dụng Smart Delta Cache: chỉ sinh lại nếu `updated_at > 6 ngày`).
+  - **0% AI calls khi phát sinh giao dịch**: Thao tác Mua, Bán, Cổ tức, Tiền mặt hoàn toàn không kích hoạt AI để đảm bảo hiệu năng tối đa.
+* **Đặc tả Schema chi tiết (Bảng `portfolio_ai_insights`)**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Ý Nghĩa Nghiệp Vụ & Nguồn Gốc |
+  | :--- | :--- | :--- |
+  | `user_id` | `TEXT (PK)` | Định danh người dùng (mặc định `'demo'`). Đảm bảo phân tách độc lập 100% dữ liệu giữa các tài khoản. |
+  | `health_score` | `TEXT` | Xếp hạng sức khỏe danh mục: `A+`, `A`, `B+`, `B`, `C+`, `C`, `D`. |
+  | `health_verdict` | `TEXT` | Thông điệp kết luận 1 câu ngắn gọn về độ cân bằng và sức chống chịu của danh mục. |
+  | `portfolio_beta` | `REAL` | Hệ số Beta bình quân gia quyền của danh mục so với VN-Index. |
+  | `cash_weight_pct` | `REAL` | Tỷ trọng đệm tiền mặt bảo vệ trên tổng NAV (%). |
+  | `report_json` | `TEXT` | Chuỗi JSON đầy đủ chứa ma trận 3 tầng độ nhạy vĩ mô (`macroSensitivity`), 3 kịch bản chịu tải cực đoan (`stressTestScenarios`), và khuyến nghị tái cân bằng (`rebalancingRecommendations`). |
+  | `status` | `TEXT` | Trạng thái sinh dữ liệu (`success` / `failed`). |
+  | `updated_at` | `TEXT (ISO)` | Thời điểm sinh báo cáo phân tích. Dùng để kiểm tra Smart Delta Cache (> 6 ngày). |
+
+---
+
+### PHÂN HỆ 11: KIỂM TOÁN AN TOÀN CỔ TỨC & KỶ LUẬT PHÂN BỔ VỐN (AI DIVIDEND AUDIT)
+
+* **Vị trí lưu trữ**: Khối `aiDividendAudit` trong `data/financials/<MÃ>.json` (và bên trong `dividendSustainability`).
+* **Chu kỳ & Điều phối**:
+  - Hàng Tuần (Sáng Thứ Bảy) trong lượt gọi tuần tích hợp 5-trong-1 của cổ phiếu (`generate_ai_insights.py --scope stocks`).
+  - Áp dụng Smart Delta Cache: Bỏ qua nếu dữ liệu AI đã sinh trong vòng 6 ngày.
+* **Đặc tả Schema chi tiết**:
+  | Trường Dữ Liệu | Kiểu Dữ Liệu | Ý Nghĩa Nghiệp Vụ & Nguồn Gốc |
+  | :--- | :--- | :--- |
+  | `safetyRating` | `string` | Đánh giá an toàn: `Vững Chắc (Safe)`, `Cần Theo Dõi (Borderline)`, hoặc `Nguy Cơ Bẫy Cổ Tức (Trap Risk)`. |
+  | `fcfCoverageVerdict` | `string` | Kiểm toán cổ tức tiền mặt có được bảo chứng 100% bằng dòng tiền tự do FCF thực tế hay bằng nợ vay/bán tài sản. |
+  | `trapRiskLevel` | `string` | Mức độ nguy cơ bẫy cổ tức: `Thấp`, `Trung Bình`, `Cao`. |
+  | `capitalAllocationScore` | `number` | Điểm số kỷ luật phân bổ vốn của Ban Lãnh Đạo (thang điểm 0.0 - 10.0). |
+  | `capitalAllocationDiagnosis` | `string` | Đánh giá hiệu quả phân bổ vốn: ROIC so với WACC, cân đối giữa tái đầu tư mở rộng CapEx, trả nợ vay và chia tiền mặt. |
+  | `outlook3Y` | `string` | Dự phóng triển vọng duy trì hoặc cắt giảm cổ tức trong 1-3 năm tới. |
+  | `redFlags` | `array` | Danh sách các cờ cảnh báo rủi ro bẫy cổ tức (mảng rỗng `[]` nếu an toàn). |
+  | `updatedAt` | `string (ISO)` | Thời điểm sinh báo cáo kiểm toán. |
 

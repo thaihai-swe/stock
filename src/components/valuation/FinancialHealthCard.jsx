@@ -1,4 +1,5 @@
 import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function FinancialHealthCard({ healthScore, earlyWarning }) {
   if (!healthScore && !earlyWarning) return null;
@@ -34,10 +35,11 @@ export default function FinancialHealthCard({ healthScore, earlyWarning }) {
       <div className="p-6 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-xs space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-700">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 Thước Đo Sức Khỏe Toàn Diện (Overall Health Score)
               </span>
+              <IntelligenceBadge type="heuristic" tooltip="Thước đo sức khỏe Altman Z, Piotroski F & 4 trụ cột tài chính" />
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${healthScore?.badge || 'bg-indigo-600 text-white'}`}>
                 {grade}
               </span>

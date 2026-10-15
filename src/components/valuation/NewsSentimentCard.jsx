@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 function getArticleUrl(item, symbol) {
   if (item?.link && item.link !== '#' && item.link.startsWith('http')) {
@@ -42,11 +43,12 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
       <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-700">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xl">📰</span>
               <h3 className="text-lg font-black text-gray-900 dark:text-white">
                 Bản Tin Thời Sự & Bộ Đo Lường Tâm Lý 30 Ngày (News Digest & Sentiment)
               </h3>
+              <IntelligenceBadge type="heuristic" tooltip="Từ điển phân loại tin tức & thuật toán tính điểm tâm lý (-100 đến +100)" />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Phân loại 5 nhóm tin tức, đo lường điểm số tâm lý (-100 đến +100)
@@ -85,6 +87,80 @@ export default function NewsSentimentCard({ newsDigest, symbol }) {
           </div>
           <p>{tldrSummary}</p>
         </div>
+
+        {/* ── AI SEMANTIC NEWS NLP & CATALYST TRACKER ── */}
+        {newsDigest?.aiNewsAnalysis && (
+          <div className="mt-4 p-5 rounded-2xl bg-gradient-to-br from-purple-50/90 via-indigo-50/50 to-white dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-gray-800 border border-purple-200/90 dark:border-purple-800/60 space-y-3.5 shadow-2xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-100 dark:border-purple-800/40 pb-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-base">🧠</span>
+                <h5 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
+                  Phân Tích Ngữ Nghĩa & Động Lực Tăng Trưởng (Semantic News NLP)
+                </h5>
+                <IntelligenceBadge
+                  type={newsDigest?.aiNewsAnalysis ? 'ai' : 'heuristic'}
+                  provider={newsDigest?.aiNewsAnalysis?.provider}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                  newsDigest.aiNewsAnalysis.overallSentiment === 'Tích Cực'
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
+                    : newsDigest.aiNewsAnalysis.overallSentiment === 'Thận Trọng'
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
+                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300'
+                }`}>
+                  {newsDigest.aiNewsAnalysis.overallSentiment} ({newsDigest.aiNewsAnalysis.sentimentScore > 0 ? `+${newsDigest.aiNewsAnalysis.sentimentScore}` : newsDigest.aiNewsAnalysis.sentimentScore})
+                </span>
+                {newsDigest.aiNewsAnalysis.catalystTimeline && (
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                    Kỳ hạn: <b>{newsDigest.aiNewsAnalysis.catalystTimeline}</b>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
+              {newsDigest.aiNewsAnalysis.executiveSummary}
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              {/* Catalysts */}
+              {Array.isArray(newsDigest.aiNewsAnalysis.catalysts) && newsDigest.aiNewsAnalysis.catalysts.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 space-y-2">
+                  <span className="text-[11px] font-black uppercase text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                    <span>🚀</span> Động Lực Tăng Trưởng (Key Catalysts)
+                  </span>
+                  <ul className="text-xs text-gray-700 dark:text-gray-300 space-y-1.5">
+                    {newsDigest.aiNewsAnalysis.catalysts.map((cat, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-emerald-600 font-bold">•</span>
+                        <span>{cat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Key Risks */}
+              {Array.isArray(newsDigest.aiNewsAnalysis.keyRisks) && newsDigest.aiNewsAnalysis.keyRisks.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 space-y-2">
+                  <span className="text-[11px] font-black uppercase text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
+                    <span>⚠️</span> Rủi Ro Báo Chí & Pháp Lý (Headwinds)
+                  </span>
+                  <ul className="text-xs text-gray-700 dark:text-gray-300 space-y-1.5">
+                    {newsDigest.aiNewsAnalysis.keyRisks.map((risk, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-rose-600 font-bold">•</span>
+                        <span>{risk}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── SENTIMENT METER & CATEGORY BREAKDOWN ── */}

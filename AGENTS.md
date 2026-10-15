@@ -57,7 +57,7 @@ Hệ thống phân định rạch ròi dữ liệu thành 5 tầng độc lập 
 
 | Tầng Dữ Liệu | Đối Tượng & Nội Dung | Vị Trí Lưu Trữ | Trạng Thái Git | Chu Kỳ & Bộ Điều Phối |
 | :--- | :--- | :--- | :--- | :--- |
-| **TẦNG 1: ACID Database** | Sổ lệnh mua/bán FIFO (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, cấu hình. | `data/stock.db` (Local) / Turso Cloud (Prod) | **GITIGNORED (100%)** *(Tuyệt đối không commit)* | Realtime khi user thao tác. Quản lý backup qua `scripts/db_manager.py`. |
+| **TẦNG 1: ACID Database** | Sổ lệnh mua/bán FIFO (`buy_orders`, `sell_orders`), cổ tức, watchlist, tài khoản, cấu hình, phân tích sức khỏe danh mục AI (`portfolio_ai_insights`). | `data/stock.db` (Local) / Turso Cloud (Prod) | **GITIGNORED (100%)** *(Tuyệt đối không commit)* | Realtime khi user thao tác. Quản lý backup qua `scripts/db_manager.py`. |
 | **TẦNG 2: Ephemeral Cache** | Thị giá khớp lệnh realtime (VPS/TCBS), điểm số VNINDEX/VN30 trong phiên. | RAM Node.js + `data/prices_cache.json` | **GITIGNORED (100%)** *(Tránh git diff bẩn)* | Trong phiên (9:00 - 15:00 T2-T6). Cache TTL 1h (`priceService.js`). |
 | **TẦNG 3: Daily EOD Snapshot** | TradingView Scanner 50+ chỉ số, Nhiệt kế VN-Index EOD, Vàng SJC/PNJ/TG, Dầu, Tỷ giá, 60 nến DNSE. | `data/fundamentals_cache.json`, `data/macro_valuation.json`, `data/financials/<MÃ>.json` | **COMMIT VỀ GIT** | **Daily EOD (18:00 T2-T6)**: GitHub Actions `daily-eod-sync.yml` hoặc `scripts/run_pipeline.py --cadence daily`. |
 | **TẦNG 4: Weekly Macro & Sector** | 95 Chỉ số TradingEconomics, 10 nhóm ngành GICS, Lịch sử Simply Wall St, Tin tức 30 ngày. | `data/macro_indicators.json`, `data/sector_valuation_cache.json`, `data/market_valuation_history.json` | **COMMIT VỀ GIT** | **Weekly (10:00 Sáng T7)**: GitHub Actions `weekly-macro-sync.yml` hoặc `scripts/run_pipeline.py --cadence weekly`. |
@@ -95,16 +95,23 @@ Khi phát triển hoặc sửa đổi UI, các Agent phải tuân thủ nghiêm 
   * **TUYỆT ĐỐI KHÔNG**: Không hiển thị thông tin mô tả công ty hay Thước đo vị thế 52 tuần (52W Range Slider) tại modal này (để giữ modal nhẹ, tập trung 100% vào sổ cái lệnh và lãi lỗ).
   * Cung cấp nút điều hướng: **`🎯 Sang Tab Định Giá`** để chuyển thẳng người dùng sang tab Định Giá và tự động mở đúng mã đó (nơi có đầy đủ thông tin doanh nghiệp & thước đo 52 tuần).
 
-### B. Tab Vĩ Mô & VN-Index (`MacroDashboard.jsx`) — MACRO REGIME & MARKET THERMOMETER
-* **Giao diện tập trung toàn diện cho phân tích kinh tế vĩ mô & chu kỳ thị trường**:
-  1. **Nhiệt Kế Định Giá VN-Index**: P/E Bands 5 năm (Rất rẻ &lt;11.5x đến Rất đắt &gt;18x), P/B, Z-Score và các chỉ số liên thị trường (USD/VND, TPCP 10Y, Lãi suất SBV, SJC, Brent).
-  2. **Chu Kỳ Kinh Tế 5 Pha (Macro Regime)**: Xác định pha hiện tại (Phục hồi, Mở rộng, Quá nhiệt, Suy thoái, Chậm lại), Tăng trưởng GDP vs Lạm phát, Tâm lý Risk-On / Risk-Off.
-  3. **Điểm Rủi Ro Vĩ Mô (0-100)**: Phân rã 4 tầng rủi ro (Tiền tệ, Tài khóa, Lạm phát, Thanh khoản).
-  4. **Bản Đồ Luân Chuyển & Định Giá 10 Nhóm Ngành GICS (Sector Valuation & Rotation)**: Hợp nhất dữ liệu P/E Heatmap và 6 Động Lực Vĩ Mô vào 2 chế độ xem chất lượng cao: (1) Ma Trận Thiên Thời & Bản Đồ Nhiệt và (2) Bảng Số Liệu Toàn Diện & Phân Rã Vĩ Mô.
-  5. **Cố Vấn Phân Bổ 4 Loại Tài Sản & Chênh Lệch Giá Vàng**: Phân bổ Cổ phiếu, Trái phiếu/Tiền mặt, Vàng, Ngoại tệ + Đo độ chênh lệch vàng miếng SJC & nhẫn PNJ 999.9 (từ PNJ Official Edge API) so với giá quốc tế quy đổi.
-  6. **Kho 95 Chỉ Số TradingEconomics**: Tra cứu 10 phân nhóm kinh tế vĩ mô có tìm kiếm tức thì.
+### B. Tab VN-Index (`MarketDashboard.jsx`) — EQUITIES, VALUATION & SECTOR ROTATION
+* **Giao diện tập trung toàn diện cho phân tích thị trường chứng khoán Việt Nam**:
+  1. **Chỉ Số Trực Tuyến & Biểu Đồ Kỹ Thuật (DNSE)**: Nến 1D, 1M, 6M, 1Y cho VNINDEX, VN30, VN Diamond, VN Midcap, VN100.
+  2. **Nhiệt Kế Định Giá VN-Index 4 Chu Kỳ**: P/E Bands 5 năm, 10 năm, từ 2007 và 25 năm toàn thời gian (Rất rẻ <11.5x đến Rất đắt >18x), P/B, Z-Score, Composite Signal.
+  3. **Lịch Sử Định Giá 25 Năm Vietstock**: Biểu đồ chuỗi thời gian P/E, P/S, Market Cap, Doanh thu, Lợi nhuận của toàn thị trường từ 2000 đến nay.
+  4. **So Sánh 4 Phân Khúc Vốn Hóa & Phong Cách (Styles)**: Đối chiếu tương quan định giá P/E, P/B, Beta và dòng vốn giữa Blue-chips VN30, Kim Cương VN Diamond (hết room ngoại), Midcap tăng trưởng và VN-Index.
+  5. **Bản Đồ Luân Chuyển & Định Giá 10 Nhóm Ngành GICS (Sector Valuation & Rotation)**: Ma trận Thiên thời & Cơ bản (Dual Sweet-Spot Matrix), P/E Heatmap 10 ngành và Vòng quay luân chuyển ngành.
 
-### C. Tab Định Giá Cổ Phiếu (`ValuationDashboard.jsx`) — SINGLE-STOCK DEEP DIVE
+### C. Tab Kinh Tế Vĩ Mô (`MacroDashboard.jsx`) — MACRO REGIME, YIELD CURVE & MULTI-ASSET
+* **Giao diện tập trung toàn diện cho phân tích kinh tế vĩ mô, thị trường nợ & phân bổ tài sản**:
+  1. **Chu Kỳ Kinh Tế 5 Pha (Macro Regime)**: Xác định pha hiện tại (Phục hồi, Mở rộng, Quá nhiệt, Suy thoái, Chậm lại), Macro Clock, Tăng trưởng GDP vs Lạm phát, Tâm lý Risk-On / Risk-Off.
+  2. **Điểm Rủi Ro Vĩ Mô 4 Tầng (Risk Score 0-100)**: Phân rã 4 tầng rủi ro (Tiền tệ, Tài khóa, Lạm phát, Thanh khoản), Phân loại Bucket [B1-B5].
+  3. **Giám Sát Đường Cong Lợi Suất 17 Kỳ Hạn (Yield Curve)**: Đường cong TPCP Việt Nam vs US Treasury, Spread 10Y-2Y, Cảnh báo đảo ngược đường cong & Tóm tắt áp lực căng thẳng thị trường nợ (LSS).
+  4. **Cố Vấn Phân Bổ 4 Loại Tài Sản & Chênh Lệch Giá Vàng**: Ma trận kịch bản phân bổ Cổ phiếu, Trái phiếu, Vàng, Tiền mặt + Đo độ chênh lệch vàng miếng SJC & nhẫn PNJ 999.9 so với giá quốc tế quy đổi + Lưới 6 chỉ số liên thị trường (USD/VND, TPCP 10Y, Lãi suất SBV, CPI, Brent, Vàng).
+  5. **Kho 95 Chỉ Số TradingEconomics**: Tra cứu 95 chỉ số theo 10 phân nhóm kinh tế vĩ mô có tìm kiếm tức thì.
+
+### D. Tab Định Giá Cổ Phiếu (`ValuationDashboard.jsx`) — SINGLE-STOCK DEEP DIVE
 * **Loại bỏ hoàn toàn**:
   * Các khối vĩ mô và chỉ số VN-Index (đã chuyển sang `MacroDashboard.jsx`).
   * Các tag gợi ý nhanh (Quick Tags) gây rối mắt.
@@ -172,7 +179,8 @@ stock/
 │   ├── App.jsx                        # Root React Component & Tab Router
 │   ├── components/
 │   │   ├── Dashboard.jsx              # Tab Tổng quan danh mục
-│   │   ├── MacroDashboard.jsx         # Tab Phân tích Vĩ Mô, Regime 5 pha & VN-Index
+│   │   ├── MarketDashboard.jsx        # Tab Thị trường chứng khoán, VN-Index & 10 nhóm ngành
+│   │   ├── MacroDashboard.jsx         # Tab Phân tích Kinh tế Vĩ Mô, Regime 5 pha & Đa tài sản
 │   │   ├── ValuationDashboard.jsx     # Tab Tra cứu & Định giá cổ phiếu chuyên sâu
 │   │   ├── StockDetailModal.jsx       # Modal Sổ cái Lãi/Lỗ thuần túy
 │   │   ├── TransactionHistory.jsx     # Tab Lịch sử mua/bán & FIFO P/L

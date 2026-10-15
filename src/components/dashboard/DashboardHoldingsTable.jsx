@@ -1,4 +1,4 @@
-import { fmtMoney, getStockColor, getAllocationTier, compareAvgCostWithMarket, plColor, plBg } from '../../utils/format.js';
+import { fmtMoney, getAllocationTier, getStockColor, plBg, plColor } from '../../utils/format.js';
 
 export default function DashboardHoldingsTable({
   portfolio = [],
@@ -46,22 +46,20 @@ export default function DashboardHoldingsTable({
               <button
                 type="button"
                 onClick={() => setMobileViewMode('card')}
-                className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                  mobileViewMode === 'card'
+                className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${mobileViewMode === 'card'
                     ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-xs'
                     : 'text-slate-500 dark:text-slate-400'
-                }`}
+                  }`}
               >
                 📱 Thẻ
               </button>
               <button
                 type="button"
                 onClick={() => setMobileViewMode('table')}
-                className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                  mobileViewMode === 'table'
+                className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${mobileViewMode === 'table'
                     ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-xs'
                     : 'text-slate-500 dark:text-slate-400'
-                }`}
+                  }`}
               >
                 📊 Bảng
               </button>
@@ -112,33 +110,30 @@ export default function DashboardHoldingsTable({
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
-              className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                statusFilter === 'all'
+              className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${statusFilter === 'all'
                   ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
-              }`}
+                }`}
             >
               Tất cả ({portfolio.length})
             </button>
             <button
               type="button"
               onClick={() => setStatusFilter('profit')}
-              className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
-                statusFilter === 'profit'
+              className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${statusFilter === 'profit'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
-              }`}
+                }`}
             >
               <span>🟢</span> Đang Lãi ({filterCounts.profit})
             </button>
             <button
               type="button"
               onClick={() => setStatusFilter('loss')}
-              className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
-                statusFilter === 'loss'
+              className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${statusFilter === 'loss'
                   ? 'bg-rose-600 text-white shadow-2xs'
                   : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-              }`}
+                }`}
             >
               <span>🔴</span> Đang Lỗ ({filterCounts.loss})
             </button>
@@ -155,7 +150,7 @@ export default function DashboardHoldingsTable({
         <div className="py-16 text-center text-gray-400 dark:text-slate-500">
           <p className="text-4xl mb-2">📭</p>
           <p className="font-bold text-gray-700 dark:text-slate-300 text-base">Danh mục hiện đang trống</p>
-          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Chuyển sang tab "Đặt Lệnh" để bắt đầu tích lũy cổ phiếu</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Chuyển sang tab "Nhật Ký" để bắt đầu tích lũy cổ phiếu</p>
         </div>
       ) : displayedPortfolio.length === 0 ? (
         <div className="py-12 text-center text-gray-400 dark:text-slate-500">
@@ -209,10 +204,9 @@ export default function DashboardHoldingsTable({
                         <span className="font-extrabold text-sm text-gray-900 dark:text-slate-100">
                           {fmtMoney(marketPrice)}đ
                         </span>
-                        <span className={`text-[10px] font-bold ml-1.5 px-1.5 py-0.2 rounded inline-block ${
-                          changePct > 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300' :
-                          changePct < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' : 'bg-gray-100 text-gray-600'
-                        }`}>
+                        <span className={`text-[10px] font-bold ml-1.5 px-1.5 py-0.2 rounded inline-block ${changePct > 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300' :
+                            changePct < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' : 'bg-gray-100 text-gray-600'
+                          }`}>
                           {changePct > 0 ? '+' : ''}{changePct}%
                         </span>
                       </div>
@@ -392,10 +386,9 @@ export default function DashboardHoldingsTable({
                             <span className="font-extrabold text-gray-900 dark:text-slate-100">
                               {fmtMoney(marketPrice)}đ
                             </span>
-                            <span className={`text-[10px] font-bold ml-1.5 px-1 py-0.2 rounded ${
-                              changePct > 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300' :
-                              changePct < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' : 'bg-gray-100 text-gray-600'
-                            }`}>
+                            <span className={`text-[10px] font-bold ml-1.5 px-1 py-0.2 rounded ${changePct > 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300' :
+                                changePct < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' : 'bg-gray-100 text-gray-600'
+                              }`}>
                               {changePct > 0 ? '+' : ''}{changePct}%
                             </span>
                           </div>
@@ -430,7 +423,10 @@ export default function DashboardHoldingsTable({
                         <div className="flex items-center justify-center gap-1 sm:gap-1.5">
                           <button
                             type="button"
-                            onClick={() => onNavigateBuy && onNavigateBuy(p.symbol, '', marketPrice || p.avgCost)}
+                            onClick={() => {
+                              const buyPrice = (marketPrice || p.avgCost) ? String((marketPrice || p.avgCost) / 1000) : '';
+                              onNavigateBuy && onNavigateBuy(p.symbol, '', buyPrice);
+                            }}
                             className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold cursor-pointer transition-colors border border-emerald-200/60 dark:border-emerald-800/40 active:scale-95 shrink-0"
                             title={`Mua thêm ${p.symbol}`}
                           >
@@ -438,7 +434,14 @@ export default function DashboardHoldingsTable({
                           </button>
                           <button
                             type="button"
-                            onClick={() => onNavigateSell && onNavigateSell(p.symbol)}
+                            onClick={() => {
+                              const sellPrice = (marketPrice || p.avgCost) ? String((marketPrice || p.avgCost) / 1000) : '';
+                              onNavigateSell && onNavigateSell({
+                                symbol: p.symbol,
+                                quantity: String(p.totalQty),
+                                price: sellPrice,
+                              });
+                            }}
                             className="px-2 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold cursor-pointer transition-colors border border-rose-200/60 dark:border-rose-800/40 active:scale-95 shrink-0"
                             title={`Bán chốt ${p.symbol}`}
                           >

@@ -4,6 +4,7 @@ import App from './App.jsx';
 import './index.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ThemeProvider } from './context/ThemeContext.jsx';
+import { ToastProvider } from './context/ToastContext.jsx';
 
 const googleClientId = import.meta.env.GOOGLE_CLIENT_ID || import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -16,7 +17,13 @@ function Root() {
     <App hasGoogleClientId={false} />
   );
 
-  return <ThemeProvider>{content}</ThemeProvider>;
+  return (
+    <ThemeProvider>
+      <ToastProvider>
+        {content}
+      </ToastProvider>
+    </ThemeProvider>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

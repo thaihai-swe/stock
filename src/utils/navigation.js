@@ -8,6 +8,7 @@ export const VALID_TABS = [
   'trade',
   'history',
   'valuation',
+  'market',
   'macro',
   'dca',
   'strategy',
@@ -19,6 +20,7 @@ const ALIAS_TABS = {
   buy: { tab: 'trade', tradeType: 'buy' },
   sell: { tab: 'trade', tradeType: 'sell' },
   dividend: { tab: 'trade', tradeType: 'dividend' },
+  vnindex: { tab: 'market' },
 };
 
 /**

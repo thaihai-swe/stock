@@ -6,6 +6,7 @@ export default function TradeSidebarContext({
   portfolio = [],
   watchlist = [],
   dividends = [],
+  marketPrices = {},
   onSelectBuy,
   onSelectSell,
 }) {
@@ -98,14 +99,21 @@ export default function TradeSidebarContext({
                         {stock.totalQty.toLocaleString()} cp
                       </span>
                     </div>
-                    <div className="text-[11px] text-gray-400 dark:text-slate-500 truncate mt-0.5">
-                      Vốn TB: <span className="font-medium text-gray-700 dark:text-slate-300">{fmtMoney(stock.avgCost)}đ</span>
+                    <div className="text-[11px] text-gray-400 dark:text-slate-500 truncate mt-0.5 flex items-center gap-1.5 flex-wrap">
+                      <span>Vốn TB: <strong className="font-semibold text-gray-700 dark:text-slate-300">{fmtMoney(stock.avgCost)}đ</strong></span>
+                      {marketPrices[stock.symbol]?.price && (
+                        <span>· Thị giá: <strong className="font-semibold text-emerald-600 dark:text-emerald-400">{fmtMoney(marketPrices[stock.symbol].price)}đ</strong></span>
+                      )}
                     </div>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => onSelectBuy && onSelectBuy(stock.symbol)}
+                    onClick={() => {
+                      const curPrice = marketPrices[stock.symbol]?.price || stock.avgCost;
+                      const priceVal = curPrice ? curPrice / 1000 : undefined;
+                      onSelectBuy && onSelectBuy(stock.symbol, priceVal);
+                    }}
                     className="shrink-0 text-xs font-bold px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs cursor-pointer flex items-center gap-1"
                     title={`Điền mã ${stock.symbol} vào form mua`}
                   >
@@ -207,8 +215,17 @@ export default function TradeSidebarContext({
                       <b className="text-gray-700 dark:text-slate-200">{fmtMoney(stock.avgCost)}đ</b>
                     </div>
                     <div className="text-right">
-                      <span>Hòa vốn: </span>
-                      <b className="text-amber-600 dark:text-amber-400">{fmtMoney(stock.breakEvenPrice || stock.avgCost)}đ</b>
+                      {marketPrices[stock.symbol]?.price ? (
+                        <>
+                          <span>Thị giá: </span>
+                          <b className="text-emerald-600 dark:text-emerald-400">{fmtMoney(marketPrices[stock.symbol].price)}đ</b>
+                        </>
+                      ) : (
+                        <>
+                          <span>Hòa vốn: </span>
+                          <b className="text-amber-600 dark:text-amber-400">{fmtMoney(stock.breakEvenPrice || stock.avgCost)}đ</b>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -217,7 +234,11 @@ export default function TradeSidebarContext({
                     {stock.totalQty >= 200 && (
                       <button
                         type="button"
-                        onClick={() => onSelectSell && onSelectSell(stock.symbol, Math.floor(stock.totalQty / 2))}
+                        onClick={() => {
+                          const curPrice = marketPrices[stock.symbol]?.price || stock.avgCost;
+                          const priceVal = curPrice ? curPrice / 1000 : undefined;
+                          onSelectSell && onSelectSell(stock.symbol, Math.floor(stock.totalQty / 2), priceVal);
+                        }}
                         className="flex-1 text-[11px] font-bold py-1 px-2 rounded-xl bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 border border-gray-200 dark:border-slate-600 transition-colors shadow-2xs cursor-pointer"
                         title={`Bán 50% số lượng (${Math.floor(stock.totalQty / 2).toLocaleString()} cp)`}
                       >
@@ -226,7 +247,11 @@ export default function TradeSidebarContext({
                     )}
                     <button
                       type="button"
-                      onClick={() => onSelectSell && onSelectSell(stock.symbol, stock.totalQty)}
+                      onClick={() => {
+                        const curPrice = marketPrices[stock.symbol]?.price || stock.avgCost;
+                        const priceVal = curPrice ? curPrice / 1000 : undefined;
+                        onSelectSell && onSelectSell(stock.symbol, stock.totalQty, priceVal);
+                      }}
                       className="flex-1 text-[11px] font-bold py-1 px-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition-colors shadow-2xs cursor-pointer"
                       title={`Bán tất cả ${stock.totalQty.toLocaleString()} cp`}
                     >

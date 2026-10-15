@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatVND } from '../../utils/format.js';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function HistoricalValuationBandCard({ historicalBands, currentPrice, symbol, eps, bvps }) {
   if (!historicalBands) return null;
@@ -110,6 +111,7 @@ export default function HistoricalValuationBandCard({ historicalBands, currentPr
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
               Dải Băng P25 - P50 - P75 Chu Kỳ {peBand.yearsUsed ? `${peBand.yearsUsed} Năm` : '5 Năm'}
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình dải băng định giá phân vị P25/P50/P75 chu kỳ 5 năm" />
           </div>
           <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1">
             Định Giá Lịch Sử 3 Tầng Phân Vị P/E & P/B — {symbol}

@@ -1,5 +1,7 @@
 import React, { useRef } from 'react';
 import { formatVND, formatBn, formatPercent } from '../../utils/format';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
+import Modal from '../common/Modal.jsx';
 
 /**
  * FullResearchReportModal.jsx
@@ -35,6 +37,7 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
   const magic = financials.magicFormula || financials.forensicAnalysis?.magicFormula || {};
   const inflection = financials.fcfInflection || financials.forensicAnalysis?.fcfInflection || {};
   const ratios = financials.financialRatios || {};
+  const aiDeepDive = financials.aiDeepDive || null;
 
   // ── ĐỒNG BỘ & BẢO ĐẢM TÍNH TOÀN VẸN CỦA DỮ LIỆU (DEFENSIVE RESOLUTION) ──
   // 1. DuPont 5 Nhân Tố CFA
@@ -129,11 +132,12 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/60 dark:bg-black/80 backdrop-blur-md overflow-hidden">
-      <div
-        ref={scrollContainerRef}
-        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-700/80 p-5 md:p-8 space-y-6 relative scroll-smooth"
-      >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="5xl"
+    >
+      <div className="p-5 md:p-8 space-y-6">
         {/* Sticky Header & Action Bar */}
         <div className="sticky -top-5 md:-top-8 z-20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md pt-2 pb-4 border-b border-gray-200 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -232,33 +236,133 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
 
         {/* ── CHƯƠNG 1: TÓM TẮT & LUẬN ĐIỂM ĐẦU TƯ ── */}
         <section id="ch1" className="space-y-3 pt-2">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-            <span>📌</span>
-            <span>Chương 1: Tóm Tắt Khuyến Nghị & Luận Điểm Đầu Tư (Executive Summary)</span>
-          </h3>
-          <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs text-gray-700 dark:text-gray-200 leading-relaxed space-y-2">
-            <p>
-              Cổ phiếu <strong>{symbol}</strong> ghi nhận mức điểm sức khỏe tài chính tổng hợp đạt{' '}
-              <strong className="text-emerald-600 dark:text-emerald-400">{healthOverall != null ? `${healthOverall}/100 (${healthGrade})` : 'Chưa đủ dữ liệu'}</strong>{' '}
-              với rủi ro vận hành ở mức thấp ({earlyLevel}). Giá trị nội tại hội tụ từ các mô hình định giá chuyên sâu ước đạt{' '}
-              <strong className="text-emerald-600 dark:text-emerald-400">{formatVND(multiples.consensusFairValue || currentPrice)}</strong>, tương ứng Biên An Toàn (MoS) đạt{' '}
-              <strong>{multiples.marginOfSafety != null ? `${multiples.marginOfSafety}%` : '0%'}</strong>.
-            </p>
-            <p>
-              Hệ thống kiểm toán gian lận Beneish cho kết quả đánh giá <strong>{beneishScore != null ? `M-Score = ${beneishScore}` : 'Chưa đủ dữ liệu'}</strong> ({beneishProb}).
-              Mô hình Magic Formula xếp hạng cổ phiếu vào nhóm <strong>{magicCategory}</strong> với ROIC đạt{' '}
-              <strong className="text-indigo-600 dark:text-indigo-400">{magicRoic != null ? `${magicRoic}%` : '—'}</strong> và Earnings Yield đạt{' '}
-              <strong className="text-emerald-600 dark:text-emerald-400">{magicEy != null ? `${magicEy}%` : '—'}</strong>.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
+              <span>📌</span>
+              <span>Chương 1: Tóm Tắt Khuyến Nghị & Luận Điểm Đầu Tư (Executive Summary)</span>
+              <IntelligenceBadge
+                type={aiDeepDive ? 'ai' : 'heuristic'}
+                provider={aiDeepDive?.provider}
+              />
+            </h3>
+            {aiDeepDive && (
+              <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold self-start sm:self-auto flex items-center gap-1">
+                <span>🧠 CFA Deep-Dive Copilot</span>
+              </span>
+            )}
           </div>
+
+          {aiDeepDive ? (
+            <div className="space-y-3">
+              {/* Thesis Headline Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-white dark:from-indigo-950/50 dark:via-purple-950/30 dark:to-gray-900 border border-indigo-200/90 dark:border-indigo-800/80 space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-xl bg-indigo-600 text-white shadow-xs">
+                    {aiDeepDive.recommendation}
+                  </span>
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200">
+                    Conviction: {aiDeepDive.convictionScore}/100
+                  </span>
+                </div>
+                <h4 className="text-sm font-black text-gray-900 dark:text-white leading-snug">
+                  {aiDeepDive.thesisHeadline}
+                </h4>
+                <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {aiDeepDive.valuationConvergenceAnalysis}
+                </p>
+              </div>
+
+              {/* Health Check & Economic Moat */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700 space-y-1.5">
+                  <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                    <span>🛡️</span>
+                    <span>Sức Khỏe BCTC & Cấu Trúc Vốn</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {aiDeepDive.financialHealthCheck}
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700 space-y-1.5">
+                  <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                    <span>🏰</span>
+                    <span>Con Hào Kinh Tế & Động Lực Tăng Trưởng</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {aiDeepDive.growthAndMoatAnalysis}
+                  </p>
+                </div>
+              </div>
+
+              {/* Catalysts & Downside Risks */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                {Array.isArray(aiDeepDive.catalysts) && aiDeepDive.catalysts.length > 0 && (
+                  <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-800/40 space-y-1.5">
+                    <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                      <span>🚀</span>
+                      <span>Động Lực Tăng Giá (Catalysts)</span>
+                    </div>
+                    <ul className="space-y-1 list-disc list-inside text-gray-700 dark:text-gray-300">
+                      {aiDeepDive.catalysts.map((cat, idx) => (
+                        <li key={idx} className="leading-relaxed">{cat}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {Array.isArray(aiDeepDive.downsideRisks) && aiDeepDive.downsideRisks.length > 0 && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-800/40 space-y-1.5">
+                    <div className="font-bold text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
+                      <span>⚠️</span>
+                      <span>Rủi Ro Suy Giảm (Downside Risks)</span>
+                    </div>
+                    <ul className="space-y-1 list-disc list-inside text-gray-700 dark:text-gray-300">
+                      {aiDeepDive.downsideRisks.map((risk, idx) => (
+                        <li key={idx} className="leading-relaxed">{risk}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Strategy */}
+              {aiDeepDive.actionStrategy && (
+                <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/70 dark:border-indigo-800/50 text-xs">
+                  <div className="font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5 mb-1">
+                    <span>🎯</span>
+                    <span>Chiến Lược Hành Động & Phân Bổ Vốn</span>
+                  </div>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {aiDeepDive.actionStrategy}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs text-gray-700 dark:text-gray-200 leading-relaxed space-y-2">
+              <p>
+                Cổ phiếu <strong>{symbol}</strong> ghi nhận mức điểm sức khỏe tài chính tổng hợp đạt{' '}
+                <strong className="text-emerald-600 dark:text-emerald-400">{healthOverall != null ? `${healthOverall}/100 (${healthGrade})` : 'Chưa đủ dữ liệu'}</strong>{' '}
+                với rủi ro vận hành ở mức thấp ({earlyLevel}). Giá trị nội tại hội tụ từ các mô hình định giá chuyên sâu ước đạt{' '}
+                <strong className="text-emerald-600 dark:text-emerald-400">{formatVND(multiples.consensusFairValue || currentPrice)}</strong>, tương ứng Biên An Toàn (MoS) đạt{' '}
+                <strong>{multiples.marginOfSafety != null ? `${multiples.marginOfSafety}%` : '0%'}</strong>.
+              </p>
+              <p>
+                Hệ thống kiểm toán gian lận Beneish cho kết quả đánh giá <strong>{beneishScore != null ? `M-Score = ${beneishScore}` : 'Chưa đủ dữ liệu'}</strong> ({beneishProb}).
+                Mô hình Magic Formula xếp hạng cổ phiếu vào nhóm <strong>{magicCategory}</strong> với ROIC đạt{' '}
+                <strong className="text-indigo-600 dark:text-indigo-400">{magicRoic != null ? `${magicRoic}%` : '—'}</strong> và Earnings Yield đạt{' '}
+                <strong className="text-emerald-600 dark:text-emerald-400">{magicEy != null ? `${magicEy}%` : '—'}</strong>.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* ── CHƯƠNG 2: ĐỊNH GIÁ & DCF ── */}
         <section id="ch2" className="space-y-4 pt-3 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
               <span>🎯</span>
               <span>Chương 2: Ma Trận 10 Mô Hình Định Lượng, 7 Vùng Giá & 7 Bẫy Định Giá</span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình định lượng 10 công thức chiết khấu và bội số" />
             </h3>
             {multiples.threeLayerDecision?.buyRecommendation && (
               <span className="text-xs px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold self-start sm:self-auto">
@@ -411,9 +515,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
         {/* ── CHƯƠNG 3: BENEISH M-SCORE ── */}
         <section id="ch3" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
               <span>🛡️</span>
               <span>Chương 3: Kiểm Toán Gian Lận BCTC Beneish M-Score (8 Chỉ Số)</span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình toán học kiểm toán pháp y Beneish M-Score 8 biến số" />
             </h3>
             <span
               className={`text-xs px-2.5 py-0.5 rounded-md font-bold ${
@@ -458,9 +563,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
         {/* ── CHƯƠNG 4: JOEL GREENBLATT MAGIC FORMULA ── */}
         <section id="ch4" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
               <span>✨</span>
               <span>Chương 4: Joel Greenblatt Magic Formula (EY% & ROIC%)</span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình đầu tư giá trị Joel Greenblatt Magic Formula" />
             </h3>
             <span className="text-xs px-2.5 py-0.5 rounded-md font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
               Điểm: {magicScore != null ? `${magicScore}/100` : '—'}
@@ -487,9 +593,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
 
         {/* ── CHƯƠNG 5: ĐIỂM UỐN FCF & ACCRUALS ── */}
         <section id="ch5" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
             <span>🎯</span>
             <span>Chương 5: Giải Mã Điểm Uốn Dòng Tiền & Dồn Tích (FCF Inflection Point)</span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình phân tích dồn tích Sloan Accruals & chu kỳ FCF" />
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-center">
@@ -523,9 +630,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
         {/* ── CHƯƠNG 6: DUPONT 5 NHÂN TỐ MỞ RỘNG (CFA INSTITUTE MODEL) ── */}
         <section id="ch6" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
               <span>🧬</span>
               <span>Chương 6: Phân Rã DuPont 5 Nhân Tố Mở Rộng (CFA Model)</span>
+              <IntelligenceBadge type="heuristic" tooltip="Đẳng thức phân rã ROE 5 nhân tố mở rộng theo chuẩn CFA" />
             </h3>
             <span className="text-xs px-2.5 py-0.5 rounded-md font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
               ROE Tổng Hợp: {dupontRoe}%
@@ -593,9 +701,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
 
         {/* ── CHƯƠNG 7: SỨC KHỎE TÀI CHÍNH & CẢNH BÁO SỚM ── */}
         <section id="ch7" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
             <span>🏥</span>
             <span>Chương 7: Sức Khỏe Tài Chính & Hệ Thống Cảnh Báo Sớm</span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình chấm điểm sức khỏe Altman Z, Piotroski F & 4 trụ cột" />
           </h3>
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
@@ -650,9 +759,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
 
         {/* ── CHƯƠNG 8: WYCKOFF POC ── */}
         <section id="ch8" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
             <span>🧬</span>
             <span>Chương 8: Hồ Sơ Hành Vi Định Lượng & Wyckoff POC</span>
+            <IntelligenceBadge type="heuristic" tooltip="Thuật toán phân tích khối lượng dải giá Wyckoff VPOC" />
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="p-3 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
@@ -679,9 +789,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
 
         {/* ── CHƯƠNG 9: RỦI RO BIẾN ĐỘNG ── */}
         <section id="ch9" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
             <span>⚡</span>
             <span>Chương 9: Đo Lường Rủi Ro Biến Động Thị Giá</span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình thống kê độ biến động VaR 95%, Sharpe và MDD" />
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
             <div className="p-3 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-center">
@@ -713,9 +824,10 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
 
         {/* ── CHƯƠNG 10: TIN TỨC 30 NGÀY ── */}
         <section id="ch10" className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-800">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 flex-wrap">
             <span>📰</span>
             <span>Chương 10: Bản Tin & Tâm Lý Thị Trường 30 Ngày</span>
+            <IntelligenceBadge type="heuristic" tooltip="Từ điển phân loại & tính điểm tâm lý tin tức 30 ngày (-100 đến +100)" />
           </h3>
           <div className="p-4 rounded-xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-xs text-gray-700 dark:text-gray-300 leading-relaxed space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-gray-200 dark:border-gray-700/60">
@@ -783,6 +895,6 @@ export default function FullResearchReportModal({ isOpen, onClose, symbol, stock
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

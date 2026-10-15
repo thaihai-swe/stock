@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function SectorValuationHeatmap({
   dualMatrix = {},
@@ -6,6 +7,7 @@ export default function SectorValuationHeatmap({
   sectorRotation = [],
   vnindexPE = null,
   regime = {},
+  sectorTransmission = null,
 }) {
   const [viewMode, setViewMode] = useState('dual_matrix'); // 'dual_matrix' | 'table'
   const [selectedQuadrant, setSelectedQuadrant] = useState('all'); // 'all' | 'sweet_spot' | 'value_trap' | 'momentum' | 'defense'
@@ -64,44 +66,47 @@ export default function SectorValuationHeatmap({
     return null;
   }
 
-  const QUADRANT_CONFIGS = {
-    sweet_spot: {
-      title: 'Vùng Vàng Gom Mua (Sweet Spot)',
-      icon: '💎',
-      badge: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
-      headerBg: 'from-emerald-500/15 via-emerald-500/5 to-transparent',
-      borderColor: 'border-emerald-500/40',
-      desc: 'Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động tích sản dài hạn.',
-      items: quadrants.sweetSpot || [],
-    },
-    value_trap: {
-      title: 'Vùng Bẫy Giá Rẻ (Value Trap)',
-      icon: '⚠️',
-      badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
-      headerBg: 'from-amber-500/15 via-amber-500/5 to-transparent',
-      borderColor: 'border-amber-500/40',
-      desc: 'Định giá rất rẻ nhưng chịu áp lực vĩ mô / đòn bẩy. Nên chia nhỏ tỷ trọng gom từng nhịp hoặc chờ tín hiệu đảo chiều.',
-      items: quadrants.valueTrap || [],
-    },
-    momentum: {
-      title: 'Vùng Quá Nhiệt (Momentum / Overheated)',
-      icon: '🔥',
-      badge: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
-      headerBg: 'from-purple-500/15 via-purple-500/5 to-transparent',
-      borderColor: 'border-purple-500/40',
-      desc: 'Động lực vĩ mô mạnh mẽ nhưng định giá đã vượt đỉnh lịch sử. Phù hợp giao dịch ngắn hạn theo dòng tiền, quản trị rủi ro chặt chẽ.',
-      items: quadrants.momentum || [],
-    },
-    defense: {
-      title: 'Vùng Phòng Thủ / Tránh Né (Defense)',
-      icon: '🛡️',
-      badge: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30',
-      headerBg: 'from-rose-500/15 via-rose-500/5 to-transparent',
-      borderColor: 'border-rose-500/40',
-      desc: 'Vĩ mô bất lợi và định giá không hấp dẫn. Khuyến nghị đứng ngoài hoặc chủ động hạ tỷ trọng.',
-      items: quadrants.defense || [],
-    },
-  };
+  const QUADRANT_CONFIGS = useMemo(() => {
+    const meta = dualMatrix?.quadrantMeta || {};
+    return {
+      sweet_spot: {
+        title: meta.sweet_spot?.title || 'Vùng Vàng Gom Mua (Sweet Spot)',
+        icon: meta.sweet_spot?.icon || '💎',
+        badge: meta.sweet_spot?.badge || 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+        headerBg: meta.sweet_spot?.headerBg || 'from-emerald-500/15 via-emerald-500/5 to-transparent',
+        borderColor: meta.sweet_spot?.borderColor || 'border-emerald-500/40',
+        desc: meta.sweet_spot?.desc || 'Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động tích sản dài hạn.',
+        items: quadrants.sweetSpot || [],
+      },
+      value_trap: {
+        title: meta.value_trap?.title || 'Vùng Bẫy Giá Rẻ (Value Trap)',
+        icon: meta.value_trap?.icon || '⚠️',
+        badge: meta.value_trap?.badge || 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
+        headerBg: meta.value_trap?.headerBg || 'from-amber-500/15 via-amber-500/5 to-transparent',
+        borderColor: meta.value_trap?.borderColor || 'border-amber-500/40',
+        desc: meta.value_trap?.desc || 'Định giá rất rẻ nhưng chịu áp lực vĩ mô / đòn bẩy. Nên chia nhỏ tỷ trọng gom từng nhịp hoặc chờ tín hiệu đảo chiều.',
+        items: quadrants.valueTrap || [],
+      },
+      momentum: {
+        title: meta.momentum?.title || 'Vùng Quá Nhiệt (Momentum / Overheated)',
+        icon: meta.momentum?.icon || '🔥',
+        badge: meta.momentum?.badge || 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+        headerBg: meta.momentum?.headerBg || 'from-purple-500/15 via-purple-500/5 to-transparent',
+        borderColor: meta.momentum?.borderColor || 'border-purple-500/40',
+        desc: meta.momentum?.desc || 'Động lực vĩ mô mạnh mẽ nhưng định giá đã vượt đỉnh lịch sử. Phù hợp giao dịch ngắn hạn theo dòng tiền, quản trị rủi ro chặt chẽ.',
+        items: quadrants.momentum || [],
+      },
+      defense: {
+        title: meta.defense?.title || 'Vùng Phòng Thủ / Tránh Né (Defense)',
+        icon: meta.defense?.icon || '🛡️',
+        badge: meta.defense?.badge || 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30',
+        headerBg: meta.defense?.headerBg || 'from-rose-500/15 via-rose-500/5 to-transparent',
+        borderColor: meta.defense?.borderColor || 'border-rose-500/40',
+        desc: meta.defense?.desc || 'Vĩ mô bất lợi và định giá không hấp dẫn. Khuyến nghị đứng ngoài hoặc chủ động hạ tỷ trọng.',
+        items: quadrants.defense || [],
+      },
+    };
+  }, [dualMatrix?.quadrantMeta, quadrants]);
 
   // Render lưới 6 động lực vĩ mô dùng chung cho thẻ và dòng mở rộng
   const renderDecomposition = (dec = {}) => (
@@ -295,10 +300,11 @@ export default function SectorValuationHeatmap({
       {/* ── 1. HEADER & CHUYỂN ĐỔI CHẾ ĐỘ XEM (CHỈ CÒN 2 CHẾ ĐỘ TINH GỌN) ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-700/60">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Định Giá Thực Tế & Tác Động Vĩ Mô Chu Kỳ
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình định lượng P/E Heatmap & 6 biến số chu kỳ 10 ngành GICS" />
             <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-200/50">
               GICS Vietnam · 10 Ngành · 2.000+ CP
             </span>
@@ -337,6 +343,72 @@ export default function SectorValuationHeatmap({
           ))}
         </div>
       </div>
+
+      {/* ── AI MACRO-TO-SECTOR TRANSMISSION PANEL ── */}
+      {sectorTransmission && (
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50/90 via-indigo-50/50 to-white dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-gray-800 border border-purple-200/90 dark:border-purple-800/60 space-y-3.5 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-100 dark:border-purple-800/40 pb-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-base">🧠</span>
+              <h4 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
+                Dẫn Truyền Vĩ Mô Vào 10 Nhóm Ngành (AI Sector Transmission)
+              </h4>
+              <IntelligenceBadge
+                type={sectorTransmission?.transmissionHeadline ? 'ai' : 'heuristic'}
+                provider={sectorTransmission?.provider}
+              />
+            </div>
+          </div>
+
+          {sectorTransmission.transmissionHeadline && (
+            <p className="text-xs text-gray-900 dark:text-white font-bold leading-relaxed">
+              {sectorTransmission.transmissionHeadline}
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            {/* Beneficiary */}
+            {Array.isArray(sectorTransmission.beneficiarySectors) && sectorTransmission.beneficiarySectors.length > 0 && (
+              <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 space-y-2">
+                <span className="text-[11px] font-black uppercase text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                  <span>🚀</span> Nhóm Ngành Hưởng Lợi Dẫn Truyền Vĩ Mô
+                </span>
+                <ul className="space-y-1.5 text-gray-700 dark:text-gray-300">
+                  {sectorTransmission.beneficiarySectors.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-1.5">
+                      <span className="text-emerald-600 font-bold">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Pressured */}
+            {Array.isArray(sectorTransmission.pressuredSectors) && sectorTransmission.pressuredSectors.length > 0 && (
+              <div className="p-3.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 space-y-2">
+                <span className="text-[11px] font-black uppercase text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
+                  <span>⚠️</span> Nhóm Ngành Chịu Áp Lực Chi Phí Vốn / Tỷ Giá
+                </span>
+                <ul className="space-y-1.5 text-gray-700 dark:text-gray-300">
+                  {sectorTransmission.pressuredSectors.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-1.5">
+                      <span className="text-rose-600 font-bold">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {sectorTransmission.portfolioAction && (
+            <div className="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 text-xs text-indigo-950 dark:text-indigo-200 font-medium">
+              💡 <b>Chiến lược hành động:</b> {sectorTransmission.portfolioAction}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── 2. METRIC CARDS TỔNG QUAN THỊ TRƯỜNG NGÀNH ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

@@ -42,12 +42,19 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || vars.GEMINI_MODEL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL || vars.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL || vars.OPENAI_MODEL }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || vars.AI_PROVIDER }}
+          AI_MODEL: ${{ secrets.AI_MODEL || vars.AI_MODEL }}
 
       - name: 💾 5. Tự động Commit & Push dữ liệu Macro & Sector mới
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/macro_indicators.json data/sector_valuation_cache.json data/market_valuation_history.json data/macro_valuation.json data/financials/
+          git add data/macro_indicators.json data/sector_valuation_cache.json data/market_valuation_history.json data/macro_valuation.json data/financials/ data/ai_insights_cache.json data/portfolio_ai_insights.json
           if git diff --staged --quiet; then
             echo "ℹ️ Không có thay đổi dữ liệu vĩ mô mới."
           else

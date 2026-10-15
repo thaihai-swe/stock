@@ -1,4 +1,5 @@
 import { fmtMoney, plColor } from '../../utils/format.js';
+import { RISK_POSTURES } from '../../utils/constants.js';
 
 export default function DashboardHero({
   totalNAV = 0,
@@ -25,10 +26,28 @@ export default function DashboardHero({
 }) {
   // Phong cách quản trị rủi ro phân bổ tài sản
   const getRiskPosture = () => {
-    if (cashPct >= 50) return { label: '🛡️ Phòng thủ cao', bg: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/80 dark:text-blue-200 dark:border-blue-700/50' };
-    if (cashPct >= 20) return { label: '⚖️ Cân bằng tối ưu', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/80 dark:text-emerald-200 dark:border-emerald-700/50' };
-    if (cashPct >= 5) return { label: '🚀 Tấn công chủ động', bg: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/80 dark:text-amber-200 dark:border-amber-700/50' };
-    return { label: '⚡ Full 100% Cổ phiếu', bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-200 dark:border-rose-700/50' };
+    if (cashBalance < 0) {
+      return {
+        label: '⚡ Sử Dụng Ký Quỹ (Margin)',
+        bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-200 dark:border-rose-700/50',
+      };
+    }
+    const postures = Array.isArray(RISK_POSTURES)
+      ? RISK_POSTURES
+      : (RISK_POSTURES && typeof RISK_POSTURES === 'object'
+          ? Object.values(RISK_POSTURES)
+          : []);
+
+    for (const p of postures) {
+      if (cashPct >= (p?.minCashPct ?? 0)) {
+        return { label: p?.label ?? '', bg: p?.bg ?? '' };
+      }
+    }
+    const fallback = postures[postures.length - 1];
+    return {
+      label: fallback?.label ?? '⚡ Full 100% Cổ phiếu',
+      bg: fallback?.bg ?? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-200 dark:border-rose-700/50',
+    };
   };
 
   const posture = getRiskPosture();
@@ -147,13 +166,22 @@ export default function DashboardHero({
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="card-nested !p-2.5">
-              <span className="text-[11px] text-slate-500 dark:text-indigo-300 block">💵 Tiền mặt</span>
+            <div className={`card-nested !p-2.5 ${cashBalance < 0 ? '!border-rose-300 dark:!border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20' : ''}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-500 dark:text-indigo-300 block">
+                  {cashBalance < 0 ? '⚠️ Tiền mặt (Nợ Margin)' : '💵 Tiền mặt'}
+                </span>
+                {cashBalance < 0 && (
+                  <span className="text-[10px] font-extrabold text-rose-600 dark:text-rose-400">
+                    Ký Quỹ
+                  </span>
+                )}
+              </div>
               <div className="flex items-baseline justify-between mt-0.5">
-                <span className="font-bold text-slate-900 dark:text-white text-base sm:text-lg truncate">
+                <span className={`font-bold text-base sm:text-lg truncate ${cashBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
                   {fmtMoney(cashBalance)}đ
                 </span>
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 ml-1">
+                <span className={`text-xs font-bold ml-1 ${cashBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                   {cashPct}%
                 </span>
               </div>
@@ -174,16 +202,26 @@ export default function DashboardHero({
 
           {/* Allocation Gauge Bar */}
           <div className="w-full bg-slate-100 dark:bg-slate-950/80 h-3 rounded-full overflow-hidden flex p-0.5 border border-slate-200 dark:border-indigo-700/40">
-            <div
-              style={{ width: `${cashPct}%` }}
-              className="bg-emerald-500 rounded-l-full transition-all duration-500"
-              title={`Tiền mặt: ${cashPct}% (${fmtMoney(cashBalance)}đ)`}
-            />
-            <div
-              style={{ width: `${stockPct}%` }}
-              className="bg-indigo-500 rounded-r-full transition-all duration-500"
-              title={`Cổ phiếu: ${stockPct}% (${fmtMoney(totalMarketValue)}đ)`}
-            />
+            {cashBalance >= 0 ? (
+              <>
+                <div
+                  style={{ width: `${Math.max(0, Math.min(100, cashPct))}%` }}
+                  className="bg-emerald-500 rounded-l-full transition-all duration-500"
+                  title={`Tiền mặt: ${cashPct}% (${fmtMoney(cashBalance)}đ)`}
+                />
+                <div
+                  style={{ width: `${Math.max(0, Math.min(100, stockPct))}%` }}
+                  className="bg-indigo-500 rounded-r-full transition-all duration-500"
+                  title={`Cổ phiếu: ${stockPct}% (${fmtMoney(totalMarketValue)}đ)`}
+                />
+              </>
+            ) : (
+              <div
+                style={{ width: '100%' }}
+                className="bg-gradient-to-r from-rose-500 to-indigo-600 rounded-full transition-all duration-500"
+                title={`Vay ký quỹ: ${fmtMoney(cashBalance)}đ · Cổ phiếu: ${fmtMoney(totalMarketValue)}đ`}
+              />
+            )}
           </div>
         </div>
 

@@ -1,5 +1,11 @@
 import React from 'react';
 import { formatVND } from '../../utils/format';
+import {
+  FINANCIAL_SECTOR_EXEMPTION,
+  REVERSE_DCF_THRESHOLDS,
+  REVERSE_DCF_NARRATIVES,
+} from '../../utils/constants';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) {
   if (!dcfAnalysis) {
@@ -54,11 +60,12 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
       <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-700">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xl">🌊</span>
               <h3 className="text-lg font-black text-gray-900 dark:text-white">
                 Mô Hình Chiết Khấu Dòng Tiền Tự Do DCF (FCFF) & Reverse DCF
               </h3>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình định lượng chiết khấu dòng tiền DCF FCFF & Reverse DCF" />
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -78,10 +85,10 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
               <span className="text-3xl">🏛️</span>
               <div className="space-y-2">
                 <div className="text-sm font-bold text-indigo-900 dark:text-indigo-200">
-                  Miễn trừ áp dụng mô hình DCF (FCFF) cho Nhóm Ngân Hàng / Tài Chính
+                  {FINANCIAL_SECTOR_EXEMPTION.title || 'Miễn trừ áp dụng mô hình DCF (FCFF) cho Nhóm Ngân Hàng / Tài Chính'}
                 </div>
                 <p className="text-xs text-indigo-800/80 dark:text-indigo-300/80 leading-relaxed">
-                  Theo chuẩn mực định giá quốc tế (Aswath Damodaran &amp; CFA Institute), mô hình chiết khấu dòng tiền tự do doanh nghiệp (FCFF) không áp dụng cho các tổ chức tài chính do tiền gửi khách hàng và huy động vốn được tính trực tiếp vào dòng tiền hoạt động (CFO), làm méo mó dòng tiền tự do.
+                  {FINANCIAL_SECTOR_EXEMPTION.reason || 'Theo chuẩn mực định giá quốc tế (Aswath Damodaran & CFA Institute), mô hình chiết khấu dòng tiền tự do doanh nghiệp (FCFF) không áp dụng cho các tổ chức tài chính do tiền gửi khách hàng và huy động vốn được tính trực tiếp vào dòng tiền hoạt động (CFO), làm méo mó dòng tiền tự do.'}
                 </p>
                 <div className="pt-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
                   💡 Khuyến nghị sử dụng các mô hình chuyên biệt cho nhóm này:
@@ -226,11 +233,11 @@ export default function DcfValuationCard({ dcfAnalysis, currentPrice, symbol }) 
               <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-700/40 space-y-2">
                 <div className="font-bold text-gray-800 dark:text-gray-200">Đối chiếu với tiềm năng thực tế:</div>
                 <p className="leading-relaxed">
-                  {reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 8.0
-                    ? '✅ Thị trường đang định giá rất thận trọng (kỳ vọng tăng trưởng thấp hơn GDP/ngành), tạo biên an toàn hấp dẫn cho nhà đầu tư tích lũy dài hạn.'
-                    : reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= 18.0
-                      ? '⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.'
-                      : '⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá.'}
+                  {reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= (REVERSE_DCF_THRESHOLDS.prudentMaxGrowth ?? 8.0)
+                    ? (REVERSE_DCF_NARRATIVES.prudent || '✅ Thị trường đang định giá rất thận trọng (kỳ vọng tăng trưởng thấp hơn GDP/ngành), tạo biên an toàn hấp dẫn cho nhà đầu tư tích lũy dài hạn.')
+                    : reverseDcfImpliedGrowth != null && reverseDcfImpliedGrowth <= (REVERSE_DCF_THRESHOLDS.reasonableMaxGrowth ?? 18.0)
+                      ? (REVERSE_DCF_NARRATIVES.reasonable || '⚖️ Kỳ vọng tăng trưởng ở mức hợp lý tương đương tốc độ mở rộng công suất bình thường của doanh nghiệp.')
+                      : (REVERSE_DCF_NARRATIVES.aggressive || '⚠️ Thị trường đang phản ánh kỳ vọng tăng trưởng rất tham vọng. Doanh nghiệp cần duy trì tăng trưởng đột phá để giữ vững thị giá.')}
                 </p>
               </div>
             </div>

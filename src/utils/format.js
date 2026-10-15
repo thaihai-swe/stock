@@ -1,3 +1,9 @@
+import {
+  DISCIPLINE_TAGS as CENTRAL_DISCIPLINE_TAGS,
+  ALLOCATION_TIERS,
+  DEFAULT_TRADE_FEE_PCT,
+} from './constants.js';
+
 // Format tiền VNĐ
 export function fmtMoney(value) {
   if (value === null || value === undefined || isNaN(value)) return '0';
@@ -56,22 +62,20 @@ export const DEFAULT_TAGS = [
 ];
 
 // Danh sách thẻ tâm lý & kỷ luật đánh giá giao dịch bán (Trade Review Journal)
-export const DISCIPLINE_TAGS = [
-  { id: 'target', label: '🎯 Đạt mục tiêu', shortLabel: 'Đạt mục tiêu', desc: 'Chốt lời chuẩn kế hoạch đã định', type: 'disciplined', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' },
-  { id: 'stoploss', label: '🛑 Cắt lỗ chuẩn', shortLabel: 'Cắt lỗ chuẩn', desc: 'Cắt lỗ dứt khoát theo kỷ luật, bảo vệ vốn', type: 'disciplined', color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800' },
-  { id: 'early', label: '🏃 Chốt non', shortLabel: 'Chốt non', desc: 'Bán vội khi vừa chớm lời, sợ mất lãi', type: 'emotional', color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' },
-  { id: 'late', label: '😰 Cắt lỗ trễ', shortLabel: 'Cắt lỗ trễ', desc: 'Chần chừ để lỗ sâu (gồng lỗ) mới bán', type: 'emotional', color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' },
-  { id: 'panic', label: '⚡ Bán hoảng / FOMO', shortLabel: 'Bán hoảng', desc: 'Bị tâm lý đám đông hoặc bảng điện chi phối', type: 'emotional', color: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800' },
-  { id: 'rebalance', label: '🔄 Đảo hàng / Cơ cấu', shortLabel: 'Đảo hàng', desc: 'Bán để tái phân bổ vốn sang mã khác tốt hơn', type: 'neutral', color: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800' },
-];
+export const DISCIPLINE_TAGS = CENTRAL_DISCIPLINE_TAGS;
 
 export function getDisciplineTagInfo(tagName) {
   if (!tagName) return null;
-  return DISCIPLINE_TAGS.find(d => d.label === tagName || d.shortLabel === tagName || tagName.includes(d.shortLabel) || tagName.includes(d.id)) || null;
+  const tags = Array.isArray(DISCIPLINE_TAGS)
+    ? DISCIPLINE_TAGS
+    : (DISCIPLINE_TAGS && typeof DISCIPLINE_TAGS === 'object'
+        ? Object.values(DISCIPLINE_TAGS)
+        : []);
+  return tags.find(d => d?.label === tagName || d?.shortLabel === tagName || (d?.shortLabel && tagName.includes(d.shortLabel)) || (d?.id && tagName.includes(d.id))) || null;
 }
 
-// Tính giá hòa vốn (mặc định sau phí bán 0.1%)
-export function calcBreakEvenPrice(avgCost, feePct = 0.1) {
+// Tính giá hòa vốn (mặc định sau phí giao dịch từ cấu hình)
+export function calcBreakEvenPrice(avgCost, feePct = DEFAULT_TRADE_FEE_PCT) {
   if (!avgCost || avgCost <= 0) return 0;
   const factor = 1 - feePct / 100;
   return factor > 0 ? Math.round(avgCost / factor) : avgCost;
@@ -111,47 +115,19 @@ export function getStockColor(symbol, portfolio = []) {
 // 8. Định dạng phân tầng màu sắc theo mốc Tỷ Trọng (%)
 export function getAllocationTier(pct) {
   const val = typeof pct === 'number' ? pct : parseFloat(pct) || 0;
-  if (val >= 50) {
-    return {
-      bg: 'bg-red-50 dark:bg-rose-950/70',
-      text: 'text-red-700 dark:text-rose-300',
-      border: 'border-red-300 dark:border-rose-800/60',
-      bar: 'bg-red-500',
-      label: 'Cực cao (>50%)',
-      isWarning: true,
-    };
+  const tiers = Array.isArray(ALLOCATION_TIERS)
+    ? ALLOCATION_TIERS
+    : (ALLOCATION_TIERS && typeof ALLOCATION_TIERS === 'object'
+        ? Object.values(ALLOCATION_TIERS)
+        : []);
+
+  for (const tier of tiers) {
+    if (val >= (tier?.minPct ?? 0)) {
+      return tier;
+    }
   }
-  if (val >= 40) {
-    return {
-      bg: 'bg-amber-50 dark:bg-amber-950/70',
-      text: 'text-amber-800 dark:text-amber-300',
-      border: 'border-amber-300 dark:border-amber-800/60',
-      bar: 'bg-amber-500',
-      label: 'Rất cao (40-50%)',
-      isWarning: false,
-    };
-  }
-  if (val >= 25) {
-    return {
-      bg: 'bg-indigo-50 dark:bg-indigo-950/70',
-      text: 'text-indigo-700 dark:text-indigo-300',
-      border: 'border-indigo-200 dark:border-indigo-800/60',
-      bar: 'bg-indigo-600',
-      label: 'Chủ lực (25-40%)',
-      isWarning: false,
-    };
-  }
-  if (val >= 10) {
-    return {
-      bg: 'bg-blue-50 dark:bg-blue-950/70',
-      text: 'text-blue-700 dark:text-blue-300',
-      border: 'border-blue-200 dark:border-blue-800/60',
-      bar: 'bg-blue-500',
-      label: 'Vừa phải (10-25%)',
-      isWarning: false,
-    };
-  }
-  return {
+
+  return tiers[tiers.length - 1] || {
     bg: 'bg-slate-100 dark:bg-slate-800',
     text: 'text-slate-700 dark:text-slate-300',
     border: 'border-slate-200 dark:border-slate-700',

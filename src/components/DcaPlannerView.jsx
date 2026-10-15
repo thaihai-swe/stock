@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchPrices } from '../utils/api.js';
+import {
+  DCA_DEFAULT_DROP_PCT,
+  DCA_DEFAULT_STEPS,
+  DCA_PRESET_BASE_LOTS,
+  DCA_PRESET_DROP_PCTS,
+  DCA_PRESET_STEPS,
+  DCA_VOLUME_STRATEGIES,
+  DEFAULT_TRADE_FEE_PCT,
+} from '../utils/constants.js';
 import { calcBreakEvenPrice, fmtMoney } from '../utils/format.js';
 
 export default function DcaPlannerView({
@@ -16,13 +25,13 @@ export default function DcaPlannerView({
   // --- State Chế độ 1 Lần ---
   const [addQty, setAddQty] = useState('100');
   const [addPriceK, setAddPriceK] = useState(''); // x1.000đ
-  const [feePct, setFeePct] = useState('0.1');
+  const [feePct, setFeePct] = useState(String(DEFAULT_TRADE_FEE_PCT));
 
   // --- State Chế độ Mua Gom Đa Tầng (Grid Pyramiding) ---
   const [gridBasePriceK, setGridBasePriceK] = useState(''); // Giá khởi điểm P0 (mặc định theo thị trường)
-  const [gridDropPct, setGridDropPct] = useState(3); // Bước giá giảm mỗi đợt (-3% mặc định)
-  const [gridSteps, setGridSteps] = useState(20); // Số đợt gom (20 lần mặc định)
-  const [gridBaseLot, setGridBaseLot] = useState(100); // Lô cơ sở (100 cp)
+  const [gridDropPct, setGridDropPct] = useState(DCA_DEFAULT_DROP_PCT); // Bước giá giảm mỗi đợt (-3% mặc định)
+  const [gridSteps, setGridSteps] = useState(DCA_DEFAULT_STEPS); // Số đợt gom (20 lần mặc định)
+  const [gridBaseLot, setGridBaseLot] = useState(DCA_PRESET_BASE_LOTS[0] || 100); // Lô cơ sở (100 cp)
   const [gridVolumeStrategy, setGridVolumeStrategy] = useState('cluster3'); // 'cluster3', 'fixed', 'linear', 'martingale'
   const [includeCurrentHoldings, setIncludeCurrentHoldings] = useState(true); // Mặc định tính kèm danh mục hiện có
 
@@ -278,8 +287,8 @@ export default function DcaPlannerView({
             <button
               onClick={() => setTabMode('grid')}
               className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${tabMode === 'grid'
-                  ? 'bg-white text-indigo-700 shadow-md scale-102'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-indigo-700 shadow-md scale-102'
+                : 'text-blue-100 hover:text-white hover:bg-white/10'
                 }`}
             >
               <span>🪜 Kế Hoạch Mua Gom Đa Tầng</span>
@@ -290,8 +299,8 @@ export default function DcaPlannerView({
             <button
               onClick={() => setTabMode('single')}
               className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${tabMode === 'single'
-                  ? 'bg-white text-indigo-700 shadow-md scale-102'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-indigo-700 shadow-md scale-102'
+                : 'text-blue-100 hover:text-white hover:bg-white/10'
                 }`}
             >
               <span>⚡ Mua Nhanh 1 Lần</span>
@@ -464,14 +473,14 @@ export default function DcaPlannerView({
                   <span className="text-[11px] text-red-600 dark:text-rose-400 font-extrabold">-{gridDropPct}%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  {[-2, -3, -5, -7].map(val => (
+                  {DCA_PRESET_DROP_PCTS.map(val => (
                     <button
                       key={val}
                       type="button"
                       onClick={() => setGridDropPct(Math.abs(val))}
                       className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${gridDropPct === Math.abs(val)
-                          ? 'bg-red-600 text-white shadow-2xs'
-                          : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                        ? 'bg-red-600 text-white shadow-2xs'
+                        : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       {val}%
@@ -500,14 +509,14 @@ export default function DcaPlannerView({
                   <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold">{totalSteps} lần</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  {[5, 10, 15, 20].map(val => (
+                  {DCA_PRESET_STEPS.map(val => (
                     <button
                       key={val}
                       type="button"
                       onClick={() => setGridSteps(val)}
                       className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${totalSteps === val
-                          ? 'bg-indigo-600 text-white shadow-2xs'
-                          : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       {val}
@@ -535,14 +544,14 @@ export default function DcaPlannerView({
                   <span className="text-[11px] text-gray-600 dark:text-slate-300 font-bold">{baseLot.toLocaleString()} cp</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  {[100, 200, 500, 1000].map(val => (
+                  {DCA_PRESET_BASE_LOTS.map(val => (
                     <button
                       key={val}
                       type="button"
                       onClick={() => setGridBaseLot(val)}
                       className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${baseLot === val
-                          ? 'bg-indigo-600 text-white shadow-2xs'
-                          : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                         }`}
                     >
                       {val}
@@ -559,63 +568,29 @@ export default function DcaPlannerView({
                 Quy tắc phân bổ khối lượng gom:
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setGridVolumeStrategy('cluster3')}
-                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'cluster3'
+                {(Array.isArray(DCA_VOLUME_STRATEGIES)
+                  ? DCA_VOLUME_STRATEGIES
+                  : (DCA_VOLUME_STRATEGIES && typeof DCA_VOLUME_STRATEGIES === 'object'
+                    ? Object.values(DCA_VOLUME_STRATEGIES)
+                    : [])
+                ).map(strat => (
+                  <button
+                    key={strat.id}
+                    type="button"
+                    onClick={() => setGridVolumeStrategy(strat.id)}
+                    className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === strat.id
                       ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
                       : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                >
-                  <div className="font-extrabold flex items-center gap-1">
-                    <span>🌟 Kim tự tháp x2 mỗi 3 đợt</span>
-                  </div>
-                  <div className={`text-[11px] mt-0.5 ${gridVolumeStrategy === 'cluster3' ? 'text-indigo-100' : 'text-gray-400'}`}>
-                    100 → 100 → 100 → 200... (Chuẩn mẫu)
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setGridVolumeStrategy('fixed')}
-                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'fixed'
-                      ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                >
-                  <div className="font-extrabold">📐 Khối lượng đều</div>
-                  <div className={`text-[11px] mt-0.5 ${gridVolumeStrategy === 'fixed' ? 'text-indigo-100' : 'text-gray-400'}`}>
-                    100 → 100 → 100 → 100...
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setGridVolumeStrategy('linear')}
-                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'linear'
-                      ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                >
-                  <div className="font-extrabold">📈 Tăng dần đều</div>
-                  <div className={`text-[11px] mt-0.5 ${gridVolumeStrategy === 'linear' ? 'text-indigo-100' : 'text-gray-400'}`}>
-                    100 → 200 → 300 → 400...
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setGridVolumeStrategy('martingale')}
-                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'martingale'
-                      ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                >
-                  <div className="font-extrabold">🚀 Gấp đôi mỗi bước</div>
-                  <div className={`text-[11px] mt-0.5 ${gridVolumeStrategy === 'martingale' ? 'text-indigo-100' : 'text-gray-400'}`}>
-                    100 → 200 → 400 → 800...
-                  </div>
-                </button>
+                      }`}
+                  >
+                    <div className="font-extrabold flex items-center gap-1">
+                      <span>{strat.label || strat.name || strat.id}</span>
+                    </div>
+                    <div className={`text-[11px] mt-0.5 ${gridVolumeStrategy === strat.id ? 'text-indigo-100' : 'text-gray-400'}`}>
+                      {strat.pattern || ''}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -707,7 +682,7 @@ export default function DcaPlannerView({
                 </span>
               </div>
               <div className="text-xs text-gray-500 dark:text-slate-400 font-semibold">
-                Click <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Đặt Lệnh Mua
+                Click <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Nhật Ký Mua
               </div>
             </div>
 
@@ -803,8 +778,8 @@ export default function DcaPlannerView({
                         <td className="py-3 px-3 text-center whitespace-nowrap">
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold ${row.dropRatio === 0
-                                ? 'bg-gray-100 text-gray-600'
-                                : 'bg-red-50 text-red-600 border border-red-100'
+                              ? 'bg-gray-100 text-gray-600'
+                              : 'bg-red-50 text-red-600 border border-red-100'
                               }`}
                           >
                             {row.dropPercentText}
@@ -1069,7 +1044,7 @@ export default function DcaPlannerView({
                   className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md active:scale-95 flex items-center gap-2 self-start sm:self-auto"
                 >
                   <span>🛒</span>
-                  <span>Đi Đến Đặt Lệnh Mua Này</span>
+                  <span>Đi Đến Nhật Ký Mua Này</span>
                 </button>
               )}
             </div>

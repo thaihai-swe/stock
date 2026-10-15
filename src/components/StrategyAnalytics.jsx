@@ -93,7 +93,13 @@ export default function StrategyAnalytics({ data, initialMarketPrices = {} }) {
 
   // Thống kê nhật ký tâm lý & điểm kỷ luật từ các lệnh bán
   const disciplineStats = useMemo(() => {
-    const list = DISCIPLINE_TAGS.map(d => ({
+    const rawTags = Array.isArray(DISCIPLINE_TAGS)
+      ? DISCIPLINE_TAGS
+      : (DISCIPLINE_TAGS && typeof DISCIPLINE_TAGS === 'object'
+          ? Object.values(DISCIPLINE_TAGS)
+          : []);
+
+    const list = rawTags.map(d => ({
       ...d,
       count: 0,
       winCount: 0,

@@ -1,19 +1,21 @@
 import { useState, useMemo } from 'react';
 import { addDividend, deleteDividend } from '../utils/api.js';
 import { fmtMoney, fmtDate, getTodayDate } from '../utils/format.js';
+import { DIVIDEND_CASH_TAX_PCT } from '../utils/constants.js';
+import { useToast } from '../context/ToastContext.jsx';
 
 export default function DividendManager({
   dividends = [],
   portfolio = [],
   onSuccess,
-  showToast,
 }) {
+  const { showToast } = useToast();
   const [type, setType] = useState('CASH'); // 'CASH' | 'STOCK'
   const [symbol, setSymbol] = useState('');
   const [date, setDate] = useState(getTodayDate());
   const [quantity, setQuantity] = useState('');
   const [amountPerShare, setAmountPerShare] = useState('');
-  const [taxPct, setTaxPct] = useState('5'); // 5% thuế TNCN cổ tức ở VN
+  const [taxPct, setTaxPct] = useState(String(DIVIDEND_CASH_TAX_PCT)); // Thuế TNCN cổ tức theo luật VN
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -92,11 +94,11 @@ export default function DividendManager({
       setQuantity('');
       setAmountPerShare('');
       setNote('');
-      if (showToast) showToast(`✅ Đã thêm cổ tức mã ${symbol.trim().toUpperCase()}`, 'success');
+      showToast(`✅ Đã thêm cổ tức mã ${symbol.trim().toUpperCase()}`, 'success');
       if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.message);
-      if (showToast) showToast('❌ ' + err.message, 'error');
+      showToast('❌ ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -107,11 +109,10 @@ export default function DividendManager({
     setDeletingId(id);
     try {
       await deleteDividend(id);
-      if (showToast) showToast(`✅ Đã xóa bản ghi cổ tức mã ${sym}`, 'success');
+      showToast(`✅ Đã xóa bản ghi cổ tức mã ${sym}`, 'success');
       if (onSuccess) onSuccess();
     } catch (err) {
-      if (showToast) showToast('❌ ' + err.message, 'error');
-      else alert('❌ ' + err.message);
+      showToast('❌ ' + err.message, 'error');
     } finally {
       setDeletingId(null);
     }

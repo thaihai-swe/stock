@@ -21,6 +21,15 @@ const FALLBACK_CONSTANTS = {
     riskFreeRateAnnual: 0.045,
     defaultBankInterestRate: 5.0,
   },
+  macro: {
+    macroThresholds: {},
+    macroNarratives: {},
+    aiMacroConfig: {
+      enabled: true,
+      provider: 'heuristic_fallback',
+      model: 'gemini-1.5-flash',
+    },
+  },
 };
 
 let cachedConstants = null;
@@ -48,6 +57,20 @@ export function getSystemConstants(reload = false) {
           ...FALLBACK_CONSTANTS.tradingAndFees,
           ...(parsed.tradingAndFees || {}),
         },
+        macro: {
+          ...FALLBACK_CONSTANTS.macro,
+          ...(parsed.macro || {}),
+          macroThresholds: {
+            ...(parsed.macro?.macroThresholds || {}),
+          },
+          macroNarratives: {
+            ...(parsed.macro?.macroNarratives || {}),
+          },
+          aiMacroConfig: {
+            ...FALLBACK_CONSTANTS.macro.aiMacroConfig,
+            ...(parsed.macro?.aiMacroConfig || {}),
+          },
+        },
       };
       return cachedConstants;
     }
@@ -57,4 +80,54 @@ export function getSystemConstants(reload = false) {
 
   cachedConstants = FALLBACK_CONSTANTS;
   return cachedConstants;
+}
+
+export function getMacroConstants(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.macro || {};
+}
+
+export function getMacroThresholds(reload = false) {
+  const macro = getMacroConstants(reload);
+  return macro.macroThresholds || {};
+}
+
+export function getMacroNarratives(reload = false) {
+  const macro = getMacroConstants(reload);
+  return macro.macroNarratives || {};
+}
+
+export function getAiMacroConfig(reload = false) {
+  const macro = getMacroConstants(reload);
+  return macro.aiMacroConfig || {};
+}
+
+export function getPortfolioConfig(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.portfolioAnalytics || {};
+}
+
+export function getDcaConfig(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.dcaPlannerConfig || {};
+}
+
+export function getStrategyConfig(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.strategyAndDiscipline || {};
+}
+
+export function getValuationNarratives(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.valuationNarrativesAndPresets || {};
+}
+
+export function getAiEngineConfig(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.aiEngineHub || {};
+}
+
+export function getTaxAndFeesConfig(reload = false) {
+  const all = getSystemConstants(reload);
+  return all.taxAndFees || {};
 }

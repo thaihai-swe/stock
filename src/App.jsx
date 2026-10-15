@@ -1,8 +1,9 @@
-import { Fragment, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard.jsx';
 import UserNav from './components/UserNav.jsx';
 import { DashboardSkeleton, TabSkeleton } from './components/common/SkeletonLoader.jsx';
 import { useTheme } from './context/ThemeContext.jsx';
+import { useToast } from './context/ToastContext.jsx';
 import {
   clearAuthToken,
   cloneDemoData,
@@ -15,6 +16,7 @@ import { parseUrlRoute, syncUrlRoute } from './utils/navigation.js';
 
 // Nạp lười (Code Splitting) các Tab nặng để tối ưu dung lượng Bundle ban đầu
 const ValuationDashboard = lazy(() => import('./components/ValuationDashboard.jsx'));
+const MarketDashboard = lazy(() => import('./components/MarketDashboard.jsx'));
 const MacroDashboard = lazy(() => import('./components/MacroDashboard.jsx'));
 const TransactionHistory = lazy(() => import('./components/TransactionHistory.jsx'));
 const TradeOrderView = lazy(() => import('./components/TradeOrderView.jsx'));
@@ -28,6 +30,7 @@ const LoginModal = lazy(() => import('./components/LoginModal.jsx'));
 const prefetchTab = (tabId) => {
   switch (tabId) {
     case 'valuation': import('./components/ValuationDashboard.jsx'); break;
+    case 'market': import('./components/MarketDashboard.jsx'); break;
     case 'macro': import('./components/MacroDashboard.jsx'); break;
     case 'history': import('./components/TransactionHistory.jsx'); break;
     case 'trade': import('./components/TradeOrderView.jsx'); break;
@@ -41,13 +44,14 @@ const prefetchTab = (tabId) => {
 
 const TABS = [
   // Cụm 1: Quản Trị Danh Mục & Giao Dịch
-  { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Tổng quan', icon: '📊', group: 'portfolio' },
-  { id: 'trade', label: '⚡ Đặt Lệnh', shortLabel: 'Đặt Lệnh', icon: '⚡', group: 'portfolio' },
+  { id: 'dashboard', label: '📊 Dashboard', shortLabel: 'Dashboard', icon: '📊', group: 'portfolio' },
+  { id: 'trade', label: '⚡ Nhật Ký', shortLabel: 'Nhật Ký', icon: '⚡', group: 'portfolio' },
   { id: 'history', label: '📋 Lịch sử', shortLabel: 'Lịch sử', icon: '📋', group: 'portfolio' },
 
   // Cụm 2: Định Giá & Phân Tích Chuyên Sâu
-  { id: 'valuation', label: '🏢 Định Giá Cổ Phiếu', shortLabel: 'Định Giá', icon: '🏢', group: 'research' },
-  { id: 'macro', label: '🌐 Vĩ Mô & VN-Index', shortLabel: 'Vĩ Mô', icon: '🌐', group: 'research' },
+  { id: 'valuation', label: '🏢 Định Giá', shortLabel: 'Định Giá', icon: '🏢', group: 'research' },
+  { id: 'market', label: '🏛️ VN-Index', shortLabel: 'Thị Trường', icon: '🏛️', group: 'research' },
+  { id: 'macro', label: '🌐 Vĩ Mô', shortLabel: 'Vĩ Mô', icon: '🌐', group: 'research' },
   { id: 'dca', label: '🪜 Kế Hoạch DCA', shortLabel: 'DCA', icon: '🪜', group: 'research' },
   { id: 'strategy', label: '🎯 Chiến lược', shortLabel: 'Chiến lược', icon: '🎯', group: 'research' },
 
@@ -69,7 +73,8 @@ const TAB_GROUPS = [
     groupTitle: 'Định Giá & Phân Tích Chuyên Sâu',
     items: [
       { id: 'valuation', label: 'Định Giá Cổ Phiếu', icon: '🏢', desc: '10 mô hình định lượng (Graham, DCF, RIM, NAV...), 7 Vùng giá & BCTC 122+ chỉ tiêu' },
-      { id: 'macro', label: 'Vĩ Mô & VN-Index', icon: '🌐', desc: 'Regime chu kỳ, nhiệt kế định giá & 10 nhóm ngành' },
+      { id: 'market', label: 'VN-Index', icon: '🏛️', desc: 'Chỉ số trực tuyến, P/E chu kỳ, 4 phong cách vốn hóa & 10 nhóm ngành' },
+      { id: 'macro', label: 'Vĩ Mô', icon: '🌐', desc: 'Regime chu kỳ 5 pha, đường cong lợi suất, phân bổ tài sản & 95 chỉ số' },
       { id: 'dca', label: 'Kế Hoạch DCA', icon: '🪜', desc: 'Mô phỏng & lộ trình mua gom đa tầng' },
       { id: 'strategy', label: 'Chiến Lược Đầu Tư', icon: '🎯', desc: 'Hiệu suất Win Rate theo phong cách & kỷ luật' },
     ]
@@ -78,7 +83,7 @@ const TAB_GROUPS = [
     groupTitle: 'Tiện Ích & Cấu Hình Hệ Thống',
     items: [
       { id: 'watchlist', label: 'Danh Sách Theo Dõi', icon: '👁️', desc: 'Cảnh báo mốc giá mua/bán mục tiêu' },
-      { id: 'settings', label: 'Cài Đặt & Báo Cáo', icon: '⚙️', desc: 'Báo cáo thuế, backup JSON & database' },
+      { id: 'settings', label: 'Cài Đặt & Dữ Liệu', icon: '⚙️', desc: 'Giao diện, backup JSON & sao lưu database' },
     ]
   }
 ];
@@ -90,6 +95,11 @@ export default function App({ hasGoogleClientId = false }) {
   const [tradeType, setTradeType] = useState(initialRoute.tradeType || 'buy');
   const [buyInitial, setBuyInitial] = useState({
     symbol: initialRoute.tab === 'trade' && initialRoute.tradeType === 'buy' ? initialRoute.symbol : '',
+    quantity: '',
+    price: '',
+  });
+  const [sellInitial, setSellInitial] = useState({
+    symbol: initialRoute.tab === 'trade' && initialRoute.tradeType === 'sell' ? initialRoute.symbol : '',
     quantity: '',
     price: '',
   });
@@ -115,7 +125,7 @@ export default function App({ hasGoogleClientId = false }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [toast, setToast] = useState(null);
+  const { showToast } = useToast();
 
   // Quản lý Dark Mode / Light Mode từ ThemeContext
   const { themeMode, effectiveTheme, isDark, setThemeMode, toggleTheme } = useTheme();
@@ -169,22 +179,12 @@ export default function App({ hasGoogleClientId = false }) {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const toastTimerRef = useRef(null);
-  const showToast = useCallback((message, type = 'info') => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    setToast({ message, type });
-    toastTimerRef.current = setTimeout(() => {
-      setToast(null);
-    }, 4000);
-  }, []);
-
   const [data, setData] = useState({
     buyOrders: [],
     sellOrders: [],
     portfolio: [],
     dividends: [],
     watchlist: [],
-    goal: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -334,8 +334,22 @@ export default function App({ hasGoogleClientId = false }) {
     setIsTradeSheetOpen(false);
   }
 
-  function handleSelectSell(symbol) {
-    const sym = symbol || '';
+  function handleSelectSell(symbolOrObj, quantity = '', price = '') {
+    let sym = '';
+    let qty = '';
+    let prc = '';
+
+    if (typeof symbolOrObj === 'object' && symbolOrObj !== null) {
+      sym = symbolOrObj.symbol || '';
+      qty = symbolOrObj.quantity || '';
+      prc = symbolOrObj.price || '';
+    } else {
+      sym = symbolOrObj || '';
+      qty = quantity || '';
+      prc = price || '';
+    }
+
+    setSellInitial({ symbol: sym, quantity: qty, price: prc });
     setSellInitialSymbol(sym);
     setTradeType('sell');
     setTab('trade');
@@ -449,7 +463,6 @@ export default function App({ hasGoogleClientId = false }) {
               <span className="text-2xl drop-shadow-2xs">📈</span>
               <div className="leading-tight">
                 <span className="font-extrabold text-slate-800 dark:text-white text-base sm:text-lg tracking-tight block">
-                  Nhật Ký Giao Dịch
                 </span>
               </div>
             </div>
@@ -459,9 +472,8 @@ export default function App({ hasGoogleClientId = false }) {
               {/* P&L badge: Dạng đầy đủ trên Desktop, Dạng cô đọng trên Mobile */}
               {(data.sellOrders || []).length > 0 && (
                 <div
-                  className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full transition-all border ${
-                    totalRealizedPL >= 0 ? 'badge-gain' : 'badge-loss'
-                  }`}
+                  className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full transition-all border ${totalRealizedPL >= 0 ? 'badge-gain' : 'badge-loss'
+                    }`}
                   title={`Tổng lãi/lỗ đã chốt: ${new Intl.NumberFormat('vi-VN').format(Math.round(totalRealizedPL))}đ`}
                 >
                   <span>{totalRealizedPL >= 0 ? '▲' : '▼'}</span>
@@ -595,15 +607,19 @@ export default function App({ hasGoogleClientId = false }) {
                 onNavigateDca={handleSelectDca}
                 onNavigateSell={handleSelectSell}
                 onSwitchTab={switchTab}
-                showToast={showToast}
               />
             )}
             <Suspense fallback={<TabSkeleton />}>
+              {tab === 'market' && (
+                <MarketDashboard
+                  refreshKey={refreshKey}
+                  onSwitchTab={switchTab}
+                />
+              )}
               {tab === 'macro' && (
                 <MacroDashboard
                   refreshKey={refreshKey}
                   onSwitchTab={switchTab}
-                  showToast={showToast}
                 />
               )}
               {tab === 'valuation' && (
@@ -629,10 +645,11 @@ export default function App({ hasGoogleClientId = false }) {
                   dividends={data.dividends || []}
                   watchlist={data.watchlist || []}
                   buyInitial={buyInitial}
+                  sellInitial={sellInitial}
                   sellInitialSymbol={sellInitialSymbol}
-                  showToast={showToast}
                   onSuccess={() => {
                     setBuyInitial({ symbol: '', quantity: '', price: '' });
+                    setSellInitial({ symbol: '', quantity: '', price: '' });
                     setSellInitialSymbol('');
                     loadData();
                   }}
@@ -645,7 +662,6 @@ export default function App({ hasGoogleClientId = false }) {
                   onNavigateBuy={handleSelectBuy}
                   onNavigateSell={handleSelectSell}
                   onSwitchTab={switchTab}
-                  showToast={showToast}
                 />
               )}
               {tab === 'strategy' && (
@@ -659,7 +675,6 @@ export default function App({ hasGoogleClientId = false }) {
                   onSuccess={loadData}
                   onSelectBuy={handleSelectBuy}
                   onSelectSell={handleSelectSell}
-                  showToast={showToast}
                 />
               )}
               {tab === 'settings' && (
@@ -667,7 +682,6 @@ export default function App({ hasGoogleClientId = false }) {
                   data={data}
                   currentUser={currentUser}
                   onSuccess={loadData}
-                  showToast={showToast}
                 />
               )}
             </Suspense>
@@ -758,14 +772,14 @@ export default function App({ hasGoogleClientId = false }) {
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['trade', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab)
+            className={`flex flex-col items-center justify-center h-full transition-all cursor-pointer ${['trade', 'market', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab)
               ? 'text-indigo-600 font-bold'
               : 'text-gray-400 hover:text-gray-600 font-medium'
               }`}
           >
             <span className="text-xl leading-none">☰</span>
             <span className="text-[10px] mt-1 tracking-tight">Menu</span>
-            {['trade', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab) && (
+            {['trade', 'market', 'macro', 'dca', 'strategy', 'watchlist', 'settings'].includes(tab) && (
               <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-0.5" />
             )}
           </button>
@@ -974,33 +988,30 @@ export default function App({ hasGoogleClientId = false }) {
                   <button
                     type="button"
                     onClick={() => setThemeMode('light')}
-                    className={`py-1 rounded-lg font-semibold transition-all ${
-                      themeMode === 'light'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`py-1 rounded-lg font-semibold transition-all ${themeMode === 'light'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     ☀️ Sáng
                   </button>
                   <button
                     type="button"
                     onClick={() => setThemeMode('dark')}
-                    className={`py-1 rounded-lg font-semibold transition-all ${
-                      themeMode === 'dark'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`py-1 rounded-lg font-semibold transition-all ${themeMode === 'dark'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     🌙 Tối
                   </button>
                   <button
                     type="button"
                     onClick={() => setThemeMode('system')}
-                    className={`py-1 rounded-lg font-semibold transition-all ${
-                      themeMode === 'system'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`py-1 rounded-lg font-semibold transition-all ${themeMode === 'system'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     💻 Tự động
                   </button>
@@ -1030,31 +1041,6 @@ export default function App({ hasGoogleClientId = false }) {
             hasGoogleClientId={hasGoogleClientId}
           />
         </Suspense>
-      )}
-
-      {/* 9. TOAST NOTIFICATION */}
-      {toast && (
-        <div
-          className={`fixed bottom-20 md:bottom-6 right-4 z-50 max-w-sm sm:max-w-md px-4 py-3 rounded-2xl shadow-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-200 ${toast.type === 'success'
-              ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-950/20'
-              : toast.type === 'error'
-                ? 'bg-rose-600 text-white border-rose-500 shadow-rose-950/20'
-                : 'bg-slate-900 text-white border-slate-800 shadow-slate-950/20'
-            }`}
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm shrink-0">{toast.type === 'success' ? '✅' : toast.type === 'error' ? '⚠️' : 'ℹ️'}</span>
-            <span className="truncate">{toast.message}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setToast(null)}
-            className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/20 transition-colors cursor-pointer shrink-0 text-xs font-bold leading-none"
-            title="Đóng thông báo"
-          >
-            ✕
-          </button>
-        </div>
       )}
     </div>
   );

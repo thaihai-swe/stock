@@ -1,4 +1,6 @@
 import React from 'react';
+import { DIVIDEND_SUSTAINABILITY } from '../../utils/constants';
+import IntelligenceBadge, { getIntelligenceSource } from '../common/IntelligenceBadge.jsx';
 
 export default function DividendSustainabilityCard({ dividendSustainability, symbol }) {
   if (!dividendSustainability) return null;
@@ -8,21 +10,39 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
     status = 'Chưa đủ số liệu',
     payoutRatio = null,
     fcfPayoutRatio = null,
-    consistency = null
+    consistency = null,
+    aiDividendAudit = null
   } = dividendSustainability;
 
   const isSafe = status?.includes('an toàn') || status?.includes('Bền vững');
   const isTrap = status?.includes('Bẫy') || status?.includes('Cắt giảm') || (fcfPayoutRatio != null && fcfPayoutRatio > 100);
+
+  const aiSource = aiDividendAudit ? getIntelligenceSource(aiDividendAudit) : null;
+  const safetyRating = aiDividendAudit?.safetyRating || (isSafe ? 'Vững Chắc (Safe)' : isTrap ? 'Nguy Cơ Bẫy Cổ Tức (Trap Risk)' : 'Cần Theo Dõi (Borderline)');
+  const isRatingSafe = safetyRating.includes('Safe') || safetyRating.includes('Vững Chắc');
+  const isRatingTrap = safetyRating.includes('Trap') || safetyRating.includes('Bẫy');
+
+  const ratingBadgeClass = isRatingSafe
+    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+    : isRatingTrap
+    ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+    : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200 dark:border-amber-800';
 
   return (
     <div className="p-5 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xs space-y-5">
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              Kiểm Toán Dòng Tiền Cổ Tức
+              Kiểm Toán Dòng Tiền & Phân Bổ Vốn
             </span>
+            <IntelligenceBadge
+              source={aiDividendAudit}
+              provider={aiDividendAudit?.provider}
+              type={(aiDividendAudit?.safetyComment || aiDividendAudit?.strengths) ? 'ai' : 'heuristic'}
+              tooltip="Mô hình kiểm toán độ bền vững cổ tức bằng dòng tiền FCF và kỷ luật phân bổ vốn"
+            />
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               Bảo Chứng Bằng Dòng Tiền FCF
             </span>
@@ -33,15 +53,9 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
         </div>
 
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-black px-3 py-1 rounded-xl uppercase inline-flex items-center gap-1.5 ${
-            isSafe
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-              : isTrap
-              ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
-              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-          }`}>
-            <span>{isSafe ? '🛡️' : isTrap ? '🚨' : '⚠️'}</span>
-            <span>{status} {score != null ? `(${score}/10)` : ''}</span>
+          <span className={`text-xs font-black px-3 py-1 rounded-xl uppercase inline-flex items-center gap-1.5 border ${ratingBadgeClass}`}>
+            <span>{isRatingSafe ? '🛡️' : isRatingTrap ? '🚨' : '⚠️'}</span>
+            <span>{safetyRating}</span>
           </span>
         </div>
       </div>
@@ -55,16 +69,20 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
           </span>
           <div className="flex items-baseline gap-1.5 mt-1">
             <span className={`text-xl font-black ${
-              fcfPayoutRatio != null && fcfPayoutRatio <= 60
+              fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutSafeThreshold ?? 60)
                 ? 'text-emerald-600 dark:text-emerald-400'
-                : fcfPayoutRatio != null && fcfPayoutRatio <= 100
+                : fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutMaxThreshold ?? 100)
                 ? 'text-amber-600 dark:text-amber-400'
                 : 'text-rose-600 dark:text-rose-400'
             }`}>
               {fcfPayoutRatio != null ? `${fcfPayoutRatio}%` : '—'}
             </span>
             <span className="text-[10px] text-gray-400">
-              {fcfPayoutRatio != null && fcfPayoutRatio <= 60 ? '(Rất dư dả)' : fcfPayoutRatio != null && fcfPayoutRatio <= 100 ? '(Đủ tài trợ)' : '(Thâm hụt tiền)'}
+              {fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutSafeThreshold ?? 60)
+                ? '(Rất dư dả)'
+                : fcfPayoutRatio != null && fcfPayoutRatio <= (DIVIDEND_SUSTAINABILITY.fcfPayoutMaxThreshold ?? 100)
+                ? '(Đủ tài trợ)'
+                : '(Thâm hụt tiền)'}
             </span>
           </div>
           <span className="text-[10px] text-gray-400 block pt-1">
@@ -82,7 +100,7 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
               {payoutRatio != null ? `${payoutRatio}%` : '—'}
             </span>
             <span className="text-[10px] text-gray-400">
-              {payoutRatio != null && payoutRatio <= 70 ? '(Cân bằng)' : '(Chiếm tỷ trọng lớn)'}
+              {payoutRatio != null && payoutRatio <= (DIVIDEND_SUSTAINABILITY.accountingPayoutThreshold ?? 70) ? '(Cân bằng)' : '(Chiếm tỷ trọng lớn)'}
             </span>
           </div>
           <span className="text-[10px] text-gray-400 block pt-1">
@@ -109,26 +127,80 @@ export default function DividendSustainabilityCard({ dividendSustainability, sym
         </div>
       </div>
 
-      {/* ── CẢNH BÁO HOẶC LỜI KHUYÊN ── */}
-      <div className={`p-3.5 rounded-2xl border text-xs leading-relaxed flex items-start gap-2.5 ${
-        isSafe
-          ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300'
-          : isTrap
-          ? 'bg-rose-50/60 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300'
-          : 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300'
-      }`}>
-        <span className="text-base">{isSafe ? '💡' : isTrap ? '⚠️' : 'ℹ️'}</span>
-        <div>
-          <span className="font-bold">Nhận Định Chiến Lược: </span>
-          {isSafe ? (
-            <span>Doanh nghiệp có dòng tiền tự do FCF mạnh mẽ bảo chứng 100% cho việc chi trả cổ tức. Đây là ứng viên chất lượng cao cho danh mục đầu tư tích sản dài hạn hưởng cổ tức bền vững.</span>
-          ) : isTrap ? (
-            <span>Cảnh báo bẫy cổ tức (Dividend Trap): Doanh nghiệp đang chia cổ tức cao hơn dòng tiền tự do tạo ra, có thể phải vay nợ để trả cổ tức hoặc sẽ buộc phải cắt giảm cổ tức trong các kỳ tới.</span>
-          ) : (
-            <span>Tỷ lệ chi trả ở mức trung tính. Cần theo dõi tiến độ Capex và khả năng tạo tiền từ hoạt động kinh doanh để đảm bảo cổ tức không bị gián đoạn.</span>
-          )}
+      {/* ── AI CAPITAL ALLOCATION AUDIT & FCF VERDICT ── */}
+      {aiDividendAudit ? (
+        <div className="p-4 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 space-y-3">
+          <div className="flex items-center justify-between gap-2 border-b border-emerald-100/80 dark:border-emerald-900/40 pb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">💎</span>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                Kiểm Toán Kỷ Luật Phân Bổ Vốn & Dòng Tiền Tự Do
+              </h4>
+            </div>
+            {aiDividendAudit.capitalAllocationScore != null && (
+              <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                Điểm Phân Bổ: {aiDividendAudit.capitalAllocationScore}/10
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-2 text-xs leading-relaxed text-gray-700 dark:text-slate-200">
+            {aiDividendAudit.fcfCoverageVerdict && (
+              <div>
+                <strong className="text-gray-900 dark:text-white">Bảo chứng dòng tiền: </strong>
+                <span>{aiDividendAudit.fcfCoverageVerdict}</span>
+              </div>
+            )}
+
+            {aiDividendAudit.capitalAllocationDiagnosis && (
+              <div>
+                <strong className="text-gray-900 dark:text-white">Kỷ luật phân bổ vốn của Ban Lãnh Đạo: </strong>
+                <span>{aiDividendAudit.capitalAllocationDiagnosis}</span>
+              </div>
+            )}
+
+            {aiDividendAudit.outlook3Y && (
+              <div className="p-2.5 bg-white/70 dark:bg-slate-900/50 rounded-xl border border-emerald-100/60 dark:border-slate-800 text-[11px]">
+                <strong className="text-indigo-600 dark:text-indigo-400">📅 Triển vọng 1-3 năm: </strong>
+                <span>{aiDividendAudit.outlook3Y}</span>
+              </div>
+            )}
+
+            {aiDividendAudit.redFlags?.length > 0 && (
+              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-700 dark:text-rose-300 space-y-1">
+                <span className="font-bold flex items-center gap-1">🚨 Cờ Cảnh Báo Bẫy Cổ Tức:</span>
+                <ul className="list-disc list-inside space-y-0.5">
+                  {aiDividendAudit.redFlags.map((flag, idx) => (
+                    <li key={idx}>{flag}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        /* ── CẢNH BÁO HOẶC LỜI KHUYÊN HEURISTIC CŨ ── */
+        <div className={`p-3.5 rounded-2xl border text-xs leading-relaxed flex items-start gap-2.5 ${
+          isSafe
+            ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300'
+            : isTrap
+            ? 'bg-rose-50/60 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300'
+            : 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300'
+        }`}>
+          <span className="text-base">{isSafe ? '💡' : isTrap ? '⚠️' : 'ℹ️'}</span>
+          <div>
+            <span className="font-bold">Nhận Định Chiến Lược: </span>
+            {isSafe ? (
+              <span>Doanh nghiệp có dòng tiền tự do FCF mạnh mẽ bảo chứng 100% cho việc chi trả cổ tức. Đây là ứng viên chất lượng cao cho danh mục đầu tư tích sản dài hạn hưởng cổ tức bền vững.</span>
+            ) : isTrap ? (
+              <span>Cảnh báo bẫy cổ tức (Dividend Trap): Doanh nghiệp đang chia cổ tức cao hơn dòng tiền tự do tạo ra, có thể phải vay nợ để trả cổ tức hoặc sẽ buộc phải cắt giảm cổ tức trong các kỳ tới.</span>
+            ) : (
+              <span>Tỷ lệ chi trả ở mức trung tính. Cần theo dõi tiến độ Capex và khả năng tạo tiền từ hoạt động kinh doanh để đảm bảo cổ tức không bị gián đoạn.</span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

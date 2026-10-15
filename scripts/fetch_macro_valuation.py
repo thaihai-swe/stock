@@ -58,6 +58,7 @@ except ImportError:
 DATA_DIR = ROOT_DIR / "data"
 MACRO_FILE = DATA_DIR / "macro_valuation.json"
 INDICATORS_FILE = DATA_DIR / "macro_indicators.json"
+AI_CACHE_FILE = DATA_DIR / "ai_insights_cache.json"
 
 
 def fetch_and_save_macro():
@@ -299,12 +300,83 @@ def fetch_and_save_macro():
         "interbankRate": te_core.get("interbank_rate", fb_interbank),
     })
 
+    # 4g. Tổng hợp AI Macro Insight (Bảo lưu aiInsight, weeklyPulse, sectorTransmission hoặc nạp từ ai_insights_cache.json)
+    ai_cache_data = {}
+    if AI_CACHE_FILE.exists():
+        try:
+            with open(AI_CACHE_FILE, "r", encoding="utf-8") as f:
+                ai_cache_data = json.load(f)
+        except Exception:
+            ai_cache_data = {}
+
+    ai_insight = prev_cached_doc.get("aiInsight") if MACRO_FILE.exists() else None
+    if not ai_insight and ai_cache_data.get("aiInsight"):
+        ai_insight = ai_cache_data.get("aiInsight")
+
+    if not ai_insight:
+        ai_insight = {
+            "status": "ready",
+            "model": "offline-cio-heuristic",
+            "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "headline": f"Chiến Lược Vĩ Mô: Pha {regime_phase.get('titleVi', '')} — {advisor_result.get('stance', '')}",
+            "strategicTakeaways": [
+                f"Định giá VN-Index P/E {current_pe:.1f}x (Z-Score: {advisor_result.get('zScore', 0):+.2f}), dải định giá {advisor_result.get('bandText', '')}.",
+                f"Tỷ trọng phân bổ khuyến nghị: {advisor_result.get('recommendedEquityPct', 70)}% Cổ phiếu / {advisor_result.get('recommendedCashPct', 30)}% Tiền mặt.",
+                f"Chuỗi truyền dẫn rủi ro: {yield_curve_monitor.get('summary', {}).get('transChainStage', 'N/A')} ({yield_curve_monitor.get('summary', {}).get('assetDecisionVi', '')}).",
+            ],
+            "actionPlan": [
+                "Theo dõi sát động thái can thiệp tỷ giá USD/VND và thanh khoản liên ngân hàng.",
+                "Tập trung gom cổ phiếu thuộc các nhóm ngành lọt vùng Sweet Spot (Định giá rẻ + Vĩ mô ủng hộ).",
+                "Duy trì kỷ luật phân bổ tài sản phòng thủ khi áp lực ngoại biên gia tăng."
+            ],
+            "riskAlerts": [
+                f"Rủi ro vĩ mô tổng hợp: {risk_info.get('riskScore', 0)}/100 ({risk_info.get('riskBucket', '')})."
+            ]
+        }
+
+    # Bảo lưu weeklyPulse: Ưu tiên tài liệu hiện có, fallback sang ai_insights_cache.json
+    weekly_pulse = prev_cached_doc.get("weeklyPulse") if MACRO_FILE.exists() else None
+    if not weekly_pulse and ai_cache_data.get("weeklyPulse"):
+        weekly_pulse = ai_cache_data.get("weeklyPulse")
+
+    # Bảo lưu sectorTransmission: Dẫn truyền vĩ mô vào ngành
+    sector_transmission = prev_cached_doc.get("sectorTransmission") if MACRO_FILE.exists() else None
+    if not sector_transmission and ai_cache_data.get("sectorTransmission"):
+        sector_transmission = ai_cache_data.get("sectorTransmission")
+
+    # Bảo lưu các phân hệ AI vĩ mô mở rộng (Scenarios, Clock Dynamics, Yield Curve, Multi-Asset, Style, Tail Risks)
+    ai_scenarios = prev_cached_doc.get("aiScenarios") if MACRO_FILE.exists() else None
+    if not ai_scenarios and ai_cache_data.get("aiScenarios"):
+        ai_scenarios = ai_cache_data.get("aiScenarios")
+
+    ai_clock_dynamics = prev_cached_doc.get("aiClockDynamics") if MACRO_FILE.exists() else None
+    if not ai_clock_dynamics and ai_cache_data.get("aiClockDynamics"):
+        ai_clock_dynamics = ai_cache_data.get("aiClockDynamics")
+
+    ai_yield_curve_diag = prev_cached_doc.get("aiYieldCurveDiagnosis") if MACRO_FILE.exists() else None
+    if not ai_yield_curve_diag and ai_cache_data.get("aiYieldCurveDiagnosis"):
+        ai_yield_curve_diag = ai_cache_data.get("aiYieldCurveDiagnosis")
+
+    ai_multi_asset = prev_cached_doc.get("aiMultiAssetStrategy") if MACRO_FILE.exists() else None
+    if not ai_multi_asset and ai_cache_data.get("aiMultiAssetStrategy"):
+        ai_multi_asset = ai_cache_data.get("aiMultiAssetStrategy")
+
+    ai_style_rotation = prev_cached_doc.get("aiStyleRotation") if MACRO_FILE.exists() else None
+    if not ai_style_rotation and ai_cache_data.get("aiStyleRotation"):
+        ai_style_rotation = ai_cache_data.get("aiStyleRotation")
+
+    ai_tail_risk = prev_cached_doc.get("aiTailRiskAnalysis") if MACRO_FILE.exists() else None
+    if not ai_tail_risk and ai_cache_data.get("aiTailRiskAnalysis"):
+        ai_tail_risk = ai_cache_data.get("aiTailRiskAnalysis")
+
     macro_doc = {
         "_meta": {
             "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
             "version": "4.0"
         },
+        "aiInsight": ai_insight,
+        "weeklyPulse": weekly_pulse,
         "yieldCurveMonitor": yield_curve_monitor,
         "marketIndex": market_index_data,
         "vn30Valuation": vn30_analysis,
@@ -378,6 +450,22 @@ def fetch_and_save_macro():
 
     if val_data:
         macro_doc["marketValuationHistory"] = val_data
+
+    if sector_transmission:
+        macro_doc["sectorTransmission"] = sector_transmission
+
+    if ai_scenarios:
+        macro_doc["aiScenarios"] = ai_scenarios
+    if ai_clock_dynamics:
+        macro_doc["aiClockDynamics"] = ai_clock_dynamics
+    if ai_yield_curve_diag:
+        macro_doc["aiYieldCurveDiagnosis"] = ai_yield_curve_diag
+    if ai_multi_asset:
+        macro_doc["aiMultiAssetStrategy"] = ai_multi_asset
+    if ai_style_rotation:
+        macro_doc["aiStyleRotation"] = ai_style_rotation
+    if ai_tail_risk:
+        macro_doc["aiTailRiskAnalysis"] = ai_tail_risk
 
     with open(MACRO_FILE, "w", encoding="utf-8") as f:
         json.dump(macro_doc, f, ensure_ascii=False, indent=2)

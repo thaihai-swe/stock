@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { formatPercent, formatBn } from '../../utils/format';
+import { MAGIC_FORMULA_UI } from '../../utils/constants';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 /**
  * ForensicAccountingCard.jsx
@@ -22,9 +24,10 @@ export default function ForensicAccountingCard({ financials, stockItem }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-700">
         <div>
-          <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 flex-wrap">
             <span>🛡️</span>
             <span>Kiểm Toán Tài Chính & Sàng Lọc Lượng Hóa Cao Cấp</span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình kiểm toán gian lận Beneish, Magic Formula & điểm uốn FCF" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">
             Beneish M-Score · Magic Formula · Điểm Uốn FCF
@@ -155,6 +158,55 @@ export default function ForensicAccountingCard({ financials, stockItem }) {
                 </div>
               </div>
 
+              {/* ── AI FORENSIC AUDITOR & EARNINGS QUALITY ── */}
+              {financials?.forensicAnalysis?.aiAuditComment && (
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50/80 via-indigo-50/50 to-white dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-gray-800 border border-purple-200/80 dark:border-purple-800/60 space-y-3.5 shadow-2xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-100 dark:border-purple-800/40 pb-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-base">🧠</span>
+                      <h5 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
+                        Chẩn Đoán Kiểm Toán Pháp Y (AI Forensic Auditor)
+                      </h5>
+                      <IntelligenceBadge
+                        type={financials?.forensicAnalysis?.aiAuditComment ? 'ai' : 'heuristic'}
+                        provider={financials?.forensicAnalysis?.aiAuditComment?.provider}
+                      />
+                    </div>
+                    {financials.forensicAnalysis.aiAuditComment.auditVerdict && (
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                        financials.forensicAnalysis.aiAuditComment.auditVerdict.includes('Sạch')
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
+                          : financials.forensicAnalysis.aiAuditComment.auditVerdict.includes('Lưu Ý')
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300'
+                          : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300'
+                      }`}>
+                        {financials.forensicAnalysis.aiAuditComment.auditVerdict}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
+                    {financials.forensicAnalysis.aiAuditComment.forensicDiagnosis}
+                  </p>
+
+                  {Array.isArray(financials.forensicAnalysis.aiAuditComment.auditorChecklist) && financials.forensicAnalysis.aiAuditComment.auditorChecklist.length > 0 && (
+                    <div className="p-3.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 space-y-1.5">
+                      <span className="text-[11px] font-black uppercase text-indigo-900 dark:text-indigo-300 flex items-center gap-1.5">
+                        <span>📋</span> Câu Hỏi Chất Vấn Kiểm Toán Trọng Yếu Tại ĐHCĐ
+                      </span>
+                      <ul className="text-xs text-gray-700 dark:text-gray-300 space-y-1.5">
+                        {financials.forensicAnalysis.aiAuditComment.auditorChecklist.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <span className="text-indigo-600 font-bold">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Bảng 8 Chỉ Số Con Beneish */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
@@ -260,7 +312,7 @@ export default function ForensicAccountingCard({ financials, stockItem }) {
                     <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">
                       {magic.compositeScore}/100
                     </div>
-                    <div className="text-[10px] text-gray-400 mt-0.5">Top-Tier: &ge; 70 điểm</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">Top-Tier: &ge; {MAGIC_FORMULA_UI.topTierScore ?? 70} điểm</div>
                   </div>
                 </div>
               </div>
@@ -275,12 +327,12 @@ export default function ForensicAccountingCard({ financials, stockItem }) {
                     </span>
                     <span
                       className={`text-xs font-black px-2 py-0.5 rounded-md ${
-                        magic.earningsYield >= 8.5
+                        magic.earningsYield >= (MAGIC_FORMULA_UI.eyThreshold ?? 8.5)
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                           : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
                       }`}
                     >
-                      {magic.earningsYield >= 8.5 ? 'Hấp Dẫn (Rẻ)' : 'Định Giá Cao'}
+                      {magic.earningsYield >= (MAGIC_FORMULA_UI.eyThreshold ?? 8.5) ? 'Hấp Dẫn (Rẻ)' : 'Định Giá Cao'}
                     </span>
                   </div>
                   <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
@@ -299,12 +351,12 @@ export default function ForensicAccountingCard({ financials, stockItem }) {
                     </span>
                     <span
                       className={`text-xs font-black px-2 py-0.5 rounded-md ${
-                        magic.roic >= 15.0
+                        magic.roic >= (MAGIC_FORMULA_UI.roicThreshold ?? 15.0)
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                           : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
                       }`}
                     >
-                      {magic.roic >= 15.0 ? 'Moat Mạnh' : 'Hiệu Quả Vừa'}
+                      {magic.roic >= (MAGIC_FORMULA_UI.roicThreshold ?? 15.0) ? 'Moat Mạnh' : 'Hiệu Quả Vừa'}
                     </span>
                   </div>
                   <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">

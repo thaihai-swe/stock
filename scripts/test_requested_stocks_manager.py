@@ -19,11 +19,13 @@ DATA_DIR = ROOT_DIR / "data"
 sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.lib.requested_stocks_manager import (
+    TursoHttpClient,
     init_requested_stocks_table,
     get_pending_requested_symbols,
     filter_missing_financials,
     mark_symbol_synced,
     mark_symbol_failed,
+    add_requested_symbol,
     add_to_supported_stocks,
     REQUESTED_FILE,
     SUPPORTED_FILE
@@ -34,6 +36,17 @@ def run_tests():
     print("\n========================================================")
     print("🧪 BẮT ĐẦU KIỂM THỬ REQUESTED STOCKS MANAGER (5 TRƯỜNG)")
     print("========================================================")
+
+    # 0. Kiểm thử TursoHttpClient serialization & URL normalization
+    mock_client = TursoHttpClient("libsql://test-db.turso.io", "test-token")
+    assert mock_client.pipeline_url == "https://test-db.turso.io/v2/pipeline", f"Lỗi URL: {mock_client.pipeline_url}"
+    assert mock_client._to_arg(None) == {"type": "null"}
+    assert mock_client._to_arg("HPG") == {"type": "text", "value": "HPG"}
+    assert mock_client._to_arg(123) == {"type": "integer", "value": "123"}
+    assert mock_client._to_arg(3.14) == {"type": "float", "value": 3.14}
+    assert mock_client._from_col({"type": "integer", "value": "42"}) == 42
+    assert mock_client._from_col({"type": "null"}) is None
+    print("✅ 0. TursoHttpClient serialization & URL normalization: Thành công")
 
     init_requested_stocks_table()
     print("✅ 1. init_requested_stocks_table: Thành công")

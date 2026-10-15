@@ -340,13 +340,66 @@ def get_macro_config() -> Dict[str, Any]:
     return cfg.get("macro", FALLBACK_CONFIG["macro"])
 
 
+def get_macro_thresholds() -> Dict[str, Any]:
+    """Lấy các ngưỡng số liệu đo lường, cảnh báo và fallback cho vĩ mô."""
+    macro = get_macro_config()
+    return macro.get("macroThresholds", {})
+
+
+def get_macro_narratives() -> Dict[str, Any]:
+    """Lấy các mô tả, luận điểm, kịch bản và template văn bản cho vĩ mô."""
+    macro = get_macro_config()
+    return macro.get("macroNarratives", {})
+
+
+def get_ai_macro_config() -> Dict[str, Any]:
+    """Lấy cấu hình phân hệ AI Macro Strategist & Copilot."""
+    macro = get_macro_config()
+    return macro.get("aiMacroConfig", {})
+
+
 def get_trading_config() -> Dict[str, Any]:
     """Lấy cấu hình thuế, phí giao dịch và lãi suất tham chiếu."""
     cfg = load_system_constants()
-    return cfg.get("tradingAndFees", FALLBACK_CONFIG["tradingAndFees"])
+    return cfg.get("taxAndFees") or cfg.get("tradingAndFees") or FALLBACK_CONFIG.get("tradingAndFees", {})
+
+
+def get_tax_and_fees_config() -> Dict[str, Any]:
+    """Lấy cấu hình thuế TNCN và biểu phí giao dịch."""
+    return get_trading_config()
 
 
 def get_system_config() -> Dict[str, Any]:
     """Lấy cấu hình hệ thống, timeout và rate limiter."""
     cfg = load_system_constants()
     return cfg.get("systemAndNetwork", FALLBACK_CONFIG["systemAndNetwork"])
+
+
+def get_portfolio_config() -> Dict[str, Any]:
+    """Lấy cấu hình phân hệ quản lý danh mục, tỷ trọng tiền mặt và Sharpe."""
+    cfg = load_system_constants()
+    return cfg.get("portfolioAnalytics", {})
+
+
+def get_dca_config() -> Dict[str, Any]:
+    """Lấy cấu hình kế hoạch mua gom DCA đa tầng và bước giá."""
+    cfg = load_system_constants()
+    return cfg.get("dcaPlannerConfig", {})
+
+
+def get_strategy_config() -> Dict[str, Any]:
+    """Lấy cấu hình nhật ký chiến lược, thẻ kỷ luật và mẫu nhận định."""
+    cfg = load_system_constants()
+    return cfg.get("strategyAndDiscipline", {})
+
+
+def get_valuation_narratives() -> Dict[str, Any]:
+    """Lấy các kịch bản DCF, mô tả 7 vùng giá và nhận định cổ tức."""
+    cfg = load_system_constants()
+    return cfg.get("valuationNarrativesAndPresets", {})
+
+
+def get_ai_engine_config() -> Dict[str, Any]:
+    """Lấy cấu hình hệ sinh thái AI trợ lý (Gemini / OpenAI / Heuristic)."""
+    cfg = load_system_constants()
+    return cfg.get("aiEngineHub", {})

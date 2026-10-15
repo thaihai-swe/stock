@@ -42,6 +42,7 @@ function mapSellOrder(r) {
     grossRevenue: Number(r.gross_revenue),
     netRevenue: Number(r.net_revenue ?? (r.gross_revenue - (r.fee ?? 0) - (r.tax ?? 0))),
     totalRevenue: Number(r.net_revenue ?? (r.gross_revenue - (r.fee ?? 0) - (r.tax ?? 0))),
+    netPrice: Number(r.quantity) > 0 ? Math.round((Number(r.net_revenue ?? (r.gross_revenue - (r.fee ?? 0) - (r.tax ?? 0))) / Number(r.quantity)) * 100) / 100 : Number(r.price),
     totalCost: Number(r.total_cost),
     profitLoss: Number(r.profit_loss),
     profitLossPct: Number(r.profit_loss_pct),
@@ -118,7 +119,6 @@ export async function getAllData(userId = 'demo') {
   const watchlist = watchRes.rows.map(mapWatchlist);
 
   let settings = {};
-  let goal = null;
 
   for (const row of setRes.rows) {
     if (row.key === 'settings') {
@@ -127,8 +127,6 @@ export async function getAllData(userId = 'demo') {
         const { maxAllocationPct, ...rest } = parsed;
         settings = rest;
       }
-    } else if (row.key === 'goal') {
-      goal = safeJsonParse(row.value, null);
     }
   }
 
@@ -140,7 +138,6 @@ export async function getAllData(userId = 'demo') {
     dividends,
     watchlist,
     settings,
-    goal,
     portfolio,
   };
 }
@@ -168,11 +165,26 @@ export async function addBuyOrder(order, userId = 'demo') {
       userId,
     ],
   });
+
+  // Tự động khấu trừ tiền mặt đúng bằng tổng vốn mua đã chi ra (bao gồm phí mua)
+  if (order.totalCost > 0) {
+    await adjustCashBalance(-order.totalCost, userId);
+  }
+
   return order;
 }
 
 export async function deleteBuyOrder(id, userId = 'demo') {
   await initDatabase();
+  const buyRes = await db.execute({
+    sql: 'SELECT * FROM buy_orders WHERE id = ? AND user_id = ?;',
+    args: [id, userId],
+  });
+  if (buyRes.rows.length === 0) {
+    throw new Error('Không tìm thấy lệnh mua.');
+  }
+  const buyOrder = mapBuyOrder(buyRes.rows[0]);
+
   // Kiểm tra xem lệnh mua có đang được dùng trong lệnh bán nào của user không
   const sellRes = await db.execute({
     sql: 'SELECT matched_lots FROM sell_orders WHERE user_id = ?;',
@@ -189,12 +201,20 @@ export async function deleteBuyOrder(id, userId = 'demo') {
     sql: 'DELETE FROM buy_orders WHERE id = ? AND user_id = ?;',
     args: [id, userId],
   });
+
+  // Tự động hoàn lại tiền mặt đúng bằng số tiền đã bỏ ra cho lô mua này
+  if (buyOrder.totalCost > 0) {
+    await adjustCashBalance(buyOrder.totalCost, userId);
+  }
+
   return true;
 }
 
 // 3. Thao tác Lệnh Bán (Sell Orders & Khớp FIFO / Highest / Lowest)
 export async function executeSellOrder(sellOrder, matchedLots, userId = 'demo') {
   await initDatabase();
+
+  const netRev = sellOrder.netRevenue ?? sellOrder.totalRevenue ?? (sellOrder.grossRevenue - (sellOrder.fee ?? 0) - (sellOrder.tax ?? 0));
 
   const statements = [
     {
@@ -208,10 +228,10 @@ export async function executeSellOrder(sellOrder, matchedLots, userId = 'demo') 
         sellOrder.price,
         sellOrder.feePct || 0,
         sellOrder.fee || 0,
-        sellOrder.taxPct || 0.1,
+        sellOrder.taxPct || 0,
         sellOrder.tax || 0,
         sellOrder.grossRevenue,
-        sellOrder.netRevenue || sellOrder.totalRevenue,
+        netRev,
         sellOrder.totalCost,
         sellOrder.profitLoss,
         sellOrder.profitLossPct,
@@ -234,6 +254,12 @@ export async function executeSellOrder(sellOrder, matchedLots, userId = 'demo') 
   }
 
   await db.batch(statements, 'write');
+
+  // Tự động cộng tiền mặt đúng bằng số tiền thực nhận thu về từ lệnh bán
+  if (netRev > 0) {
+    await adjustCashBalance(netRev, userId);
+  }
+
   return sellOrder;
 }
 
@@ -264,6 +290,13 @@ export async function deleteSellOrder(id, userId = 'demo') {
   }
 
   await db.batch(statements, 'write');
+
+  // Tự động thu hồi lại số tiền thực nhận đã cộng trước đây khi bán
+  const netRev = sellOrder.netRevenue ?? sellOrder.totalRevenue ?? (sellOrder.grossRevenue - (sellOrder.fee ?? 0) - (sellOrder.tax ?? 0));
+  if (netRev > 0) {
+    await adjustCashBalance(-netRev, userId);
+  }
+
   return true;
 }
 
@@ -290,6 +323,12 @@ export async function addCashDividend(record, userId = 'demo') {
       userId,
     ],
   });
+
+  // Tự động cộng tiền mặt đúng bằng số tiền cổ tức thực nhận
+  if (record.netAmount > 0) {
+    await adjustCashBalance(record.netAmount, userId);
+  }
+
   return record;
 }
 
@@ -386,6 +425,12 @@ export async function deleteDividend(id, userId = 'demo') {
   }
 
   await db.batch(statements, 'write');
+
+  // Nếu là cổ tức tiền mặt, thu hồi lại số tiền mặt tương ứng
+  if (d.type === 'CASH' && Number(d.net_amount || 0) > 0) {
+    await adjustCashBalance(-Number(d.net_amount), userId);
+  }
+
   return true;
 }
 
@@ -429,6 +474,26 @@ export async function updateSettings(settings, userId = 'demo') {
   return settings;
 }
 
+export async function adjustCashBalance(delta, userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: "SELECT value FROM app_settings WHERE key = 'settings' AND user_id = ?;",
+    args: [userId],
+  });
+  let currentSettings = {};
+  if (res.rows && res.rows.length > 0) {
+    currentSettings = safeJsonParse(res.rows[0].value, {});
+  }
+  const currentCash = Number(currentSettings.cashBalance) || 0;
+  const newCash = Math.round(currentCash + delta);
+  currentSettings.cashBalance = newCash;
+  await db.execute({
+    sql: "INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('settings', ?, ?);",
+    args: [JSON.stringify(currentSettings), userId],
+  });
+  return newCash;
+}
+
 export async function updateCashBalance(cashBalance, userId = 'demo') {
   await initDatabase();
   const res = await db.execute({
@@ -439,7 +504,7 @@ export async function updateCashBalance(cashBalance, userId = 'demo') {
   if (res.rows && res.rows.length > 0) {
     currentSettings = safeJsonParse(res.rows[0].value, {});
   }
-  currentSettings.cashBalance = Math.max(0, Number(cashBalance) || 0);
+  currentSettings.cashBalance = Number(cashBalance) || 0;
   await db.execute({
     sql: "INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('settings', ?, ?);",
     args: [JSON.stringify(currentSettings), userId],
@@ -455,17 +520,9 @@ export async function getCashBalance(userId = 'demo') {
   });
   if (res.rows && res.rows.length > 0) {
     const currentSettings = safeJsonParse(res.rows[0].value, {});
-    return Math.max(0, Number(currentSettings.cashBalance) || 0);
+    return Number(currentSettings.cashBalance) || 0;
   }
   return 0;
-}
-export async function updateGoal(goal, userId = 'demo') {
-  await initDatabase();
-  await db.execute({
-    sql: `INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('goal', ?, ?);`,
-    args: [JSON.stringify(goal), userId],
-  });
-  return goal;
 }
 
 // 7. Khôi phục toàn bộ dữ liệu từ Backup JSON
@@ -589,12 +646,6 @@ export async function restoreAllData(fullJson, userId = 'demo') {
       });
     }
   }
-  if (fullJson.goal) {
-    statements.push({
-      sql: `INSERT OR REPLACE INTO app_settings (key, value, user_id) VALUES ('goal', ?, ?);`,
-      args: [JSON.stringify(fullJson.goal), userId],
-    });
-  }
 
   await db.batch(statements, 'write');
   return true;
@@ -634,7 +685,6 @@ export async function cloneDemoDataForUser(targetUserId) {
     dividends: clonedDividends,
     watchlist: clonedWatchlist,
     settings: demoData.settings,
-    goal: demoData.goal,
   }, targetUserId);
 
   return true;
@@ -653,9 +703,57 @@ export async function clearUserData(userId) {
     { sql: 'DELETE FROM dividends WHERE user_id = ?;', args: [userId] },
     { sql: 'DELETE FROM watchlist WHERE user_id = ?;', args: [userId] },
     { sql: 'DELETE FROM app_settings WHERE user_id = ?;', args: [userId] },
+    { sql: 'DELETE FROM portfolio_ai_insights WHERE user_id = ?;', args: [userId] },
   ];
 
   await db.batch(statements, 'write');
+  return true;
+}
+
+// 10. Quản lý AI Portfolio Stress-Test theo người dùng
+export async function getPortfolioAiInsight(userId = 'demo') {
+  await initDatabase();
+  const res = await db.execute({
+    sql: 'SELECT * FROM portfolio_ai_insights WHERE user_id = ? LIMIT 1;',
+    args: [userId]
+  });
+  if (res.rows && res.rows.length > 0) {
+    const row = res.rows[0];
+    try {
+      const parsed = JSON.parse(row.report_json);
+      return {
+        ...parsed,
+        userId: row.user_id,
+        updatedAt: row.updated_at,
+        healthScore: row.health_score || parsed.healthScore,
+        healthVerdict: row.health_verdict || parsed.healthVerdict,
+        portfolioBeta: row.portfolio_beta != null ? row.portfolio_beta : parsed.portfolioBeta,
+        cashWeightPct: row.cash_weight_pct != null ? row.cash_weight_pct : parsed.cashWeightPct,
+        status: row.status || parsed.status || 'success'
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
+export async function savePortfolioAiInsight(userId = 'demo', report = {}) {
+  await initDatabase();
+  const reportJson = typeof report === 'string' ? report : JSON.stringify(report);
+  const healthScore = report.healthScore || 'B+';
+  const healthVerdict = report.healthVerdict || '';
+  const portfolioBeta = report.portfolioBeta != null ? report.portfolioBeta : 1.0;
+  const cashWeightPct = report.cashWeightPct != null ? report.cashWeightPct : 0.0;
+  const status = report.status || 'success';
+  const updatedAt = report.updatedAt || new Date().toISOString();
+
+  await db.execute({
+    sql: `INSERT OR REPLACE INTO portfolio_ai_insights 
+          (user_id, health_score, health_verdict, portfolio_beta, cash_weight_pct, report_json, status, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+    args: [userId, healthScore, healthVerdict, portfolioBeta, cashWeightPct, reportJson, status, updatedAt]
+  });
   return true;
 }
 

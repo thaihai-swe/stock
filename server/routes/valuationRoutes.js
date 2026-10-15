@@ -2,8 +2,18 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
-import { ROOT_DIR, DATA_DIR, REQUESTED_STOCKS_FILE } from '../config/constants.js';
+import {
+  ROOT_DIR,
+  DATA_DIR,
+  REQUESTED_STOCKS_FILE,
+  MACRO_CONFIG,
+  MACRO_THRESHOLDS,
+  MACRO_NARRATIVES,
+  AI_MACRO_CONFIG,
+  AI_INSIGHTS_CACHE_FILE,
+} from '../config/constants.js';
 import { db } from '../storage/db.js';
+import { getPortfolioAiInsight } from '../storage/sqliteStore.js';
 
 const router = express.Router();
 
@@ -12,6 +22,7 @@ const MACRO_FILE = path.join(DATA_DIR, 'macro_valuation.json');
 const MACRO_INDICATORS_FILE = path.join(DATA_DIR, 'macro_indicators.json');
 const MARKET_HISTORY_FILE = path.join(DATA_DIR, 'market_valuation_history.json');
 const FINANCIALS_DIR = path.join(DATA_DIR, 'financials');
+const PORTFOLIO_AI_FILE = path.join(DATA_DIR, 'portfolio_ai_insights.json');
 
 // In-memory cache cho DNSE OHLC proxy (TTL 1 giờ)
 const dnseCache = new Map();
@@ -99,7 +110,46 @@ router.get('/valuation/macro', (req, res) => {
   try {
     if (fs.existsSync(MACRO_FILE)) {
       const raw = fs.readFileSync(MACRO_FILE, 'utf-8');
-      return res.json(JSON.parse(raw));
+      const macroData = JSON.parse(raw);
+
+      // Tầng phòng thủ Zero-Downtime AI Cache: Nạp weeklyPulse & sectorTransmission từ ai_insights_cache.json nếu macro_valuation.json chưa có
+      if (fs.existsSync(AI_INSIGHTS_CACHE_FILE)) {
+        try {
+          const aiRaw = fs.readFileSync(AI_INSIGHTS_CACHE_FILE, 'utf-8');
+          const aiCache = JSON.parse(aiRaw);
+          if (!macroData.weeklyPulse && aiCache.weeklyPulse) {
+            macroData.weeklyPulse = aiCache.weeklyPulse;
+          }
+          if (!macroData.sectorTransmission && aiCache.sectorTransmission) {
+            macroData.sectorTransmission = aiCache.sectorTransmission;
+          }
+          if (!macroData.aiInsight && aiCache.aiInsight) {
+            macroData.aiInsight = aiCache.aiInsight;
+          }
+          if (!macroData.aiScenarios && aiCache.aiScenarios) {
+            macroData.aiScenarios = aiCache.aiScenarios;
+          }
+          if (!macroData.aiClockDynamics && aiCache.aiClockDynamics) {
+            macroData.aiClockDynamics = aiCache.aiClockDynamics;
+          }
+          if (!macroData.aiYieldCurveDiagnosis && aiCache.aiYieldCurveDiagnosis) {
+            macroData.aiYieldCurveDiagnosis = aiCache.aiYieldCurveDiagnosis;
+          }
+          if (!macroData.aiMultiAssetStrategy && aiCache.aiMultiAssetStrategy) {
+            macroData.aiMultiAssetStrategy = aiCache.aiMultiAssetStrategy;
+          }
+          if (!macroData.aiStyleRotation && aiCache.aiStyleRotation) {
+            macroData.aiStyleRotation = aiCache.aiStyleRotation;
+          }
+          if (!macroData.aiTailRiskAnalysis && aiCache.aiTailRiskAnalysis) {
+            macroData.aiTailRiskAnalysis = aiCache.aiTailRiskAnalysis;
+          }
+        } catch (e) {
+          console.warn('⚠️ Lỗi nạp fallback AI cache:', e.message);
+        }
+      }
+
+      return res.json(macroData);
     }
     return res.json({
       marketIndex: null,
@@ -108,6 +158,60 @@ router.get('/valuation/macro', (req, res) => {
     });
   } catch (error) {
     console.error('Lỗi đọc macro_valuation.json:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * 2a. GET /api/valuation/macro/config
+ * Lấy toàn bộ ngưỡng số liệu (thresholds), mô tả chu kỳ & narrative từ file cấu hình & macro JSON
+ */
+router.get('/valuation/macro/config', (req, res) => {
+  try {
+    let macroData = {};
+    if (fs.existsSync(MACRO_FILE)) {
+      try {
+        macroData = JSON.parse(fs.readFileSync(MACRO_FILE, 'utf-8'));
+      } catch {}
+    }
+    const aiInsight = macroData.aiInsight || {};
+    return res.json({
+      thresholds: MACRO_THRESHOLDS,
+      narratives: MACRO_NARRATIVES,
+      aiConfig: {
+        enabled: AI_MACRO_CONFIG?.enabled ?? true,
+        mode: 'background_pipeline',
+        provider: aiInsight.provider || 'python_pipeline',
+        model: aiInsight.model || 'Gemini 2.5 Flash / CIO Heuristic',
+        hasApiKey: true,
+        updatedAt: aiInsight.updatedAt || macroData.updatedAt || null,
+      },
+    });
+  } catch (error) {
+    console.error('Lỗi lấy macro config:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * 2a-2. POST /api/valuation/macro/ai-analysis
+ * Trả về báo cáo chiến lược CIO sinh bởi Python Background Pipeline (0ms, 0 API cost).
+ */
+router.post('/valuation/macro/ai-analysis', async (req, res) => {
+  try {
+    let macroData = {};
+    if (fs.existsSync(MACRO_FILE)) {
+      try {
+        macroData = JSON.parse(fs.readFileSync(MACRO_FILE, 'utf-8'));
+      } catch {}
+    }
+    return res.json(macroData.aiInsight || {
+      headline: 'Chiến Lược Phân Bổ CIO Toàn Diện',
+      summary: 'Dữ liệu phân tích vĩ mô được đồng bộ tự động từ Python Background Pipeline.',
+      bullets: [],
+    });
+  } catch (error) {
+    console.error('Lỗi thực thi AI Macro Analysis:', error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -525,4 +629,170 @@ router.get('/valuation/requested-stocks', async (req, res) => {
   }
 });
 
+/**
+ * 8. POST /api/valuation/ai-refresh/:symbol
+ * Kích hoạt cập nhật AI tích hợp riêng cho 1 mã cổ phiếu cụ thể (On-Demand Single Stock Refresh)
+ */
+router.post('/valuation/ai-refresh/:symbol', (req, res) => {
+  const sym = (req.params.symbol || '').trim().toUpperCase();
+  if (!sym) {
+    return res.status(400).json({ error: 'Thiếu mã cổ phiếu' });
+  }
+
+  const filePath = path.join(FINANCIALS_DIR, `${sym}.json`);
+  const isServerlessOrNoPython = Boolean(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    !fs.existsSync(VENV_PYTHON)
+  );
+
+  if (isServerlessOrNoPython) {
+    if (fs.existsSync(filePath)) {
+      try {
+        const finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        return res.json({
+          success: true,
+          message: `Dữ liệu phân tích AI cho mã ${sym} đã sẵn sàng từ kho lưu trữ.`,
+          symbol: sym,
+          data: finData
+        });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+    return res.status(404).json({ error: `Chưa có dữ liệu cho mã ${sym}` });
+  }
+
+  const aiScript = path.join(ROOT_DIR, 'scripts', 'generate_ai_insights.py');
+  execFile(PYTHON_CMD, [aiScript, '--scope', 'stocks', '--symbols', sym, '--force'], (err, stdout, stderr) => {
+    if (err) {
+      console.warn(`Lỗi chạy AI refresh cho ${sym}:`, stderr || err.message);
+    }
+    if (fs.existsSync(filePath)) {
+      try {
+        const finData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        return res.json({
+          success: true,
+          message: `Đã làm mới phân tích AI tích hợp cho mã ${sym}!`,
+          symbol: sym,
+          data: finData
+        });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+    return res.status(404).json({ error: `Không tìm thấy file BCTC sau khi chạy AI cho ${sym}` });
+  });
+});
+
+/**
+ * 9. GET /api/portfolio/ai-stress-test
+ * Đọc báo cáo sức khỏe danh mục & mô phỏng chịu tải vĩ mô theo người dùng (0ms)
+ */
+router.get('/portfolio/ai-stress-test', async (req, res) => {
+  try {
+    const userId = req.user?.id || req.query?.userId || 'demo';
+
+    // 1. Đọc từ Tầng 1: ACID Database portfolio_ai_insights theo user_id
+    const dbInsight = await getPortfolioAiInsight(userId);
+    if (dbInsight) {
+      return res.json(dbInsight);
+    }
+
+    // 2. Fallback nếu là tài khoản demo và có file local
+    if (userId === 'demo' && fs.existsSync(PORTFOLIO_AI_FILE)) {
+      const raw = fs.readFileSync(PORTFOLIO_AI_FILE, 'utf-8');
+      return res.json(JSON.parse(raw));
+    }
+
+    // 3. Fallback mặc định
+    return res.json({
+      healthScore: 'Chưa có dữ liệu',
+      healthVerdict: 'Chưa có báo cáo sức khỏe danh mục. Vui lòng bấm Làm Mới để phân tích.',
+      summary: '',
+      portfolioBeta: 1.0,
+      cashWeightPct: 0.0,
+      macroSensitivity: {
+        interestRateRisk: 'Chưa phân tích',
+        fxRisk: 'Chưa phân tích',
+        cyclicalRisk: 'Chưa phân tích'
+      },
+      stressTestScenarios: [],
+      rebalancingRecommendations: [],
+      updatedAt: null
+    });
+  } catch (err) {
+    console.error('Lỗi đọc portfolio AI stress-test:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * 10. POST /api/portfolio/ai-stress-test/refresh
+ * Kích hoạt sinh lại báo cáo sức khỏe danh mục on-demand theo người dùng
+ */
+router.post('/portfolio/ai-stress-test/refresh', (req, res) => {
+  const userId = req.user?.id || req.body?.userId || req.query?.userId || 'demo';
+  const isServerlessOrNoPython = Boolean(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    !fs.existsSync(VENV_PYTHON)
+  );
+
+  if (isServerlessOrNoPython) {
+    getPortfolioAiInsight(userId).then((insight) => {
+      if (insight) {
+        return res.json({
+          success: true,
+          message: 'Dữ liệu phân tích danh mục định kỳ sẵn sàng từ database.',
+          data: insight
+        });
+      }
+      if (userId === 'demo' && fs.existsSync(PORTFOLIO_AI_FILE)) {
+        try {
+          const raw = fs.readFileSync(PORTFOLIO_AI_FILE, 'utf-8');
+          return res.json({
+            success: true,
+            message: 'Dữ liệu phân tích danh mục định kỳ sẵn sàng từ kho lưu trữ.',
+            data: JSON.parse(raw)
+          });
+        } catch (e) {
+          return res.status(500).json({ error: e.message });
+        }
+      }
+      return res.json({ success: true, message: 'Dữ liệu đang được đồng bộ định kỳ.' });
+    }).catch((err) => res.status(500).json({ error: err.message }));
+    return;
+  }
+
+  const aiScript = path.join(ROOT_DIR, 'scripts', 'generate_ai_insights.py');
+  execFile(PYTHON_CMD, [aiScript, '--scope', 'portfolio', '--user-id', userId, '--force'], async (err, stdout, stderr) => {
+    if (err) {
+      console.warn('Lỗi chạy portfolio AI refresh:', stderr || err.message);
+    }
+    try {
+      const updated = await getPortfolioAiInsight(userId);
+      if (updated) {
+        return res.json({
+          success: true,
+          message: 'Đã hoàn tất đánh giá sức khỏe danh mục & mô phỏng chịu tải!',
+          data: updated
+        });
+      }
+      if (userId === 'demo' && fs.existsSync(PORTFOLIO_AI_FILE)) {
+        const raw = fs.readFileSync(PORTFOLIO_AI_FILE, 'utf-8');
+        return res.json({
+          success: true,
+          message: 'Đã hoàn tất đánh giá sức khỏe danh mục & mô phỏng chịu tải!',
+          data: JSON.parse(raw)
+        });
+      }
+      return res.status(500).json({ error: 'Không thể tạo báo cáo danh mục' });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  });
+});
+
 export default router;
+

@@ -605,7 +605,17 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 46961
+    "impliedFcfYieldPrice": 46961,
+    "aiConvergence": {
+      "convergenceHeadline": "Phân kỳ cấu trúc giữa dòng tiền tái đầu tư ngắn hạn và giá trị kinh tế dài hạn: Trọng tâm hội tụ tại vùng 65.000 - 72.000 VND/cổ phiếu",
+      "divergenceExplanation": "Sự phân hóa sâu sắc giữa các nhóm mô hình bắt nguồn từ đặc thù chu kỳ kinh doanh và cấu trúc phân bổ vốn của FPT. Nhóm dòng tiền thuần ngắn hạn gồm FCFF (39.965 VND), FCFE (30.501 VND) và DDM (26.883 VND) phản ánh giá trị thấp bất thường do doanh nghiệp đang ở đỉnh chu kỳ tái đầu tư CapEx quy mô lớn (mở rộng Data Center, hạ tầng AI Factory, hệ thống trường đại học và M&A dịch vụ IT quốc tế), khiến dòng tiền tự do bị nén chặt và tỷ lệ chi trả cổ tức tiền mặt bị giới hạn. Ngược lại, mô hình Residual Income - RIM (124.167 VND) định giá rất cao nhờ ghi nhận trọn vẹn con hào kinh tế (Economic Moat) với ROE vượt trội 26-28%, liên tục duy trì cao hơn đáng kể so với chi phí vốn chủ sở hữu (Ke ~11-12%). Vùng hội tụ đáng tin cậy nhất nằm ở DCF Đa Giai Đoạn (64.631 VND), P/E Chuẩn Hóa (68.151 VND) và P/B Gordon (71.742 VND) - nơi tác động của vòng đời CapEx đã được bình thường hóa để phản ánh năng lực sinh lời bền vững 18-20%/năm.",
+      "sensitivityStory": "Với thuộc tính cổ phiếu tăng trưởng có 'thời lượng dòng tiền' (cash flow duration) dài, định giá FPT có độ nhạy cảm cao với lãi suất chiết khấu. Hiện tại, biên an toàn 6,3% là tương đối mỏng trước các biến số vĩ mô. Thử tải kịch bản bất lợi: (1) Nếu chi phí vốn WACC tăng thêm 1,5% (lên ~11,8% do lợi suất trái phiếu chính phủ tăng hoặc rủi ro biến động tỷ giá tại thị trường xuất khẩu phần mềm gia tăng), giá trị nội tại DCF sẽ suy giảm khoảng 14,8%, kéo định giá DCF từ 64.631 VND xuống vùng ~55.000 VND; (2) Nếu tốc độ tăng trưởng dài hạn sau chu kỳ cao điểm (g) giảm 1,0% (từ 4,0% xuống 3,0%), định giá DCF tiếp tục giảm thêm 8,5%. Trong kịch bản kiểm tra áp lực kép (WACC +1,5% và g -1,0%), định giá fair value của DCF sẽ tụt về quanh mức 49.500 VND, xóa sạch hoàn toàn biên an toàn 6,3% và đưa định giá cổ phiếu vào trạng thái định giá quá cao (Overvalued) từ 15% đến 22% so với giá trị cơ bản chịu tải.",
+      "preferredModelRecommendation": "Đối với phân ngành Dịch vụ CNTT và Viễn thông có lợi thế cạnh tranh về vốn con người và biên sinh lời cao như FPT, mô hình DCF Đa Giai Đoạn (chuẩn hóa dòng tiền CapEx theo chu kỳ 10 năm) kết hợp P/E Chuẩn Hóa (PEG matching) và Residual Income (RIM) là bộ ba công cụ tin cậy nhất. Khuyến nghị loại bỏ DDM (do chính sách giữ lại lợi nhuận cao để tái đầu tư) và giảm tỷ trọng FCFF/FCFE ngắn hạn chưa điều chỉnh để tránh bóp méo giá trị thực chất của doanh nghiệp trong giai đoạn tăng tốc chuyển dịch cơ cấu sang AI và Điện toán đám mây.",
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -3005,6 +3015,23 @@
           "type": "neutral"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 0,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của FPT duy trì trạng thái trung tính, phản ánh sự ổn định trong hoạt động kinh doanh cốt lõi và thanh khoản thị trường.",
+      "catalysts": [
+        "Kỳ vọng tăng trưởng sản lượng và mở rộng thị phần trong các quý tới.",
+        "Tiến độ giải ngân các dự án trọng điểm và kế hoạch trả cổ tức tiền mặt."
+      ],
+      "keyRisks": [
+        "Biến động giá nguyên vật liệu đầu vào và sức ép cạnh tranh trong ngành.",
+        "Rủi ro thị trường chung và sự đảo chiều dòng vốn khối ngoại."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "status": "success",
+      "provider": "offline-heuristic-engine",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
   },
   "beneishMScore": {
@@ -3243,6 +3270,40 @@
       "latestCfo": 1702.0,
       "latestCapex": 747.0,
       "constructionInProgress": 1046.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Sạch Sẽ & Minh Bạch",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score đạt -1.97 nằm dưới ngưỡng cảnh báo vi phạm (-1.78) kết hợp cùng Altman Z-Score ở mức 3.0 khẳng định FPT có hồ sơ tài chính lành mạnh, không có dấu hiệu thao túng doanh thu ảo hay rủi ro kiệt quệ tài chính. Tuy nhiên, biên độ an toàn của M-Score tương đối sát ngưỡng can thiệp kiểm toán, đòi hỏi lưu ý kiểm tra đối ứng giữa biến số dồn tích TATA và tăng trưởng khoản phải thu DSRI từ các hợp đồng dịch vụ CNTT dài hạn. BCTC không phản ánh rủi ro vốn hóa chi phí sai lệch qua chỉ số AQI hay ghi nhận khấu hao bất thường (DEPI).",
+      "dupontEarningsQuality": "Chất lượng ROE (15.9%) đến từ giá trị nội tại thực chất với biên lợi nhuận hoạt động vững chắc (13.39%) và lợi thế từ chính sách ưu đãi thuế công nghệ (Tax Burden đạt 0.882x), hoàn toàn không phải do thổi phồng đòn bẩy nợ vay (Leverage chỉ 1.79x). Điểm nghẽn duy nhất nằm ở vòng quay tài sản (0.75 lần) do đặc thù thâm dụng vốn đầu tư cơ sở hạ tầng viễn thông và trung tâm dữ liệu chưa đạt điểm rơi tối ưu công suất.",
+      "auditorChecklist": [
+        "Xin Ban Lãnh Đạo làm rõ cơ chế ghi nhận doanh thu dồn tích chưa lập hóa đơn (Unbilled Revenue) đối với các hợp đồng xuất khẩu phần mềm quy mô lớn, và cơ sở kiểm tra tính suy giảm giá trị của các khoản phải thu này trong bối cảnh M-Score tiệm cận ngưỡng nhạy cảm?",
+        "Với hệ số vòng quay tổng tài sản chỉ đạt 0.75 lần, Ban Điều Hành có kế hoạch cụ thể nào để đẩy nhanh tốc độ thương mại hóa các dự án Capex lớn (Data Center, AI Campus) nhằm tối ưu hóa hiệu suất tài sản và gia tăng ROE tự nhiên mà không cần nới lỏng đòn bẩy tài chính?"
+      ],
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
+  },
+  "aiDeepDive": {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ",
+    "convictionScore": 88,
+    "thesisHeadline": "Cơ hội tích lũy chiến lược tại vùng chiết khấu sâu với vị thế dẫn đầu công nghệ số và sức khỏe tài chính vượt trội",
+    "valuationConvergenceAnalysis": "Cổ phiếu FPT đang giao dịch trong vùng 'Tích lũy' (Accumulate) với mức P/E trượt chỉ 10.71x và EV/EBITDA 8.6x, chiết khấu sâu so với mức trung bình lịch sử 5 năm (18x-20x). Kết quả hội tụ từ các mô hình dòng tiền chiết khấu (DCF) và mô hình thu nhập thặng dư (RIM) xác định vùng giá trị hợp lý hội tụ trong biên độ 57,862 - 66,998 VNĐ/cp. Với ROE duy trì ở mức cao 25.08% vượt xa chi phí vốn chủ sở hữu CoE (~10.5%), doanh nghiệp liên tục tạo ra giá trị kinh tế thặng dư (EVA) vững chắc, củng cố biên an toàn hấp dẫn cho tầm nhìn trung - dài hạn.",
+    "trapAssessment": "TrapScore ghi nhận mức tối ưu 0.0/100 (Rủi ro Thấp), hoàn toàn triệt tiêu các bẫy định giá trọng yếu. Bảng cân đối kế toán cực kỳ lành mạnh với Net Debt bằng 0, tỷ số thanh toán hiện hành đạt 2.79x và tỷ số tiền mặt 1.76x loại bỏ triệt để rủi ro kiệt quệ tài chính (Debt Stress). Tỷ suất sinh lời thực chất (ROE 25.08%, Net Margin 18.64%) xác nhận đây không phải bẫy giá trị (Value Trap) hay bẫy sổ sách (Book Trap).",
+    "catalysts": [
+      "Động lực xuất khẩu phần mềm duy trì tăng trưởng 2 chữ số nhờ làn sóng thương mại hóa Generative AI và quan hệ đối tác chiến lược hệ sinh thái bán dẫn/AI toàn cầu",
+      "Mảng Giáo dục (FPT Education) tiếp tục mở rộng quy mô tuyển sinh toàn quốc, duy trì biên EBITDA vượt trội và hoàn thiện chuỗi giá trị nhân lực khép kín",
+      "Sự phục hồi giải ngân vốn đầu tư công nghệ thông tin tại thị trường nội địa cho các phân khúc Chuyển đổi số, Hạ tầng Cloud và Trung tâm dữ liệu"
+    ],
+    "keyRisks": [
+      "Rủi ro suy thoái kinh tế tại các thị trường trọng điểm (Mỹ, EU, Nhật Bản) khiến khách hàng doanh nghiệp trì hoãn ngân sách đầu tư CNTT",
+      "Biến động tỷ giá bất lợi (đặc biệt là đồng Yên Nhật - JPY) tác động tiêu cực đến biên lợi nhuận chuyển đổi doanh thu quốc tế"
+    ],
+    "targetPriceHorizon12M": "67,000 VNĐ",
+    "status": "success",
+    "provider": "openai",
+    "model": "super-vip",
+    "updatedAt": "2026-10-13T16:21:30.900791+00:00"
   }
 }

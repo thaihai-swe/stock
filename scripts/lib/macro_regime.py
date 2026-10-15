@@ -13,14 +13,16 @@ Bộ động cơ định lượng vĩ mô, nhận diện chu kỳ và phân bổ
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
-    from .config_loader import get_macro_config
+    from .config_loader import get_macro_config, get_macro_thresholds, get_macro_narratives
 except ImportError:
     try:
-        from lib.config_loader import get_macro_config
+        from lib.config_loader import get_macro_config, get_macro_thresholds, get_macro_narratives
     except ImportError:
-        from scripts.lib.config_loader import get_macro_config
+        from scripts.lib.config_loader import get_macro_config, get_macro_thresholds, get_macro_narratives
 
 _macro_cfg = get_macro_config()
+_thresholds = get_macro_thresholds()
+_narratives = get_macro_narratives()
 
 _pe_bands = _macro_cfg.get("vnindexPeBands") or {}
 PE_BAND_DEEP_VALUE = float(_pe_bands.get("deepValue", 11.5))
@@ -40,9 +42,55 @@ FALLBACK_PMI = float(_fallback_inds.get("pmi", 50.5))
 FALLBACK_CREDIT = float(_fallback_inds.get("creditGrowthYoY", 14.0))
 FALLBACK_GDP = float(_fallback_inds.get("gdpGrowthYoY", 6.5))
 
+# Đọc cấu hình ngưỡng số liệu đo lường từ Single Source of Truth
+_fx_cfg = _thresholds.get("usdvnd", {})
+FX_CRIT_HIGH = float(_fx_cfg.get("criticalHigh", 25900))
+FX_HIGH = float(_fx_cfg.get("high", 25600))
+FX_BEAR = float(_fx_cfg.get("bearishDriver", 26000))
+FX_BULL = float(_fx_cfg.get("bullishDriver", 25000))
+FX_SHOCK = float(_fx_cfg.get("externalShock", 25700))
+
+_ib_cfg = _thresholds.get("interbankRate", {})
+IB_CRIT_HIGH = float(_ib_cfg.get("criticalHigh", 6.5))
+IB_HIGH = float(_ib_cfg.get("high", 5.0))
+IB_BEAR = float(_ib_cfg.get("bearishDriver", 6.0))
+IB_TIGHT = float(_ib_cfg.get("tightening", 5.5))
+IB_BULL = float(_ib_cfg.get("bullishDriver", 3.0))
+IB_CRISIS_SPREAD = float(_ib_cfg.get("liquidityCrisisSpread", 2.0))
+
+_cpi_cfg = _thresholds.get("cpi", {})
+CPI_CRIT_HIGH = float(_cpi_cfg.get("criticalHigh", 5.5))
+CPI_CEIL = float(_cpi_cfg.get("ceilingTarget", 4.5))
+CPI_BULL = float(_cpi_cfg.get("bullish", 4.0))
+CPI_COOL = float(_cpi_cfg.get("cool", 3.5))
+
+_gdp_cfg = _thresholds.get("gdp", {})
+GDP_HIGH = float(_gdp_cfg.get("highGrowth", 6.5))
+GDP_MOD = float(_gdp_cfg.get("moderateGrowth", 6.0))
+GDP_SLOW = float(_gdp_cfg.get("slowdown", 5.5))
+GDP_RECESSION = float(_gdp_cfg.get("recessionAlert", 4.0))
+
+_pmi_cfg = _thresholds.get("pmi", {})
+PMI_EXP = float(_pmi_cfg.get("expansion", 51.0))
+PMI_NEUT = float(_pmi_cfg.get("neutral", 50.0))
+PMI_CONT = float(_pmi_cfg.get("contraction", 49.0))
+
+_cred_cfg = _thresholds.get("credit", {})
+CRED_CRUNCH = float(_cred_cfg.get("crunchThreshold", 10.0))
+CRED_OPT_MIN = float(_cred_cfg.get("optimalMin", 12.0))
+CRED_OPT_MAX = float(_cred_cfg.get("optimalMax", 16.5))
+
+_oil_cfg = _thresholds.get("oilBrent", {})
+OIL_CRIT = float(_oil_cfg.get("criticalHigh", 95.0))
+OIL_EXT_HIGH = float(_oil_cfg.get("extremeHigh", 105.0))
+OIL_LOW = float(_oil_cfg.get("low", 50.0))
+OIL_OPT_MIN = float(_oil_cfg.get("optimalMin", 65.0))
+OIL_OPT_MAX = float(_oil_cfg.get("optimalMax", 90.0))
+
 PHASES = ("Recovery", "Expansion", "Overheating", "Slowdown", "Recession")
 
-PHASE_META = {
+# Đọc mô tả 5 pha từ Single Source of Truth
+PHASE_META = _narratives.get("phaseMeta") or {
     "Recovery": {
         "titleVi": "Phục Hồi Kinh Tế",
         "description": "Lãi suất hạ nhiệt, lạm phát thấp, thanh khoản dồi dào. Cổ phiếu chu kỳ, chứng khoán và bán lẻ dẫn dắt.",
@@ -336,13 +384,13 @@ def compute_sector_rotation(phase: str, macro: Dict[str, Any]) -> List[Dict[str,
     oil = float(macro.get("oilBrent") or FALLBACK_OIL)
     pmi = float(macro.get("pmi") or FALLBACK_PMI)
 
-    # Xác định driver strength (+1 / 0 / -1)
-    str_interbank = 1 if interbank < 3.0 else (-1 if interbank > 5.5 else 0)
-    str_sbv = 1 if sbv_rate <= 4.5 else (-1 if sbv_rate > 5.5 else 0)
-    str_cpi = 1 if cpi < 4.0 else (-1 if cpi > 6.0 else 0)
-    str_fx = 1 if usdvnd < 25000 else (-1 if usdvnd > 26000 else 0)
-    str_oil = 1 if (65 <= oil <= 90) else (-1 if oil > 105 or oil < 50 else 0)
-    str_pmi = 1 if pmi >= 51.0 else (-1 if pmi < 49.0 else 0)
+    # Xác định driver strength (+1 / 0 / -1) theo cấu hình Single Source of Truth
+    str_interbank = 1 if interbank < IB_BULL else (-1 if interbank > IB_TIGHT else 0)
+    str_sbv = 1 if sbv_rate <= FALLBACK_SBV_RATE else (-1 if sbv_rate > IB_TIGHT else 0)
+    str_cpi = 1 if cpi < CPI_BULL else (-1 if cpi > CPI_CRIT_HIGH else 0)
+    str_fx = 1 if usdvnd < FX_BULL else (-1 if usdvnd > FX_BEAR else 0)
+    str_oil = 1 if (OIL_OPT_MIN <= oil <= OIL_OPT_MAX) else (-1 if oil > OIL_EXT_HIGH or oil < OIL_LOW else 0)
+    str_pmi = 1 if pmi >= PMI_EXP else (-1 if pmi < PMI_CONT else 0)
 
     drivers = [str_interbank, str_sbv, str_cpi, str_fx, str_oil, str_pmi]
 
@@ -433,35 +481,35 @@ def evaluate_leading_signals(macro: Dict[str, Any]) -> Dict[str, Any]:
             "key": "interbank",
             "name": "Lãi Suất Liên Ngân Hàng",
             "val": f"{interbank:.2f}%",
-            "status": "bullish" if interbank < 3.0 else ("bearish" if interbank > 6.0 else "neutral"),
+            "status": "bullish" if interbank < IB_BULL else ("bearish" if interbank > IB_BEAR else "neutral"),
             "lead": "Thanh khoản liên ngân hàng duy trì thông thoáng hỗ trợ dòng tiền thị trường."
         },
         {
             "key": "credit",
             "name": "Tăng Trưởng Tín Dụng",
             "val": f"{credit:.1f}%",
-            "status": "bullish" if (12.0 <= credit <= 16.5) else ("neutral" if credit > 16.5 else "bearish"),
-            "lead": "Tín dụng tăng trưởng trong dải tối ưu 12-16% hỗ trợ sản xuất kinh doanh."
+            "status": "bullish" if (CRED_OPT_MIN <= credit <= CRED_OPT_MAX) else ("neutral" if credit > CRED_OPT_MAX else "bearish"),
+            "lead": f"Tín dụng tăng trưởng trong dải tối ưu {CRED_OPT_MIN:.0f}-{CRED_OPT_MAX:.0f}% hỗ trợ sản xuất kinh doanh."
         },
         {
             "key": "cpi",
             "name": "Lạm Phát CPI",
             "val": f"{cpi:.2f}%",
-            "status": "bullish" if cpi < 4.0 else ("neutral" if cpi <= 5.5 else "bearish"),
+            "status": "bullish" if cpi < CPI_BULL else ("neutral" if cpi <= CPI_CRIT_HIGH else "bearish"),
             "lead": "CPI dưới ngưỡng kiểm soát đảm bảo dư địa điều hành chính sách tiền tệ."
         },
         {
             "key": "pmi",
             "name": "Chỉ Số Sản Xuất PMI",
             "val": f"{pmi:.1f}",
-            "status": "bullish" if pmi >= 51.0 else ("bearish" if pmi < 49.0 else "neutral"),
+            "status": "bullish" if pmi >= PMI_EXP else ("bearish" if pmi < PMI_CONT else "neutral"),
             "lead": "Hoạt động sản xuất công nghiệp và đơn hàng mới duy trì đà mở rộng."
         },
         {
             "key": "fx",
             "name": "Tỷ Giá USD/VND",
             "val": f"{usdvnd:,.0f}",
-            "status": "bullish" if usdvnd < 25000 else ("bearish" if usdvnd > 26000 else "neutral"),
+            "status": "bullish" if usdvnd < FX_BULL else ("bearish" if usdvnd > FX_BEAR else "neutral"),
             "lead": "Tỷ giá ổn định giảm áp lực can thiệp hút ròng của Ngân hàng Nhà nước."
         },
         {
@@ -602,47 +650,54 @@ def analyze_macro_clock(macro: Dict[str, Any]) -> Dict[str, Any]:
     gdp_val = float(macro.get("gdp_growth_yoy") or macro.get("vn_gdp_yoy") or 7.0)
     cpi_val = float(macro.get("cpi_yoy") or macro.get("vn_cpi_yoy") or 4.5)
 
-    if gdp_val > 6.5:
+    if gdp_val > GDP_HIGH:
         gdp_phase = "Expansion"
-        gdp_phase_vi = "Tăng Trưởng Cao (>6.5%)"
-    elif gdp_val < 5.5:
+        gdp_phase_vi = f"Tăng Trưởng Cao (>{GDP_HIGH}%)"
+    elif gdp_val < GDP_SLOW:
         gdp_phase = "Slowdown"
-        gdp_phase_vi = "Tăng Trưởng Chậm (<5.5%)"
+        gdp_phase_vi = f"Tăng Trưởng Chậm (<{GDP_SLOW}%)"
     else:
         gdp_phase = "Stable"
-        gdp_phase_vi = "Tăng Trưởng Cân Bằng (5.5 - 6.5%)"
+        gdp_phase_vi = f"Tăng Trưởng Cân Bằng ({GDP_SLOW} - {GDP_HIGH}%)"
 
-    if cpi_val > 5.5:
+    if cpi_val > CPI_CRIT_HIGH:
         infl_state = "Hot"
-        infl_state_vi = "Lạm Phát Nóng (>5.5%)"
-    elif cpi_val < 3.5:
+        infl_state_vi = f"Lạm Phát Nóng (>{CPI_CRIT_HIGH}%)"
+    elif cpi_val < CPI_COOL:
         infl_state = "Cool"
-        infl_state_vi = "Lạm Phát Hạ Nhiệt (<3.5%)"
+        infl_state_vi = f"Lạm Phát Hạ Nhiệt (<{CPI_COOL}%)"
     else:
         infl_state = "Stable"
-        infl_state_vi = "Lạm Phát Trong Tầm Kiểm Soát (3.5 - 5.5%)"
+        infl_state_vi = f"Lạm Phát Trong Tầm Kiểm Soát ({CPI_COOL} - {CPI_CRIT_HIGH}%)"
+
+    _mc_cfg = _narratives.get("macroClock") or {}
+    goldilocks = _mc_cfg.get("goldilocks", {})
+    overheating = _mc_cfg.get("overheating", {})
+    stagflation = _mc_cfg.get("stagflation", {})
+    reflation = _mc_cfg.get("reflation", {})
+    transition = _mc_cfg.get("transition", {})
 
     clock_map = {
         ("Expansion", "Cool"): {
-            "quadrant": "🟢 GOLDILOCKS",
+            "quadrant": goldilocks.get("quadrant", "🟢 GOLDILOCKS"),
             "quadrantKey": "goldilocks",
-            "titleVi": "Vàng Kinh Tế (Goldilocks)",
-            "desc": "Tăng trưởng cao + Lạm phát hạ nhiệt • Môi trường lý tưởng nhất cho cổ phiếu",
+            "titleVi": goldilocks.get("titleVi", "Vàng Kinh Tế (Goldilocks)"),
+            "desc": goldilocks.get("desc", "Tăng trưởng cao + Lạm phát hạ nhiệt • Môi trường lý tưởng nhất cho cổ phiếu"),
             "colorClass": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
-            "favored": ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Bán Lẻ", "Công Nghệ"],
-            "avoided": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm", "Tiện Ích Điện Nước"]
+            "favored": goldilocks.get("favored", ["Chứng Khoán", "Ngân Hàng", "Bất Động Sản", "Bán Lẻ", "Công Nghệ"]),
+            "avoided": goldilocks.get("avoided", ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm", "Tiện Ích Điện Nước"])
         },
         ("Expansion", "Hot"): {
-            "quadrant": "🟠 OVERHEATING",
+            "quadrant": overheating.get("quadrant", "🟠 OVERHEATING"),
             "quadrantKey": "overheating",
-            "titleVi": "Tăng Nhiệt Đỉnh Chu Kỳ (Overheating)",
-            "desc": "Tăng trưởng cao + Lạm phát nóng • Ưu tiên tài sản thực và nhóm hàng hóa",
+            "titleVi": overheating.get("titleVi", "Tăng Nhiệt Đỉnh Chu Kỳ (Overheating)"),
+            "desc": overheating.get("desc", "Tăng trưởng cao + Lạm phát nóng • Ưu tiên tài sản thực và nhóm hàng hóa"),
             "colorClass": "text-amber-400 bg-amber-500/20 border-amber-500/40",
-            "favored": ["Năng Lượng & Dầu Khí", "Thép & Vật Liệu", "Tiện Ích Điện Nước"],
-            "avoided": ["Ngân Hàng", "Bất Động Sản", "Chứng Khoán"]
+            "favored": overheating.get("favored", ["Năng Lượng & Dầu Khí", "Thép & Vật Liệu", "Tiện Ích Điện Nước"]),
+            "avoided": overheating.get("avoided", ["Ngân Hàng", "Bất Động Sản", "Chứng Khoán"])
         },
         ("Expansion", "Stable"): {
-            "quadrant": "🟠 OVERHEATING",
+            "quadrant": overheating.get("quadrant", "🟠 OVERHEATING"),
             "quadrantKey": "overheating",
             "titleVi": "Mở Rộng Tăng Tốc (Expansion)",
             "desc": "Tăng trưởng mạnh + Lạm phát vừa phải • Chu kỳ mở rộng bùng nổ của doanh nghiệp",
@@ -651,34 +706,34 @@ def analyze_macro_clock(macro: Dict[str, Any]) -> Dict[str, Any]:
             "avoided": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm"]
         },
         ("Slowdown", "Hot"): {
-            "quadrant": "🔴 STAGFLATION",
+            "quadrant": stagflation.get("quadrant", "🔴 STAGFLATION"),
             "quadrantKey": "stagflation",
-            "titleVi": "Đình Lạm Rủi Ro (Stagflation)",
-            "desc": "Tăng trưởng chậm + Lạm phát cao • Nguy cơ chi phí đẩy, ưu tiên tiền mặt & vàng",
+            "titleVi": stagflation.get("titleVi", "Đình Lạm Rủi Ro (Stagflation)"),
+            "desc": stagflation.get("desc", "Tăng trưởng chậm + Lạm phát cao • Nguy cơ chi phí đẩy, ưu tiên tiền mặt & vàng"),
             "colorClass": "text-rose-400 bg-rose-500/20 border-rose-500/40",
-            "favored": ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm & Y Tế", "Vàng", "Tiền Mặt"],
-            "avoided": ["Chứng Khoán", "Bất Động Sản", "Ngân Hàng", "Xây Dựng"]
+            "favored": stagflation.get("favored", ["Tiêu Dùng Thiết Yếu (FMCG)", "Dược Phẩm & Y Tế", "Vàng", "Tiền Mặt"]),
+            "avoided": stagflation.get("avoided", ["Chứng Khoán", "Bất Động Sản", "Ngân Hàng", "Xây Dựng"])
         },
         ("Slowdown", "Cool"): {
-            "quadrant": "🔵 REFLATION",
+            "quadrant": reflation.get("quadrant", "🔵 REFLATION"),
             "quadrantKey": "reflation",
-            "titleVi": "Tái Nới Lỏng Kích Thích (Reflation)",
-            "desc": "Tăng trưởng chậm + Lạm phát hạ nhiệt • Dư địa nới lỏng chính sách, đón đầu phục hồi",
+            "titleVi": reflation.get("titleVi", "Tái Nới Lỏng Kích Thích (Reflation)"),
+            "desc": reflation.get("desc", "Tăng trưởng chậm + Lạm phát hạ nhiệt • Dư địa nới lỏng chính sách, đón đầu phục hồi"),
             "colorClass": "text-cyan-400 bg-cyan-500/20 border-cyan-500/40",
-            "favored": ["Chứng Khoán", "Ngân Hàng", "Đầu Tư Công & Xây Dựng", "Công Nghệ"],
-            "avoided": ["FMCG", "Tiện Ích Điện Nước"]
+            "favored": reflation.get("favored", ["Chứng Khoán", "Ngân Hàng", "Đầu Tư Công & Xây Dựng", "Công Nghệ"]),
+            "avoided": reflation.get("avoided", ["FMCG", "Tiện Ích Điện Nước"])
         },
         ("Slowdown", "Stable"): {
-            "quadrant": "🔵 REFLATION",
+            "quadrant": reflation.get("quadrant", "🔵 REFLATION"),
             "quadrantKey": "reflation",
-            "titleVi": "Tái Nới Lỏng Kích Thích (Reflation)",
+            "titleVi": reflation.get("titleVi", "Tái Nới Lỏng Kích Thích (Reflation)"),
             "desc": "Tăng trưởng chậm lại + Lạm phát ổn định • Chu kỳ kích thích kinh tế dần hình thành",
             "colorClass": "text-cyan-400 bg-cyan-500/20 border-cyan-500/40",
             "favored": ["Chứng Khoán", "Ngân Hàng", "Đầu Tư Công"],
             "avoided": ["FMCG", "Tiện Ích"]
         },
         ("Stable", "Hot"): {
-            "quadrant": "🟠 OVERHEATING",
+            "quadrant": overheating.get("quadrant", "🟠 OVERHEATING"),
             "quadrantKey": "overheating",
             "titleVi": "Tăng Nhiệt Thận Trọng",
             "desc": "Tăng trưởng cân bằng + Lạm phát nhích cao • Đề phòng SBV hút tiền thanh khoản",
@@ -687,22 +742,22 @@ def analyze_macro_clock(macro: Dict[str, Any]) -> Dict[str, Any]:
             "avoided": ["BĐS Đầu Cơ", "Chứng Khoán"]
         },
         ("Stable", "Cool"): {
-            "quadrant": "🟢 GOLDILOCKS",
+            "quadrant": goldilocks.get("quadrant", "🟢 GOLDILOCKS"),
             "quadrantKey": "goldilocks",
-            "titleVi": "Cân Bằng Thuận Lợi (Goldilocks)",
-            "desc": "Tăng trưởng ổn định + Lạm phát thấp • Tích lũy cổ phiếu giá trị có nền tảng vững chắc",
+            "titleVi": goldilocks.get("titleVi", "Cân Bằng Thuận Lợi (Goldilocks)"),
+            "desc": goldilocks.get("desc", "Tăng trưởng ổn định + Lạm phát thấp • Tích lũy cổ phiếu giá trị có nền tảng vững chắc"),
             "colorClass": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
-            "favored": ["Ngân Hàng", "Công Nghệ", "Bán Lẻ", "Chứng Khoán"],
-            "avoided": ["FMCG", "Y Tế"]
+            "favored": goldilocks.get("favored", ["Ngân Hàng", "Công Nghệ", "Bán Lẻ", "Chứng Khoán"]),
+            "avoided": goldilocks.get("avoided", ["FMCG", "Y Tế"])
         },
         ("Stable", "Stable"): {
-            "quadrant": "⚪ TRANSITION",
+            "quadrant": transition.get("quadrant", "⚪ TRANSITION"),
             "quadrantKey": "transition",
-            "titleVi": "Chuyển Giao Cân Bằng (Transition)",
-            "desc": "Tín hiệu vĩ mô trung tính • Phù hợp nắm giữ danh mục và chọn lọc kỹ lưỡng",
+            "titleVi": transition.get("titleVi", "Chuyển Giao Cân Bằng (Transition)"),
+            "desc": transition.get("desc", "Tín hiệu vĩ mô trung tính • Phù hợp nắm giữ danh mục và chọn lọc kỹ lưỡng"),
             "colorClass": "text-gray-300 bg-gray-500/20 border-gray-500/40",
-            "favored": ["Ngân Hàng Lớn", "Công Nghệ (FPT)", "Bán Lẻ Đầu Ngành"],
-            "avoided": ["BĐS Đầu Cơ", "Cổ Phiếu Đòn Bẩy Cao"]
+            "favored": transition.get("favored", ["Ngân Hàng Lớn", "Công Nghệ (FPT)", "Bán Lẻ Đầu Ngành"]),
+            "avoided": transition.get("avoided", ["BĐS Đầu Cơ", "Cổ Phiếu Đòn Bẩy Cao"])
         },
     }
 
@@ -865,79 +920,86 @@ def detect_scenarios_and_tail_risks(
         },
     }
 
-    # 6 Named Tail-Risks (Kiểm tra trigger thực tế)
+    # 6 Named Tail-Risks (Kiểm tra trigger thực tế theo Single Source of Truth)
     active_tail_risks = []
+    _tail_narr = _narratives.get("tailRisks") or {}
 
     # 1. Liquidity Crisis
-    if interbank > sbv_rate + 2.0:
+    if interbank > sbv_rate + IB_CRISIS_SPREAD:
+        t_meta = _tail_narr.get("liquidity_crisis", {})
         active_tail_risks.append({
             "id": "liquidity_crisis",
-            "name": "Khủng Hoảng Thanh Khoản (Liquidity Crisis)",
-            "signal": "STRONG SELL",
+            "name": t_meta.get("name", "Khủng Hoảng Thanh Khoản (Liquidity Crisis)"),
+            "signal": t_meta.get("signal", "STRONG SELL"),
             "badge": "bg-rose-500 text-white animate-pulse",
-            "severity": "CRITICAL",
-            "trigger": f"Lãi suất liên ngân hàng qua đêm ({interbank:.2f}%) vượt trần lãi suất SBV ({sbv_rate:.2f}%) + 2.0pp.",
-            "impact": "Áp lực thanh khoản hệ thống ngắn hạn căng thẳng, room tín dụng bị co hẹp, chi phí vốn ngân hàng tăng mạnh.",
+            "severity": t_meta.get("severity", "CRITICAL"),
+            "trigger": f"Lãi suất liên ngân hàng qua đêm ({interbank:.2f}%) vượt trần lãi suất SBV ({sbv_rate:.2f}%) + {IB_CRISIS_SPREAD:.1f}pp.",
+            "impact": t_meta.get("impact", "Áp lực thanh khoản hệ thống ngắn hạn căng thẳng, room tín dụng bị co hẹp, chi phí vốn ngân hàng tăng mạnh."),
         })
 
     # 2. Stagflation
-    if gdp < 4.0 and cpi > 5.5 and risk_score > 60:
+    if gdp < GDP_RECESSION and cpi > CPI_CRIT_HIGH and risk_score > 60:
+        t_meta = _tail_narr.get("stagflation", {})
         active_tail_risks.append({
             "id": "stagflation",
-            "name": "Đình Lạm (Stagflation Shock)",
-            "signal": "STRONG SELL",
+            "name": t_meta.get("name", "Đình Lạm (Stagflation Shock)"),
+            "signal": t_meta.get("signal", "STRONG SELL"),
             "badge": "bg-rose-500 text-white animate-pulse",
-            "severity": "CRITICAL",
-            "trigger": f"GDP ({gdp:.2f}%) dưới 4% trong khi CPI ({cpi:.2f}%) vượt 5.5% và điểm rủi ro vĩ mô ở mức cao ({risk_score}/100).",
-            "impact": "Biên lợi nhuận của hầu hết doanh nghiệp niêm yết bị bào mòn bởi chi phí đầu vào, nguy cơ suy thoái tăng vọt.",
+            "severity": t_meta.get("severity", "CRITICAL"),
+            "trigger": f"GDP ({gdp:.2f}%) dưới {GDP_RECESSION:.0f}% trong khi CPI ({cpi:.2f}%) vượt {CPI_CRIT_HIGH:.1f}% và điểm rủi ro vĩ mô ở mức cao ({risk_score}/100).",
+            "impact": t_meta.get("impact", "Biên lợi nhuận của hầu hết doanh nghiệp niêm yết bị bào mòn bởi chi phí đầu vào, nguy cơ suy thoái tăng vọt."),
         })
 
     # 3. Credit Crunch
-    if credit < 10.0 and sbv_rate > 5.5:
+    if credit < CRED_CRUNCH and sbv_rate > IB_TIGHT:
+        t_meta = _tail_narr.get("credit_crunch", {})
         active_tail_risks.append({
             "id": "credit_crunch",
-            "name": "Thắt Chặt Tín Dụng (Credit Crunch)",
-            "signal": "SELL",
+            "name": t_meta.get("name", "Thắt Chặt Tín Dụng (Credit Crunch)"),
+            "signal": t_meta.get("signal", "SELL"),
             "badge": "bg-amber-500 text-white",
-            "severity": "HIGH",
+            "severity": t_meta.get("severity", "HIGH"),
             "trigger": f"Tăng trưởng tín dụng thấp ({credit:.1f}%) trong bối cảnh lãi suất điều hành cao ({sbv_rate:.1f}%).",
-            "impact": "Dòng vốn lưu động doanh nghiệp bị nghẽn, áp lực nợ xấu và đảo nợ ngân hàng gia tăng.",
+            "impact": t_meta.get("impact", "Dòng vốn lưu động doanh nghiệp bị nghẽn, áp lực nợ xấu và đảo nợ ngân hàng gia tăng."),
         })
 
     # 4. External Shock
-    if usdvnd > 25700 or (vn10y - us10y) < -1.0:
+    if usdvnd > FX_SHOCK or (vn10y - us10y) < -1.0:
+        t_meta = _tail_narr.get("external_shock", {})
         active_tail_risks.append({
             "id": "external_shock",
-            "name": "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)",
-            "signal": "CAUTION",
+            "name": t_meta.get("name", "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)"),
+            "signal": t_meta.get("signal", "CAUTION"),
             "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
-            "severity": "MEDIUM",
+            "severity": t_meta.get("severity", "MEDIUM"),
             "trigger": f"Tỷ giá USD/VND ({usdvnd:,.0f}) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu ({vn10y - us10y:.2f}%).",
-            "impact": "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng.",
+            "impact": t_meta.get("impact", "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng."),
         })
 
     # 5. Soft Landing
-    if risk_score < 50 and gdp >= 5.5 and cpi <= 5.0 and (vn10y - sbv_rate) >= -0.3:
+    if risk_score < 50 and gdp >= GDP_SLOW and cpi <= 5.0 and (vn10y - sbv_rate) >= -0.3:
+        t_meta = _tail_narr.get("soft_landing", {})
         active_tail_risks.append({
             "id": "soft_landing",
-            "name": "Kinh Tế Hạ Cánh Mềm (Soft Landing)",
-            "signal": "BUY",
+            "name": t_meta.get("name", "Kinh Tế Hạ Cánh Mềm (Soft Landing)"),
+            "signal": t_meta.get("signal", "BUY"),
             "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
-            "severity": "POSITIVE",
+            "severity": t_meta.get("severity", "POSITIVE"),
             "trigger": f"Điểm rủi ro vĩ mô thấp ({risk_score}/100), GDP tăng trưởng tốt ({gdp:.2f}%), lạm phát trong tầm kiểm soát ({cpi:.2f}%).",
-            "impact": "Kinh tế hạ nhiệt an toàn, tạo nền tảng vững chắc cho chu kỳ tăng trưởng lợi nhuận doanh nghiệp.",
+            "impact": t_meta.get("impact", "Kinh tế hạ nhiệt an toàn, tạo nền tảng vững chắc cho chu kỳ tăng trưởng lợi nhuận doanh nghiệp."),
         })
 
     # 6. Bull Opportunity
-    if risk_score < 40 and gdp >= 6.5:
+    if risk_score < 40 and gdp >= GDP_HIGH:
+        t_meta = _tail_narr.get("bull_opportunity", {})
         active_tail_risks.append({
             "id": "bull_opportunity",
-            "name": "Cơ Hội Bùng Nổ Vĩ Mô (Bull Opportunity)",
-            "signal": "STRONG BUY",
+            "name": t_meta.get("name", "Cơ Hội Bùng Nổ Vĩ Mô (Bull Opportunity)"),
+            "signal": t_meta.get("signal", "STRONG BUY"),
             "badge": "bg-emerald-500 text-white",
-            "severity": "POSITIVE",
+            "severity": t_meta.get("severity", "POSITIVE"),
             "trigger": f"Môi trường vĩ mô mở rộng toàn diện: Điểm rủi ro rất thấp ({risk_score}/100) kết hợp GDP bùng nổ ({gdp:.2f}%).",
-            "impact": "Cơ hội vàng giải ngân tích lũy cổ phiếu giá trị và nhóm cổ phiếu dẫn dắt thị trường.",
+            "impact": t_meta.get("impact", "Cơ hội vàng giải ngân tích lũy cổ phiếu giá trị và nhóm cổ phiếu dẫn dắt thị trường."),
         })
 
     return {
@@ -1109,27 +1171,27 @@ def generate_executive_summary(
     gdp = float(macro.get("gdp_growth_yoy") or FALLBACK_GDP)
     risk_score = risk_info.get("riskScore", 50.0)
 
-    # 1. Key Risks (Sắp xếp theo mức độ nghiêm trọng)
+    # 1. Key Risks (Sắp xếp theo mức độ nghiêm trọng theo Single Source of Truth)
     key_risks = []
-    if usdvnd > 25600:
+    if usdvnd > FX_HIGH:
         key_risks.append({
-            "level": "Rất cao" if usdvnd > 25900 else "Cao",
+            "level": "Rất cao" if usdvnd > FX_CRIT_HIGH else "Cao",
             "title": "Áp Lực Tỷ Giá USD/VND & Can Thiệp Tiền Tệ",
             "risk": f"Tỷ giá USD/VND neo cao ở mức {usdvnd:,.0f} đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
             "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
         })
-    if interbank > 5.0:
+    if interbank > IB_HIGH:
         key_risks.append({
-            "level": "Cao" if interbank > 6.5 else "Trung bình",
+            "level": "Cao" if interbank > IB_CRIT_HIGH else "Trung bình",
             "title": "Lãi Suất Liên Ngân Hàng Tăng Nhiệt",
             "risk": f"Lãi suất liên ngân hàng qua đêm đạt {interbank:.2f}%, báo hiệu thanh khoản cục bộ của hệ thống ngân hàng bị thắt chặt.",
             "color": "text-amber-400 bg-amber-500/10 border-amber-500/30"
         })
-    if cpi > 4.5:
+    if cpi > CPI_CEIL:
         key_risks.append({
             "level": "Cao",
             "title": "Lạm Phát CPI Vượt Ngưỡng Mục Tiêu",
-            "risk": f"CPI tăng {cpi:.2f}% YoY vượt trần kiểm soát 4.5%, thu hẹp dư địa nới lỏng chính sách tiền tệ của SBV.",
+            "risk": f"CPI tăng {cpi:.2f}% YoY vượt trần kiểm soát {CPI_CEIL}%, thu hẹp dư địa nới lỏng chính sách tiền tệ của SBV.",
             "color": "text-orange-400 bg-orange-500/10 border-orange-500/30"
         })
 
@@ -1143,24 +1205,28 @@ def generate_executive_summary(
                 "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
             })
 
+    exec_narr = _narratives.get("executiveSummary") or {}
     if not key_risks:
-        key_risks.append({
-            "level": "Trung bình",
-            "title": "Biến Động Địa Chính Trị Toàn Cầu",
-            "risk": "Biến động giá dầu thô Brent và chính sách lãi suất neo cao của Fed tạo rủi ro nhập khẩu lạm phát.",
-            "color": "text-blue-400 bg-blue-500/10 border-blue-500/30"
-        })
+        def_risks = exec_narr.get("defaultKeyRisks") or [
+            {
+                "level": "Trung bình",
+                "title": "Biến Động Địa Chính Trị Toàn Cầu",
+                "risk": "Biến động giá dầu thô Brent và chính sách lãi suất neo cao của Fed tạo rủi ro nhập khẩu lạm phát.",
+                "color": "text-blue-400 bg-blue-500/10 border-blue-500/30"
+            }
+        ]
+        key_risks.extend(def_risks)
 
     # 2. Catalysts (Động lực tích cực)
     catalysts = []
-    if gdp >= 6.0:
+    if gdp >= GDP_MOD:
         catalysts.append({
             "level": "Cao",
             "title": "Tăng Trưởng GDP Phục Hồi Mạnh Mẽ",
             "desc": f"Tăng trưởng kinh tế đạt {gdp:.2f}% YoY, tạo bệ phóng vững chắc cho lợi nhuận sau thuế của các doanh nghiệp niêm yết.",
             "color": "text-emerald-400 bg-emerald-500/10 border-emerald-500/30"
         })
-    if pmi >= 50.0:
+    if pmi >= PMI_NEUT:
         catalysts.append({
             "level": "Cao",
             "title": "Khu Vực Sản Xuất Duy Trì Đà Mở Rộng",
@@ -1174,21 +1240,29 @@ def generate_executive_summary(
             "desc": f"P/E VN-Index ở mức {market_pe:.2f}x (dưới trung vị 10 năm), tạo biên an toàn lớn cho chiến lược đầu tư giá trị và tích sản dài hạn.",
             "color": "text-cyan-400 bg-cyan-500/10 border-cyan-500/30"
         })
-    catalysts.append({
-        "level": "Trung bình",
-        "title": "Kỳ Vọng Nâng Hạng Thị Trường FTSE / MSCI",
-        "desc": "Quy định Non-Pre-funding (Thông tư 68) đi vào thực thi tháo gỡ nút thắt lớn nhất cho dòng vốn ngoại tổ chức giải ngân.",
-        "color": "text-indigo-400 bg-indigo-500/10 border-indigo-500/30"
-    })
+    def_cats = exec_narr.get("defaultCatalysts") or [
+        {
+            "level": "Trung bình",
+            "title": "Kỳ Vọng Nâng Hạng Thị Trường FTSE / MSCI",
+            "desc": "Quy định Non-Pre-funding (Thông tư 68) đi vào thực thi tháo gỡ nút thắt lớn nhất cho dòng vốn ngoại tổ chức giải ngân.",
+            "color": "text-indigo-400 bg-indigo-500/10 border-indigo-500/30"
+        }
+    ]
+    catalysts.extend(def_cats)
 
     # 3. Key Takeaways
     regime_name = regime.get("titleVi", "Mở Rộng Tăng Trưởng")
     stance_text = "Ưu tiên tích lũy cổ phiếu giá trị" if risk_score < 55 else "Duy trì vị thế cân bằng phòng thủ"
 
+    takeaways_tpl = exec_narr.get("takeawaysTemplates") or {}
+    t_insight = takeaways_tpl.get("insight", "⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha '{regimeName}' với điểm rủi ro vĩ mô {riskScore}/100. P/E thị trường {marketPe}x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.")
+    t_risk = takeaways_tpl.get("risk", "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND ({usdvnd}) và thanh khoản liên ngân hàng ({interbank}%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.")
+    t_opp = takeaways_tpl.get("opportunity", "Cơ hội lớn nhất: {stanceText}, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap).")
+
     key_takeaways = [
-        f"⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha '{regime_name}' với điểm rủi ro vĩ mô {risk_score}/100. P/E thị trường {market_pe:.2f}x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
-        f"Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND ({usdvnd:,.0f}) và thanh khoản liên ngân hàng ({interbank:.2f}%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
-        f"Cơ hội lớn nhất: {stance_text}, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
+        t_insight.format(regimeName=regime_name, riskScore=f"{risk_score:.0f}", marketPe=f"{market_pe:.2f}"),
+        t_risk.format(usdvnd=f"{usdvnd:,.0f}", interbank=f"{interbank:.2f}"),
+        t_opp.format(stanceText=stance_text),
     ]
 
     return {
@@ -1222,77 +1296,81 @@ def calculate_style_indices(
     if vn30_pb is None:
         vn30_pb = round(vnindex_pb * 1.10, 2)
 
-    # VN Diamond có P/E chiết khấu hơn VN30 khoảng 15-20% do tỷ trọng Bank/Bán lẻ lớn và room ngoại kín
     diamond_pe = round(vn30_pe * 0.82, 2)
     diamond_pb = round(vn30_pb * 0.88, 2)
 
-    # VN Midcap có P/E cao hơn VN-Index khoảng 15-20% do beta cao và định giá kỳ vọng tăng trưởng
     midcap_pe = round(vnindex_pe * 1.18, 2)
     midcap_pb = round(vnindex_pb * 0.92, 2)
 
     vn100_pe = round((vn30_pe * 0.75 + midcap_pe * 0.25), 2)
     vn100_pb = round((vn30_pb * 0.75 + midcap_pb * 0.25), 2)
 
+    style_narr = _narratives.get("styleIndices") or {}
+    s_vnindex = style_narr.get("VNINDEX", {})
+    s_vn30 = style_narr.get("VN30", {})
+    s_diamond = style_narr.get("VNDIAMOND", {})
+    s_midcap = style_narr.get("VNMIDCAP", {})
+
     return [
         {
             "code": "VNINDEX",
-            "name": "VN-Index (Toàn Thị Trường)",
-            "proxy": "VNINDEX",
-            "icon": "🏛️",
-            "type": "Broad Market",
+            "name": s_vnindex.get("name", "VN-Index (Toàn Thị Trường)"),
+            "proxy": s_vnindex.get("proxy", "VNINDEX"),
+            "icon": s_vnindex.get("icon", "🏛️"),
+            "type": s_vnindex.get("type", "Broad Market"),
             "pe": vnindex_pe,
             "pb": vnindex_pb,
             "beta": 1.00,
             "peBand": "Rất Rẻ" if vnindex_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if vnindex_pe < PE_BAND_CHEAP else "Hợp Lý"),
             "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
-            "flowCharacter": "Dòng tiền toàn thị trường, phản ánh tổng thể chu kỳ kinh tế",
-            "strategy": "Tích lũy DCA dài hạn theo nhịp điều chỉnh của chỉ số",
-            "weightAdvice": "Benchmark chuẩn mực"
+            "flowCharacter": s_vnindex.get("flowCharacter", "Dòng tiền toàn thị trường, phản ánh tổng thể chu kỳ kinh tế"),
+            "strategy": s_vnindex.get("strategy", "Tích lũy DCA dài hạn theo nhịp điều chỉnh của chỉ số"),
+            "weightAdvice": s_vnindex.get("weightAdvice", "Benchmark chuẩn mực")
         },
         {
             "code": "VN30",
-            "name": "VN30 (Top 30 Blue-Chips)",
-            "proxy": "E1VFVN30",
-            "icon": "🏢",
-            "type": "Large-Cap",
+            "name": s_vn30.get("name", "VN30 (Top 30 Blue-Chips)"),
+            "proxy": s_vn30.get("proxy", "E1VFVN30"),
+            "icon": s_vn30.get("icon", "🏢"),
+            "type": s_vn30.get("type", "Large-Cap"),
             "pe": vn30_pe,
             "pb": vn30_pb,
             "beta": 0.95,
             "peBand": "Rất Rẻ" if vn30_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if vn30_pe < PE_BAND_CHEAP else "Hợp Lý"),
             "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
-            "flowCharacter": "Trụ đỡ thị trường, nơi dòng vốn ETF và tổ chức nước ngoài giải ngân đầu tiên",
-            "strategy": "Phòng thủ vững chắc, hưởng lợi khi thị trường nâng hạng FTSE",
-            "weightAdvice": "Chiếm 40 - 50% tỷ trọng cổ phiếu"
+            "flowCharacter": s_vn30.get("flowCharacter", "Dòng vốn ngoại và tổ chức lớn, thanh khoản cao nhất"),
+            "strategy": s_vn30.get("strategy", "Nắm giữ nòng cốt danh mục, phòng thủ trước biến động"),
+            "weightAdvice": s_vn30.get("weightAdvice", "40% - 50% danh mục")
         },
         {
             "code": "VNDIAMOND",
-            "name": "VN Diamond (Cổ Phiếu Kim Cương)",
-            "proxy": "FUEVFVND",
-            "icon": "💎",
-            "type": "Quality & Foreign Room",
+            "name": s_diamond.get("name", "VN Diamond (Kín Room Ngoại)"),
+            "proxy": s_diamond.get("proxy", "FUEVFVND"),
+            "icon": s_diamond.get("icon", "💎"),
+            "type": s_diamond.get("type", "Quality / Foreign Room"),
             "pe": diamond_pe,
             "pb": diamond_pb,
-            "beta": 1.08,
-            "peBand": "Siêu Hấp Dẫn" if diamond_pe < 10.0 else "Rất Rẻ",
-            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40 animate-pulse",
-            "flowCharacter": "Nhóm cổ phiếu kín room ngoại (FPT, MWG, PNJ, REE, TCB...), thanh khoản chất lượng",
-            "strategy": "Định giá rẻ vượt trội so với chất lượng doanh nghiệp, điểm trúng dòng vốn ngoại",
-            "weightAdvice": "Chiếm 25 - 35% tỷ trọng cổ phiếu"
+            "beta": 0.88,
+            "peBand": "Rất Rẻ" if diamond_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if diamond_pe < PE_BAND_CHEAP else "Hợp Lý"),
+            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "flowCharacter": s_diamond.get("flowCharacter", "Dòng vốn ngoại ủy thác chất lượng cao, cổ phiếu đầu ngành P/E hấp dẫn"),
+            "strategy": s_diamond.get("strategy", "Tích sản dài hạn, hưởng lợi từ sóng nâng hạng và kết quả kinh doanh vượt trội"),
+            "weightAdvice": s_diamond.get("weightAdvice", "25% - 35% danh mục")
         },
         {
             "code": "VNMIDCAP",
-            "name": "VN Midcap (Top 70 Vốn Hóa Vừa)",
-            "proxy": "FUEDCMID",
-            "icon": "🚀",
-            "type": "High Beta Growth",
+            "name": s_midcap.get("name", "VN Midcap (Vốn Hóa Vừa)"),
+            "proxy": s_midcap.get("proxy", "FUEDCMID"),
+            "icon": s_midcap.get("icon", "🚀"),
+            "type": s_midcap.get("type", "Mid-Cap Growth"),
             "pe": midcap_pe,
             "pb": midcap_pb,
-            "beta": 1.32,
-            "peBand": "Hấp Dẫn" if midcap_pe < PE_BAND_CHEAP else "Cân Bằng",
-            "peBandColor": "text-teal-400 bg-teal-500/20 border-teal-500/40",
-            "flowCharacter": "Tập trung BĐS, Thép, Chứng khoán, dòng tiền cá nhân ưa chuộng, sóng tăng bốc nhất",
-            "strategy": "Gia tăng tỷ trọng khi chu kỳ nới lỏng tiền tệ mở rộng để tối đa hóa hiệu suất",
-            "weightAdvice": "Chiếm 20 - 30% tỷ trọng cổ phiếu"
+            "beta": 1.25,
+            "peBand": "Rất Rẻ" if midcap_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if midcap_pe < PE_BAND_CHEAP else "Hợp Lý"),
+            "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
+            "flowCharacter": s_midcap.get("flowCharacter", "Dòng tiền cá nhân sôi động, Beta cao, nhạy sóng đầu cơ và tăng trưởng nhanh"),
+            "strategy": s_midcap.get("strategy", "Tối ưu hóa lợi nhuận trong pha tăng trưởng (Expansion) và bùng nổ thanh khoản"),
+            "weightAdvice": s_midcap.get("weightAdvice", "15% - 25% danh mục")
         },
         {
             "code": "VN100",
@@ -1303,7 +1381,7 @@ def calculate_style_indices(
             "pe": vn100_pe,
             "pb": vn100_pb,
             "beta": 1.05,
-            "peBand": "Rất Rẻ" if vn100_pe < 12.0 else "Rẻ",
+            "peBand": "Rất Rẻ" if vn100_pe < PE_BAND_DEEP_VALUE else ("Rẻ" if vn100_pe < PE_BAND_CHEAP else "Hợp Lý"),
             "peBandColor": "text-emerald-400 bg-emerald-500/20 border-emerald-500/40",
             "flowCharacter": "Bao phủ 100 cổ phiếu hàng đầu chiếm hơn 90% vốn hóa thị trường",
             "strategy": "Cân bằng hoàn hảo giữa sức mạnh Blue-chip và tiềm năng bứt phá của Midcap",

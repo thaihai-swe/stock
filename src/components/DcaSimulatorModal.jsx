@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
-import { fmtMoney, calcBreakEvenPrice } from '../utils/format.js';
+import { useEffect, useMemo, useState } from 'react';
+import { calcBreakEvenPrice, fmtMoney } from '../utils/format.js';
+import Modal from './common/Modal.jsx';
 
 export default function DcaSimulatorModal({
   isOpen,
@@ -231,71 +232,98 @@ export default function DcaSimulatorModal({
     'bg-cyan-50/20 dark:bg-cyan-950/20 hover:bg-cyan-50/50 dark:hover:bg-cyan-950/40',
   ];
 
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div className="modal-backdrop" onClick={onClose} />
-      <div className="modal-dialog max-w-5xl max-h-[92vh] flex flex-col">
-        
-        {/* --- Header & Tabs Switcher --- */}
-        <div className="bg-gradient-to-r from-indigo-700 via-blue-700 to-indigo-800 p-5 sm:p-6 text-white shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl p-2.5 bg-white/10 rounded-2xl backdrop-blur-md shadow-xs">🪜</span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight">
-                    Mô Phỏng Mua Bình Quân Giá & Lập Kế Hoạch Gom Cổ Phiếu
-                  </h3>
-                  <span className="text-[10px] uppercase font-bold bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full shadow-xs">
-                    PRO DCA
-                  </span>
-                </div>
-                <p className="text-blue-100 text-xs sm:text-sm mt-0.5">
-                  Lập kế hoạch mua gom đa tầng (Kim tự tháp ngược Martingale) và tính toán điểm hòa vốn chính xác
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
-              title="Đóng"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Tab Selector */}
-          <div className="flex items-center gap-2 mt-4 bg-black/20 p-1 rounded-2xl w-fit">
-            <button
-              onClick={() => setTabMode('grid')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
-                tabMode === 'grid'
-                  ? 'bg-white text-indigo-700 shadow-md scale-102'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <span>🪜 Kế Hoạch Mua Gom Đa Tầng (Lưới Martingale)</span>
-              <span className="text-[10px] bg-indigo-100 text-indigo-800 font-extrabold px-1.5 py-0.2 rounded-md">
-                Khuyên dùng
+  const customHeader = (
+    <div className="bg-gradient-to-r from-indigo-700 via-blue-700 to-indigo-800 p-5 sm:p-6 text-white shrink-0">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl p-2.5 bg-white/10 rounded-2xl backdrop-blur-md shadow-xs">🪜</span>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg sm:text-xl font-bold tracking-tight">
+                Mô Phỏng Mua Bình Quân Giá & Lập Kế Hoạch Gom Cổ Phiếu
+              </h3>
+              <span className="text-[10px] uppercase font-bold bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full shadow-xs">
+                PRO DCA
               </span>
-            </button>
-            <button
-              onClick={() => setTabMode('single')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
-                tabMode === 'single'
-                  ? 'bg-white text-indigo-700 shadow-md scale-102'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <span>⚡ Mua Bình Quân Nhanh (1 Lần)</span>
-            </button>
+            </div>
+            <p className="text-blue-100 text-xs sm:text-sm mt-0.5">
+              Lập kế hoạch mua gom đa tầng (Kim tự tháp ngược Martingale) và tính toán điểm hòa vốn chính xác
+            </p>
           </div>
         </div>
+        <button
+          onClick={onClose}
+          className="text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          title="Đóng (Esc)"
+        >
+          ✕
+        </button>
+      </div>
 
-        {/* --- Body (Scrollable) --- */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
+      {/* Tab Selector */}
+      <div className="flex items-center gap-2 mt-4 bg-black/20 p-1 rounded-2xl w-fit">
+        <button
+          onClick={() => setTabMode('grid')}
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${tabMode === 'grid'
+              ? 'bg-white text-indigo-700 shadow-md scale-102'
+              : 'text-blue-100 hover:text-white hover:bg-white/10'
+            }`}
+        >
+          <span>🪜 Kế Hoạch Mua Gom Đa Tầng (Lưới Martingale)</span>
+          <span className="text-[10px] bg-indigo-100 text-indigo-800 font-extrabold px-1.5 py-0.2 rounded-md">
+            Khuyên dùng
+          </span>
+        </button>
+        <button
+          onClick={() => setTabMode('single')}
+          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${tabMode === 'single'
+              ? 'bg-white text-indigo-700 shadow-md scale-102'
+              : 'text-blue-100 hover:text-white hover:bg-white/10'
+            }`}
+        >
+          <span>⚡ Mua Bình Quân Nhanh (1 Lần)</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  const customFooter = (
+    <div className="bg-slate-50 dark:bg-slate-900/90 px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+      <button
+        onClick={onClose}
+        className="btn-secondary !text-xs"
+      >
+        Đóng
+      </button>
+
+      {tabMode === 'single' && onNavigateBuy && (
+        <button
+          onClick={handleGoBuySingle}
+          disabled={plannedQty <= 0 || plannedPrice <= 0}
+          className="btn-primary !text-xs flex items-center gap-1.5"
+        >
+          <span>🛒</span>
+          <span>Đi Đến Nhật Ký Mua Này</span>
+        </button>
+      )}
+
+      {tabMode === 'grid' && (
+        <div className="text-xs text-slate-500 dark:text-slate-400">
+          💡 Bấm vào <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> tại dòng bạn muốn giải ngân trong bảng
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="5xl"
+      customHeader={customHeader}
+      customFooter={customFooter}
+    >
+      <div className="p-5 sm:p-6 space-y-6">
           {/* Thanh chọn cổ phiếu dùng chung */}
           <div className="bg-gray-50/80 dark:bg-gray-900/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -448,11 +476,10 @@ export default function DcaSimulatorModal({
                           key={val}
                           type="button"
                           onClick={() => setGridDropPct(Math.abs(val))}
-                          className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${
-                            gridDropPct === Math.abs(val)
+                          className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${gridDropPct === Math.abs(val)
                               ? 'bg-red-600 text-white shadow-2xs'
                               : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                          }`}
+                            }`}
                         >
                           {val}%
                         </button>
@@ -485,11 +512,10 @@ export default function DcaSimulatorModal({
                           key={val}
                           type="button"
                           onClick={() => setGridSteps(val)}
-                          className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${
-                            totalSteps === val
+                          className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-all ${totalSteps === val
                               ? 'bg-indigo-600 text-white shadow-2xs'
                               : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                          }`}
+                            }`}
                         >
                           {val}
                         </button>
@@ -521,11 +547,10 @@ export default function DcaSimulatorModal({
                           key={val}
                           type="button"
                           onClick={() => setGridBaseLot(val)}
-                          className={`text-xs px-2 py-1.5 rounded-lg font-semibold transition-all ${
-                            baseLot === val
+                          className={`text-xs px-2 py-1.5 rounded-lg font-semibold transition-all ${baseLot === val
                               ? 'bg-indigo-600 text-white shadow-2xs scale-102'
                               : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                          }`}
+                            }`}
                         >
                           {val}
                         </button>
@@ -544,11 +569,10 @@ export default function DcaSimulatorModal({
                     <button
                       type="button"
                       onClick={() => setGridVolumeStrategy('cluster3')}
-                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
-                        gridVolumeStrategy === 'cluster3'
+                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'cluster3'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
                           : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
+                        }`}
                     >
                       <div className="font-bold flex items-center gap-1">
                         <span>🌟 Kim tự tháp x2 mỗi 3 đợt</span>
@@ -561,11 +585,10 @@ export default function DcaSimulatorModal({
                     <button
                       type="button"
                       onClick={() => setGridVolumeStrategy('fixed')}
-                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
-                        gridVolumeStrategy === 'fixed'
+                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'fixed'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
                           : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
+                        }`}
                     >
                       <div className="font-bold">📐 Khối lượng đều</div>
                       <div className={`text-[10px] ${gridVolumeStrategy === 'fixed' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
@@ -576,11 +599,10 @@ export default function DcaSimulatorModal({
                     <button
                       type="button"
                       onClick={() => setGridVolumeStrategy('linear')}
-                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
-                        gridVolumeStrategy === 'linear'
+                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'linear'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
                           : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
+                        }`}
                     >
                       <div className="font-bold">📈 Tăng dần đều</div>
                       <div className={`text-[10px] ${gridVolumeStrategy === 'linear' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
@@ -591,11 +613,10 @@ export default function DcaSimulatorModal({
                     <button
                       type="button"
                       onClick={() => setGridVolumeStrategy('martingale')}
-                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${
-                        gridVolumeStrategy === 'martingale'
+                      className={`text-left p-2 rounded-xl border text-xs font-semibold transition-all ${gridVolumeStrategy === 'martingale'
                           ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs'
                           : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
+                        }`}
                     >
                       <div className="font-bold">🚀 Gấp đôi mỗi bước</div>
                       <div className={`text-[10px] ${gridVolumeStrategy === 'martingale' ? 'text-indigo-100' : 'text-gray-400 dark:text-gray-400'}`}>
@@ -693,7 +714,7 @@ export default function DcaSimulatorModal({
                     </span>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 font-medium hidden sm:block">
-                    Click <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Đặt Lệnh
+                    Click <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> để chuyển nhanh vào Form Nhật Ký
                   </div>
                 </div>
 
@@ -788,11 +809,10 @@ export default function DcaSimulatorModal({
                             {/* Cột % Giảm */}
                             <td className="py-2.5 px-3 text-center whitespace-nowrap">
                               <span
-                                className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${
-                                  row.dropRatio === 0
+                                className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${row.dropRatio === 0
                                     ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                                     : 'bg-red-50 dark:bg-rose-950/40 text-red-600 dark:text-rose-400 border border-red-100 dark:border-rose-900/40'
-                                }`}
+                                  }`}
                               >
                                 {row.dropPercentText}
                               </span>
@@ -1050,34 +1070,6 @@ export default function DcaSimulatorModal({
             </div>
           )}
         </div>
-
-        {/* --- Footer --- */}
-        <div className="bg-slate-50 dark:bg-slate-900/90 px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-          <button
-            onClick={onClose}
-            className="btn-secondary !text-xs"
-          >
-            Đóng
-          </button>
-
-          {tabMode === 'single' && onNavigateBuy && (
-            <button
-              onClick={handleGoBuySingle}
-              disabled={plannedQty <= 0 || plannedPrice <= 0}
-              className="btn-primary !text-xs flex items-center gap-1.5"
-            >
-              <span>🛒</span>
-              <span>Đi Đến Đặt Lệnh Mua Này</span>
-            </button>
-          )}
-
-          {tabMode === 'grid' && (
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              💡 Bấm vào <span className="font-bold text-indigo-600 dark:text-indigo-400">"🛒 Mua đợt này"</span> tại dòng bạn muốn giải ngân trong bảng
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

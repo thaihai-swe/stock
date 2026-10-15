@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatVND } from '../../utils/format.js';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function ValuationFormulasDeconstructionCard({
   valuation,
@@ -42,6 +43,7 @@ export default function ValuationFormulasDeconstructionCard({
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               Quantitative Framework
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Hệ thống 10 công thức toán học định lượng & ma trận trọng số phân ngành" />
           </div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-1">
             Giải Phẫu 10 Mô Hình Định Lượng & Cơ Chế Hội Tụ Consensus — {symbol}
@@ -102,6 +104,55 @@ export default function ValuationFormulasDeconstructionCard({
           </div>
         </div>
       </div>
+
+      {/* ── AI VALUATION CONVERGENCE & SENSITIVITY INTERPRETER ── */}
+      {valData?.aiConvergence && (
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50/90 via-indigo-50/50 to-white dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-gray-800 border border-purple-200/90 dark:border-purple-800/60 space-y-3.5 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-100 dark:border-purple-800/40 pb-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-base">🧠</span>
+              <h5 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
+                Luận Giải Hội Tụ Định Giá & Thử Tải Độ Nhạy (AI Valuation Convergence)
+              </h5>
+              <IntelligenceBadge
+                type={valData?.aiConvergence ? 'ai' : 'heuristic'}
+                provider={valData?.aiConvergence?.provider}
+              />
+            </div>
+            {valData.aiConvergence.preferredModelRecommendation && (
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300">
+                {valData.aiConvergence.preferredModelRecommendation}
+              </span>
+            )}
+          </div>
+
+          {valData.aiConvergence.convergenceHeadline && (
+            <h6 className="text-xs font-bold text-gray-900 dark:text-white">
+              {valData.aiConvergence.convergenceHeadline}
+            </h6>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
+            <div className="p-3.5 rounded-xl bg-white dark:bg-gray-800/80 border border-gray-200/70 dark:border-gray-700/60 space-y-1.5">
+              <span className="text-[11px] font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+                <span>⚖️</span> Phân Kỳ Mô Hình Dòng Tiền vs Bội Số P/E, P/B
+              </span>
+              <p className="text-gray-700 dark:text-gray-300">
+                {valData.aiConvergence.divergenceExplanation}
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white dark:bg-gray-800/80 border border-gray-200/70 dark:border-gray-700/60 space-y-1.5">
+              <span className="text-[11px] font-black uppercase text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                <span>📉</span> Thử Tải Kịch Bản Biến Động Chi Phí Vốn WACC
+              </span>
+              <p className="text-gray-700 dark:text-gray-300">
+                {valData.aiConvergence.sensitivityStory}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 2. LƯỚI GIẢI PHẪU 10 MÔ HÌNH ĐỊNH LƯỢNG ── */}
       <div className="space-y-4">

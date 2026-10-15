@@ -1,11 +1,16 @@
 import { useState, useMemo } from 'react';
 import { fmtMoney } from '../utils/format.js';
 import { computeOpportunityCost } from '../utils/stockAnalytics.js';
+import IntelligenceBadge from './common/IntelligenceBadge.jsx';
+import {
+  DEFAULT_BANK_INTEREST_RATE,
+  PRESET_BANK_INTEREST_RATES,
+} from '../utils/constants.js';
 
 const STORAGE_KEY = 'stock_portfolio_opportunity_cost_rate';
 
 export default function OpportunityCostCard({ buyOrders = [], totalCumulativePL = 0 }) {
-  // Đọc từ localStorage nếu người dùng đã lưu mức lãi suất trước đó, mặc định 6.0%
+  // Đọc từ localStorage nếu người dùng đã lưu mức lãi suất trước đó, mặc định theo cấu hình hệ thống
   const [bankRate, setBankRate] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -14,7 +19,7 @@ export default function OpportunityCostCard({ buyOrders = [], totalCumulativePL 
         if (!isNaN(parsed) && parsed > 0 && parsed <= 30) return parsed;
       }
     } catch {}
-    return 6.0;
+    return DEFAULT_BANK_INTEREST_RATE;
   });
 
   const [inputVal, setInputVal] = useState(bankRate.toString());
@@ -69,8 +74,9 @@ export default function OpportunityCostCard({ buyOrders = [], totalCumulativePL 
             🏦
           </span>
           <div>
-            <h3 className="font-bold text-gray-800 dark:text-slate-100 text-sm flex items-center gap-2">
+            <h3 className="font-bold text-gray-800 dark:text-slate-100 text-sm flex items-center gap-2 flex-wrap">
               <span>So Kèo Chi Phí Cơ Hội (Chứng Khoán vs Gửi Tiết Kiệm)</span>
+              <IntelligenceBadge type="heuristic" tooltip="Mô hình tính toán chi phí cơ hội lãi kép gửi tiết kiệm ngân hàng" />
               <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
                 outperformed
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/50'
@@ -91,7 +97,7 @@ export default function OpportunityCostCard({ buyOrders = [], totalCumulativePL 
             <span className="text-[10px] text-gray-400 dark:text-slate-500 font-semibold px-1 hidden xs:inline">
               Lãi suất:
             </span>
-            {[6.0, 7.0, 8.0].map(rate => (
+            {(Array.isArray(PRESET_BANK_INTEREST_RATES) ? PRESET_BANK_INTEREST_RATES : [5.0, 6.0, 7.0, 8.0]).map(rate => (
               <button
                 key={rate}
                 type="button"

@@ -1,6 +1,7 @@
 import React from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
-export default function ExtendedDupontCard({ extendedDupont }) {
+export default function ExtendedDupontCard({ extendedDupont, aiAuditComment }) {
   if (!extendedDupont) return null;
 
   const {
@@ -19,10 +20,11 @@ export default function ExtendedDupontCard({ extendedDupont }) {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Mô Hình Chuẩn Mực CFA Institute
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Đẳng thức toán học phân rã Extended DuPont 5 nhân tố CFA" />
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200">
               5 Nhân Tố Mở Rộng
             </span>
@@ -126,6 +128,25 @@ export default function ExtendedDupontCard({ extendedDupont }) {
           </div>
           <p className="text-xs text-emerald-900/90 dark:text-emerald-200/90 leading-relaxed">
             {qualityAssessment}
+          </p>
+        </div>
+      )}
+
+      {/* ── AI DUPONT QUALITY DIAGNOSTICIAN ── */}
+      {(aiAuditComment?.dupontEarningsQuality || extendedDupont?.dupontEarningsQuality) && (
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50/90 via-indigo-50/50 to-white dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-gray-800 border border-purple-200/80 dark:border-purple-800/60 space-y-2 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🧠</span>
+            <span className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-200">
+              Chẩn Đoán Lợi Nhuận Thuần Túy vs Đòn Bẩy Ảo (AI DuPont Diagnostician)
+            </span>
+            <IntelligenceBadge
+              type={aiAuditComment?.dupontEarningsQuality || extendedDupont?.dupontEarningsQuality ? 'ai' : 'heuristic'}
+              provider={aiAuditComment?.provider || extendedDupont?.provider}
+            />
+          </div>
+          <p className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
+            {aiAuditComment?.dupontEarningsQuality || extendedDupont?.dupontEarningsQuality}
           </p>
         </div>
       )}

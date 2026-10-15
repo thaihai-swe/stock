@@ -13,7 +13,7 @@ export default function HistoryHeroHeader({
   const totalBuyCapital = buys.reduce((s, o) => s + (o.totalCost || (o.quantity * o.price)), 0);
 
   // Tổng tiền bán thu về
-  const totalSellRevenue = sells.reduce((s, o) => s + (o.totalRevenue || (o.quantity * o.price)), 0);
+  const totalSellRevenue = sells.reduce((s, o) => s + (o.netRevenue ?? o.totalRevenue ?? (o.quantity * o.price)), 0);
 
   // Tổng lãi/lỗ đã chốt của các lệnh bán
   const totalRealizedPL = sells.reduce((s, o) => s + (o.profitLoss || 0), 0);

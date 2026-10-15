@@ -606,7 +606,17 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 48179
+    "impliedFcfYieldPrice": 48179,
+    "aiConvergence": {
+      "convergenceHeadline": "Phân kỳ cực đoan giữa mô hình dòng tiền và phương pháp tài sản; giá trị thực tiễn hội tụ quanh trục P/B và P/E chuẩn hóa (14.000 - 18.000 VND)",
+      "divergenceExplanation": "Sự phân kỳ sâu sắc giữa các mô hình bắt nguồn từ đặc thù bảng cân đối kế toán của ngân hàng thương mại như SHB. Các mô hình dòng tiền chiết khấu (DCF đa giai đoạn đạt 71.465 VND, FCFF/FCFE quanh 57.000 - 58.000 VND) và Residual Income (481.694 VND - bị méo mó nghiêm trọng do giả định ROE vượt xa chi phí vốn vô tận) hoàn toàn không phù hợp, do đối với ngân hàng, nợ vay là nguyên liệu đầu vào chứ không phải cấu trúc vốn đòn bẩy, và tái đầu tư chủ yếu là mở rộng tài sản sinh lời (cho vay) tuân thủ hệ số CAR thay vì CapEx tài sản cố định hữu hình. Ngược lại, nhóm P/E chuẩn hóa (15.010 VND) và Book NAV (14.375 VND) phản ánh sát thực tế hơn chu kỳ tín dụng, biên lãi ròng (NIM) và áp lực trích lập dự phòng nợ xấu (NPL). P/B Gordon (33.910 VND) phản ánh kịch bản lạc quan về ROE mục tiêu nhưng chưa chiết khấu rủi ro tập trung tín dụng.",
+      "sensitivityStory": "Thử tải kịch bản vĩ mô bất lợi: Nếu chi phí vốn chủ sở hữu (Ke/WACC) tăng 1.5% (do áp lực lãi suất phi rủi ro và phần bù rủi ro nợ xấu gia tăng) kết hợp tăng trưởng tín dụng dài hạn giảm 1%, định giá theo mô hình Gordon Growth (P/B) sẽ sụt giảm từ 22% đến 28%. Khi đó, mức định giá kỳ vọng sẽ bị kéo tụt về sát giá trị sổ sách Book NAV quanh 13.500 - 14.500 VND. Biên an toàn danh nghĩa 30.5% hiện tại sẽ bị xóa sạch, thu hẹp về dưới 5% hoặc rơi vào vùng định giá quá cao (overvalued) nếu chất lượng tài sản suy giảm làm xói mòn vốn chủ sở hữu.",
+      "preferredModelRecommendation": "Khuyến nghị sử dụng mô hình P/B Chuẩn hóa kết hợp Gordon Growth Model có chiết khấu rủi ro chất lượng tài sản (NPL-adjusted Book Value) và P/E Chuẩn hóa theo chu kỳ kinh tế. Loại bỏ hoàn toàn DCF, FCFF, EV/EBITDA và RIM chưa hiệu chỉnh, do các mô hình này vi phạm nguyên lý kế toán ngân hàng và tạo ra sai số định giá phi thực tế.",
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -2931,10 +2941,9 @@
       "categoryScores": {
         "disclosure": 60.0,
         "biz": 19.4,
-        "macro": 44.4,
+        "macro": 28.6,
         "analyst": 0.0,
-        "sector": 0.0,
-        "macro": 28.6
+        "sector": 0.0
       }
     },
     "tldr": {
@@ -2962,6 +2971,23 @@
           "type": "neutral"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Trung Tính",
+      "sentimentScore": 0,
+      "executiveSummary": "Dòng chảy thông tin báo chí 30 ngày qua của SHB duy trì trạng thái trung tính, phản ánh sự ổn định trong hoạt động kinh doanh cốt lõi và thanh khoản thị trường.",
+      "catalysts": [
+        "Kỳ vọng tăng trưởng sản lượng và mở rộng thị phần trong các quý tới.",
+        "Tiến độ giải ngân các dự án trọng điểm và kế hoạch trả cổ tức tiền mặt."
+      ],
+      "keyRisks": [
+        "Biến động giá nguyên vật liệu đầu vào và sức ép cạnh tranh trong ngành.",
+        "Rủi ro thị trường chung và sự đảo chiều dòng vốn khối ngoại."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "status": "success",
+      "provider": "offline-heuristic-engine",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
   },
   "beneishMScore": {
@@ -3200,6 +3226,41 @@
       "latestCfo": 8947.0,
       "latestCapex": 32.0,
       "constructionInProgress": 885.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.33 (vượt ngưỡng an toàn -1.78) kích hoạt cảnh báo rủi ro thao túng, chủ yếu đến từ yếu tố kế toán dồn tích (TATA) và rủi ro vốn hóa tài sản/lãi dự thu tương đương biến số AQI và DSRI trong mô hình ngân hàng. Dù Altman Z đạt 3.0 thể hiện vùng an toàn ngắn hạn, việc phụ thuộc vào các khoản thu nhập chưa thực thu tiềm ẩn nguy cơ phóng đại kết quả kinh doanh so với dòng tiền thực tế.",
+      "dupontEarningsQuality": "Chất lượng ROE 19.14% phần lớn được khuếch đại bởi đòn bẩy tài chính ở mức cao (12.79 lần) đặc trưng ngành ngân hàng, thay vì đến từ tốc độ luân chuyển tài sản thực chất (Asset Turnover chỉ 0.04 lần). Đáng chú ý, chi phí trả lãi đã bào mòn tới 75.1% EBIT (Interest Burden 0.249), cho thấy biên lợi nhuận ròng chịu sức ép rất lớn từ chi phí vốn huy động và dễ bị tổn thương nếu NIM co hẹp.",
+      "auditorChecklist": [
+        "Quy mô và tốc độ thu hồi các khoản lãi và phí phải thu (lãi dự thu) trong năm qua là bao nhiêu, và ngân hàng đã thoái bao nhiêu lãi dự thu vào chi phí do khách hàng quá hạn trả nợ?",
+        "Với mức đòn bẩy 12.79 lần cùng gánh nặng chi phí huy động vốn ăn mòn 3/4 EBIT, Ban Lãnh Đạo dự phòng kịch bản nào cho tỷ lệ an toàn vốn (CAR) nếu nợ nhóm 2 và nợ cơ cấu tiềm ẩn chuyển thành nợ xấu thực tế?"
+      ],
+      "status": "success",
+      "provider": "openai",
+      "model": "super-vip",
+      "updatedAt": "2026-10-13T16:21:30.900791+00:00"
     }
+  },
+  "aiDeepDive": {
+    "recommendation": "🟢 MUA TÍCH LŨY GIÁ TRỊ",
+    "convictionScore": 88,
+    "thesisHeadline": "Chiết khấu định giá sâu bất hợp lý so với năng lực sinh lời: ROE 19.14% đối lập P/B 0.71x mở ra cơ hội biên an toàn 30.5%",
+    "valuationConvergenceAnalysis": "Các mô hình định lượng ghi nhận sự hội tụ giá trị hợp lý của SHB trong biên độ 14.209 - 16.453 VNĐ, phản ánh mức biên an toàn (Margin of Safety) đạt 30.5% so với thị giá hiện tại đang ở Buy Zone (11.200 - 12.700 VNĐ). Đáng chú ý, mô hình P/B - ROE và Mô hình Thu nhập thặng dư (RIM) chỉ ra sự sai lệch định giá nghiêm trọng khi cổ phiếu giao dịch tại P/B chỉ 0.71x và P/E 4.14x, hoàn toàn thấp hơn trung bình ngành ngân hàng (P/B 1.1x, P/E 7.5x) bất chấp ROE duy trì ở mức cao 19.14% và ROA đạt 1.50%. Sự hội tụ từ các kịch bản định lượng khẳng định thị giá đang nằm trong vùng an toàn cao để giải ngân tích lũy.",
+    "trapAssessment": "Điểm bẫy định giá ở mức 0.0/100 (THẤP), xác nhận không có tín hiệu bẫy giá trị (Value Trap) hay bẫy sổ sách (Book Trap). ROE 19.14% vượt xa chi phí vốn cổ phần (CoE ước tính ~13.5%), chứng minh SHB đang tạo ra giá trị kinh tế thực chất chứ không phá hủy giá trị sổ sách. Đòn bẩy tài chính 12.79x hoàn toàn nằm trong chuẩn mực an toàn vốn của ngành ngân hàng theo Basel II. Rủi ro pha loãng và áp lực thanh khoán thấp, đảm bảo chất lượng dòng tiền và chất lượng tài sản không bị bóp méo.",
+    "catalysts": [
+      "Kỳ vọng hoàn tất thương vụ phát hành riêng lẻ cho nhà đầu tư chiến lược nước ngoài giúp gia tăng bộ đệm vốn CAR và kích hoạt sóng định giá lại.",
+      "Tăng trưởng tín dụng duy trì ở mức cao hơn trung bình ngành nhờ room tín dụng dồi dào, tập trung vào lĩnh vực chuỗi cung ứng, SME và năng lượng xanh.",
+      "Xu hướng tái định giá P/B từ 0.71x về mức tối thiểu 0.95x - 1.0x khi thị trường nhận diện đúng hiệu quả sinh lời vượt trội."
+    ],
+    "keyRisks": [
+      "Áp lực nợ xấu tiềm ẩn và trích lập dự phòng từ nhóm khách hàng doanh nghiệp bất động sản, xây lắp lớn.",
+      "Biên lãi ròng (NIM) chịu áp lực thu hẹp nếu chi phí vốn (CoF) tăng trong bối cảnh cạnh tranh huy động tiền gửi gắt gao.",
+      "Rủi ro thị trường chung điều chỉnh ảnh hưởng đến tâm lý định giá của nhóm cổ phiếu ngân hàng thương mại cổ phần tư nhân."
+    ],
+    "targetPriceHorizon12M": "15.300 VNĐ",
+    "status": "success",
+    "provider": "openai",
+    "model": "super-vip",
+    "updatedAt": "2026-10-13T16:21:30.900791+00:00"
   }
 }

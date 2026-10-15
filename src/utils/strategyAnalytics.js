@@ -1,3 +1,9 @@
+import {
+  DISCIPLINE_TAGS,
+  RISK_ALERT_WIN_RATE_THRESHOLD,
+  STRATEGY_NARRATIVES,
+} from './constants.js';
+
 /**
  * Engine Phân Tích Hiệu Suất Chiến Lược & Tags (Trading Journal Analytics)
  */
@@ -14,7 +20,12 @@ export function analyzeStrategies(buyOrders = [], sellOrders = [], marketPrices 
     return 'Chưa gắn thẻ';
   }
 
-  const disciplineTagNames = new Set(['🎯 Đạt mục tiêu', '🛑 Cắt lỗ chuẩn', '🏃 Chốt non', '😰 Cắt lỗ trễ', '⚡ Bán hoảng', '🔄 Đảo hàng']);
+  const rawTags = Array.isArray(DISCIPLINE_TAGS)
+    ? DISCIPLINE_TAGS
+    : (DISCIPLINE_TAGS && typeof DISCIPLINE_TAGS === 'object'
+        ? Object.values(DISCIPLINE_TAGS)
+        : []);
+  const disciplineTagNames = new Set(rawTags.map(t => t?.label || t?.id));
 
   // Hàm xác định 1 tag chiến lược duy nhất cho lệnh bán
   function getSellOrderTag(sellOrder) {
@@ -155,37 +166,55 @@ export function analyzeStrategies(buyOrders = [], sellOrders = [], marketPrices 
     .sort((a, b) => b.activeCapital - a.activeCapital)[0] || null;
 
   const riskAlertStrategy = [...validClosedStrategies]
-    .filter(s => s.totalRealizedPL < 0 || s.winRate < 40)
+    .filter(s => s.totalRealizedPL < 0 || s.winRate < RISK_ALERT_WIN_RATE_THRESHOLD)
     .sort((a, b) => a.totalRealizedPL - b.totalRealizedPL)[0] || null;
 
   // Tự động sinh Khuyến Nghị & Kỷ Luật Giao Dịch (Actionable Insights)
   const insights = [];
 
   if (topProfitStrategy) {
+    const titleTemplate = STRATEGY_NARRATIVES.topProfitTitle || 'Chiến lược hiệu quả nhất: {tag}';
+    const descTemplate = STRATEGY_NARRATIVES.topProfitDesc || 'Đã mang về tổng cộng +{profit}đ với tỷ lệ thắng {winRate}% ({winCount}/{totalClosed} lệnh). Tiếp tục phát huy thế mạnh này.';
     insights.push({
       type: 'success',
       icon: '🏆',
-      title: `Chiến lược hiệu quả nhất: ${topProfitStrategy.tag}`,
-      desc: `Đã mang về tổng cộng +${new Intl.NumberFormat('vi-VN').format(topProfitStrategy.totalRealizedPL)}đ với tỷ lệ thắng ${topProfitStrategy.winRate}% (${topProfitStrategy.winCount}/${topProfitStrategy.totalClosed} lệnh). Tiếp tục phát huy thế mạnh này.`,
+      title: titleTemplate.replace('{tag}', topProfitStrategy.tag),
+      desc: descTemplate
+        .replace('{profit}', new Intl.NumberFormat('vi-VN').format(topProfitStrategy.totalRealizedPL))
+        .replace('{winRate}', String(topProfitStrategy.winRate))
+        .replace('{winCount}', String(topProfitStrategy.winCount))
+        .replace('{totalClosed}', String(topProfitStrategy.totalClosed)),
     });
   }
 
   if (riskAlertStrategy) {
+    const titleTemplate = STRATEGY_NARRATIVES.riskAlertTitle || 'Cảnh báo chiến lược rủi ro: {tag}';
+    const descTemplate = STRATEGY_NARRATIVES.riskAlertDesc || 'Chiến lược này đang ghi nhận {lossReason}. Hãy kiểm tra lại tiêu chí chọn điểm mua và kỷ luật cắt lỗ sớm.';
+    const lossReason = riskAlertStrategy.totalRealizedPL < 0
+      ? 'thua lỗ ' + new Intl.NumberFormat('vi-VN').format(riskAlertStrategy.totalRealizedPL) + 'đ'
+      : 'tỷ lệ thắng chỉ ' + riskAlertStrategy.winRate + '%';
     insights.push({
       type: 'warning',
       icon: '⚠️',
-      title: `Cảnh báo chiến lược rủi ro: ${riskAlertStrategy.tag}`,
-      desc: `Chiến lược này đang ghi nhận ${riskAlertStrategy.totalRealizedPL < 0 ? 'thua lỗ ' + new Intl.NumberFormat('vi-VN').format(riskAlertStrategy.totalRealizedPL) + 'đ' : 'tỷ lệ thắng chỉ ' + riskAlertStrategy.winRate + '%'}. Hãy kiểm tra lại tiêu chí chọn điểm mua và kỷ luật cắt lỗ sớm.`,
+      title: titleTemplate.replace('{tag}', riskAlertStrategy.tag),
+      desc: descTemplate
+        .replace('{lossReason}', lossReason),
     });
   }
 
   if (topHoldingStrategy && totalHoldingCapital > 0) {
     const allocPct = ((topHoldingStrategy.activeCapital / totalHoldingCapital) * 100).toFixed(1);
+    const titleTemplate = STRATEGY_NARRATIVES.topHoldingTitle || 'Tập trung nguồn vốn: {tag}';
+    const descTemplate = STRATEGY_NARRATIVES.topHoldingDesc || 'Chiếm {allocPct}% tổng vốn đang nắm giữ ({capital}đ) qua {symbolCount} mã ({symbols}).';
     insights.push({
       type: 'info',
       icon: '💼',
-      title: `Tập trung nguồn vốn: ${topHoldingStrategy.tag}`,
-      desc: `Chiếm ${allocPct}% tổng vốn đang nắm giữ (${new Intl.NumberFormat('vi-VN').format(topHoldingStrategy.activeCapital)}đ) qua ${topHoldingStrategy.activeSymbols.length} mã (${topHoldingStrategy.activeSymbols.join(', ')}).`,
+      title: titleTemplate.replace('{tag}', topHoldingStrategy.tag),
+      desc: descTemplate
+        .replace('{allocPct}', allocPct)
+        .replace('{capital}', new Intl.NumberFormat('vi-VN').format(topHoldingStrategy.activeCapital))
+        .replace('{symbolCount}', String(topHoldingStrategy.activeSymbols.length))
+        .replace('{symbols}', topHoldingStrategy.activeSymbols.join(', ')),
     });
   }
 

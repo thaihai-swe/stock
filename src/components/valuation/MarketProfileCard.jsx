@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatVND } from '../../utils/format';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 export default function MarketProfileCard({ marketProfile, symbol, currentPrice }) {
   if (!marketProfile) {
@@ -34,6 +35,7 @@ export default function MarketProfileCard({ marketProfile, symbol, currentPrice 
               <h3 className="text-lg font-black text-gray-900 dark:text-white">
                 Hồ Sơ Hành Vi Thị Trường Định Lượng (15-Block Market Profile)
               </h3>
+              <IntelligenceBadge type="heuristic" tooltip="Thuật toán phân tích cấu trúc khối lượng Volume Profile, Wyckoff Effort & Đuôi rủi ro phân phối" />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Phân tích cấu trúc khối lượng theo dải giá (VAP), Dòng tiền Wyckoff & Rủi ro

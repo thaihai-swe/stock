@@ -37,6 +37,9 @@ if (shouldUseTurso) {
     console.error('❌ Chưa cấu hình biến môi trường TURSO_DATABASE_URL trên Vercel!');
     throw new Error('Chưa cấu hình TURSO_DATABASE_URL và TURSO_AUTH_TOKEN trên Vercel! Vui lòng vào Vercel Dashboard -> Settings -> Environment Variables để thêm.');
   }
+  if (dbMode === 'turso' && !tursoUrl) {
+    console.warn('⚠️ CẢNH BÁO: DB_MODE=turso được cấu hình nhưng biến TURSO_DATABASE_URL trong .env đang trống hoặc bị comment (#). Hệ thống tự động chuyển về Local SQLite (data/stock.db).');
+  }
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
@@ -182,6 +185,20 @@ export async function initDatabase() {
   } catch (e) {
     // bỏ qua nếu index đã tồn tại
   }
+
+  // 6c. Tạo bảng portfolio_ai_insights (Phân tích sức khỏe danh mục AI theo người dùng)
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS portfolio_ai_insights (
+      user_id TEXT PRIMARY KEY,
+      health_score TEXT,
+      health_verdict TEXT,
+      portfolio_beta REAL,
+      cash_weight_pct REAL,
+      report_json TEXT NOT NULL,
+      status TEXT DEFAULT 'success',
+      updated_at TEXT NOT NULL
+    );
+  `);
 
   // 7. Migration an toàn: Bổ sung cột user_id vào các database đã có sẵn dữ liệu
   await addColumnSafe('buy_orders', 'user_id TEXT DEFAULT "demo"');
@@ -331,17 +348,11 @@ async function autoMigrateFromJson() {
         }
       }
 
-      // Import settings & goal
+      // Import settings
       if (data.settings) {
         await db.execute({
           sql: `INSERT OR REPLACE INTO app_settings (key, value) VALUES ('settings', ?);`,
           args: [JSON.stringify(data.settings)],
-        });
-      }
-      if (data.goal) {
-        await db.execute({
-          sql: `INSERT OR REPLACE INTO app_settings (key, value) VALUES ('goal', ?);`,
-          args: [JSON.stringify(data.goal)],
         });
       }
 

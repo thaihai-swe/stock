@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { addWatchlist, deleteWatchlist, fetchPrices } from '../utils/api.js';
 import { fmtDate, fmtMoney } from '../utils/format.js';
+import { useToast } from '../context/ToastContext.jsx';
+import EmptyState from './common/EmptyState.jsx';
+import StockSymbolInput from './common/StockSymbolInput.jsx';
 
-export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell, refreshKey, showToast }) {
+export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, onSelectBuy, onSelectSell, refreshKey }) {
+  const { showToast } = useToast();
   const [symbol, setSymbol] = useState('');
   const [targetBuyPrice, setTargetBuyPrice] = useState('');
   const [targetSellPrice, setTargetSellPrice] = useState('');
@@ -57,7 +61,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
         targetPrice: buyP, // backward compatibility
         note,
       });
-      if (showToast) showToast(`✅ Đã thêm mã ${symbol.trim().toUpperCase()} vào watchlist`, 'success');
+      showToast(`✅ Đã thêm mã ${symbol.trim().toUpperCase()} vào watchlist`, 'success');
       setSymbol('');
       setTargetBuyPrice('');
       setTargetSellPrice('');
@@ -65,7 +69,7 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
       onSuccess();
     } catch (err) {
       setError(err.message);
-      if (showToast) showToast('❌ ' + err.message, 'error');
+      showToast('❌ ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -76,11 +80,10 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
     setDeletingId(id);
     try {
       await deleteWatchlist(id);
-      if (showToast) showToast(`✅ Đã xóa mã ${sym} khỏi watchlist`, 'success');
+      showToast(`✅ Đã xóa mã ${sym} khỏi watchlist`, 'success');
       onSuccess();
     } catch (err) {
-      if (showToast) showToast('❌ ' + err.message, 'error');
-      else alert('❌ ' + err.message);
+      showToast('❌ ' + err.message, 'error');
     } finally {
       setDeletingId(null);
     }
@@ -106,11 +109,13 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
               <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 uppercase mb-1">
                 Mã cổ phiếu <span className="text-red-500">*</span>
               </label>
-              <input
+              <StockSymbolInput
                 value={symbol}
-                onChange={e => setSymbol(e.target.value.toUpperCase())}
+                onChange={setSymbol}
                 placeholder="VD: SSI, FPT..."
-                className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm uppercase font-bold focus:outline-none focus:ring-2 focus:ring-blue-400"
+                size="sm"
+                colorTheme="blue"
+                required
               />
             </div>
 
@@ -250,11 +255,11 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
         </div>
 
         {watchlist.length === 0 ? (
-          <div className="py-12 text-center text-gray-400 dark:text-slate-500">
-            <p className="text-4xl mb-2">🔭</p>
-            <p className="font-medium text-gray-600 dark:text-slate-400">Chưa có mã nào trong danh sách theo dõi</p>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Thêm các mã bạn quan tâm ở khung bên trên</p>
-          </div>
+          <EmptyState
+            icon="🔭"
+            title="Chưa có mã nào trong danh sách theo dõi"
+            description="Thêm các mã cổ phiếu bạn quan tâm ở khung bên trên để nhận cảnh báo khi thị giá chạm vùng gom mua / chốt lời."
+          />
         ) : (
           <>
             {/* 1. Chế độ xem Thẻ (Mobile Card View) */}
@@ -412,7 +417,10 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                       <span className="text-[10px] text-gray-400 dark:text-slate-500">Thêm: {fmtDate(item.createdAt)}</span>
                       <div className="flex items-center gap-1.5">
                         <button
-                          onClick={() => onSelectBuy(item.symbol)}
+                          onClick={() => {
+                            const buyPrice = (item.currentPrice || item.targetBuyPrice) ? String((item.currentPrice || item.targetBuyPrice) / 1000) : '';
+                            onSelectBuy(item.symbol, '', buyPrice);
+                          }}
                           className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${isBuyReached
                             ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                             : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-900'
@@ -422,7 +430,14 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                         </button>
                         {onSelectSell && (
                           <button
-                            onClick={() => onSelectSell(item.symbol)}
+                            onClick={() => {
+                              const sellPrice = (item.currentPrice || holding?.avgCost) ? String((item.currentPrice || holding?.avgCost) / 1000) : '';
+                              onSelectSell({
+                                symbol: item.symbol,
+                                quantity: holding ? String(holding.totalQty) : '',
+                                price: sellPrice,
+                              });
+                            }}
                             className={`text-xs font-bold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${isSellReached
                               ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
                               : holding
@@ -615,7 +630,10 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                         {/* Hành động */}
                         <td className="px-5 py-4 text-right space-x-1.5 whitespace-nowrap">
                           <button
-                            onClick={() => onSelectBuy(item.symbol)}
+                            onClick={() => {
+                              const buyPrice = (item.currentPrice || item.targetBuyPrice) ? String((item.currentPrice || item.targetBuyPrice) / 1000) : '';
+                              onSelectBuy(item.symbol, '', buyPrice);
+                            }}
                             className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${isBuyReached
                               ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                               : 'bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50'
@@ -626,7 +644,14 @@ export default function Watchlist({ watchlist = [], portfolio = [], onSuccess, o
                           </button>
                           {onSelectSell && (
                             <button
-                              onClick={() => onSelectSell(item.symbol)}
+                              onClick={() => {
+                                const sellPrice = (item.currentPrice || holding?.avgCost) ? String((item.currentPrice || holding?.avgCost) / 1000) : '';
+                                onSelectSell({
+                                  symbol: item.symbol,
+                                  quantity: holding ? String(holding.totalQty) : '',
+                                  price: sellPrice,
+                                });
+                              }}
                               className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${isSellReached
                                 ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
                                 : holding

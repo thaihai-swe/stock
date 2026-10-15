@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
-const SCENARIOS_META = {
+const DEFAULT_SCENARIOS_META = {
   base: {
     id: 'base',
     label: 'Kịch Bản Cơ Sở (Base Case)',
@@ -31,6 +32,13 @@ export default function ScenarioAllocationMatrix({ scenarioAllocation = {}, curr
   const [activeScenario, setActiveScenario] = useState('base');
   const [profile, setProfile] = useState('balanced'); // 'conservative' | 'balanced' | 'aggressive'
   const [horizon, setHorizon] = useState('medium'); // 'short' | 'medium' | 'long'
+
+  const scenariosMeta = useMemo(() => {
+    return {
+      ...DEFAULT_SCENARIOS_META,
+      ...(scenarioAllocation?.scenariosMeta || {}),
+    };
+  }, [scenarioAllocation?.scenariosMeta]);
 
   const baseAlloc = scenarioAllocation?.base || { equity: 50.0, bond: 30.0, cash: 15.0, gold: 5.0 };
   const bullAlloc = scenarioAllocation?.bull || { equity: 65.0, bond: 20.0, cash: 10.0, gold: 5.0 };
@@ -74,6 +82,7 @@ export default function ScenarioAllocationMatrix({ scenarioAllocation = {}, curr
             <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-200/50">
               Macro Allocation Engine
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Động cơ phân bổ tài sản 4 lớp theo 3 kịch bản kinh tế vĩ mô & khẩu vị rủi ro cá nhân" />
           </div>
           <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mt-1">
             Ma Trận Phân Bổ Danh Mục Theo 3 Kịch Bản Kinh Tế
@@ -85,7 +94,7 @@ export default function ScenarioAllocationMatrix({ scenarioAllocation = {}, curr
 
         {/* Tab chọn kịch bản */}
         <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700/80 p-1.5 rounded-2xl">
-          {Object.values(SCENARIOS_META).map((s) => (
+          {Object.values(scenariosMeta).map((s) => (
             <button
               key={s.id}
               onClick={() => setActiveScenario(s.id)}
@@ -105,7 +114,7 @@ export default function ScenarioAllocationMatrix({ scenarioAllocation = {}, curr
 
       {/* ── 2. CARD KỊCH BẢN ĐANG CHỌN (SCENARIO CARD) ── */}
       {(() => {
-        const scMeta = SCENARIOS_META[activeScenario];
+        const scMeta = scenariosMeta[activeScenario] || scenariosMeta.base;
         return (
           <div className="p-4 sm:p-5 rounded-2xl bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/70 dark:border-gray-700 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

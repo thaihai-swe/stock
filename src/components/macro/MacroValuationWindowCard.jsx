@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import IntelligenceBadge from '../common/IntelligenceBadge.jsx';
 
 const VALUATION_WINDOWS = [
   { id: 'five_year', label: '5 Năm', shortLabel: '5N', desc: 'Chu kỳ kinh tế & tiền tệ gần nhất' },
@@ -56,8 +57,20 @@ export default function MacroValuationWindowCard({
   const peXpbStats = activeWin?.peXpb || null;
   const roeStats = activeWin?.roeProxy || null;
   const compSignal = activeWin?.compositeSignal || null;
-  const derivedMetrics = market.derivedMetrics || {};
   const pePos = peStats?.percentile != null ? Math.min(96, Math.max(4, peStats.percentile)) : 35;
+  const derivedMetrics = market.derivedMetrics || {};
+
+  const windowsList = useMemo(() => {
+    if (market.windows && Object.keys(market.windows).length > 0) {
+      return Object.entries(market.windows).map(([id, w]) => ({
+        id,
+        label: w.label || id,
+        shortLabel: id === 'five_year' ? '5N' : id === 'ten_year' ? '10N' : id === 'modern' ? '2007' : '25N',
+        desc: w.desc || ''
+      }));
+    }
+    return VALUATION_WINDOWS;
+  }, [market.windows]);
 
   return (
     <div className="bg-white dark:bg-slate-900 text-gray-900 dark:text-white rounded-3xl p-5 sm:p-7 lg:p-8 shadow-sm border border-gray-100 dark:border-slate-800 space-y-6 transition-colors">
@@ -72,10 +85,11 @@ export default function MacroValuationWindowCard({
       {/* 2. HEADER: TÊN CHỈ SỐ, BAND NHÃN & COMPOSITE SIGNAL */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
               Nhiệt Kế Định Giá VN-Index (Vietstock 2000–Hiện Tại)
             </span>
+            <IntelligenceBadge type="heuristic" tooltip="Mô hình định lượng P/E Bands & Composite Signal 4 cửa sổ" />
             {derivedMetrics.dataDate && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200/60 dark:border-slate-700">
                 Chốt tháng: {derivedMetrics.dataDate}
@@ -109,7 +123,7 @@ export default function MacroValuationWindowCard({
       {/* 3. THANH CHUYỂN ĐỔI 4 CỬA SỔ CHU KỲ THỐNG KÊ */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-slate-800/80 rounded-2xl border border-gray-200/60 dark:border-slate-700/60 shrink-0 overflow-x-auto">
-          {VALUATION_WINDOWS.map((win) => {
+          {windowsList.map((win) => {
             const isSelected = valuationWindow === win.id;
             return (
               <button
