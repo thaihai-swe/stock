@@ -606,7 +606,16 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": 108135
+    "impliedFcfYieldPrice": 108135,
+    "aiConvergence": {
+      "convergenceHeadline": "Hội Tụ Định Giá Nghiêng Về Tiềm Năng Tái Định Giá Mạnh Khi Nút Thắt Trái Phiếu Được Gỡ Bỏ",
+      "divergenceExplanation": "Sự phân hóa giữa các phương pháp xuất phát từ việc định giá thị trường (P/B, P/E) đang áp mức chiết khấu rủi ro tín dụng quá đà đối với danh mục trái phiếu doanh nghiệp, trong khi các mô hình giá trị nội tại (Residual Income, DDM) phản ánh chuẩn xác năng lực tạo ra dòng thặng dư kinh tế ổn định từ nền tảng ROE trên 20%.",
+      "sensitivityStory": "Trong kịch bản căng thẳng khi chi phí vốn chủ sở hữu (Ke) tăng thêm 1.5% do biến động vĩ mô, giá trị hợp lý của MBB theo mô hình Residual Income giảm khoảng 12.8%, nhưng biên an toàn hiện tại (45.3%) vẫn đủ dày để hấp thụ biến động và bảo vệ vốn cho nhà đầu tư.",
+      "preferredModelRecommendation": "Mô hình Thu nhập thặng dư (Residual Income Model - RIM) kết hợp với P/B chu kỳ là phương pháp tin cậy nhất để phản ánh chính xác giá trị tạo lập từ vốn chủ sở hữu ngân hàng.",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -2457,6 +2466,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Tích Cực",
+      "sentimentScore": 75,
+      "executiveSummary": "Dòng chảy thông tin xoay quanh MBB ghi nhận nhiều điểm sáng từ việc hoàn tất thủ tục tiếp nhận ngân hàng 0 đồng để bứt phá tăng trưởng tín dụng và đà tăng trưởng thu nhập ngoài lãi ổn định. Tâm lý thị trường đối với MBB đang dần tích cực hơn khi ngân hàng tích cực xử lý các tài sản thế chấp và trích lập dự phòng thận trọng cho các khoản nợ tiềm ẩn.",
+      "catalysts": [
+        "Kỳ vọng hoàn tất chuyển giao bắt buộc ngân hàng thương mại TNHH MTV Đại Dương (OceanBank) tạo động lực nới 'room' tín dụng lên trên 20%",
+        "Tăng trưởng quy mô khách hàng số vượt mốc 28 triệu người, thúc đẩy doanh thu phí dịch vụ và thanh toán"
+      ],
+      "keyRisks": [
+        "Áp lực phân loại lại nợ và tăng chi phí dự phòng khi Thông tư 02 hết hiệu lực",
+        "Biến động thanh khoản hệ thống tạo sức ép cạnh tranh lãi suất huy động trong nửa cuối năm"
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -2695,6 +2721,61 @@
       "latestCfo": 11770.0,
       "latestCapex": 171.0,
       "constructionInProgress": 1088.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Cần Lưu Ý Kế Toán",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score ở mức -1.64 vi phạm ngưỡng tiêu chuẩn (-1.78), tuy nhiên đây là hiện tượng kỹ thuật thường gặp khi áp dụng mô hình sản xuất cho định chế tài chính do đặc thù dồn tích lãi dự thu và tăng trưởng tài sản sinh lời nhanh. Mặc dù vậy, kiểm toán viên cần theo dõi chặt chẽ tiến độ thu hồi lãi và phí dự thu để đảm bảo không ghi nhận doanh thu ảo trước khi thực thu.",
+      "dupontEarningsQuality": "Chất lượng ROE 22.04% rất cao và lành mạnh; hệ số đòn bẩy tài chính 11.6x nằm hoàn toàn trong ngưỡng an toàn chuẩn mực của ngành ngân hàng thương mại (CAR Basel II luôn duy trì >11.5%), cho thấy ROE vượt trội được dẫn dắt bởi hiệu quả sinh lời cốt lõi (Operating Margin ấn tượng) và tối ưu hóa chi phí hoạt động (CIR) thay vì lạm dụng nợ vay.",
+      "auditorChecklist": [
+        "Thực trạng thu hồi nợ gốc, lãi và mức độ trích lập dự phòng cụ thể đối với các khoản vay/trái phiếu của nhóm Novaland và Trung Nam hiện nay ra sao?",
+        "Kế hoạch tài chính và cơ chế hỗ trợ từ NHNN nhằm bù đắp rủi ro pha loãng tài sản khi chính thức sáp nhập OceanBank vào bảng cân đối?"
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
+  },
+  "aiDeepDive": {
+    "thesisHeadline": "Cỗ Máy Sinh Lời Vượt Trội Nhờ CASA Dẫn Đầu, Được Định Giá Thấp Hơn Đáng Kể Năng Lực Cốt Lõi",
+    "cfaSummary": "MBB duy trì vị thế định chế tài chính bán lẻ và số hóa hàng đầu với tỷ suất sinh lời ROE ấn tượng đạt 22.04% và tỷ lệ tiền gửi không kỳ hạn (CASA) thuộc nhóm cao nhất hệ thống ngân hàng. Với biên an toàn định giá lên tới 45.3%, mức định giá hiện tại đã phản ánh quá mức các lo ngại về chất lượng tài sản liên quan đến trái phiếu doanh nghiệp, mở ra cơ hội giải ngân hấp dẫn cho tầm nhìn trung hạn.",
+    "coreCatalysts": [
+      "Được cấp hạn mức tăng trưởng tín dụng vượt trội ngành nhờ vai trò chủ lực trong việc nhận chuyển giao bắt buộc OceanBank",
+      "Lợi thế chi phí vốn (CoF) tối ưu bền vững từ hệ sinh thái khách hàng số quy mô lớn giúp bảo vệ biên lãi thuần (NIM) ổn định"
+    ],
+    "investmentRisks": [
+      "Rủi ro trích lập dự phòng gia tăng từ dư nợ tín dụng và trái phiếu của các tập đoàn bất động sản, năng lượng tái tạo quy mô lớn",
+      "Tốc độ phục hồi của thị trường bất động sản và sức cầu tiêu dùng chậm hơn kỳ vọng gây áp lực lên nợ nhóm 2 và tỷ lệ nợ xấu (NPL)"
+    ],
+    "recommendation": "MUA GOM TÍCH LŨY",
+    "targetHorizon": "12 - 24 Tháng",
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
+  },
+  "dividendSustainability": {
+    "aiDividendAudit": {
+      "safetyRating": "Vững Chắc (Safe)",
+      "fcfCoverageVerdict": "Đối với mô hình ngân hàng thương mại, dòng tiền tự do FCF công nghiệp được thay thế bằng dòng tiền lợi nhuận giữ lại thực thu; với nguồn lợi nhuận ròng hàng năm vượt 20.000 tỷ đồng và hệ số an toàn vốn CAR vững chắc, khả năng chi trả cổ tức tiền mặt ở tỷ lệ 5% mệnh giá hoàn toàn được bảo chứng vững vàng mà không làm tổn hại cấu trúc vốn.",
+      "trapRiskLevel": "Thấp",
+      "capitalAllocationScore": 8.5,
+      "capitalAllocationDiagnosis": "Ban Lãnh đạo duy trì kỷ luật phân bổ vốn chuẩn mực: Kết hợp hài hòa giữa chi trả cổ tức tiền mặt đều đặn (5%) để đảm bảo lợi ích cổ đông và chi trả cổ tức cổ phiếu (10-15%) nhằm liên tục nâng cao bộ đệm vốn cấp 1, phục vụ mục tiêu mở rộng tín dụng quy mô lớn.",
+      "outlook3Y": "Duy trì chính sách cổ tức hỗn hợp linh hoạt (5% tiền mặt + 10-15% cổ phiếu) trong 1-3 năm tới nhằm cân đối giữa quyền lợi nhà đầu tư và nhu cầu duy trì CAR trên 11% phục vụ nhận chuyển giao tổ chức tín dụng yếu kém.",
+      "redFlags": [],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
+  },
+  "aiDividendAudit": {
+    "safetyRating": "Vững Chắc (Safe)",
+    "fcfCoverageVerdict": "Đối với mô hình ngân hàng thương mại, dòng tiền tự do FCF công nghiệp được thay thế bằng dòng tiền lợi nhuận giữ lại thực thu; với nguồn lợi nhuận ròng hàng năm vượt 20.000 tỷ đồng và hệ số an toàn vốn CAR vững chắc, khả năng chi trả cổ tức tiền mặt ở tỷ lệ 5% mệnh giá hoàn toàn được bảo chứng vững vàng mà không làm tổn hại cấu trúc vốn.",
+    "trapRiskLevel": "Thấp",
+    "capitalAllocationScore": 8.5,
+    "capitalAllocationDiagnosis": "Ban Lãnh đạo duy trì kỷ luật phân bổ vốn chuẩn mực: Kết hợp hài hòa giữa chi trả cổ tức tiền mặt đều đặn (5%) để đảm bảo lợi ích cổ đông và chi trả cổ tức cổ phiếu (10-15%) nhằm liên tục nâng cao bộ đệm vốn cấp 1, phục vụ mục tiêu mở rộng tín dụng quy mô lớn.",
+    "outlook3Y": "Duy trì chính sách cổ tức hỗn hợp linh hoạt (5% tiền mặt + 10-15% cổ phiếu) trong 1-3 năm tới nhằm cân đối giữa quyền lợi nhà đầu tư và nhu cầu duy trì CAR trên 11% phục vụ nhận chuyển giao tổ chức tín dụng yếu kém.",
+    "redFlags": [],
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   }
 }
