@@ -606,7 +606,16 @@
         }
       ]
     },
-    "impliedFcfYieldPrice": null
+    "impliedFcfYieldPrice": null,
+    "aiConvergence": {
+      "convergenceHeadline": "Hội Tụ Định Giá Bền Vững Qua Mô Hình P/B - ROE Và Thu Nhập Thặng Dư",
+      "divergenceExplanation": "Các mô hình dòng tiền thuần (DCF/FCFF) tạo độ phân kỳ lớn do bản chất dòng tiền hoạt động ngân hàng gắn liền với quy mô huy động và tín dụng; trong khi đó phương pháp P/B kết hợp Residual Income (Thu nhập thặng dư) hội tụ rất sát với giá trị nội tại nhờ phản ánh đúng năng lực tạo ROE 17-18% bền vững trên quy mô vốn tự có.",
+      "sensitivityStory": "Khi thử tải kịch bản thận trọng với chi phí vốn vốn chủ sở hữu (Ke) tăng thêm 1.5%, giá trị hợp lý của ACB chỉ điều chỉnh giảm 8-10%, biên an toàn 23.5% hiện tại vẫn bảo vệ nhà đầu tư vững chắc trước các cú sốc vĩ mô.",
+      "preferredModelRecommendation": "Mô hình P/B tương quan ROE kết hợp Chiết khấu Thu nhập Thặng dư (Residual Income Model)",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
   },
   "financialRatios": {
     "valuation": {
@@ -2417,6 +2426,23 @@
           "type": "positive"
         }
       ]
+    },
+    "aiNewsAnalysis": {
+      "overallSentiment": "Tích Cực",
+      "sentimentScore": 78,
+      "executiveSummary": "Dòng thông tin ghi nhận kỳ vọng tăng trưởng tích cực từ chiến lược mở rộng bán lẻ thận trọng và kế hoạch duy trì chính sách cổ tức kép hấp dẫn. Giới phân tích đánh giá cao ACB như một hầm trú ẩn an toàn với tỷ lệ nợ xấu thấp và khả năng duy trì tăng trưởng lợi nhuận hai chữ số.",
+      "catalysts": [
+        "Kế hoạch chi trả cổ tức kết hợp tiền mặt (10%) và cổ phiếu (15%) tiếp tục khẳng định cam kết giá trị cổ đông.",
+        "Dư nợ tín dụng phục hồi vững chắc ở phân khúc tiêu dùng và SME xuất khẩu trong nửa cuối năm."
+      ],
+      "keyRisks": [
+        "Mặt bằng lãi suất cho vay ưu đãi kích cầu tín dụng có thể kéo giảm lợi suất sinh lời của tài sản (Asset Yield).",
+        "Tiến độ phục hồi của thị trường bất động sản dân cư ảnh hưởng đến tốc độ giải ngân cho vay mua nhà."
+      ],
+      "catalystTimeline": "Trung hạn (3-6 tháng)",
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
   },
   "beneishMScore": {
@@ -2655,6 +2681,61 @@
       "latestCfo": -20936.0,
       "latestCapex": 95.0,
       "constructionInProgress": 0.0
+    },
+    "aiAuditComment": {
+      "auditVerdict": "Sạch Sẽ & Minh Bạch",
+      "forensicDiagnosis": "Chỉ số Beneish M-Score (-1.69) chạm ngưỡng cảnh báo kỹ thuật là hiện tượng 'dương tính giả' kinh điển do mô hình M-Score không được thiết kế cho các định chế tài chính/ngân hàng thương mại nơi cho vay và tiền gửi là tài sản kinh doanh cốt lõi. Kiểm toán pháp y cấu trúc nợ và trích lập dự phòng khẳng định ACB là một trong những ngân hàng có chất lượng kế toán minh bạch nhất, tỷ lệ bao phủ nợ xấu (LLR) cao và không có rủi ro che giấu nợ xấu ngoài bảng cân đối.",
+      "dupontEarningsQuality": "ROE 17.29% phản ánh chất lượng lợi nhuận thực chất từ biên hoạt động cốt lõi vượt trội và hiệu quả kiểm soát chi phí (CIR top đầu ngành ~33%), không phải hệ quả của việc lạm dụng đòn bẩy; mức đòn bẩy 10.75x là chuẩn mực và an toàn tuyệt đối theo chuẩn Basel II/III đối với ngân hàng bán lẻ.",
+      "auditorChecklist": [
+        "Đánh giá tiến độ thu hồi nợ và tỷ lệ trích lập dự phòng thực tế đối với nhóm nợ cơ cấu lại thời hạn theo Thông tư 02 khi hết hiệu lực?",
+        "Kế hoạch điều tiết cơ cấu danh mục tài sản sinh lời nhằm cân bằng giữa tỷ lệ an toàn vốn CAR và tối ưu hóa NIM trong chu kỳ lãi suất mới?"
+      ],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
     }
+  },
+  "aiDeepDive": {
+    "thesisHeadline": "Thành Trì Quản Trị Rủi Ro Và Hiệu Quả Sinh Lời Bền Vững Ngành Ngân Hàng",
+    "cfaSummary": "ACB duy trì vị thế đầu ngành về chất lượng tài sản và kỷ luật quản trị rủi ro với danh mục tín dụng tập trung bán lẻ/SME, hầu như sạch bóng trái phiếu doanh nghiệp rủi ro cao. Khả năng sinh lời vượt trội với ROE duy trì trên 17% cùng đệm an toàn vốn vững chắc tạo biên an toàn 23.5%, mang lại tỷ lệ lợi nhuận/rủi ro hấp dẫn cho dòng tiền dài hạn.",
+    "coreCatalysts": [
+      "Tăng trưởng tín dụng vượt trội hạn mức ngành nhờ bộ đệm vốn CAR chuẩn Basel III vững chắc (>12.5%) và chất lượng tài sản lành mạnh.",
+      "Tối ưu chi phí vốn (COF) và mở rộng CASA bán lẻ qua nền tảng số hóa, giúp giữ vững biên lãi thuần (NIM) trước áp lực cạnh tranh."
+    ],
+    "investmentRisks": [
+      "Chi phí trích lập dự phòng tiềm ẩn có thể gia tăng khi các khoản nợ tái cơ cấu theo Thông tư 02 dần chuyển nhóm nợ xấu.",
+      "Biên lãi thuần NIM chịu áp lực thu hẹp nếu cuộc đua lãi suất huy động nóng trở lại hoặc tín dụng bán lẻ phục hồi chậm hơn dự kiến."
+    ],
+    "recommendation": "MUA GOM TÍCH LŨY",
+    "targetHorizon": "12 - 24 Tháng",
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
+  },
+  "dividendSustainability": {
+    "aiDividendAudit": {
+      "safetyRating": "Vững Chắc (Safe)",
+      "fcfCoverageVerdict": "Đối với ngân hàng thương mại, dòng tiền tự do FCF thường âm do tái đầu tư vào tăng trưởng tài sản tín dụng; tuy nhiên, cổ tức tiền mặt của ACB được bảo chứng hoàn toàn bởi lợi nhuận giữ lại thực chất, dòng tiền kinh doanh lành mạnh và bộ đệm an toàn vốn CAR vượt xa yêu cầu pháp lý.",
+      "trapRiskLevel": "Thấp",
+      "capitalAllocationScore": 9.0,
+      "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn của Ban Lãnh Đạo đạt chuẩn mực cao nhất thị trường: cân bằng hoàn hảo giữa việc trả cổ tức tiền mặt 10-15% để đem lại dòng tiền trực tiếp cho cổ đông và chia cổ tức bằng cổ phiếu 15% nhằm củng cố vốn tự có Cấp 1, tài trợ tăng trưởng tín dụng mà không làm pha loãng EPS.",
+      "outlook3Y": "Duy trì ổn định chính sách cổ tức hỗn hợp (tiền mặt 10% + cổ phiếu 15%) liên tục trong 1-3 năm tới nhờ dự phóng tăng trưởng lợi nhuận sau thuế duy trì đều đặn 13-16%/năm.",
+      "redFlags": [],
+      "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+      "provider": "openai",
+      "model": "super-vip"
+    }
+  },
+  "aiDividendAudit": {
+    "safetyRating": "Vững Chắc (Safe)",
+    "fcfCoverageVerdict": "Đối với ngân hàng thương mại, dòng tiền tự do FCF thường âm do tái đầu tư vào tăng trưởng tài sản tín dụng; tuy nhiên, cổ tức tiền mặt của ACB được bảo chứng hoàn toàn bởi lợi nhuận giữ lại thực chất, dòng tiền kinh doanh lành mạnh và bộ đệm an toàn vốn CAR vượt xa yêu cầu pháp lý.",
+    "trapRiskLevel": "Thấp",
+    "capitalAllocationScore": 9.0,
+    "capitalAllocationDiagnosis": "Kỷ luật phân bổ vốn của Ban Lãnh Đạo đạt chuẩn mực cao nhất thị trường: cân bằng hoàn hảo giữa việc trả cổ tức tiền mặt 10-15% để đem lại dòng tiền trực tiếp cho cổ đông và chia cổ tức bằng cổ phiếu 15% nhằm củng cố vốn tự có Cấp 1, tài trợ tăng trưởng tín dụng mà không làm pha loãng EPS.",
+    "outlook3Y": "Duy trì ổn định chính sách cổ tức hỗn hợp (tiền mặt 10% + cổ phiếu 15%) liên tục trong 1-3 năm tới nhờ dự phóng tăng trưởng lợi nhuận sau thuế duy trì đều đặn 13-16%/năm.",
+    "redFlags": [],
+    "updatedAt": "2026-10-15T16:10:11.776289+00:00",
+    "provider": "openai",
+    "model": "super-vip"
   }
 }
