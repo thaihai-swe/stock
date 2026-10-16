@@ -148,7 +148,7 @@ export default function QualityOfEarningsCard({ financials, stockItem, symbol })
         latest: null,
         score: 50,
         grade: 'Chưa đủ dữ liệu',
-        gradeBadge: 'bg-gray-100 text-gray-600',
+        gradeBadge: 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700',
         cfoNiWinRate: 50,
         redFlags: [],
       };

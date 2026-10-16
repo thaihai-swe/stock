@@ -420,10 +420,10 @@ export default function StockDetailModal({
                           <div>
                             <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5 flex-wrap">
                               <span>
-                                Bán {item.quantity?.toLocaleString()} cp @ {fmtMoney(item.netPrice || item.price)}đ
+                                Bán {item.quantity?.toLocaleString()} cp @ khớp {fmtMoney(item.price)}đ
                                 {Math.round(item.price) !== Math.round(item.netPrice || item.price) && (
-                                  <span className="text-[10px] font-normal text-gray-400 ml-1">
-                                    (khớp {fmtMoney(item.price)}đ)
+                                  <span className="text-[10px] font-medium text-indigo-600 dark:text-indigo-400 ml-1">
+                                    (thực nhận {fmtMoney(item.netPrice || item.price)}đ/cp)
                                   </span>
                                 )}
                               </span>
@@ -442,9 +442,14 @@ export default function StockDetailModal({
                           <div className={`font-bold ${plColor(item.profitLoss)}`}>
                             {isSellProfit ? '+' : ''}{fmtMoney(item.profitLoss)}đ ({item.profitLossPct}%)
                           </div>
-                          <div className="text-[10px] text-gray-400">
+                          <div className="text-[10px] text-gray-500 dark:text-slate-400 font-medium">
                             Thu về: {fmtMoney(item.total)}đ
                           </div>
+                          {item.fee > 0 && (
+                            <div className="text-[10px] text-gray-400 dark:text-slate-500">
+                              Khớp: {fmtMoney(item.quantity * item.price)}đ • <span className="text-rose-500">-{fmtMoney(item.fee)}đ phí</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
