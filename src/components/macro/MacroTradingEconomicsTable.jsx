@@ -102,7 +102,7 @@ export default function MacroTradingEconomicsTable({ indicatorsData = {} }) {
               <button
                 type="button"
                 onClick={() => setIndicatorSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-bold cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 text-xs font-bold cursor-pointer"
               >
                 ✕
               </button>

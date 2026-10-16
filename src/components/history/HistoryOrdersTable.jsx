@@ -44,7 +44,9 @@ export default function HistoryOrdersTable({
       <div className={`p-4 space-y-3 ${mobileViewMode === 'card' ? 'block sm:hidden' : 'hidden'}`}>
         {sortedOrders.map((tx) => {
           const isBuy = tx.type === 'BUY';
-          const netSellRevenue = !isBuy ? (tx.netRevenue ?? tx.totalRevenue ?? (tx.grossRevenue ? tx.grossRevenue - (tx.fee || 0) : tx.quantity * tx.price)) : 0;
+          const grossRevenue = tx.grossRevenue || (tx.quantity * tx.price);
+          const feeAmount = tx.fee !== undefined ? tx.fee : Math.round(grossRevenue * ((tx.feePct ?? 0.1) / 100));
+          const netSellRevenue = !isBuy ? (tx.netRevenue ?? tx.totalRevenue ?? (grossRevenue - feeAmount)) : 0;
           const netSellPrice = !isBuy ? (tx.netPrice || (tx.quantity > 0 ? (netSellRevenue / tx.quantity) : tx.price)) : tx.price;
           const total = isBuy
             ? (tx.totalCost || (tx.quantity * tx.price))
@@ -123,14 +125,14 @@ export default function HistoryOrdersTable({
 
                 <div>
                   <span className="text-gray-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">
-                    {isBuy ? 'Giá mua khớp' : 'Giá bán thực nhận'}
+                    {isBuy ? 'Giá mua khớp' : 'Giá khớp sàn'}
                   </span>
                   <span className="font-bold text-gray-800 dark:text-slate-200 text-sm mt-0.5 block">
-                    {fmtMoney(isBuy ? tx.price : netSellPrice)}đ
+                    {fmtMoney(tx.price)}đ
                   </span>
                   {!isBuy && Math.round(tx.price) !== Math.round(netSellPrice) && (
-                    <span className="text-[10px] text-gray-400 dark:text-slate-500 block">
-                      Khớp: {fmtMoney(tx.price)}đ
+                    <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium block">
+                      Thực nhận: {fmtMoney(netSellPrice)}đ/cp
                     </span>
                   )}
                 </div>
@@ -167,6 +169,9 @@ export default function HistoryOrdersTable({
                       <span className="text-gray-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Thu thực nhận</span>
                       <span className="font-bold text-indigo-700 dark:text-indigo-400 text-xs mt-0.5 block">
                         {fmtMoney(total)}đ
+                      </span>
+                      <span className="text-[10px] text-gray-400 dark:text-slate-500 block truncate">
+                        Khớp: {fmtMoney(grossRevenue)}đ • -{fmtMoney(feeAmount)}đ phí
                       </span>
                     </div>
                   </>
@@ -331,7 +336,9 @@ export default function HistoryOrdersTable({
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {sortedOrders.map((tx) => {
               const isBuy = tx.type === 'BUY';
-              const netSellRevenue = !isBuy ? (tx.netRevenue ?? tx.totalRevenue ?? (tx.grossRevenue ? tx.grossRevenue - (tx.fee || 0) : tx.quantity * tx.price)) : 0;
+              const grossRevenue = tx.grossRevenue || (tx.quantity * tx.price);
+              const feeAmount = tx.fee !== undefined ? tx.fee : Math.round(grossRevenue * ((tx.feePct ?? 0.1) / 100));
+              const netSellRevenue = !isBuy ? (tx.netRevenue ?? tx.totalRevenue ?? (grossRevenue - feeAmount)) : 0;
               const netSellPrice = !isBuy ? (tx.netPrice || (tx.quantity > 0 ? (netSellRevenue / tx.quantity) : tx.price)) : tx.price;
               const total = isBuy
                 ? (tx.totalCost || (tx.quantity * tx.price))
@@ -384,17 +391,27 @@ export default function HistoryOrdersTable({
                   {/* Giá Khớp & Giá Vốn TB Gốc */}
                   <td className="px-4 py-3.5 text-right">
                     {isBuy ? (
-                      <span className="font-bold text-gray-800 dark:text-slate-200">
-                        {fmtMoney(tx.price)}đ
-                      </span>
+                      <div>
+                        <span className="font-bold text-gray-800 dark:text-slate-200">
+                          {fmtMoney(tx.price)}đ
+                        </span>
+                        {tx.costPerShare && Math.round(tx.costPerShare) !== Math.round(tx.price) && (
+                          <div className="text-[10px] text-gray-400 dark:text-slate-500">
+                            Vốn sau phí: {fmtMoney(tx.costPerShare)}đ
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <div>
                         <div className="font-bold text-gray-900 dark:text-slate-100">
-                          Bán: {fmtMoney(netSellPrice)}đ
+                          Khớp: {fmtMoney(tx.price)}đ
                         </div>
                         {Math.round(tx.price) !== Math.round(netSellPrice) && (
-                          <div className="text-[10px] text-gray-400 dark:text-slate-500">
-                            Khớp: {fmtMoney(tx.price)}đ
+                          <div
+                            className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium cursor-help"
+                            title={`Giá bán thực nhận trên mỗi CP sau khi trừ phí (${fmtMoney(feeAmount)}đ): ${fmtMoney(netSellPrice)}đ/cp`}
+                          >
+                            Thực nhận: {fmtMoney(netSellPrice)}đ/cp
                           </div>
                         )}
                         <div className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold mt-0.5">
@@ -412,14 +429,23 @@ export default function HistoryOrdersTable({
                           {fmtMoney(total)}đ
                         </span>
                         <div className="text-[10px] text-gray-400 dark:text-slate-500">
-                          Phí: {tx.feePct !== undefined ? `${tx.feePct}%` : '0%'}
+                          Phí: {tx.feePct !== undefined ? `${tx.feePct}%` : '0%'} {tx.fee ? `(${fmtMoney(tx.fee)}đ)` : ''}
                         </div>
                       </div>
                     ) : (
                       <div>
-                        <span className="font-bold text-indigo-700 dark:text-indigo-400">
-                          Thu: {fmtMoney(total)}đ
+                        <span
+                          className="font-bold text-indigo-700 dark:text-indigo-400 cursor-help inline-flex items-center gap-1"
+                          title={`Chi tiết dòng tiền lệnh bán:\n• Khớp gộp: ${fmtMoney(grossRevenue)}đ (${tx.quantity?.toLocaleString()} cp × ${fmtMoney(tx.price)}đ)\n• Phí giao dịch (${tx.feePct ?? 0.1}%): -${fmtMoney(feeAmount)}đ\n= Thực thu về ví: ${fmtMoney(total)}đ`}
+                        >
+                          <span>Thu: {fmtMoney(total)}đ</span>
+                          <span className="text-[10px] text-indigo-400 opacity-70">ℹ️</span>
                         </span>
+                        <div className="text-[10px] text-gray-400 dark:text-slate-500 flex items-center justify-end gap-1">
+                          <span>Khớp: {fmtMoney(grossRevenue)}đ</span>
+                          <span>•</span>
+                          <span className="text-rose-500 font-medium">-{fmtMoney(feeAmount)}đ phí</span>
+                        </div>
                         <div className="text-[10px] text-gray-400 dark:text-slate-500">
                           Vốn gốc: {fmtMoney(tx.totalCost)}đ
                         </div>

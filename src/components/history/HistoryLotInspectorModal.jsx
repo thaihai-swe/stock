@@ -34,8 +34,11 @@ export default function HistoryLotInspectorModal({
         <h3 className="font-extrabold text-gray-800 dark:text-slate-100 text-sm sm:text-base flex items-center gap-1.5">
           <span>{methodInfo.icon}</span> Giải Phẫu Khớp Lệnh: {methodInfo.label}
         </h3>
-        <p className="text-[11px] text-gray-400 dark:text-slate-500">
-          Lệnh bán ngày {fmtDate(tx.date)} · Khối lượng: {tx.quantity.toLocaleString()} cp
+        <p className="text-[11px] text-gray-500 dark:text-slate-400">
+          Lệnh bán ngày {fmtDate(tx.date)} · Khối lượng: {tx.quantity.toLocaleString()} cp · Thu ròng: <span className="font-semibold text-gray-800 dark:text-slate-200">{fmtMoney(netRevenue)}đ</span>
+          {(tx.fee > 0 || (tx.grossRevenue && tx.grossRevenue !== netRevenue)) && (
+            <span className="text-gray-400 dark:text-slate-500"> (Khớp {fmtMoney(tx.grossRevenue || tx.quantity * tx.price)}đ - {fmtMoney(tx.fee || ((tx.grossRevenue || tx.quantity * tx.price) - netRevenue))}đ phí)</span>
+          )}
         </p>
       </div>
     </div>
@@ -65,13 +68,13 @@ export default function HistoryLotInspectorModal({
         {/* TỔNG KẾT HIỆU SUẤT LỆNH BÁN */}
         <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-gray-50/80 dark:bg-slate-800/60 border border-gray-100 dark:border-slate-800 shrink-0 text-xs">
           <div>
-            <span className="text-gray-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Giá bán thực nhận</span>
+            <span className="text-gray-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Giá khớp sàn</span>
             <span className="font-extrabold text-gray-900 dark:text-slate-100 text-sm sm:text-base mt-0.5 block truncate">
-              {fmtMoney(netSellPrice)}đ
+              {fmtMoney(tx.price)}đ
             </span>
             {Math.round(tx.price) !== Math.round(netSellPrice) && (
-              <span className="text-[10px] text-gray-400 dark:text-slate-500 block">
-                Khớp: {fmtMoney(tx.price)}đ
+              <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium block">
+                Thực nhận: {fmtMoney(netSellPrice)}đ/cp
               </span>
             )}
           </div>
