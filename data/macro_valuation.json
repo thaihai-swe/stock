@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updatedAt": "2026-10-24T08:00:10Z",
+    "updatedAt": "2026-10-31T09:28:05Z",
     "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
     "version": "4.0"
   },
@@ -27,7 +27,7 @@
     "status": "success",
     "provider": "offline-heuristic-engine",
     "model": "Quantitative Deterministic Heuristic v4.0",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00"
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00"
   },
   "weeklyPulse": {
     "pulseHeadline": "Nhịp Đập Tuần: VN-Index tích lũy quanh vùng 1,250 điểm trong pha Mở Rộng Tăng Trưởng",
@@ -47,7 +47,7 @@
     "status": "success",
     "provider": "offline-heuristic-engine",
     "model": "Quantitative Deterministic Heuristic v4.0",
-    "updatedAt": "2026-10-24T08:00:30.068526+00:00"
+    "updatedAt": "2026-10-31T09:28:24.776960+00:00"
   },
   "yieldCurveMonitor": {
     "_meta": {
@@ -59,8 +59,8 @@
       "vnYcCode": "YC0",
       "vnYcLabel": "NEUTRAL_MIXED",
       "vnYcDesc": "Trạng thái cân bằng chu kỳ. Đường cong phân hóa.",
-      "usYcCode": "YC0",
-      "usYcLabel": "NEUTRAL_MIXED",
+      "usYcCode": "YC4",
+      "usYcLabel": "TIGHT_INVERTED",
       "transChainStage": "LIQUIDITY SQUEEZE",
       "transStageSummary": "Áp lực tỷ giá kéo căng thanh khoản liên ngân hàng trong nước",
       "transBadge": "bg-amber-500/20 text-amber-400 border-amber-500/30",
@@ -70,7 +70,7 @@
       "equityRiskPremium": 5.01,
       "earningsYield": 9.5,
       "vnCurvature": -0.54,
-      "usCurvature": 0.4,
+      "usCurvature": 0.46,
       "vnMoveFocus": "LONG (Đầu dài 10Y)",
       "favoredSectors": "Luân chuyển cân bằng (Neutral Rotation)"
     },
@@ -120,15 +120,15 @@
         "id": 4,
         "metric": "2Y / 5Y / 10Y Yields (Bộ 3 kỳ hạn TPCP)",
         "vn": "2.45% / 3.20% / 4.49%",
-        "us": "4.65% / 5.02% / 4.99%",
-        "delta": "Spread 10Y: -0.50%",
+        "us": "4.65% / 5.02% / 4.93%",
+        "delta": "Spread 10Y: -0.44%",
         "highlight": "normal"
       },
       {
         "id": 5,
         "metric": "Level / Slope / Curvature (Nelson-Siegel)",
         "vn": "3.38% / +2.04% / -0.54%",
-        "us": "4.89% / +0.34% / +0.40%",
+        "us": "4.87% / +0.28% / +0.46%",
         "delta": "Curv VN: -0.54%",
         "highlight": "normal"
       },
@@ -136,7 +136,7 @@
         "id": 6,
         "metric": "YC Regime (Hình thái đường cong)",
         "vn": "YC0 | NEUTRAL_MIXED",
-        "us": "YC0 | NEUTRAL_MIXED",
+        "us": "YC4 | TIGHT_INVERTED",
         "delta": "Trạng thái cân bằng chu kỳ. Đường cong phân hóa.",
         "highlight": "normal"
       },
@@ -144,7 +144,7 @@
         "id": 7,
         "metric": "Segmented Slope (Độ dốc phân đoạn)",
         "vn": "2-5Y: +0.75% | 5-10Y: +1.29%",
-        "us": "2-5Y: +0.37% | 5-10Y: -0.03%",
+        "us": "2-5Y: +0.37% | 5-10Y: -0.09%",
         "delta": "10Y-2Y: +2.04%",
         "highlight": "normal"
       },
@@ -152,7 +152,7 @@
         "id": 8,
         "metric": "Curve Stress Score (Điểm căng thẳng đường cong)",
         "vn": "37.9/100 (MID)",
-        "us": "54.8/100 (MID)",
+        "us": "57.5/100 (MID)",
         "delta": "Ngưỡng rủi ro: 75/100",
         "highlight": "normal"
       },
@@ -176,7 +176,7 @@
         "id": 11,
         "metric": "4 Macro Spreads (4 Chênh lệch vĩ mô)",
         "vn": "LiqGap: +1.97% | 10Y-Policy: -0.01%",
-        "us": "Spread10Y: -0.50% | PolicyGap: -0.35%",
+        "us": "Spread10Y: -0.44% | PolicyGap: -0.35%",
         "delta": "Driver: LOCAL STRESS",
         "highlight": "warning"
       },
@@ -192,7 +192,7 @@
         "id": 13,
         "metric": "Funding Dynamics (Động lực thanh khoản hệ thống)",
         "vn": "Thanh khoản dồi dào | Gap: +1.97%",
-        "us": "Spread 2Y: -2.20% | USD/VND: 25,840",
+        "us": "Spread 2Y: -2.20% | USD/VND: 25,799",
         "delta": "LOCAL STRESS",
         "highlight": "normal"
       },
@@ -233,19 +233,19 @@
   "marketIndex": {
     "symbol": "VNINDEX",
     "name": "Chỉ Số VN-Index",
-    "currentPoint": 1774.15,
-    "prevPoint": 1760.63,
-    "change": 13.52,
-    "changePercent": 0.77,
-    "high": 1775.19,
-    "low": 1750.83,
-    "volume": 763825728,
+    "currentPoint": 1741.62,
+    "prevPoint": 1755.61,
+    "change": -13.99,
+    "changePercent": -0.8,
+    "high": 1748.68,
+    "low": 1727.0,
+    "volume": 690653376,
     "currentPE": 10.53,
     "currentPB": 1.77,
-    "historicalMeanPE": 11.4,
-    "historicalStdPE": 2.25,
-    "zScore": -0.39,
-    "percentile": 38.8,
+    "historicalMeanPE": 11.45,
+    "historicalStdPE": 2.2,
+    "zScore": -0.42,
+    "percentile": 38.3,
     "band": "DEEP_VALUE",
     "bandText": "Rất Rẻ (Vùng đáy lịch sử)",
     "bandColor": "emerald",
@@ -299,87 +299,87 @@
         "key": "ten_year",
         "label": "10 Năm",
         "desc": "Cửa sổ chuẩn mực vĩ mô dài hạn (Khuyến nghị)",
-        "dateFrom": "2016-10-30",
+        "dateFrom": "2016-11-29",
         "dateTo": "2026-10-14",
-        "nObs": 121,
+        "nObs": 120,
         "pe": {
           "label": "P/E (10 Năm)",
-          "mean": 11.4,
-          "median": 11.69,
-          "std": 2.25,
+          "mean": 11.45,
+          "median": 11.7,
+          "std": 2.2,
           "current": 10.53,
-          "zscore": -0.39,
-          "percentile": 38.8,
-          "p10": 8.4,
-          "p25": 9.8,
-          "p75": 13.25,
+          "zscore": -0.42,
+          "percentile": 38.3,
+          "p10": 8.48,
+          "p25": 9.81,
+          "p75": 13.26,
           "p90": 14.01,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 121,
-          "vsMedianPct": -9.9,
-          "vsMeanPct": -7.6
+          "nObs": 120,
+          "vsMedianPct": -10.0,
+          "vsMeanPct": -8.0
         },
         "pb": {
           "label": "P/B (10 Năm)",
-          "mean": 1.61,
+          "mean": 1.62,
           "median": 1.57,
-          "std": 0.34,
+          "std": 0.33,
           "current": 1.77,
-          "zscore": 0.47,
-          "percentile": 72.7,
-          "p10": 1.16,
-          "p25": 1.43,
+          "zscore": 0.46,
+          "percentile": 72.5,
+          "p10": 1.2,
+          "p25": 1.44,
           "p75": 1.84,
           "p90": 2.07,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 121,
+          "nObs": 120,
           "vsMedianPct": 12.7,
-          "vsMeanPct": 9.8
+          "vsMeanPct": 9.4
         },
         "peXpb": {
           "label": "P/E×P/B (10 Năm)",
-          "mean": 19.06,
-          "median": 18.91,
-          "std": 7.26,
+          "mean": 19.17,
+          "median": 18.95,
+          "std": 7.18,
           "current": 18.64,
-          "zscore": -0.06,
-          "percentile": 47.1,
-          "p10": 9.85,
-          "p25": 14.03,
+          "zscore": -0.07,
+          "percentile": 46.7,
+          "p10": 10.05,
+          "p25": 14.05,
           "p75": 23.32,
-          "p90": 28.61,
+          "p90": 28.67,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 121,
-          "vsMedianPct": -1.4,
-          "vsMeanPct": -2.2
+          "nObs": 120,
+          "vsMedianPct": -1.6,
+          "vsMeanPct": -2.8
         },
         "roeProxy": {
           "label": "ROE (10 Năm)",
           "mean": 14.18,
           "median": 14.4,
-          "std": 1.24,
+          "std": 1.25,
           "current": 16.81,
-          "zscore": 2.12,
+          "zscore": 2.11,
           "percentile": 98.3,
           "p10": 12.23,
           "p25": 13.38,
           "p75": 15.16,
-          "p90": 15.62,
+          "p90": 15.63,
           "band": "Rất mắc",
           "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
           "bandColor": "#ef4444",
-          "nObs": 121,
-          "vsMedianPct": 16.7,
-          "vsMeanPct": 18.5
+          "nObs": 120,
+          "vsMedianPct": 16.8,
+          "vsMeanPct": 18.6
         },
         "compositeSignal": {
-          "score": 52.7,
+          "score": 52.4,
           "signal": "TRUNG LẬP / GIỮ (HOLD)",
           "badge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "color": "#3b82f6",
@@ -390,87 +390,87 @@
         "key": "five_year",
         "label": "5 Năm",
         "desc": "Chu kỳ kinh tế & tiền tệ gần nhất",
-        "dateFrom": "2021-10-28",
+        "dateFrom": "2021-11-29",
         "dateTo": "2026-10-14",
-        "nObs": 61,
+        "nObs": 60,
         "pe": {
           "label": "P/E (5 Năm)",
-          "mean": 12.8,
-          "median": 12.88,
-          "std": 1.35,
+          "mean": 12.76,
+          "median": 12.84,
+          "std": 1.34,
           "current": 10.53,
           "zscore": -1.67,
-          "percentile": 6.6,
-          "p10": 11.17,
-          "p25": 11.74,
-          "p75": 13.65,
-          "p90": 14.29,
+          "percentile": 6.7,
+          "p10": 11.15,
+          "p25": 11.73,
+          "p75": 13.62,
+          "p90": 14.23,
           "band": "Rất rẻ",
           "bandBadge": "bg-emerald-500/20 text-emerald-400 border border-emerald-400/40",
           "bandColor": "#22c55e",
-          "nObs": 61,
-          "vsMedianPct": -18.2,
-          "vsMeanPct": -17.7
+          "nObs": 60,
+          "vsMedianPct": -18.0,
+          "vsMeanPct": -17.5
         },
         "pb": {
           "label": "P/B (5 Năm)",
           "mean": 1.78,
-          "median": 1.7,
-          "std": 0.27,
+          "median": 1.69,
+          "std": 0.26,
           "current": 1.77,
-          "zscore": -0.05,
-          "percentile": 59.0,
+          "zscore": -0.02,
+          "percentile": 60.0,
           "p10": 1.53,
           "p25": 1.57,
           "p75": 1.92,
-          "p90": 2.17,
+          "p90": 2.12,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 61,
-          "vsMedianPct": 4.1,
-          "vsMeanPct": -0.8
+          "nObs": 60,
+          "vsMedianPct": 4.7,
+          "vsMeanPct": -0.3
         },
         "peXpb": {
           "label": "P/E×P/B (5 Năm)",
-          "mean": 23.06,
-          "median": 21.52,
-          "std": 5.6,
+          "mean": 22.87,
+          "median": 21.51,
+          "std": 5.45,
           "current": 18.64,
-          "zscore": -0.79,
-          "percentile": 16.4,
-          "p10": 17.32,
-          "p25": 19.21,
-          "p75": 25.24,
-          "p90": 29.77,
+          "zscore": -0.78,
+          "percentile": 16.7,
+          "p10": 17.26,
+          "p25": 19.2,
+          "p75": 25.1,
+          "p90": 29.25,
           "band": "Rẻ",
           "bandBadge": "bg-teal-500/20 text-teal-300 border border-teal-400/40",
           "bandColor": "#14b8a6",
-          "nObs": 61,
+          "nObs": 60,
           "vsMedianPct": -13.4,
-          "vsMeanPct": -19.2
+          "vsMeanPct": -18.5
         },
         "roeProxy": {
           "label": "ROE (5 Năm)",
-          "mean": 13.96,
-          "median": 13.56,
-          "std": 1.61,
+          "mean": 13.94,
+          "median": 13.54,
+          "std": 1.62,
           "current": 16.81,
-          "zscore": 1.76,
+          "zscore": 1.78,
           "percentile": 96.7,
-          "p10": 12.04,
-          "p25": 12.41,
-          "p75": 15.48,
-          "p90": 15.86,
+          "p10": 12.03,
+          "p25": 12.4,
+          "p75": 15.45,
+          "p90": 15.87,
           "band": "Rất mắc",
           "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
           "bandColor": "#ef4444",
-          "nObs": 61,
-          "vsMedianPct": 24.0,
-          "vsMeanPct": 20.4
+          "nObs": 60,
+          "vsMedianPct": 24.2,
+          "vsMeanPct": 20.6
         },
         "compositeSignal": {
-          "score": 34.5,
+          "score": 34.9,
           "signal": "MUA TÍCH LŨY (VALUE BUY)",
           "badge": "bg-teal-500/20 text-teal-300 border border-teal-400/40",
           "color": "#14b8a6",
@@ -677,87 +677,87 @@
         "key": "ten_year",
         "label": "10 Năm",
         "desc": "Cửa sổ chuẩn mực vĩ mô dài hạn (Khuyến nghị)",
-        "dateFrom": "2016-10-30",
+        "dateFrom": "2016-11-29",
         "dateTo": "2026-10-14",
-        "nObs": 121,
+        "nObs": 120,
         "pe": {
           "label": "P/E (10 Năm)",
-          "mean": 11.21,
+          "mean": 11.26,
           "median": 11.28,
-          "std": 2.08,
+          "std": 2.03,
           "current": 10.86,
-          "zscore": -0.17,
-          "percentile": 40.5,
-          "p10": 8.26,
-          "p25": 10.1,
-          "p75": 12.68,
+          "zscore": -0.2,
+          "percentile": 40.0,
+          "p10": 8.67,
+          "p25": 10.12,
+          "p75": 12.7,
           "p90": 13.87,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 121,
+          "nObs": 120,
           "vsMedianPct": -3.7,
-          "vsMeanPct": -3.1
+          "vsMeanPct": -3.5
         },
         "pb": {
           "label": "P/B (10 Năm)",
-          "mean": 1.85,
-          "median": 1.78,
-          "std": 0.38,
+          "mean": 1.86,
+          "median": 1.79,
+          "std": 0.37,
           "current": 2.13,
-          "zscore": 0.73,
-          "percentile": 78.5,
-          "p10": 1.34,
+          "zscore": 0.72,
+          "percentile": 78.3,
+          "p10": 1.39,
           "p25": 1.67,
           "p75": 2.11,
           "p90": 2.38,
           "band": "Mắc",
           "bandBadge": "bg-amber-500/20 text-amber-300 border border-amber-400/40",
           "bandColor": "#f59e0b",
-          "nObs": 121,
-          "vsMedianPct": 19.7,
-          "vsMeanPct": 14.9
+          "nObs": 120,
+          "vsMedianPct": 19.3,
+          "vsMeanPct": 14.4
         },
         "peXpb": {
           "label": "P/E×P/B (10 Năm)",
-          "mean": 21.51,
-          "median": 20.22,
-          "std": 7.85,
+          "mean": 21.64,
+          "median": 20.33,
+          "std": 7.75,
           "current": 23.13,
-          "zscore": 0.21,
-          "percentile": 66.1,
-          "p10": 10.99,
-          "p25": 17.32,
-          "p75": 26.12,
-          "p90": 32.27,
+          "zscore": 0.19,
+          "percentile": 65.8,
+          "p10": 12.1,
+          "p25": 17.36,
+          "p75": 26.24,
+          "p90": 32.33,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 121,
-          "vsMedianPct": 14.4,
-          "vsMeanPct": 7.6
+          "nObs": 120,
+          "vsMedianPct": 13.8,
+          "vsMeanPct": 6.9
         },
         "roeProxy": {
           "label": "ROE (10 Năm)",
-          "mean": 16.56,
-          "median": 16.74,
+          "mean": 16.55,
+          "median": 16.73,
           "std": 1.35,
           "current": 19.61,
           "zscore": 2.26,
           "percentile": 98.3,
-          "p10": 14.64,
-          "p25": 15.54,
-          "p75": 17.55,
+          "p10": 14.63,
+          "p25": 15.53,
+          "p75": 17.54,
           "p90": 18.13,
           "band": "Rất mắc",
           "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
           "bandColor": "#ef4444",
-          "nObs": 121,
-          "vsMedianPct": 17.1,
-          "vsMeanPct": 18.4
+          "nObs": 120,
+          "vsMedianPct": 17.3,
+          "vsMeanPct": 18.5
         },
         "compositeSignal": {
-          "score": 56.6,
+          "score": 56.3,
           "signal": "TRUNG LẬP / GIỮ (HOLD)",
           "badge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "color": "#3b82f6",
@@ -768,87 +768,87 @@
         "key": "five_year",
         "label": "5 Năm",
         "desc": "Chu kỳ kinh tế & tiền tệ gần nhất",
-        "dateFrom": "2021-10-28",
+        "dateFrom": "2021-11-29",
         "dateTo": "2026-10-14",
-        "nObs": 61,
+        "nObs": 60,
         "pe": {
           "label": "P/E (5 Năm)",
-          "mean": 12.17,
-          "median": 11.95,
-          "std": 1.2,
+          "mean": 12.13,
+          "median": 11.92,
+          "std": 1.16,
           "current": 10.86,
-          "zscore": -1.1,
-          "percentile": 14.8,
-          "p10": 10.82,
-          "p25": 11.26,
-          "p75": 12.9,
-          "p90": 13.89,
+          "zscore": -1.09,
+          "percentile": 15.0,
+          "p10": 10.81,
+          "p25": 11.25,
+          "p75": 12.89,
+          "p90": 13.59,
           "band": "Rẻ",
           "bandBadge": "bg-teal-500/20 text-teal-300 border border-teal-400/40",
           "bandColor": "#14b8a6",
-          "nObs": 61,
-          "vsMedianPct": -9.1,
-          "vsMeanPct": -10.8
+          "nObs": 60,
+          "vsMedianPct": -8.9,
+          "vsMeanPct": -10.5
         },
         "pb": {
           "label": "P/B (5 Năm)",
-          "mean": 1.98,
-          "median": 1.86,
-          "std": 0.32,
+          "mean": 1.97,
+          "median": 1.85,
+          "std": 0.31,
           "current": 2.13,
-          "zscore": 0.45,
-          "percentile": 70.5,
+          "zscore": 0.5,
+          "percentile": 71.7,
           "p10": 1.66,
           "p25": 1.71,
-          "p75": 2.24,
-          "p90": 2.41,
+          "p75": 2.21,
+          "p90": 2.38,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 61,
-          "vsMedianPct": 14.5,
-          "vsMeanPct": 7.4
+          "nObs": 60,
+          "vsMedianPct": 15.1,
+          "vsMeanPct": 8.0
         },
         "peXpb": {
           "label": "P/E×P/B (5 Năm)",
-          "mean": 24.45,
-          "median": 22.06,
-          "std": 6.25,
+          "mean": 24.2,
+          "median": 21.98,
+          "std": 6.0,
           "current": 23.13,
-          "zscore": -0.21,
-          "percentile": 54.1,
-          "p10": 18.23,
-          "p25": 19.43,
-          "p75": 28.41,
-          "p90": 32.27,
+          "zscore": -0.18,
+          "percentile": 55.0,
+          "p10": 18.22,
+          "p25": 19.39,
+          "p75": 28.23,
+          "p90": 31.88,
           "band": "Trung bình",
           "bandBadge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "bandColor": "#3b82f6",
-          "nObs": 61,
-          "vsMedianPct": 4.9,
-          "vsMeanPct": -5.4
+          "nObs": 60,
+          "vsMedianPct": 5.3,
+          "vsMeanPct": -4.4
         },
         "roeProxy": {
           "label": "ROE (5 Năm)",
-          "mean": 16.26,
-          "median": 15.82,
+          "mean": 16.23,
+          "median": 15.81,
           "std": 1.71,
           "current": 19.61,
-          "zscore": 1.96,
+          "zscore": 1.98,
           "percentile": 96.7,
           "p10": 14.06,
-          "p25": 14.81,
-          "p75": 17.78,
+          "p25": 14.8,
+          "p75": 17.76,
           "p90": 18.3,
           "band": "Rất mắc",
           "bandBadge": "bg-rose-500/20 text-rose-300 border border-rose-400/40",
           "bandColor": "#ef4444",
-          "nObs": 61,
+          "nObs": 60,
           "vsMedianPct": 24.0,
-          "vsMeanPct": 20.6
+          "vsMeanPct": 20.9
         },
         "compositeSignal": {
-          "score": 43.8,
+          "score": 44.4,
           "signal": "TRUNG LẬP / GIỮ (HOLD)",
           "badge": "bg-blue-500/20 text-blue-300 border border-blue-400/40",
           "color": "#3b82f6",
@@ -2188,7 +2188,7 @@
       {
         "level": "Cao",
         "title": "Áp Lực Tỷ Giá USD/VND & Can Thiệp Tiền Tệ",
-        "risk": "Tỷ giá USD/VND neo cao ở mức 25,840 đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
+        "risk": "Tỷ giá USD/VND neo cao ở mức 25,799 đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
         "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
       },
       {
@@ -2206,7 +2206,7 @@
       {
         "level": "Cao",
         "title": "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)",
-        "risk": "Tỷ giá USD/VND (25,840) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.50%). SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng.",
+        "risk": "Tỷ giá USD/VND (25,799) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.44%). SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng.",
         "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
       }
     ],
@@ -2238,7 +2238,7 @@
     ],
     "keyTakeaways": [
       "⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha 'Mở Rộng Tăng Trưởng' với điểm rủi ro vĩ mô 44/100. P/E thị trường 10.53x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
-      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,840) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
+      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,799) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
       "Cơ hội lớn nhất: Ưu tiên tích lũy cổ phiếu giá trị, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
     ]
   },
@@ -2299,16 +2299,16 @@
   "macro": {
     "vn10yYield": 4.49,
     "sbvRefinancingRate": 4.5,
-    "us10yYield": 4.99,
-    "usdVndRate": 25840.0,
-    "goldWorld": 4007.9,
-    "oilBrent": 116.72,
-    "dxy": 101.81,
-    "sjcGoldBuy": 138.7,
-    "sjcGoldSell": 141.7,
-    "pnjGoldBuy": 138.0,
-    "pnjGoldSell": 141.0,
-    "pnjUpdateDate": "24/10/2026 09:38:51",
+    "us10yYield": 4.93,
+    "usdVndRate": 25799.0,
+    "goldWorld": 3898.9,
+    "oilBrent": 117.64,
+    "dxy": 101.88,
+    "sjcGoldBuy": 136.0,
+    "sjcGoldSell": 139.0,
+    "pnjGoldBuy": 133.6,
+    "pnjGoldSell": 137.6,
+    "pnjUpdateDate": "31/10/2026 10:38:15",
     "inflationCpi": 5.08,
     "coreInflation": 4.45,
     "interbankOvernight": 6.47,
@@ -2365,25 +2365,25 @@
   },
   "yieldCurveAnalysis": {
     "vn10y": 4.49,
-    "us10y": 4.99,
+    "us10y": 4.93,
     "sbvRefinancingRate": 4.5,
     "longShortSpread": -0.01,
-    "crossCountrySpread": -0.5,
+    "crossCountrySpread": -0.44,
     "inversionWarning": true,
     "recessionLead": false,
     "ycRegime": "Stress",
     "ycRegimeVi": "Căng Thẳng / Nguy Cơ Đảo Ngược Kỳ Hạn",
     "regimeBadge": "bg-rose-500/20 text-rose-400 border-rose-500/30",
     "ycStressIndex": 65.8,
-    "assessment": "Lợi suất TPCP 10Y (4.49%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = -0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.50%. ⚠️ Cảnh báo: Lợi suất dài hạn đang thấp hơn lãi suất điều hành, cần theo dõi thanh khoản hệ thống."
+    "assessment": "Lợi suất TPCP 10Y (4.49%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = -0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.44%. ⚠️ Cảnh báo: Lợi suất dài hạn đang thấp hơn lãi suất điều hành, cần theo dõi thanh khoản hệ thống."
   },
   "scenarioMatrix": {
     "base": {
       "name": "Kịch Bản Cơ Sở (Base Case)",
       "probability": 55,
       "badgeColor": "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-      "currentPoint": 1774.15,
-      "vnIndexRange": "1739 - 1836",
+      "currentPoint": 1741.62,
+      "vnIndexRange": "1707 - 1803",
       "conditions": "CPI duy trì quanh 5.1%, PMI mở rộng trên 51 điểm, SBV giữ lãi suất điều hành 4.5%, tỷ giá ổn định trong biên độ quản lý.",
       "sectorBenefit": [
         "Ngân Hàng",
@@ -2400,8 +2400,8 @@
       "name": "Kịch Bản Tích Cực (Bull Case)",
       "probability": 25,
       "badgeColor": "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      "currentPoint": 1774.15,
-      "vnIndexRange": "1819 - 1925",
+      "currentPoint": 1741.62,
+      "vnIndexRange": "1785 - 1890",
       "conditions": "Fed tiếp tục chu kỳ hạ lãi suất, SBV nới lỏng room tín dụng, dòng vốn FDI & khối ngoại quay lại mua ròng, tỷ giá hạ nhiệt.",
       "sectorBenefit": [
         "Chứng Khoán",
@@ -2419,8 +2419,8 @@
       "name": "Kịch Bản Thận Trọng (Bear Case)",
       "probability": 20,
       "badgeColor": "bg-rose-500/20 text-rose-400 border border-rose-500/30",
-      "currentPoint": 1774.15,
-      "vnIndexRange": "1632 - 1730",
+      "currentPoint": 1741.62,
+      "vnIndexRange": "1602 - 1698",
       "conditions": "Lạm phát thế giới và giá dầu tăng vọt, SBV buộc phải hút ròng thanh khoản tiền đồng hoặc tăng lãi suất, USD/VND vượt đỉnh.",
       "sectorBenefit": [
         "Năng Lượng & Dầu Khí",
@@ -2442,16 +2442,16 @@
       "signal": "CAUTION",
       "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
       "severity": "MEDIUM",
-      "trigger": "Tỷ giá USD/VND (25,840) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.50%).",
+      "trigger": "Tỷ giá USD/VND (25,799) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.44%).",
       "impact": "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng."
     }
   ],
   "hasActiveTailRisk": true,
   "criticalTailRiskCount": 0,
   "leadLagDivergence": {
-    "leadingPct": 56.2,
+    "leadingPct": 55.7,
     "laggingPct": 40.1,
-    "divergence": 16.1,
+    "divergence": 15.6,
     "signal": "⚠️ LEADING WARNS",
     "signalVi": "Chỉ Báo Sớm Báo Động (Leading Warns)",
     "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
@@ -2733,7 +2733,7 @@
       {
         "key": "fx",
         "name": "Tỷ Giá USD/VND",
-        "val": "25,840",
+        "val": "25,799",
         "status": "neutral",
         "lead": "Tỷ giá ổn định giảm áp lực can thiệp hút ròng của Ngân hàng Nhà nước."
       },
@@ -2818,19 +2818,19 @@
     }
   },
   "goldAdvisor": {
-    "worldConvertedVnd": 124862411,
-    "worldPriceUsd": 4007.9,
-    "spreadPct": 13.48,
-    "sjcSpreadPct": 13.48,
-    "pnjSpreadPct": 12.92,
-    "sjcBuy": 138.7,
-    "sjcSell": 141.7,
-    "pnjBuy": 138.0,
-    "pnjSell": 141.0,
-    "updatedAt": "24/10/2026 09:38:51",
+    "worldConvertedVnd": 121273887,
+    "worldPriceUsd": 3898.9,
+    "spreadPct": 14.62,
+    "sjcSpreadPct": 14.62,
+    "pnjSpreadPct": 13.46,
+    "sjcBuy": 136.0,
+    "sjcSell": 139.0,
+    "pnjBuy": 133.6,
+    "pnjSell": 137.6,
+    "updatedAt": "31/10/2026 10:38:15",
     "action": "MUA PHÒNG THỦ",
     "sizeHint": "5-10% danh mục",
-    "reason": "Chênh lệch SJC vs Thế giới rất lớn (13.48%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
+    "reason": "Chênh lệch SJC vs Thế giới rất lớn (14.62%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
   },
   "tradingEconomics": {
     "_meta": {
@@ -3976,7 +3976,7 @@
   },
   "marketValuationHistory": {
     "_meta": {
-      "updatedAt": "2026-10-24T08:00:12.172828",
+      "updatedAt": "2026-10-31T09:28:07.077972",
       "sheetId": "1TdXzsXN_bMQKHLN0Zqc8t4lS-59us02Btr_SLc0AgpQ",
       "source": "Google Sheets (Simply Wall St Vietnam)",
       "periods": [
@@ -3986,10 +3986,10 @@
         "10year"
       ],
       "totalObservations": {
-        "1year": 46,
-        "3year": 39,
-        "5year": 39,
-        "10year": 39
+        "1year": 47,
+        "3year": 40,
+        "5year": 40,
+        "10year": 40
       }
     },
     "metrics": [
@@ -4033,53 +4033,53 @@
     "periods": {
       "1year": {
         "period": "1year",
-        "observationsCount": 46,
+        "observationsCount": 47,
         "stats": {
           "marketCap": {
-            "observations": 46,
-            "current": 8520.07,
-            "mean": 8567.21,
-            "stdDev": 617.99,
+            "observations": 47,
+            "current": 8888.68,
+            "mean": 8574.05,
+            "stdDev": 613.03,
             "min": 7326.6,
             "max": 9419.8
           },
           "revenue": {
-            "observations": 46,
-            "current": 5182.91,
-            "mean": 4485.96,
-            "stdDev": 469.61,
+            "observations": 47,
+            "current": 5226.3,
+            "mean": 4501.71,
+            "stdDev": 476.87,
             "min": 3811.2,
-            "max": 5222.3
+            "max": 5226.3
           },
           "earnings": {
-            "observations": 46,
-            "current": 725.61,
-            "mean": 600.31,
-            "stdDev": 86.73,
+            "observations": 47,
+            "current": 729.45,
+            "mean": 603.06,
+            "stdDev": 87.83,
             "min": 469.3,
-            "max": 725.7
+            "max": 729.45
           },
           "pe": {
-            "observations": 46,
-            "current": 9.5,
-            "mean": 11.72,
-            "stdDev": 1.45,
+            "observations": 47,
+            "current": 9.8,
+            "mean": 11.68,
+            "stdDev": 1.46,
             "min": 9.5,
             "max": 14.8
           },
           "absolutePe": {
-            "observations": 46,
-            "current": 11.7,
-            "mean": 14.47,
-            "stdDev": 1.53,
+            "observations": 47,
+            "current": 12.2,
+            "mean": 14.42,
+            "stdDev": 1.55,
             "min": 11.7,
             "max": 17.7
           },
           "ps": {
-            "observations": 46,
-            "current": 1.6,
+            "observations": 47,
+            "current": 1.7,
             "mean": 1.92,
-            "stdDev": 0.14,
+            "stdDev": 0.15,
             "min": 1.6,
             "max": 2.3
           }
@@ -4774,57 +4774,72 @@
             "absolutePeRaw": "11.7x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Sun, 25 Oct 2026",
+            "marketCap": 8888.68,
+            "marketCapRaw": "₫8888.68t",
+            "revenue": 5226.3,
+            "revenueRaw": "₫5226.30t",
+            "earnings": 729.45,
+            "earningsRaw": "₫729.45t",
+            "pe": 9.8,
+            "peRaw": "9.8x",
+            "absolutePe": 12.2,
+            "absolutePeRaw": "12.2x",
+            "ps": 1.7,
+            "psRaw": "1.7x"
           }
         ]
       },
       "3year": {
         "period": "3year",
-        "observationsCount": 39,
+        "observationsCount": 40,
         "stats": {
           "marketCap": {
-            "observations": 39,
-            "current": 8520.07,
-            "mean": 6829.24,
-            "stdDev": 1701.51,
+            "observations": 40,
+            "current": 8888.68,
+            "mean": 6880.73,
+            "stdDev": 1710.83,
             "min": 4648.6,
             "max": 9169.3
           },
           "revenue": {
-            "observations": 39,
-            "current": 5182.91,
-            "mean": 3764.2,
-            "stdDev": 895.92,
+            "observations": 40,
+            "current": 5226.3,
+            "mean": 3800.75,
+            "stdDev": 914.08,
             "min": 2747.4,
             "max": 5233.6
           },
           "earnings": {
-            "observations": 39,
-            "current": 725.61,
-            "mean": 481.58,
-            "stdDev": 148.32,
+            "observations": 40,
+            "current": 729.45,
+            "mean": 487.77,
+            "stdDev": 151.56,
             "min": 319.4,
-            "max": 726.0
+            "max": 729.45
           },
           "pe": {
-            "observations": 39,
-            "current": 9.5,
-            "mean": 12.98,
-            "stdDev": 1.93,
+            "observations": 40,
+            "current": 9.8,
+            "mean": 12.9,
+            "stdDev": 1.97,
             "min": 9.5,
             "max": 16.4
           },
           "absolutePe": {
-            "observations": 39,
-            "current": 11.7,
-            "mean": 14.45,
-            "stdDev": 1.43,
+            "observations": 40,
+            "current": 12.2,
+            "mean": 14.39,
+            "stdDev": 1.45,
             "min": 11.7,
             "max": 17.1
           },
           "ps": {
-            "observations": 39,
-            "current": 1.6,
-            "mean": 1.82,
+            "observations": 40,
+            "current": 1.7,
+            "mean": 1.81,
             "stdDev": 0.15,
             "min": 1.5,
             "max": 2.2
@@ -5415,58 +5430,73 @@
             "absolutePeRaw": "11.7x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Sun, 25 Oct 2026",
+            "marketCap": 8888.68,
+            "marketCapRaw": "₫8888.68t",
+            "revenue": 5226.3,
+            "revenueRaw": "₫5226.30t",
+            "earnings": 729.45,
+            "earningsRaw": "₫729.45t",
+            "pe": 9.8,
+            "peRaw": "9.8x",
+            "absolutePe": 12.2,
+            "absolutePeRaw": "12.2x",
+            "ps": 1.7,
+            "psRaw": "1.7x"
           }
         ]
       },
       "5year": {
         "period": "5year",
-        "observationsCount": 39,
+        "observationsCount": 40,
         "stats": {
           "marketCap": {
-            "observations": 39,
-            "current": 8520.07,
-            "mean": 6364.03,
-            "stdDev": 1669.08,
+            "observations": 40,
+            "current": 8888.68,
+            "mean": 6427.14,
+            "stdDev": 1695.21,
             "min": 4390.0,
             "max": 9267.5
           },
           "revenue": {
-            "observations": 39,
-            "current": 5182.91,
-            "mean": 3438.08,
-            "stdDev": 994.36,
+            "observations": 40,
+            "current": 5226.3,
+            "mean": 3482.79,
+            "stdDev": 1021.44,
             "min": 2286.1,
-            "max": 5189.3
+            "max": 5226.3
           },
           "earnings": {
-            "observations": 39,
-            "current": 725.61,
-            "mean": 445.9,
-            "stdDev": 150.73,
+            "observations": 40,
+            "current": 729.45,
+            "mean": 452.98,
+            "stdDev": 155.39,
             "min": 312.5,
-            "max": 725.7
+            "max": 729.45
           },
           "pe": {
-            "observations": 39,
-            "current": 9.5,
-            "mean": 12.74,
-            "stdDev": 2.13,
+            "observations": 40,
+            "current": 9.8,
+            "mean": 12.67,
+            "stdDev": 2.15,
             "min": 9.5,
             "max": 16.6
           },
           "absolutePe": {
-            "observations": 39,
-            "current": 11.7,
-            "mean": 14.64,
-            "stdDev": 1.94,
+            "observations": 40,
+            "current": 12.2,
+            "mean": 14.57,
+            "stdDev": 1.95,
             "min": 11.7,
             "max": 19.6
           },
           "ps": {
-            "observations": 39,
-            "current": 1.6,
+            "observations": 40,
+            "current": 1.7,
             "mean": 1.89,
-            "stdDev": 0.3,
+            "stdDev": 0.29,
             "min": 1.5,
             "max": 2.7
           }
@@ -6056,58 +6086,73 @@
             "absolutePeRaw": "11.7x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Sun, 25 Oct 2026",
+            "marketCap": 8888.68,
+            "marketCapRaw": "₫8888.68t",
+            "revenue": 5226.3,
+            "revenueRaw": "₫5226.30t",
+            "earnings": 729.45,
+            "earningsRaw": "₫729.45t",
+            "pe": 9.8,
+            "peRaw": "9.8x",
+            "absolutePe": 12.2,
+            "absolutePeRaw": "12.2x",
+            "ps": 1.7,
+            "psRaw": "1.7x"
           }
         ]
       },
       "10year": {
         "period": "10year",
-        "observationsCount": 39,
+        "observationsCount": 40,
         "stats": {
           "marketCap": {
-            "observations": 39,
-            "current": 8520.07,
-            "mean": 5181.65,
-            "stdDev": 2314.97,
+            "observations": 40,
+            "current": 8888.68,
+            "mean": 5274.33,
+            "stdDev": 2359.08,
             "min": 1474.4,
             "max": 9267.5
           },
           "revenue": {
-            "observations": 39,
-            "current": 5182.91,
-            "mean": 2909.05,
-            "stdDev": 1241.65,
+            "observations": 40,
+            "current": 5226.3,
+            "mean": 2966.98,
+            "stdDev": 1279.22,
             "min": 1094.3,
-            "max": 5189.3
+            "max": 5226.3
           },
           "earnings": {
-            "observations": 39,
-            "current": 725.61,
-            "mean": 356.91,
-            "stdDev": 199.25,
+            "observations": 40,
+            "current": 729.45,
+            "mean": 366.23,
+            "stdDev": 205.31,
             "min": 85.5,
-            "max": 725.7
+            "max": 729.45
           },
           "pe": {
-            "observations": 39,
-            "current": 9.5,
-            "mean": 11.66,
+            "observations": 40,
+            "current": 9.8,
+            "mean": 11.61,
             "stdDev": 2.06,
             "min": 9.4,
             "max": 16.6
           },
           "absolutePe": {
-            "observations": 39,
-            "current": 11.7,
-            "mean": 15.41,
-            "stdDev": 2.31,
+            "observations": 40,
+            "current": 12.2,
+            "mean": 15.33,
+            "stdDev": 2.33,
             "min": 11.7,
             "max": 21.6
           },
           "ps": {
-            "observations": 39,
-            "current": 1.6,
+            "observations": 40,
+            "current": 1.7,
             "mean": 1.77,
-            "stdDev": 0.31,
+            "stdDev": 0.3,
             "min": 1.3,
             "max": 2.7
           }
@@ -6697,6 +6742,21 @@
             "absolutePeRaw": "11.7x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Sun, 25 Oct 2026",
+            "marketCap": 8888.68,
+            "marketCapRaw": "₫8888.68t",
+            "revenue": 5226.3,
+            "revenueRaw": "₫5226.30t",
+            "earnings": 729.45,
+            "earningsRaw": "₫729.45t",
+            "pe": 9.8,
+            "peRaw": "9.8x",
+            "absolutePe": 12.2,
+            "absolutePeRaw": "12.2x",
+            "ps": 1.7,
+            "psRaw": "1.7x"
           }
         ]
       }
@@ -6717,15 +6777,15 @@
     "status": "success",
     "provider": "offline-heuristic-engine",
     "model": "Quantitative Deterministic Heuristic v4.0",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00"
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00"
   },
   "aiScenarios": {
-    "marketVerdict": "VN-Index dao động tích lũy quanh vùng 1,774 điểm (P/E 10.5x), phân hóa theo năng lực tăng trưởng EPS thực tế của từng nhóm ngành.",
+    "marketVerdict": "VN-Index dao động tích lũy quanh vùng 1,742 điểm (P/E 10.5x), phân hóa theo năng lực tăng trưởng EPS thực tế của từng nhóm ngành.",
     "scenarios": {
       "base": {
         "name": "Kịch Bản Cơ Sở (Base Case)",
         "probability": 50,
-        "vnIndexTargetRange": "1,739 - 1,845",
+        "vnIndexTargetRange": "1,707 - 1,811",
         "targetPeRange": "11.5x - 11.3x",
         "projectedEpsGrowth": "+10.0% – 12.5%",
         "macroCatalysts": [
@@ -6760,7 +6820,7 @@
       "bull": {
         "name": "Kịch Bản Tích Cực (Bull Case)",
         "probability": 25,
-        "vnIndexTargetRange": "1,827 - 1,952",
+        "vnIndexTargetRange": "1,794 - 1,916",
         "targetPeRange": "11.3x - 12.7x",
         "projectedEpsGrowth": "+14.0% – 18.0%",
         "macroCatalysts": [
@@ -6795,7 +6855,7 @@
       "bear": {
         "name": "Kịch Bản Thận Trọng (Bear Case)",
         "probability": 25,
-        "vnIndexTargetRange": "1,597 - 1,721",
+        "vnIndexTargetRange": "1,567 - 1,689",
         "targetPeRange": "11.2x - 12.3x",
         "projectedEpsGrowth": "+2.0% – 5.0%",
         "macroCatalysts": [
@@ -6832,7 +6892,7 @@
         "actionSummary": "Nâng tỷ trọng tiền mặt và tài sản phòng thủ, kiên nhẫn chờ đợi điểm cân bằng định giá sâu."
       }
     },
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiClockDynamics": {
@@ -6856,7 +6916,7 @@
         "Vật Liệu Nhạy Giá"
       ]
     },
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiYieldCurveDiagnosis": {
@@ -6864,7 +6924,7 @@
     "bankingLiquidityImpact": "Thanh khoản hệ thống ngân hàng được hỗ trợ bởi các công cụ OMO của SBV, biên lãi ròng NIM có dư địa phục hồi nhẹ.",
     "corporateDebtStress": "Áp lực đáo hạn trái phiếu doanh nghiệp đang được các ngân hàng thương mại tái cơ cấu có chọn lọc, rủi ro vỡ nợ hệ thống ở mức thấp.",
     "equityMarketSignal": "Lợi tức thu nhập E/P thị trường cổ phiếu (~7.4%) duy trì mức chênh lệch dương hấp dẫn so với lợi suất TPCP 10 năm (~4.4%).",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiMultiAssetStrategy": {
@@ -6877,7 +6937,7 @@
       "cash": 10,
       "gold": 5
     },
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiStyleRotation": {
@@ -6885,13 +6945,13 @@
     "largeCapVsMidcap": "Nhóm Large-Cap VN30 đóng vai trò giữ nhịp chỉ số trong khi VN Midcap có sự phân hóa cao, chỉ những mã có câu chuyện tăng trưởng EPS riêng biệt mới thu hút dòng tiền.",
     "diamondForeignRoom": "Các cổ phiếu rổ VN Diamond tiếp tục được định giá cao hơn mặt bằng chung nhờ tỷ lệ sở hữu của khối ngoại luôn chạm trần (FSR).",
     "actionableStrategy": "Chiến lược phân bổ: 50% VN30 đầu ngành, 30% VN Diamond hết room ngoại và 20% VN Midcap chọn lọc.",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiTailRiskAnalysis": {
     "contingencyPlan": "Duy trì kỷ luật dừng lỗ tại các ngưỡng hỗ trợ kỹ thuật trọng yếu và chủ động hạ tỷ lệ margin khi thị trường xuất hiện tín hiệu căng thẳng thanh khoản liên ngân hàng.",
     "contagionChain": "Nếu tỷ giá USD/VND vượt đỉnh, áp lực rút vốn ròng của khối ngoại sẽ tác động trực tiếp lên nhóm cổ phiếu vốn hóa lớn VN30, sau đó lan tỏa sang tâm lý thị trường chung.",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiSbvOmoDiagnosis": {
@@ -6901,7 +6961,7 @@
     "bankingNIMImpact": "Chi phí vốn thị trường 2 tăng nhẹ tạo sự phân hóa rõ nét giữa ngân hàng có CASA cao và các ngân hàng nhỏ.",
     "equityMarketVerdict": "Dòng tiền trên TTCK sẽ phân hóa mạnh, ưu tiên các cổ phiếu có lượng tiền mặt ròng dồi dào và đòn bẩy thấp.",
     "actionableAdvice": "Duy trì tỷ trọng cổ phiếu ở mức 50-65%, hạn chế sử dụng Margin cao trong giai đoạn thanh khoản liên ngân hàng neo cao.",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiInflationDiagnosis": {
@@ -6930,7 +6990,7 @@
       }
     ],
     "hedgingStrategy": "Phân bổ tối thiểu 60-70% vốn vào cổ phiếu chất lượng cao và Vàng vật chất để bảo vệ sức mua thực tế vượt trên lạm phát.",
-    "updatedAt": "2026-10-24T08:00:29.982752+00:00",
+    "updatedAt": "2026-10-31T09:28:24.688993+00:00",
     "provider": "offline-heuristic-engine"
   }
 }
