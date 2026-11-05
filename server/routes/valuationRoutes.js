@@ -150,7 +150,7 @@ router.get('/valuation/macro/config', (req, res) => {
         enabled: AI_MACRO_CONFIG?.enabled ?? true,
         mode: 'background_pipeline',
         provider: aiInsight.provider || 'python_pipeline',
-        model: aiInsight.model || 'Gemini 2.5 Flash / CIO Heuristic',
+        model: aiInsight.model || 'OpenRouter / CIO Heuristic',
         hasApiKey: true,
         updatedAt: aiInsight.updatedAt || macroData.updatedAt || null,
       },

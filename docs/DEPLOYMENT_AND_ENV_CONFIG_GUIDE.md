@@ -51,13 +51,11 @@ Hệ thống được thiết kế theo nguyên tắc **"Tách Rời Tính Toán
 
 | Biến Môi Trường | GitHub Actions | Vercel Prod | Local `.env` | Định Dạng / Giá Trị Mẫu | Mô Tả Chức Năng |
 | :--- | :---: | :---: | :---: | :--- | :--- |
-| **`GEMINI_API_KEY`** | **BẮT BUỘC** ⭐ | *Không nên đặt* | Tùy chọn | `AIzaSy...` | Khóa API Google Gemini để sinh báo cáo AI tự động. |
-| **`GEMINI_MODEL`** | *Nên đặt* (Secrets/Vars)| *Không cần* | Có | `gemini-1.5-flash` \| `gemini-1.5-pro` \| `gemini-2.0-flash` | Mô hình Google Gemini mong muốn (`gemini-1.5-flash` là mặc định). |
-| **`OPENAI_API_KEY`** | *Tùy chọn* | *Không nên đặt* | Tùy chọn | `sk-...` | Khóa API OpenAI / DeepSeek / Groq (nếu không dùng Gemini). |
-| **`OPENAI_BASE_URL`** | *Tùy chọn* | *Không nên đặt* | Tùy chọn | `https://api.deepseek.com/v1` | URL endpoint tùy chỉnh tương thích chuẩn OpenAI. |
-| **`OPENAI_MODEL`** | *Tùy chọn* | *Không cần* | Có | `gpt-4o-mini` \| `deepseek-chat` | Tên mô hình khi sử dụng OpenAI Standard API. |
-| **`AI_PROVIDER`** | *Nên đặt* | *Không cần* | Có | `auto` \| `gemini` \| `openai` | Nhà cung cấp AI ưu tiên (`auto` tự phát hiện key). |
-| **`AI_MODEL`** | *Tùy chọn* | *Không cần* | Có | `gemini-1.5-flash` \| `deepseek-chat` | Tên mô hình LLM chung (dự phòng cho cả hai provider). |
+| **`OPENROUTER_API_KEY`** | **BẮT BUỘC** ⭐ | *Không nên đặt* | Tùy chọn | `sk-or-v1-...` | Khóa API OpenRouter để sinh báo cáo AI tự động. |
+| **`OPENROUTER_MODEL`** | *Nên đặt* (Secrets/Vars)| *Không cần* | Có | `deepseek/deepseek-chat` \| `anthropic/claude-3.5-sonnet` | Mô hình OpenRouter mong muốn (`deepseek/deepseek-chat` là mặc định). |
+| **`OPENROUTER_BASE_URL`** | *Tùy chọn* | *Không cần* | Có | `https://openrouter.ai/api/v1` | URL endpoint OpenRouter (mặc định: `https://openrouter.ai/api/v1`). |
+| **`AI_PROVIDER`** | *Nên đặt* | *Không cần* | Có | `openrouter` \| `heuristic` | Nhà cung cấp AI (`openrouter` là mặc định). |
+| **`AI_MODEL`** | *Tùy chọn* | *Không cần* | Có | `deepseek/deepseek-chat` \| `anthropic/claude-3.5-sonnet` | Tên mô hình LLM chung (dự phòng). |
 | **`TURSO_DATABASE_URL`**| **BẮT BUỘC** ⭐ | **BẮT BUỘC** ⭐ | Có (khi dev cloud)| `libsql://your-db.turso.io` | URL kết nối Turso Cloud SQLite. |
 | **`TURSO_AUTH_TOKEN`** | **BẮT BUỘC** ⭐ | **BẮT BUỘC** ⭐ | Có (khi dev cloud)| `eyJhbGciOi...` | Token bảo mật truy cập Turso DB. |
 | **`DB_MODE`** | *Không cần* | **BẮT BUỘC** (`turso`)| Có (`local`)\|(`turso`)| `local` (dùng file `stock.db`) hoặc `turso` (dùng cloud). |
@@ -82,8 +80,8 @@ GitHub Actions chịu trách nhiệm chạy các workflow:
 3. Tại mục **Repository secrets**, nhấn nút **New repository secret** để thêm các biến nhạy cảm:
 
 ```ini
-# 1. API Key cho AI Copilot (Khuyến nghị Gemini):
-GEMINI_API_KEY = AIzaSyxxxxxxxxxxxxxxxxxxxxxx
+# 1. API Key cho AI Copilot (OpenRouter Gateway):
+OPENROUTER_API_KEY = sk-or-v1-xxxxxxxxxxxxxxxxxxxxxx
 
 # 2. Thông tin kết nối Turso Database (Để quét hàng đợi mã requested_stocks):
 TURSO_DATABASE_URL = libsql://stock-xxxx.turso.io
@@ -93,9 +91,9 @@ TURSO_AUTH_TOKEN = eyJhbGciOiJKV1QiLCJhbGciOi...
 4. *(Tùy chọn)* Tại mục **Variables** (cạnh tab Secrets), bạn có thể đặt các biến cấu hình công khai mà không cần tạo secret:
 
 ```ini
-# Tùy biến model Gemini (Hệ thống hỗ trợ cả Secrets và Variables):
-GEMINI_MODEL = gemini-1.5-flash
-# (hoặc gemini-1.5-pro, gemini-2.0-flash, gemini-2.0-flash-lite)
+# Tùy biến model OpenRouter (Hệ thống hỗ trợ cả Secrets và Variables):
+OPENROUTER_MODEL = deepseek/deepseek-chat
+# (hoặc deepseek/deepseek-r1, anthropic/claude-3.5-sonnet, meta-llama/llama-3.3-70b-instruct)
 ```
 
 > [!NOTE]
@@ -122,7 +120,7 @@ Vercel phục vụ ứng dụng React SPA và các Serverless Functions tại [`
 
 > [!TIP]
 > **Khuyến nghị về AI trên Vercel (100% Decoupled)**:
-> **TUYỆT ĐỐI KHÔNG CẦN** cấu hình `GEMINI_API_KEY`, `GEMINI_MODEL` hay bất kỳ biến AI nào trên Vercel.
+> **TUYỆT ĐỐI KHÔNG CẦN** cấu hình `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` hay bất kỳ biến AI nào trên Vercel.
 > * Toàn bộ mã gọi LLM phía JavaScript đã được gỡ bỏ hoàn toàn để tuân thủ kiến trúc Single Source of Truth.
 > * Vercel và Frontend React chỉ đóng vai trò đọc dữ liệu 0ms có sẵn từ các snapshot tĩnh ([`data/macro_valuation.json`](file:///Users/thaihai-swe/Desktop/stock/data/macro_valuation.json) và [`data/financials/<MÃ>.json`](file:///Users/thaihai-swe/Desktop/stock/data/financials/)) do Python Background Pipeline sinh sẵn.
 > * Điều này giúp loại bỏ 100% rủi ro bị spam API key, không phát sinh chi phí, và bảo mật tuyệt đối.
@@ -143,21 +141,18 @@ Môi trường máy tính cá nhân phục vụ việc lập trình, chạy th�
    DB_MODE=local
    PORT=3001
 
-   # 2. (Tùy chọn) Điền key AI nếu muốn chạy thử CLI scripts/generate_ai_insights.py:
-   AI_PROVIDER=auto
-   GEMINI_API_KEY=your_gemini_api_key_here
-
-   # Hoặc dùng DeepSeek:
-   # OPENAI_API_KEY=your_deepseek_key_here
-   # OPENAI_BASE_URL=https://api.deepseek.com/v1
-   # OPENAI_MODEL=deepseek-chat
+   # 2. (Tùy chọn) Điền key OpenRouter nếu muốn chạy thử CLI scripts/generate_ai_insights.py:
+   AI_PROVIDER=openrouter
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   OPENROUTER_MODEL=deepseek/deepseek-chat
+   OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
    ```
 
 ---
 
-## 4. Hệ Sinh Thái AI Copilot: Chiến Lược Provider & Token
+## 4. Hệ Sinh Thái AI Copilot: OpenRouter Gateway & Heuristic Engine
 
-Hệ thống hỗ trợ kiến trúc **Đa Nhà Cung Cấp (Multi-Provider)** và tự động chuyển đổi thông minh:
+Hệ thống kết nối trực tiếp với **OpenRouter API Gateway** duy nhất và tự động fallback về bộ động cơ Heuristic định lượng khi cần:
 
 ```mermaid
 flowchart TD
@@ -165,34 +160,27 @@ flowchart TD
     CacheCheck -- "Có (Mặc định)" --> ReturnCache["Trả về kết quả từ Cache JSON (0ms, 0đ)"]
     CacheCheck -- "Không / Chạy Nền Pipeline" --> ProviderCheck{"Cấu Hình AI_PROVIDER"}
 
-    ProviderCheck -- "auto (Mặc định)" --> HasGemini{"Có GEMINI_API_KEY?"}
-    HasGemini -- "Có" --> CallGemini["Gọi Google Gemini (gemini-1.5-flash)"]
-    HasGemini -- "Không" --> HasOpenAI{"Có OPENAI_API_KEY?"}
-    HasOpenAI -- "Có" --> CallOpenAI["Gọi OpenAI / DeepSeek REST API"]
-    HasOpenAI -- "Không" --> CallHeuristic["Kích hoạt Heuristic Engine Nội Bộ"]
+    ProviderCheck -- "openrouter (Mặc định)" --> HasKey{"Có OPENROUTER_API_KEY?"}
+    HasKey -- "Có" --> CallOpenRouter["Gọi OpenRouter API (deepseek/deepseek-chat)"]
+    HasKey -- "Không" --> CallHeuristic["Kích hoạt Heuristic Engine Nội Bộ"]
 
-    CallGemini -- "Lỗi mạng / Rate Limit" --> CallHeuristic
-    CallOpenAI -- "Lỗi mạng / Rate Limit" --> CallHeuristic
+    CallOpenRouter -- "Lỗi mạng / Rate Limit 429" --> CallHeuristic
 
-    CallGemini & CallOpenAI & CallHeuristic --> SaveCache["Ghi vào data/ai_insights_cache.json"]
+    CallOpenRouter & CallHeuristic --> SaveCache["Ghi vào data/ai_insights_cache.json"]
     SaveCache --> ReturnCache
 ```
 
-### So Sánh 3 Lựa Chọn AI Hàng Đầu:
-1. **Google Gemini (Khuyến Nghị Hàng Đầu - Miễn Phí)**:
-   * **Biến cấu hình**: `GEMINI_API_KEY` và `GEMINI_MODEL` (Mặc định: `gemini-1.5-flash`).
-   * **Các mô hình hỗ trợ**:
-     - `gemini-1.5-flash`: Tốc độ cao, tiết kiệm token, ngữ cảnh 1M token (Khuyến nghị chuẩn).
-     - `gemini-1.5-pro`: Suy luận phức tạp, phân tích báo cáo tài chính 10 mô hình và vĩ mô chuyên sâu (2M token).
-     - `gemini-2.0-flash`: Thế hệ mới nhất tốc độ cực nhanh, phản hồi thời gian thực với độ trễ thấp vượt trội.
-     - `gemini-2.0-flash-lite`: Bản siêu nhẹ tối ưu quota miễn phí.
-   * **Chi phí**: **0 đồng** (Google AI Studio cấp hạn ngạch miễn phí 15 requests/phút, thoải mái cho cronjob hằng ngày).
-   * **Cách lấy key**: Truy cập [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) &rarr; Tạo API Key.
-2. **DeepSeek API (Chất Lượng Cao, Chi Phí Cực Thấp)**:
-   * **Mô hình**: `deepseek-chat` (suy luận tài chính và tiếng Việt xuất sắc).
-   * **Cấu hình**: `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_MODEL=deepseek-chat`.
-   * **Chi phí**: Cực rẻ (~0.002$ cho 1 lượt phân tích toàn diện).
-3. **Bộ Động Cơ Dự Phòng Deterministic Heuristic (Offline Fallback Engine)**:
+### 2 Lớp Xử Lý AI:
+1. **OpenRouter API Gateway (Cổng Kết Nối LLM Duy Nhất)**:
+   * **Biến cấu hình**: `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` (Mặc định: `deepseek/deepseek-chat`), `OPENROUTER_BASE_URL` (`https://openrouter.ai/api/v1`).
+   * **Các mô hình OpenRouter được hỗ trợ**:
+     - `deepseek/deepseek-chat`: Chi phí siêu rẻ, suy luận sắc sảo (Khuyến nghị chuẩn).
+     - `deepseek/deepseek-r1`: Suy luận logic toán học & pháp y BCTC chuyên sâu.
+     - `anthropic/claude-3.5-sonnet`: Văn phong tài chính chuyên nghiệp cấp quỹ đầu tư ngoại.
+     - `qwen/qwen-2.5-72b-instruct`: Tốc độ cực nhanh cho tác vụ tổng hợp tin tức.
+     - `meta-llama/llama-3.3-70b-instruct`: Mô hình mã nguồn mở mạnh mẽ.
+   * **Cách lấy key**: Truy cập [openrouter.ai/keys](https://openrouter.ai/keys) &rarr; Tạo API Key.
+2. **Bộ Động Cơ Dự Phòng Deterministic Heuristic (Offline Fallback Engine)**:
    * **Nguyên lý**: 100% mã nguồn mở cục bộ viết bằng JavaScript & Python.
    * **Chức năng**: Đọc trực tiếp các số liệu P/E Bands, DuPont, Beneish M-Score, MoS %, Sharpe Ratio và luận giải theo luật chuyên gia tài chính.
    * **Ưu điểm**: Không cần internet, không cần API Key, không bao giờ lỗi.
@@ -256,5 +244,5 @@ Hệ thống quản lý dữ liệu giao dịch người dùng (Sổ lệnh Mua,
 | :--- | :--- | :--- |
 | **`Chưa cấu hình TURSO_DATABASE_URL trên Vercel!`** | Thiếu biến môi trường trên Vercel. | Vào Vercel Settings &rarr; Environment Variables &rarr; Thêm `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `DB_MODE=turso`. Sau đó Redeploy. |
 | **`Google Token Verification Failed`** | Sai `GOOGLE_CLIENT_ID` giữa Frontend và Backend. | Đảm bảo cả `GOOGLE_CLIENT_ID` và `VITE_GOOGLE_CLIENT_ID` đều có chung giá trị Client ID từ Google Cloud Console. |
-| **`Gemini API Error 429: Resource Exhausted`** | Hết hạn ngạch tạm thời của Google AI. | Hệ thống tự động chuyển sang Heuristic Engine. Để reset quota, đợi vài phút hoặc đổi sang API key khác. |
+| **`OpenRouter API Error 429: Rate Limit`** | Hết hạn ngạch hoặc chạm giới hạn tốc độ OpenRouter. | Hệ thống tự động chuyển sang Heuristic Engine. Để reset quota, đợi vài giây hoặc nạp thêm credits tại openrouter.ai. |
 | **`GitHub Action: Permission to repository denied`** | Workflow không có quyền push commit. | Vào GitHub Repo &rarr; **Settings** &rarr; **Actions** &rarr; **General** &rarr; Mục **Workflow permissions** &rarr; Tích chọn **Read and write permissions** &rarr; Nhấn **Save**. |

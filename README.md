@@ -300,26 +300,27 @@ Hệ thống được trang bị bộ động cơ AI Copilot chuyên sâu, hỗ 
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    KIẾN TRÚC AI COPILOT ĐA PROVIDER & CHẠY NỀN              │
+│                 KIẾN TRÚC AI COPILOT CHẠY NỀN VỚI OPENROUTER GATEWAY        │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  PROVIDER 1: Google Gemini (gemini-1.5-flash / gemini-1.5-pro / gemini-2.0) │
-│  PROVIDER 2: OpenAI Standard API (GPT-4o, DeepSeek, Groq, OpenRouter, Ollama)│
-│  FALLBACK:   Built-in Deterministic Heuristic Engine (Offline 0ms, 0 cost)  │
+│  PROVIDER:  OpenRouter API Gateway (/v1/chat/completions)                   │
+│             Hỗ trợ: DeepSeek (Chat/R1), Claude 3.5 Sonnet,                  │
+│             LLaMA 3.3 70B, Qwen 2.5 72B, Mistral Large...                   │
+│  FALLBACK:  Built-in Deterministic Heuristic Engine (Offline 0ms, 0 cost)   │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  CHẾ ĐỘ VẬN HÀNH: Background Pipeline & GitHub Actions (EOD, Weekly, Qtrly) │
 │  CACHE SNAPSHOT:  data/ai_insights_cache.json & data/financials/<MÃ>.json   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 1. Hỗ Trợ Đa Nhà Cung Cấp Chuẩn Mực:
-* **Google Gemini**: Hỗ trợ SDK chính thức và Direct REST API với tùy biến model qua `GEMINI_MODEL` (`gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-2.0-flash`, `gemini-2.0-flash-lite`).
-* **OpenAI Standard API**: Hỗ trợ chuẩn `POST /v1/chat/completions` với Bearer Token, tương thích hoàn toàn với:
-  * OpenAI Official (`gpt-4o-mini`, `gpt-4o`)
-  * DeepSeek (`deepseek-chat`)
-  * Groq Cloud (`llama-3.3-70b-versatile`)
-  * OpenRouter (`deepseek/deepseek-chat`)
-  * Local LLM Ollama / vLLM (`llama3.1`, `qwen2.5`)
-* **Two-Tier Fallback Heuristic Engine**: Nếu người dùng không cài đặt API Key hoặc kết nối mạng bị gián đoạn, hệ thống **tự động kích hoạt bộ động cơ phân tích định lượng deterministic** tích hợp sẵn, sinh báo cáo chuyên môn sâu mà không phát sinh lỗi.
+### 1. Cổng Kết Nối OpenRouter Toàn Diện:
+* **OpenRouter API Gateway**: Kết nối đồng nhất chuẩn `POST https://openrouter.ai/api/v1/chat/completions` với Bearer Token và các HTTP headers định danh (`HTTP-Referer`, `X-Title`).
+* **Kho Mô Hình AI Phong Phú**:
+  * `deepseek/deepseek-chat`: Chi phí siêu tối ưu, khả năng suy luận sắc bén (Khuyến nghị mặc định).
+  * `deepseek/deepseek-r1`: Suy luận logic toán học, bóc tách thuyết minh & pháp y BCTC chuyên sâu.
+  * `anthropic/claude-3.5-sonnet`: Chất lượng văn phong tài chính chuẩn mực cấp quỹ đầu tư ngoại.
+  * `meta-llama/llama-3.3-70b-instruct`: Mô hình mã nguồn mở hiệu năng cao.
+  * `qwen/qwen-2.5-72b-instruct`: Tốc độ cực nhanh cho tác vụ tổng hợp tin tức và nhịp đập tuần.
+* **Two-Tier Fallback Heuristic Engine**: Nếu người dùng không cài đặt API Key hoặc kết nối OpenRouter bị gián đoạn, hệ thống **tự động kích hoạt bộ động cơ phân tích định lượng deterministic** tích hợp sẵn, sinh báo cáo chuyên môn sâu mà không phát sinh lỗi.
 
 ### 2. 5 Chuyên Viên Phân Tích AI Personas:
 1. **🌐 Macro Strategic CIO**: Tổng hợp tương quan liên thị trường, pha chu kỳ kinh tế, đường cong lợi suất và đưa ra chiến lược phân bổ tài sản.
@@ -403,14 +404,11 @@ PORT=3001
 TURSO_DATABASE_URL=
 TURSO_AUTH_TOKEN=
 
-# Cấu hình AI Copilot (Tùy chọn)
-AI_PROVIDER=auto
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-1.5-flash
-# Hoặc sử dụng OpenAI / DeepSeek / Groq:
-# OPENAI_API_KEY=your_openai_or_deepseek_key_here
-# OPENAI_BASE_URL=https://api.openai.com/v1
-# OPENAI_MODEL=deepseek-chat
+# Cấu hình AI Copilot (OpenRouter Gateway)
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_MODEL=deepseek/deepseek-chat
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 ```
 
 ### 4. Khởi Chạy Ứng Dụng
@@ -463,19 +461,22 @@ python scripts/db_manager.py import --input data/backups/my_backup.json
 
 ## 🧪 Quy Chuẩn Kiểm Thử Nghiệm Thu (Verification Gate)
 
-Mọi thay đổi mã nguồn trong hệ thống đều phải vượt qua bộ 4 bài kiểm thử nghiệm thu nghiêm ngặt trước khi triển khai:
+Mọi thay đổi mã nguồn trong hệ thống đều phải vượt qua bộ 5 bài kiểm thử nghiệm thu nghiêm ngặt trước khi triển khai:
 
 ```bash
 # 1. Chạy 36 Unit Test Cases Động Cơ Định Giá & Phân Tích Tài Chính (Python)
-.venv/bin/python scripts/test_valuation_engine.py
+python3 scripts/test_valuation_engine.py
 
-# 2. Chạy 6 Unit Test Cases Cố Vấn Khóa Lãi Trailing Stop & Risk-Reward Advisor (Node.js)
+# 2. Chạy 7 Unit Test Cases Cấu Hình Cổng AI OpenRouter & Provider Resolution (Python)
+python3 scripts/test_openrouter_configuration.py
+
+# 3. Chạy 6 Unit Test Cases Cố Vấn Khóa Lãi Trailing Stop & Risk-Reward Advisor (Node.js)
 node scripts/test_risk_reward_advisor.js
 
-# 3. Chạy 6 Unit Test Cases SBV OMO Radar & Sức Mua Thực Tế Fisher Inflation (Node.js)
+# 4. Chạy 6 Unit Test Cases SBV OMO Radar & Sức Mua Thực Tế Fisher Inflation (Node.js)
 node scripts/test_macro_radar_and_real_return.js
 
-# 4. Kiểm tra tính toàn vẹn Build Frontend Vite Production
+# 5. Kiểm tra tính toàn vẹn Build Frontend Vite Production
 npm run build
 ```
 

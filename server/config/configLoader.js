@@ -26,8 +26,8 @@ const FALLBACK_CONSTANTS = {
     macroNarratives: {},
     aiMacroConfig: {
       enabled: true,
-      provider: 'heuristic_fallback',
-      model: 'gemini-1.5-flash',
+      provider: 'openrouter',
+      model: 'deepseek/deepseek-chat',
     },
   },
 };

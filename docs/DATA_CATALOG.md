@@ -1184,8 +1184,8 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   - `styleIndices`: 5 phân khúc phong cách đầu tư (VNINDEX, VN30, VNDIAMOND, VNMIDCAP, VN100).
 
 * **3. Động Cơ AI Macro Strategist Copilot 2 Tầng (Two-Tier AI Engine)**:
-  - **Tier 1: Cloud LLM (Gemini 1.5 Pro / OpenAI)**:
-    - Kích hoạt khi có biến môi trường `GEMINI_API_KEY` hoặc `OPENAI_API_KEY`.
+  - **Tier 1: Cloud LLM (OpenRouter API Gateway)**:
+    - Kích hoạt khi có biến môi trường `OPENROUTER_API_KEY`.
     - Truyền tải toàn bộ bối cảnh vĩ mô thời gian thực vào prompt điều hành, ràng buộc chặt chẽ theo JSON schema chuẩn hóa.
   - **Tier 2: Built-in Heuristic Quantitative CIO Engine (Offline 100%, 0ms, 0 chi phí)**:
     - Tự động kích hoạt làm fallback dự phòng khi không có API key hoặc kết nối mạng bị gián đoạn.
@@ -1197,8 +1197,8 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
     ```json
     {
       "status": "success",
-      "provider": "gemini | openai | offline-heuristic-engine",
-      "model": "Tên mô hình AI (vd: gemini-3.1-flash-lite) hoặc heuristic version",
+      "provider": "openrouter | offline-heuristic-engine",
+      "model": "Tên mô hình OpenRouter (vd: deepseek/deepseek-chat) hoặc heuristic version",
       "updatedAt": "ISO 8601 timestamp",
       "headline": "Tiêu đề chiến lược cô đọng",
       "executiveSummary": "Đoạn văn 3-4 câu tóm tắt bức tranh vĩ mô và định hướng hành động",
@@ -1224,18 +1224,16 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
 * **Mục đích & Kiến trúc tối ưu chi phí (Cost-Optimized Background Generation)**:
   - **Không gọi LLM thời gian thực theo từng cú nhấp chuột trên Client / Web**: Toàn bộ nội dung phân tích vĩ mô, nhịp đập tuần và thẩm định cổ phiếu được sinh trước trong các tác vụ nền định kỳ qua GitHub Actions (`weekly-macro-sync.yml`, `quarterly-bctc-sync.yml`) hoặc CLI `scripts/generate_ai_insights.py`. Daily EOD pipeline không gọi AI để loại bỏ nhiễu ngắn hạn và hoàn tất trong ~5s.
   - Frontend React đọc kết quả pre-computed ở tốc độ 0ms mà không tốn chi phí API hay chịu rủi ro nghẽn mạng/rate limit/timeout.
-* **Hỗ trợ Đa Nhà Cung Cấp Chuẩn Mực (Multi-Provider Support)**:
-  - **Google Gemini**: Direct REST API (`gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-1.5-flash`, `gemini-3.1-flash-lite`, v.v.) kèm cơ chế **Smart Model Cascade** tự động chuyển model dự phòng khi gặp HTTP 503 / 429.
-  - **OpenAI Standard API**: Hỗ trợ chuẩn `POST /v1/chat/completions`, tương thích 100% với OpenAI (GPT-4o, GPT-4o-mini), DeepSeek, Groq, OpenRouter, vLLM, và Ollama cục bộ. Hỗ trợ tự động xử lý cả JSON và Server-Sent Events (SSE).
+* **Kiến Trúc AI Copilot OpenRouter & Heuristic (OpenRouter Gateway)**:
+  - **OpenRouter API Gateway**: Kết nối chuẩn `POST https://openrouter.ai/api/v1/chat/completions` cung cấp quyền truy cập linh hoạt vào các mô hình AI tiên tiến nhất thế giới (DeepSeek Chat/R1, Claude 3.5 Sonnet, LLaMA 3.3 70B, Qwen 2.5 72B, Mistral Large).
+  - Tự động tích hợp các header định danh bắt buộc của OpenRouter (`HTTP-Referer`, `X-Title`) cùng cơ chế Exponential Backoff Retry khi gặp giới hạn tốc độ HTTP 429.
   - **Cấu hình qua Biến Môi Trường (.env & GitHub Actions)**:
-    - `AI_PROVIDER`: `auto` | `gemini` | `openai` | `heuristic`.
-    - `GEMINI_API_KEY`: API key Google Gemini (Lấy miễn phí tại Google AI Studio).
-    - `GEMINI_MODEL`: Tên mô hình Gemini ưu tiên (mặc định: `gemini-2.5-flash`).
-    - `OPENAI_API_KEY`: API key OpenAI / DeepSeek / Groq / OpenRouter.
-    - `OPENAI_MODEL`: Tên mô hình khi sử dụng OpenAI Standard API (ví dụ: `gpt-4o-mini`, `super-vip`).
-    - `OPENAI_BASE_URL`: Base URL chuẩn OpenAI (mặc định: `https://api.openai.com/v1`).
-    - `AI_MODEL`: Tên mô hình LLM chung (dự phòng cho cả hai provider).
-  - **Động cơ Fallback Heuristic 2 Tầng**: Nếu không có API key hoặc LLM gặp sự cố, hệ thống tự động sinh báo cáo phân tích định lượng dựa trên các quy tắc tài chính học thuật (0ms, 0 chi phí, không bao giờ crash).
+    - `AI_PROVIDER`: `openrouter` | `heuristic` (mặc định: `openrouter`).
+    - `OPENROUTER_API_KEY`: API key OpenRouter (Lấy tại https://openrouter.ai/keys).
+    - `OPENROUTER_MODEL`: Tên mô hình OpenRouter ưu tiên (mặc định: `deepseek/deepseek-chat`).
+    - `OPENROUTER_BASE_URL`: Base URL của OpenRouter (mặc định: `https://openrouter.ai/api/v1`).
+    - `AI_MODEL`: Bí danh mô hình LLM chung (dự phòng).
+  - **Động cơ Fallback Heuristic 2 Tầng**: Nếu không có API key hoặc kết nối OpenRouter gặp sự cố, hệ thống tự động kích hoạt bộ động cơ định lượng Heuristic dự phòng 0ms dựa trên các quy tắc tài chính học thuật (0ms, 0 chi phí, không bao giờ crash).
 
 * **Cấu Trúc Chi Tiết Thẩm Định Cổ Phiếu Chuyên Sâu (`aiDeepDive` trong `data/financials/<MÃ>.json`)**:
   ```json
@@ -1255,7 +1253,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
       "Rủi ro giảm giá 2"
     ],
     "actionStrategy": "Chiến lược hành động: vùng giá gom, phương pháp DCA, phân bổ tỷ trọng NAV",
-    "provider": "gemini | openai | offline-heuristic-engine",
+    "provider": "openrouter | offline-heuristic-engine",
     "model": "Tên model thực tế",
     "updatedAt": "ISO 8601 timestamp"
   }
@@ -1265,7 +1263,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
   ```json
   {
     "status": "success",
-    "provider": "gemini | openai | offline-heuristic-engine",
+    "provider": "openrouter | offline-heuristic-engine",
     "model": "Tên model thực tế",
     "updatedAt": "ISO 8601 timestamp",
     "pulseHeadline": "Tiêu đề nhịp đập thị trường tuần cô đọng, bao quát xu hướng tuần",
@@ -1301,7 +1299,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
     ],
     "catalystTimeline": "Ngắn hạn (1-3 tháng) | Trung hạn (6-12 tháng)",
     "status": "success",
-    "provider": "gemini | openai | offline-heuristic-engine",
+    "provider": "openrouter | offline-heuristic-engine",
     "updatedAt": "ISO 8601 timestamp"
   }
   ```
@@ -1317,7 +1315,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
       "Câu hỏi chất vấn 2"
     ],
     "status": "success",
-    "provider": "gemini | openai | offline-heuristic-engine",
+    "provider": "openrouter | offline-heuristic-engine",
     "updatedAt": "ISO 8601 timestamp"
   }
   ```
@@ -1330,7 +1328,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
     "sensitivityStory": "Mô phỏng thử tải: Nếu chi phí vốn WACC tăng 1.5% do lãi suất thì biên an toàn MoS biến động ra sao",
     "preferredModelRecommendation": "Khuyến nghị mô hình định giá tin cậy nhất cho phân ngành đặc thù",
     "status": "success",
-    "provider": "gemini | openai | offline-heuristic-engine",
+    "provider": "openrouter | offline-heuristic-engine",
     "updatedAt": "ISO 8601 timestamp"
   }
   ```
@@ -1349,7 +1347,7 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
     ],
     "portfolioAction": "Khuyến nghị luân chuyển danh mục thực chiến",
     "status": "success",
-    "provider": "gemini | openai | offline-heuristic-engine",
+    "provider": "openrouter | offline-heuristic-engine",
     "updatedAt": "ISO 8601 timestamp"
   }
   ```
@@ -1384,12 +1382,12 @@ Nhằm đảm bảo tính minh bạch tuyệt đối đối với người sử 
 
 | Thẻ Định Danh (Badge) | Màu Sắc & Nhận Diện | Định Nghĩa & Phạm Vi Áp Dụng | Cơ Chế Phân Giải Dữ Liệu |
 | :--- | :--- | :--- | :--- |
-| **`AI`** *(Trí Tuệ Nhân Tạo)* | Tím / Indigo (`bg-purple-100 text-purple-700 dark:bg-purple-950/90 dark:text-purple-300 border-purple-300/80`) | Nhận định ngôn ngữ tự nhiên được sinh bởi Large Language Model (OpenAI hoặc Google Gemini). Giao diện hiển thị nhãn tinh gọn `AI`, không hiển thị tên vendor hay model để giữ giao diện trung lập và chuyên nghiệp. Tooltip: *"Trí tuệ nhân tạo (AI Copilot)"*. | Đọc trường `provider`: chỉ hiển thị khi `provider === 'openai'` hoặc `provider === 'gemini'`. |
+| **`AI`** *(Trí Tuệ Nhân Tạo)* | Tím / Indigo (`bg-purple-100 text-purple-700 dark:bg-purple-950/90 dark:text-purple-300 border-purple-300/80`) | Nhận định ngôn ngữ tự nhiên được sinh bởi Large Language Model (OpenRouter Gateway). Giao diện hiển thị nhãn tinh gọn `AI`, không hiển thị tên vendor hay model để giữ giao diện trung lập và chuyên nghiệp. Tooltip: *"Trí tuệ nhân tạo (AI Copilot)"*. | Đọc trường `provider`: chỉ hiển thị khi `provider === 'openrouter'`. |
 | **`H`** *(Heuristic & Định Lượng)* | Hổ phách / Amber (`bg-amber-100 text-amber-800 dark:bg-amber-950/90 dark:text-amber-300 border-amber-300/80`) | Công thức toán học định lượng tài chính, mô hình xác suất thống kê (DCF, Graham, Beneish, Altman Z, Dupont, Volume Profile, VaR), thuật toán phân loại dữ liệu, hoặc kịch bản dự phòng offline engine. Tooltip: *"Mô hình định lượng Heuristic / Thuật toán tài chính quy tắc"*. | Hiển thị cố định cho các khối định lượng toán học, hoặc **tự động chuyển đổi động** khi AI gặp sự cố (`provider === 'offline-heuristic-engine'`). |
 
 #### Cơ Chế Tự Động Chuyển Đổi Động (Dynamic Fallback Detection):
 * Component chuẩn [`src/components/common/IntelligenceBadge.jsx`](file:///Users/thaihai-swe/Desktop/stock/src/components/common/IntelligenceBadge.jsx) cung cấp hàm trợ năng `getIntelligenceSource(data)`:
-  * Nếu `data?.provider === 'openai' || data?.provider === 'gemini'` -> Trả về `{ type: 'ai', provider, isFallback: false }` -> Hiển thị badge `AI` kèm tooltip *"Trí tuệ nhân tạo (AI Copilot)"*.
+  * Nếu `data?.provider === 'openrouter'` -> Trả về `{ type: 'ai', provider, isFallback: false }` -> Hiển thị badge `AI` kèm tooltip *"Trí tuệ nhân tạo (AI Copilot)"*.
   * Nếu `data?.provider === 'offline-heuristic-engine'` hoặc không có AI metadata -> Trả về `{ type: 'heuristic', isFallback: true }` -> Tự động chuyển sang badge `H` kèm tooltip *"Mô hình định lượng Heuristic & Thuật toán tài chính quy tắc"*.
   * **Lưu ý**: Thông tin kỹ thuật `provider` và `model` được bảo toàn nguyên vẹn trong JSON cho mục đích kiểm toán dữ liệu và phân giải fallback, nhưng được loại bỏ 100% khỏi lớp hiển thị UI người dùng.
 

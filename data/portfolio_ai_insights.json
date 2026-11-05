@@ -1,42 +1,42 @@
 {
-  "healthScore": "A",
-  "healthVerdict": "Danh mục có sức chống chịu rủi ro rất cao nhờ bộ đệm tiền mặt áp đảo (63.9%), tuy nhiên đang phân bổ vốn quá thận trọng trong pha kinh tế Mở Rộng.",
-  "summary": "Cấu trúc tài sản mang tính phòng thủ cao với 63.9% tiền mặt, trong khi phần vốn cổ phiếu (36.1%) tập trung chủ yếu vào quỹ ETF Diamond FUEVFVND (66.3% danh mục cổ phiếu) giúp phân tán rủi ro tốt. Beta danh mục cổ phiếu ở mức 1.05 nhưng beta thực tế toàn NAV chỉ xấp xỉ 0.38 nhờ lượng tiền mặt lớn. Với bối cảnh kinh tế Mở Rộng và định giá P/E thị trường ở mức hấp dẫn (10.92), hiệu suất sinh lời hiện tại đang bị triệt tiêu do tỷ lệ nắm giữ tiền mặt vượt mức cần thiết.",
+  "healthScore": "B",
+  "healthVerdict": "Danh mục hoạt động ổn định, cần theo dõi thêm tỷ trọng các nhóm ngành chu kỳ cao.",
+  "summary": "Danh mục gồm 5 mã cổ phiếu với tỷ trọng cổ phiếu 100.0% và tiền mặt 0.0%. Hệ số Beta danh mục đạt 1.05.",
   "portfolioBeta": 1.05,
-  "cashWeightPct": 63.9,
+  "cashWeightPct": 0.0,
   "macroSensitivity": {
-    "interestRateRisk": "Thấp đối với toàn bộ NAV nhờ tỷ trọng tiền mặt 63.9%, nhưng ở mức Trung bình - Cao đối với rổ cổ phiếu do DXG chịu áp lực lớn nếu mặt bằng lãi suất đảo chiều từ lạm phát CPI (5.08%).",
-    "fxRisk": "Thấp - Trung bình, rủi ro biến động tỷ giá chủ yếu tác động gián tiếp qua dòng vốn ngoại rút ròng khỏi FUEVFVND và áp lực chi phí nguyên liệu nhập khẩu của HPG.",
-    "cyclicalRisk": "Trung bình, phần danh mục cổ phiếu phụ thuộc lớn vào chu kỳ hồi phục sản xuất và bán lẻ (HPG, PNJ, FUEVFVND), phù hợp với pha kinh tế Mở Rộng nhưng cần giám sát chặt chẽ sự lan tỏa tín dụng."
+    "interestRateRisk": "Trung bình (Có tiền mặt đệm và các mã kinh doanh cốt lõi ổn định)",
+    "fxRisk": "Thấp (Doanh nghiệp trong danh mục không chịu áp lực nợ ngoại tệ USD lớn)",
+    "cyclicalRisk": "Trung bình (Tỷ trọng nhóm ngành tài chính & chu kỳ ở mức kiểm soát)"
   },
   "stressTestScenarios": [
     {
       "name": "SBV Tăng Lãi Suất Điều Hành +100bps",
       "severity": "Vừa phải",
-      "estimatedImpactPct": -3.2,
-      "description": "Lãi suất tăng tác động tiêu cực mạnh nhất lên nhóm BĐS (DXG giảm ước tính 8-12%) và định giá rổ ngân hàng trong FUEVFVND, tuy nhiên 63.9% tiền mặt giúp kiềm chế thiệt hại trên tổng NAV chỉ ở mức -3.2%."
+      "estimatedImpactPct": -4.7,
+      "description": "Chi phí vốn vay tăng tạo áp lực lên nhóm cổ phiếu chu kỳ cao (Bất động sản, Thép), nhưng nhóm Tiền gửi và Tiện ích giữ giá tốt."
     },
     {
       "name": "Tỷ Giá USD/VND Vượt 26,000 & SBV Hút Tiền Tín Phiếu",
       "severity": "Cao",
-      "estimatedImpactPct": -4.1,
-      "description": "Áp lực tỷ giá kích hoạt động thái rút vốn của khối ngoại ảnh hưởng trực tiếp đến FUEVFVND, đồng thời gây áp lực biên lợi nhuận của HPG; mức sụt giảm toàn NAV được kiểm soát ở mức -4.1% nhờ tỷ lệ tiền mặt dồi dào."
+      "estimatedImpactPct": -6.3,
+      "description": "Thanh khoản liên ngân hàng thắt chặt gây áp lực bán hạ margin trên HOSE. Nhóm xuất khẩu và công nghệ chống chịu tốt hơn thị trường chung."
     },
     {
-      "name": "VN-Index Điều Chỉnh Kỹ Thuật -10%",
-      "severity": "Nhẹ",
-      "estimatedImpactPct": -3.8,
-      "description": "Với beta cổ phiếu 1.05 và tỷ trọng cổ phiếu chỉ chiếm 36.1% NAV, mức giảm 10% của chỉ số thị trường chỉ làm tổn thất khoảng -3.8% tổng tài sản, tạo điều kiện thuận lợi để giải ngân đón đầu chu kỳ."
+      "name": "VN-Index Điều Chỉnh Kỹ Thuật -10% Về Ngưỡng Hỗ Trợ",
+      "severity": "Vừa phải",
+      "estimatedImpactPct": -10.5,
+      "description": "Với tỷ lệ đệm tiền mặt 0.0%, danh mục chịu mức sụt giảm thấp hơn biên độ điều chỉnh chung của chỉ số VN-Index."
     }
   ],
   "rebalancingRecommendations": [
-    "Hạ tỷ trọng tiền mặt từ 63.9% xuống mức 20-30% thông qua chiến lược giải ngân từng phần (DCA) vào các nhịp điều chỉnh để tận dụng mức định giá P/E thị trường rẻ (10.92) trong pha Mở Rộng.",
-    "Gia tăng tỷ trọng FUEVFVND và HPG khi thị trường rung lắc nhằm tối ưu hóa lợi nhuận từ đà tăng trưởng tín dụng (15.08%) và chỉ số sản xuất phục hồi (PMI 51.9).",
-    "Đặt ngưỡng quản trị rủi ro nghiêm ngặt cho DXG (cắt lỗ nếu thủng vùng giá 9,500 VND) do độ nhạy lãi suất cao và rủi ro lạm phát CPI đang tiệm cận mức cảnh báo 5.08%."
+    "Duy trì tỷ lệ tiền mặt phòng thủ tối thiểu 15-20% để sẵn sàng giải ngân khi thị trường có nhịp rung lắc kỹ thuật.",
+    "Hạn chế mua đuổi các mã cổ phiếu có hệ số P/E vượt quá +1.5 độ lệch chuẩn lịch sử.",
+    "Ưu tiên tích lũy các doanh nghiệp chia cổ tức tiền mặt đều đặn nhằm tạo dòng tiền thặng dư tự nhiên."
   ],
+  "updatedAt": "2026-11-05T13:19:49Z",
   "status": "success",
-  "provider": "openai",
-  "model": "super-vip",
-  "updatedAt": "2026-10-14T16:38:08Z",
+  "provider": "offline-heuristic-engine",
+  "model": "Quantitative Deterministic Heuristic v4.0",
   "userId": "demo"
 }
