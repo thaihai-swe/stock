@@ -710,8 +710,8 @@
       "ps": 3.08,
       "evEbitda": null,
       "bvps": 11281,
-      "grahamNumber": 827,
-      "marginOfSafetyGraham": -1199.9,
+      "grahamNumber": 831,
+      "marginOfSafetyGraham": -1193.6,
       "grahamDiffPercent": -92.3,
       "ddmTarget": null,
       "ddmDiffPercent": null,
@@ -741,8 +741,8 @@
           "name": "Benjamin Graham",
           "fullName": "1. Benjamin Graham",
           "cleanName": "Benjamin Graham",
-          "value": 827,
-          "targetPrice": 827,
+          "value": 831,
+          "targetPrice": 831,
           "diffPercent": -92.3,
           "weight": 0.05,
           "baseWeight": 0.05,
@@ -751,7 +751,7 @@
           "isOutlier": true,
           "outlierGapPct": 93.7,
           "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-          "formulaDetail": "V = 94 × (7.0x + 0.8 × 3.5%) × (4.49% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.898",
+          "formulaDetail": "V = 94 × (7.0x + 0.8 × 3.5%) × (4.51% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.902",
           "parameters": {
             "eps": 94.0,
             "epsAvg": 222,
@@ -759,9 +759,9 @@
             "peMedian": 44.23,
             "hs": 0.8,
             "gCagr": 3.5,
-            "constantVn": 4.49,
+            "constantVn": 4.51,
             "yVn": 5.0,
-            "vn10yYield": 4.49
+            "vn10yYield": 4.51
           },
           "statusNote": "Phù hợp"
         },
@@ -1386,7 +1386,7 @@
         "Hệ số Beta ổn định (0.84x)"
       ]
     },
-    "updatedAt": 1793886736364
+    "updatedAt": 1793903114863
   },
   "MBB": {
     "symbol": "MBB",
@@ -1405,9 +1405,9 @@
       "ps": 2.53,
       "evEbitda": null,
       "bvps": 16121,
-      "grahamNumber": 53063,
-      "marginOfSafetyGraham": 63.3,
-      "grahamDiffPercent": 172.1,
+      "grahamNumber": 53299,
+      "marginOfSafetyGraham": 63.4,
+      "grahamDiffPercent": 173.3,
       "ddmTarget": 14134,
       "ddmDiffPercent": -27.5,
       "peTarget": 27368,
@@ -1420,8 +1420,8 @@
       "pcfDiffPercent": 16.7,
       "psFairPrice": 16122,
       "psDiffPercent": -17.3,
-      "fairValue": 37419,
-      "consensusFairValue": 37419,
+      "fairValue": 37423,
+      "consensusFairValue": 37423,
       "marginOfSafety": 47.9,
       "marginOfSafetyFairValue": 47.9,
       "upside": 91.9,
@@ -1436,17 +1436,17 @@
           "name": "Benjamin Graham",
           "fullName": "1. Benjamin Graham",
           "cleanName": "Benjamin Graham",
-          "value": 53063,
-          "targetPrice": 53063,
-          "diffPercent": 172.1,
+          "value": 53299,
+          "targetPrice": 53299,
+          "diffPercent": 173.3,
           "weight": 0.017,
           "baseWeight": 0.05,
           "suitability": 0.35,
           "suitabilityNote": "Ít phù hợp NH/CK",
           "isOutlier": false,
-          "outlierGapPct": 39.2,
+          "outlierGapPct": 39.8,
           "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-          "formulaDetail": "V = 3,110 × (7.0x + 1.0 × 12.0%) × (4.49% / 5.0%) | Bội số=19.00x, Tỷ số LS=0.898",
+          "formulaDetail": "V = 3,110 × (7.0x + 1.0 × 12.0%) × (4.51% / 5.0%) | Bội số=19.00x, Tỷ số LS=0.902",
           "parameters": {
             "eps": 3110.0,
             "epsAvg": 2248,
@@ -1454,9 +1454,9 @@
             "peMedian": 8.8,
             "hs": 1.0,
             "gCagr": 12.0,
-            "constantVn": 4.49,
+            "constantVn": 4.51,
             "yVn": 5.0,
-            "vn10yYield": 4.49
+            "vn10yYield": 4.51
           },
           "statusNote": "Ít phù hợp NH/CK"
         },
@@ -1698,7 +1698,7 @@
         }
       ],
       "consensusDetails": {
-        "cleanWeightedAvg": 36948,
+        "cleanWeightedAvg": 36955,
         "cleanMedian": 38126,
         "dispersionPct": 3.1,
         "consensusLevel": "HIGH",
@@ -1764,18 +1764,18 @@
       "sevenPriceZones": {
         "currentZone": "Deep Value",
         "zoneBadge": "bg-emerald-600 text-white",
-        "safeBuyPrice": 28064,
-        "acceptableBuyPrice": 31806,
-        "bearPrice": 26193,
-        "bullPrice": 46774,
+        "safeBuyPrice": 28067,
+        "acceptableBuyPrice": 31810,
+        "bearPrice": 26196,
+        "bullPrice": 46779,
         "boundaries": {
-          "deepValue": 25258,
-          "safeBuy": 28064,
-          "accumulate": 31806,
-          "fairLow": 35548,
-          "fairHigh": 41161,
-          "aboveFair": 44435,
-          "expensive": 53790
+          "deepValue": 25260,
+          "safeBuy": 28067,
+          "accumulate": 31810,
+          "fairLow": 35552,
+          "fairHigh": 41165,
+          "aboveFair": 44440,
+          "expensive": 53796
         }
       },
       "threeLayerDecision": {
@@ -2077,7 +2077,7 @@
       "techScoreColor": "text-gray-400",
       "factors": []
     },
-    "updatedAt": 1793886736356
+    "updatedAt": 1793903114872
   },
   "HPG": {
     "symbol": "HPG",
@@ -2095,28 +2095,28 @@
       "pb": 1.41,
       "ps": 1.16,
       "evEbitda": null,
-      "bvps": 16683,
-      "grahamNumber": 35022,
-      "marginOfSafetyGraham": 38.6,
-      "grahamDiffPercent": 62.9,
+      "bvps": 17624,
+      "grahamNumber": 35178,
+      "marginOfSafetyGraham": 38.9,
+      "grahamDiffPercent": 63.6,
       "ddmTarget": 7381,
       "ddmDiffPercent": -65.7,
       "peTarget": 45500,
       "peDiffPercent": 111.6,
-      "pbTarget": 30363,
-      "pbDiffPercent": 41.2,
+      "pbTarget": 32076,
+      "pbDiffPercent": 49.2,
       "evEbitdaFairPrice": 24822,
       "evEbitdaDiffPercent": 15.5,
       "pcfFairPrice": 13529,
       "pcfDiffPercent": -37.1,
       "psFairPrice": 28200,
       "psDiffPercent": 31.2,
-      "fairValue": 31355,
-      "consensusFairValue": 31355,
-      "marginOfSafety": 31.4,
-      "marginOfSafetyFairValue": 31.4,
-      "upside": 45.8,
-      "consensusDiffPercent": 45.8,
+      "fairValue": 32107,
+      "consensusFairValue": 32107,
+      "marginOfSafety": 33.0,
+      "marginOfSafetyFairValue": 33.0,
+      "upside": 49.3,
+      "consensusDiffPercent": 49.3,
       "valuationRating": "🟢 STRONG BUY",
       "valuationRatingText": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
       "valuationRatingBadge": "bg-emerald-600 text-white",
@@ -2127,17 +2127,17 @@
           "name": "Benjamin Graham",
           "fullName": "1. Benjamin Graham",
           "cleanName": "Benjamin Graham",
-          "value": 35022,
-          "targetPrice": 35022,
-          "diffPercent": 62.9,
+          "value": 35178,
+          "targetPrice": 35178,
+          "diffPercent": 63.6,
           "weight": 0.05,
           "baseWeight": 0.05,
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": false,
-          "outlierGapPct": 14.2,
+          "outlierGapPct": 9.7,
           "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-          "formulaDetail": "V = 3,250 × (7.0x + 1.0 × 5.0%) × (4.49% / 5.0%) | Bội số=12.00x, Tỷ số LS=0.898",
+          "formulaDetail": "V = 3,250 × (7.0x + 1.0 × 5.0%) × (4.51% / 5.0%) | Bội số=12.00x, Tỷ số LS=0.902",
           "parameters": {
             "eps": 3250.0,
             "epsAvg": 1231,
@@ -2145,9 +2145,9 @@
             "peMedian": 14.0,
             "hs": 1.0,
             "gCagr": 5.0,
-            "constantVn": 4.49,
+            "constantVn": 4.51,
             "yVn": 5.0,
-            "vn10yYield": 4.49
+            "vn10yYield": 4.51
           },
           "statusNote": "Phù hợp"
         },
@@ -2164,7 +2164,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": false,
-          "outlierGapPct": 48.3,
+          "outlierGapPct": 41.9,
           "formula": "EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)",
           "formulaDetail": "V = 3,250 × 14.0x (Trung vị 4 năm | PE Trung bình: 14.8x)",
           "parameters": {
@@ -2182,19 +2182,19 @@
           "name": "P/B Ngành & Gordon",
           "fullName": "3. P/B Ngành & Gordon",
           "cleanName": "P/B Ngành & Gordon",
-          "value": 30363,
-          "targetPrice": 30363,
-          "diffPercent": 41.2,
+          "value": 32076,
+          "targetPrice": 32076,
+          "diffPercent": 49.2,
           "weight": 0.1,
           "baseWeight": 0.1,
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": false,
-          "outlierGapPct": 1.0,
+          "outlierGapPct": 0.0,
           "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
-          "formulaDetail": "V = 16,683 × 1.82x (Trung vị 7 năm | PB Trung bình: 2.13x)",
+          "formulaDetail": "V = 17,624 × 1.82x (Trung vị 7 năm | PB Trung bình: 2.13x)",
           "parameters": {
-            "bvps": 16683,
+            "bvps": 17624,
             "roe": 20.01,
             "coe": 0.0988,
             "terminalG": 0.035,
@@ -2219,7 +2219,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": false,
-          "outlierGapPct": 1.0,
+          "outlierGapPct": 3.4,
           "formula": "DCF 3 Pha (Growth → Fade → Terminal)",
           "formulaDetail": "FCF Base, WACC=9.9%, g1=7.0%, g_term=3.5%",
           "parameters": {
@@ -2271,7 +2271,7 @@
           "formula": "(PV(FCFF) + TV - Nợ ròng) / Shares",
           "formulaDetail": "FCFF chiết khấu WACC=9.9%, Terminal g=3.5%",
           "parameters": {
-            "fcff": -12975995873960.0,
+            "fcff": -2214995873960.0,
             "netDebt": 105736761231570,
             "wacc": 0.0988,
             "shares": 8442970000.0,
@@ -2306,7 +2306,7 @@
           "formulaDetail": "FCFE chiết khấu CoE=9.9%",
           "parameters": {
             "cfo": 14278004126040.0,
-            "capex": 27254000000000.0,
+            "capex": 16493000000000.0,
             "coe": 0.0988,
             "shares": 8442970000.0
           },
@@ -2327,10 +2327,10 @@
           "isOutlier": false,
           "outlierGapPct": 0.0,
           "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
-          "formulaDetail": "BVPS=16,683 đ, ROE=20.0%, CoE=9.9%",
+          "formulaDetail": "BVPS=17,624 đ, ROE=20.0%, CoE=9.9%",
           "parameters": {
             "equity": 177713009233033,
-            "bvps": 16683,
+            "bvps": 17624,
             "roe": 20.01,
             "coe": 0.0988,
             "shares": 8442970000.0
@@ -2342,19 +2342,19 @@
           "name": "Book NAV / P/B Chuẩn Hóa",
           "fullName": "9. Book NAV / P/B Chuẩn Hóa",
           "cleanName": "Book NAV / P/B Chuẩn Hóa",
-          "value": 30363,
-          "targetPrice": 30363,
-          "diffPercent": 41.2,
+          "value": 32076,
+          "targetPrice": 32076,
+          "diffPercent": 49.2,
           "weight": 0.043,
           "baseWeight": 0.05,
           "suitability": 0.85,
           "suitabilityNote": "Phù hợp tài sản ròng",
           "isOutlier": false,
-          "outlierGapPct": 1.0,
+          "outlierGapPct": 0.0,
           "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
-          "formulaDetail": "V = 16,683 đ × 1.82x (Median P/B chu kỳ)",
+          "formulaDetail": "V = 17,624 đ × 1.82x (Median P/B chu kỳ)",
           "parameters": {
-            "bvps": 16683,
+            "bvps": 17624,
             "targetPb": 1.82,
             "equity": 177713009233033,
             "shares": 8442970000.0
@@ -2374,7 +2374,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": false,
-          "outlierGapPct": 34.0,
+          "outlierGapPct": 36.9,
           "formula": "[(EBITDA × 7.5x) - Nợ ròng] / Shares",
           "formulaDetail": "EBITDA Multiple 7.5x & EV/Sales 1.5x",
           "parameters": {
@@ -2389,9 +2389,9 @@
         }
       ],
       "consensusDetails": {
-        "cleanWeightedAvg": 31809,
-        "cleanMedian": 30674,
-        "dispersionPct": 3.7,
+        "cleanWeightedAvg": 32128,
+        "cleanMedian": 32076,
+        "dispersionPct": 0.2,
         "consensusLevel": "HIGH",
         "coveragePct": 75.0,
         "confidenceScore": 88.0,
@@ -2450,20 +2450,20 @@
         ]
       },
       "sevenPriceZones": {
-        "currentZone": "Buy Zone",
-        "zoneBadge": "bg-emerald-500 text-white",
-        "safeBuyPrice": 23516,
-        "acceptableBuyPrice": 26652,
-        "bearPrice": 21948,
-        "bullPrice": 39194,
+        "currentZone": "Deep Value",
+        "zoneBadge": "bg-emerald-600 text-white",
+        "safeBuyPrice": 24080,
+        "acceptableBuyPrice": 27291,
+        "bearPrice": 22475,
+        "bullPrice": 40134,
         "boundaries": {
-          "deepValue": 21164,
-          "safeBuy": 23516,
-          "accumulate": 26652,
-          "fairLow": 29787,
-          "fairHigh": 34490,
-          "aboveFair": 37234,
-          "expensive": 45073
+          "deepValue": 21672,
+          "safeBuy": 24080,
+          "accumulate": 27291,
+          "fairLow": 30502,
+          "fairHigh": 35318,
+          "aboveFair": 38127,
+          "expensive": 46154
         }
       },
       "threeLayerDecision": {
@@ -2478,11 +2478,11 @@
         "isTrapCapped": false
       },
       "historicalBands": {
-        "band25": 34449,
-        "band50": 37940,
-        "band75": 46101,
+        "band25": 35207,
+        "band50": 38796,
+        "band75": 47249,
         "bandPosition": "Dưới P25 (Vùng Rẻ)",
-        "bandWidthPct": 30.7,
+        "bandWidthPct": 31.0,
         "peYearsUsed": 4,
         "pbYearsUsed": 7,
         "peMean": 14.78,
@@ -2501,16 +2501,16 @@
           "p50": 1.82,
           "p75": 2.44,
           "mean": 2.13,
-          "current": 1.29,
+          "current": 1.22,
           "yearsUsed": 7
         },
         "priceBands": {
           "peP25Price": 42039,
           "peP50Price": 45516,
           "peP75Price": 51496,
-          "pbP25Price": 26860,
-          "pbP50Price": 30363,
-          "pbP75Price": 40707
+          "pbP25Price": 28375,
+          "pbP50Price": 32076,
+          "pbP75Price": 43003
         }
       },
       "dividendSustainability": {
@@ -2537,9 +2537,9 @@
             "key": "bvps",
             "label": "BVPS (Giá trị sổ sách)",
             "unit": "đ",
-            "current": 16683.0,
+            "current": 17624.0,
             "sma5y": 10873,
-            "deltaPct": 53.4,
+            "deltaPct": 62.1,
             "status": "Cải thiện rõ rệt",
             "badgeColor": "text-emerald-500 font-semibold",
             "invertLogic": false
@@ -2581,20 +2581,20 @@
             "key": "roa",
             "label": "Tỷ suất ROA",
             "unit": "%",
-            "current": 9.14,
+            "current": 11.6,
             "sma5y": 8.15,
-            "deltaPct": 12.1,
-            "status": "Ổn định",
-            "badgeColor": "text-gray-400",
+            "deltaPct": 42.3,
+            "status": "Cải thiện rõ rệt",
+            "badgeColor": "text-emerald-500 font-semibold",
             "invertLogic": false
           },
           {
             "key": "roic",
             "label": "Tỷ suất ROIC",
             "unit": "%",
-            "current": 11.64,
+            "current": 13.68,
             "sma5y": 9.76,
-            "deltaPct": 19.3,
+            "deltaPct": 40.2,
             "status": "Cải thiện rõ rệt",
             "badgeColor": "text-emerald-500 font-semibold",
             "invertLogic": false
@@ -2603,9 +2603,9 @@
             "key": "grossMargin",
             "label": "Biên Lợi Nhuận Gộp",
             "unit": "%",
-            "current": 19.01,
+            "current": 19.16,
             "sma5y": 16.82,
-            "deltaPct": 13.0,
+            "deltaPct": 13.9,
             "status": "Ổn định",
             "badgeColor": "text-gray-400",
             "invertLogic": false
@@ -2669,9 +2669,9 @@
             "key": "debtToEquity",
             "label": "Nợ / Vốn Chủ (D/E)",
             "unit": "x",
-            "current": 0.7,
+            "current": 0.71,
             "sma5y": 0.86,
-            "deltaPct": -18.2,
+            "deltaPct": -17.0,
             "status": "Cải thiện rõ rệt",
             "badgeColor": "text-emerald-500 font-semibold",
             "invertLogic": true
@@ -2680,20 +2680,20 @@
             "key": "currentRatio",
             "label": "Hệ Số Thanh Toán Hiện Hành",
             "unit": "x",
-            "current": 1.68,
+            "current": 1.45,
             "sma5y": 1.41,
-            "deltaPct": 19.1,
-            "status": "Cải thiện rõ rệt",
-            "badgeColor": "text-emerald-500 font-semibold",
+            "deltaPct": 2.8,
+            "status": "Ổn định",
+            "badgeColor": "text-gray-400",
             "invertLogic": false
           },
           {
             "key": "cashRatio",
             "label": "Hệ Số Tiền Mặt",
             "unit": "x",
-            "current": 0.52,
+            "current": 0.59,
             "sma5y": 0.45,
-            "deltaPct": 15.2,
+            "deltaPct": 30.7,
             "status": "Cải thiện rõ rệt",
             "badgeColor": "text-emerald-500 font-semibold",
             "invertLogic": false
@@ -2767,7 +2767,7 @@
         "Đồng thuận kỹ thuật TradingView: Khá"
       ]
     },
-    "updatedAt": 1793886736362
+    "updatedAt": 1793903114859
   },
   "VND": {
     "symbol": "VND",
@@ -2786,9 +2786,9 @@
       "ps": 4.24,
       "evEbitda": null,
       "bvps": 14295,
-      "grahamNumber": 12136,
-      "marginOfSafetyGraham": -17.0,
-      "grahamDiffPercent": -14.5,
+      "grahamNumber": 12190,
+      "marginOfSafetyGraham": -16.5,
+      "grahamDiffPercent": -14.2,
       "ddmTarget": 7998,
       "ddmDiffPercent": -43.7,
       "peTarget": 15169,
@@ -2817,17 +2817,17 @@
           "name": "Benjamin Graham",
           "fullName": "1. Benjamin Graham",
           "cleanName": "Benjamin Graham",
-          "value": 12136,
-          "targetPrice": 12136,
-          "diffPercent": -14.5,
+          "value": 12190,
+          "targetPrice": 12190,
+          "diffPercent": -14.2,
           "weight": 0.017,
           "baseWeight": 0.05,
           "suitability": 0.35,
           "suitabilityNote": "Ít phù hợp NH/CK",
           "isOutlier": false,
-          "outlierGapPct": 17.3,
+          "outlierGapPct": 16.9,
           "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-          "formulaDetail": "V = 1,379 × (7.0x + 0.8 × 3.5%) × (4.49% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.898",
+          "formulaDetail": "V = 1,379 × (7.0x + 0.8 × 3.5%) × (4.51% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.902",
           "parameters": {
             "eps": 1379.0,
             "epsAvg": 1158,
@@ -2835,9 +2835,9 @@
             "peMedian": 11.0,
             "hs": 0.8,
             "gCagr": 3.5,
-            "constantVn": 4.49,
+            "constantVn": 4.51,
             "yVn": 5.0,
-            "vn10yYield": 4.49
+            "vn10yYield": 4.51
           },
           "statusNote": "Ít phù hợp NH/CK"
         },
@@ -3079,7 +3079,7 @@
         }
       ],
       "consensusDetails": {
-        "cleanWeightedAvg": 13225,
+        "cleanWeightedAvg": 13226,
         "cleanMedian": 14677,
         "dispersionPct": 9.9,
         "consensusLevel": "HIGH",
@@ -3458,7 +3458,7 @@
         "Hệ số Beta ổn định (0.98x)"
       ]
     },
-    "updatedAt": 1793886736359
+    "updatedAt": 1793903114869
   },
   "PNJ": {
     "symbol": "PNJ",
@@ -4154,7 +4154,7 @@
     "updatedAt": 1792079742519
   },
   "_meta": {
-    "lastSyncedAt": "2026-11-05T13:52:16Z",
+    "lastSyncedAt": "2026-11-05T18:25:14Z",
     "syncedCount": 9,
     "symbolsCount": 9
   },
@@ -4175,9 +4175,9 @@
       "ps": 3.32,
       "evEbitda": null,
       "bvps": 17920,
-      "grahamNumber": 25007,
-      "marginOfSafetyGraham": 17.8,
-      "grahamDiffPercent": 21.7,
+      "grahamNumber": 25118,
+      "marginOfSafetyGraham": 18.2,
+      "grahamDiffPercent": 22.2,
       "ddmTarget": 10238,
       "ddmDiffPercent": -50.2,
       "peTarget": 15693,
@@ -4190,12 +4190,12 @@
       "pcfDiffPercent": -75.5,
       "psFairPrice": 14669,
       "psDiffPercent": -28.6,
-      "fairValue": 23548,
-      "consensusFairValue": 23548,
-      "marginOfSafety": 12.7,
-      "marginOfSafetyFairValue": 12.7,
-      "upside": 14.6,
-      "consensusDiffPercent": 14.6,
+      "fairValue": 23596,
+      "consensusFairValue": 23596,
+      "marginOfSafety": 12.9,
+      "marginOfSafetyFairValue": 12.9,
+      "upside": 14.8,
+      "consensusDiffPercent": 14.8,
       "valuationRating": "🟡 HOLD",
       "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
       "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
@@ -4206,17 +4206,17 @@
           "name": "Benjamin Graham",
           "fullName": "1. Benjamin Graham",
           "cleanName": "Benjamin Graham",
-          "value": 25007,
-          "targetPrice": 25007,
-          "diffPercent": 21.7,
+          "value": 25118,
+          "targetPrice": 25118,
+          "diffPercent": 22.2,
           "weight": 0.017,
           "baseWeight": 0.05,
           "suitability": 0.35,
           "suitabilityNote": "Ít phù hợp NH/CK",
           "isOutlier": false,
-          "outlierGapPct": 4.9,
+          "outlierGapPct": 4.7,
           "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-          "formulaDetail": "V = 2,701 × (5.8x + 1.0 × 4.5%) × (4.49% / 5.0%) | Bội số=10.31x, Tỷ số LS=0.898",
+          "formulaDetail": "V = 2,701 × (5.8x + 1.0 × 4.5%) × (4.51% / 5.0%) | Bội số=10.31x, Tỷ số LS=0.902",
           "parameters": {
             "eps": 2701.0,
             "epsAvg": 2642,
@@ -4224,9 +4224,9 @@
             "peMedian": 5.81,
             "hs": 1.0,
             "gCagr": 4.5,
-            "constantVn": 4.49,
+            "constantVn": 4.51,
             "yVn": 5.0,
-            "vn10yYield": 4.49
+            "vn10yYield": 4.51
           },
           "statusNote": "Ít phù hợp NH/CK"
         },
@@ -4243,7 +4243,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": false,
-          "outlierGapPct": 40.3,
+          "outlierGapPct": 40.5,
           "formula": "EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)",
           "formulaDetail": "V = 2,701 × 5.8x (Trung vị 4 năm | PE Trung bình: 6.0x)",
           "parameters": {
@@ -4269,7 +4269,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": true,
-          "outlierGapPct": 63.7,
+          "outlierGapPct": 63.3,
           "formula": "BVPS × [(ROE - g)/(r - g)]",
           "formulaDetail": "V = 17,920 × Gordon Multiple",
           "parameters": {
@@ -4323,7 +4323,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": true,
-          "outlierGapPct": 61.1,
+          "outlierGapPct": 61.2,
           "formula": "[DPS × (1 + g)] / (r - g) × Fade",
           "formulaDetail": "DPS=548 đ, r=9.0%, g=3.5%",
           "parameters": {
@@ -4404,7 +4404,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Phù hợp",
           "isOutlier": true,
-          "outlierGapPct": 1203.0,
+          "outlierGapPct": 1200.3,
           "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
           "formulaDetail": "BVPS=17,920 đ, ROE=16.8%, CoE=9.0%",
           "parameters": {
@@ -4429,7 +4429,7 @@
           "suitability": 1.0,
           "suitabilityNote": "Trọng yếu ngành Tài sản/TC",
           "isOutlier": false,
-          "outlierGapPct": 4.9,
+          "outlierGapPct": 4.7,
           "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
           "formulaDetail": "V = 17,920 đ × 1.54x (Median P/B chu kỳ)",
           "parameters": {
@@ -4468,9 +4468,9 @@
         }
       ],
       "consensusDetails": {
-        "cleanWeightedAvg": 22576,
-        "cleanMedian": 25007,
-        "dispersionPct": 9.7,
+        "cleanWeightedAvg": 22582,
+        "cleanMedian": 25118,
+        "dispersionPct": 10.1,
         "consensusLevel": "HIGH",
         "coveragePct": 50.0,
         "confidenceScore": 69.0,
@@ -4535,23 +4535,23 @@
       "sevenPriceZones": {
         "currentZone": "Accumulate",
         "zoneBadge": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-        "safeBuyPrice": 17661,
-        "acceptableBuyPrice": 20016,
-        "bearPrice": 16484,
-        "bullPrice": 29435,
+        "safeBuyPrice": 17697,
+        "acceptableBuyPrice": 20057,
+        "bearPrice": 16517,
+        "bullPrice": 29495,
         "boundaries": {
-          "deepValue": 15895,
-          "safeBuy": 17661,
-          "accumulate": 20016,
-          "fairLow": 22371,
-          "fairHigh": 25903,
-          "aboveFair": 27963,
-          "expensive": 33850
+          "deepValue": 15927,
+          "safeBuy": 17697,
+          "accumulate": 20057,
+          "fairLow": 22416,
+          "fairHigh": 25956,
+          "aboveFair": 28020,
+          "expensive": 33919
         }
       },
       "threeLayerDecision": {
-        "compositeScore": 5.0,
-        "valuationLayerScore": 6.5,
+        "compositeScore": 5.1,
+        "valuationLayerScore": 6.6,
         "qualityLayerScore": 5.5,
         "timingLayerScore": 2.0,
         "roeCoeSpread": 7.77,
@@ -4850,7 +4850,7 @@
         "Đồng thuận kỹ thuật TradingView: Tiêu cực"
       ]
     },
-    "updatedAt": 1793886736366
+    "updatedAt": 1793903114866
   },
   "FUEVFVND": {
     "symbol": "FUEVFVND",
