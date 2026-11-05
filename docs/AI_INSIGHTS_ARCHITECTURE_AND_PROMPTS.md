@@ -1,7 +1,7 @@
 # 🤖 KIẾN TRÚC NHẬN ĐỊNH AI & HỆ THỐNG PROMPTS ĐIỀU HÀNH
-### (AI Insights Engine · Two-Tier Architecture · JSON Schemas · Gemini/OpenAI Prompts)
+### (AI Insights Engine · Two-Tier Architecture · JSON Schemas · OpenRouter Gateway)
 
-Tài liệu này là đặc tả kỹ thuật chi tiết về cơ chế vận hành, cấu trúc trường dữ liệu, nguyên lý suy luận và hệ thống prompt của phân hệ **AI Copilot & Nhận Định Chiến Lược Nền (Background AI Insights Engine)** trong nền tảng *Stock Portfolio Manager & Enterprise Valuation Engine*.
+Tài liệu này là đặc tả kỹ thuật chi tiết về cơ chế vận hành, cấu trúc trường dữ liệu, nguyên lý suy luận và hệ thống prompt của phân hệ **AI Copilot & Nhận Định Chiến Lược Nền (Background AI Insights Engine)** qua cổng **OpenRouter API** trong nền tảng *Stock Portfolio Manager & Enterprise Valuation Engine*.
 
 ---
 
@@ -13,7 +13,7 @@ Tài liệu này là đặc tả kỹ thuật chi tiết về cơ chế vận h�
    - [B. Báo Cáo Thẩm Định Cổ Phiếu Chuyên Sâu (`aiDeepDive`)](#b-báo-cáo-thẩm-định-cổ-phiếu-chuyên-sâu-aideepdive)
    - [C. Nhịp Đập Thị Trường Cuối Tuần (`weeklyPulse`)](#c-nhịp-đập-thị-trường-cuối-tuần-weeklypulse)
 4. [Hệ Thống System Prompts & Ngữ Cảnh Đầu Vào (Context Data)](#4-hệ-thống-system-prompts--ngữ-cảnh-đầu-vào-context-data)
-5. [Cơ Chế Tự Động Phục Hồi Đa Mô Hình (Multi-Model Resilient Fallback)](#5-cơ-chế-tự-động-phục-hồi-đa-mô-hình-multi-model-resilient-fallback)
+5. [Cơ Chế Kháng Lỗi & Thử Lại (OpenRouter Resilient Retry & Fallback)](#5-cơ-chế-kháng-lỗi--thử-lại-openrouter-resilient-retry--fallback)
 6. [Hướng Dẫn Thực Thi Pipeline & Kiểm Tra Kết Quả](#6-hướng-dẫn-thực-thi-pipeline--kiểm-tra-kết-quả)
 
 ---
@@ -22,12 +22,12 @@ Tài liệu này là đặc tả kỹ thuật chi tiết về cơ chế vận h�
 
 Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận định:
 
-| Tiêu Chí | 🧠 TẦNG 1: LLM THỰC THỤ (Gemini / OpenAI) | ⚙️ TẦNG 2: HEURISTIC DETERMINISTIC ENGINE |
+| Tiêu Chí | 🧠 TẦNG 1: LLM THỰC THỤ (OpenRouter Gateway) | ⚙️ TẦNG 2: HEURISTIC DETERMINISTIC ENGINE |
 | :--- | :--- | :--- |
-| **Điều kiện kích hoạt** | Có cấu hình `GEMINI_API_KEY` hoặc `OPENAI_API_KEY` hợp lệ. | Không có API Key, mạng bị ngắt, hoặc LLM lỗi. |
+| **Điều kiện kích hoạt** | Có cấu hình `OPENROUTER_API_KEY` hợp lệ. | Không có API Key, mạng bị ngắt, hoặc LLM lỗi. |
 | **Bản chất câu chữ** | **AI Tự Suy Luận & Tự Viết 100%**: LLM đọc bức tranh số liệu vĩ mô/BCTC và tự sinh bài phân tích định tính bằng văn phong chuyên gia đầu tư (CIO/CFA). | **Mẫu Câu Điền Số (Rule-Based Templates)**: Hệ thống tính toán sẵn các chỉ số định lượng (Z-Score, MoS %, ERP) và điền các biến đó vào khung câu tiếng Việt chuẩn bị sẵn. |
 | **Tính đa dạng & Sâu sắc** | Ngữ nghĩa biến đổi phong phú theo bối cảnh thị trường, có khả năng liên kết đa chiều (ví dụ: tác động của tỷ giá USD/VND lên chính sách can thiệp thanh khoản liên ngân hàng của SBV). | Cố định, mang tính kỹ thuật máy móc nhằm bảo đảm 100% tính chính xác của các ngưỡng định lượng. |
-| **Nhãn định danh trong JSON** | `"provider": "gemini"` hoặc `"openai"`<br>`"model": "gemini-3.1-flash-lite"`, v.v. | `"provider": "offline-heuristic-engine"`<br>`"model": "Quantitative Deterministic Heuristic v4.0"` |
+| **Nhãn định danh trong JSON** | `"provider": "openrouter"`<br>`"model": "deepseek/deepseek-chat"`, v.v. | `"provider": "offline-heuristic-engine"`<br>`"model": "Quantitative Deterministic Heuristic v4.0"` |
 
 ---
 
@@ -38,22 +38,22 @@ Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận đ
                     │  KÍCH HOẠT PIPELINE: generate_ai_insights.py │
                     └──────────────────────┬───────────────────────┘
                                            │
-                        Kiểm tra cấu hình API Key trong .env / Secrets?
+                        Kiểm tra cấu hình OPENROUTER_API_KEY trong .env?
                                            │
                          ┌─────────────────┴─────────────────┐
                        Có │                                   │ Không
                           ▼                                   ▼
         ┌───────────────────────────────────┐ ┌───────────────────────────────────┐
-        │  GỬI SỐ LIỆU ĐẦU VÀO TỚI GOOGLE   │ │ KÍCH HOẠT FALLBACK NỘI BỘ         │
-        │  GEMINI / OPENAI REST API         │ │ (Rule-based Quantitative Heuristic│
+        │  GỬI SỐ LIỆU ĐẦU VÀO TỚI          │ │ KÍCH HOẠT FALLBACK NỘI BỘ         │
+        │  OPENROUTER API GATEWAY           │ │ (Rule-based Quantitative Heuristic│
         └─────────────────┬─────────────────┘ └─────────────────┬─────────────────┘
                           │                                     │
-                 HTTP 200 │              Lỗi 503/429/Timeout   │
+                 HTTP 200 │              Lỗi HTTP 429/Timeout   │
                           │        ┌────────────────────────────┘
                           ▼        ▼
         ┌────────────────────────────────────────────────────────┐
-        │ TỰ ĐỘNG CHUYỂN TIẾP MODEL TIẾP THEO:                   │
-        │ gemini-3.5-flash-lite ➔ gemini-3.5-flash ➔ gemini-3.1  │
+        │ TỰ ĐỘNG THỬ LẠI EXPONENTIAL BACKOFF HOẶC CHUYỂN SANG:  │
+        │ Tầng 2: Heuristic Deterministic Engine 0ms             │
         └──────────────────────────┬─────────────────────────────┘
                                    │
                                    ▼
@@ -100,8 +100,8 @@ Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận đ
     "Rủi ro từ các biến số vĩ mô bên ngoài có thể làm gián đoạn đà phục hồi của dòng vốn ngoại trên thị trường."
   ],
   "status": "success",
-  "provider": "gemini",
-  "model": "gemini-3.1-flash-lite",
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-chat",
   "updatedAt": "2026-10-13T15:03:36.282367+00:00"
 }
 ```
@@ -131,8 +131,8 @@ Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận đ
   ],
   "targetPriceHorizon12M": "35512",
   "status": "success",
-  "provider": "gemini",
-  "model": "gemini-3.1-flash-lite",
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-chat",
   "updatedAt": "2026-10-13T15:04:30.322623+00:00"
 }
 ```
@@ -145,7 +145,7 @@ Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận đ
 > 💡 **Tại sao chuyển từ Daily sang Weekly?**  
 > Các biến động từng phiên mang nhiều tiếng ồn ngắn hạn (nhiễu kỹ thuật, đáo hạn phái sinh, lệnh cơ cấu ATC). Bản tin cuối tuần tổng hợp toàn bộ 5 phiên giao dịch, giúp nhà đầu tư nhìn rõ bức tranh dòng tiền tổ chức (khối ngoại/tự doanh), luân chuyển nhóm ngành và chuẩn bị kịch bản cho tuần tiếp theo một cách điềm tĩnh và kỷ luật.
 
-**Ví dụ thực tế sinh bởi OpenAI (`super-vip`):**
+**Ví dụ thực tế sinh bởi OpenRouter (`deepseek/deepseek-chat`):**
 ```json
 {
   "pulseHeadline": "VN-Index Tích Lũy Thăm Dò Quanh Vùng Cân Bằng: Dòng Tiền Tái Định Vị Khi Định Giá Lọt 'Vùng Vàng' Chu Kỳ Tăng Trưởng",
@@ -163,8 +163,8 @@ Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận đ
   "nextWeekOutlook": "VN-Index được dự báo sẽ tiếp tục dao động tích lũy trong vùng biên độ 1.720 – 1.750 điểm nhằm hấp thụ lượng cung lơ lửng. Xu hướng luân chuyển dòng tiền từ nhóm cổ phiếu định giá đắt sang nhóm cổ phiếu cơ bản có định giá chiết khấu sâu (P/E dưới 10x) sẽ diễn ra rõ nét hơn. Kịch bản bứt phá vượt mốc 1.750 điểm có thể được kích hoạt ngay khi nhóm Tài chính và Bất động sản hoàn tất nhịp tích lũy.",
   "actionableAdvice": "Chiến lược ưu tiên: Giữ tỷ trọng cổ phiếu ở mức 60-70%, kiên nhẫn tích lũy từng phần (DCA) tại các nhịp võng giá đối với các mã cơ bản, tránh mua đuổi trong các phiên hưng phấn.",
   "status": "success",
-  "provider": "openai",
-  "model": "super-vip",
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-chat",
   "updatedAt": "2026-10-13T15:31:02.123456+00:00"
 }
 ```
@@ -232,23 +232,14 @@ Hệ thống phân định rạch ròi giữa hai phương thức sinh nhận đ
 
 ---
 
-## 5. Cơ Chế Tự Động Phục Hồi Đa Mô Hình (Multi-Model Resilient Fallback)
+## 5. Cơ Chế Kháng Lỗi & Thử Lại (OpenRouter Resilient Retry & Fallback)
 
-Trong môi trường thực tế, Google Gemini có thể gặp tình trạng quá tải cục bộ (**HTTP 503 High Demand**) hoặc chạm ngưỡng tần suất (**HTTP 429 Rate Limit**). 
+Trong môi trường thực tế, các yêu cầu gọi LLM qua internet có thể gặp tình trạng nghẽn mạng hoặc chạm ngưỡng tần suất (**HTTP 429 Rate Limit**).
 
-Hệ thống đã tích hợp cơ chế **tự động thử lại chuỗi mô hình thông minh (Smart Model Cascade)**:
-
-```python
-models_to_try = [target_model]
-for alt in ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite", "gemini-1.5-flash"]:
-    if alt not in models_to_try:
-        models_to_try.append(alt)
-```
-
-- Nếu `gemini-3.5-flash-lite` bị timeout hoặc 503 &rarr; Hệ thống tự động chuyển ngay sang `gemini-3.5-flash`.
-- Nếu `gemini-3.5-flash` chạm ngưỡng &rarr; Hệ thống chuyển sang `gemini-3.1-flash-lite` và hoàn thành thành công trong vài giây.
-- Nếu người dùng cấu hình OpenAI (`AI_PROVIDER=openai`) &rarr; Hệ thống kết nối trực tiếp đến endpoint OpenAI (`http://localhost:20128/v1` hoặc official) với cơ chế tự động xử lý cả JSON và Server-Sent Events (SSE).
-- Nếu toàn bộ các mô hình bên ngoài đều không phản hồi &rarr; Hệ thống tự động kích hoạt **Tầng 2 Heuristic Deterministic Engine**, đảm bảo pipeline không bao giờ bị dừng đột ngột.
+Hệ thống đã tích hợp cơ chế **tự động thử lại luỹ thừa (Exponential Backoff Retry)**:
+- Tự động tạm nghỉ và thử lại tối đa 3 lần với thời gian chờ giãn nở theo luỹ thừa ($2s \times 2^{\text{attempt}}$).
+- Tự động bóc tách thông báo lỗi chi tiết từ payload JSON phản hồi của OpenRouter để thông báo trung thực cho người dùng.
+- Nếu toàn bộ các lượt thử lại đều không thành công hoặc không có `OPENROUTER_API_KEY` &rarr; Hệ thống tự động kích hoạt **Tầng 2 Heuristic Deterministic Engine**, đảm bảo pipeline và giao diện không bao giờ bị crash.
 
 ---
 

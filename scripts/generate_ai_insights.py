@@ -541,18 +541,18 @@ def main():
     )
     parser.add_argument(
         "--model", "-m",
-        help="Chỉ định mô hình AI cụ thể (ví dụ: gemini-1.5-flash, gemini-2.0-flash, gpt-4o-mini)",
+        help="Chỉ định mô hình OpenRouter cụ thể (ví dụ: deepseek/deepseek-chat, anthropic/claude-3.5-sonnet, meta-llama/llama-3.3-70b-instruct)",
         default=None
     )
     parser.add_argument(
-        "--gemini-model",
-        help="Bí danh chỉ định mô hình Google Gemini",
+        "--openrouter-model",
+        help="Bí danh chỉ định mô hình OpenRouter",
         default=None
     )
     parser.add_argument(
         "--provider", "-p",
-        choices=["auto", "gemini", "openai", "heuristic"],
-        help="Nhà cung cấp AI ưu tiên (auto, gemini, openai, heuristic)",
+        choices=["auto", "openrouter", "heuristic"],
+        help="Nhà cung cấp AI ưu tiên (auto, openrouter, heuristic)",
         default=None
     )
     parser.add_argument(
@@ -563,9 +563,10 @@ def main():
 
     args = parser.parse_args()
 
-    chosen_model = args.gemini_model or args.model
+    chosen_model = args.openrouter_model or args.model
     if chosen_model:
-        os.environ["GEMINI_MODEL"] = chosen_model
+        os.environ["OPENROUTER_MODEL"] = chosen_model
+        os.environ["AI_MODEL"] = chosen_model
         ai_service.refresh_env()
 
     symbols = []
@@ -581,7 +582,7 @@ def main():
     print("==================================================================")
     print("🤖 CHƯƠNG TRÌNH SINH DỮ LIỆU PHÂN TÍCH AI CHẠY NỀN (BACKGROUND AI)")
     print(f"📌 Phạm vi (Scope): [{args.scope.upper()}] | User: [{args.user_id}] | Provider: [{status['activeProvider'].upper()}]")
-    print(f"🌟 Gemini Model:   [{status['geminiModel']}] | OpenAI Model: [{status['openaiModel']}]")
+    print(f"🌟 OpenRouter Model: [{status['openrouterModel']}] | Has Key: [{status['hasOpenRouterKey']}]")
     if chosen_model:
         print(f"🎯 CLI Model Ghi Đè: [{chosen_model}]")
     print("==================================================================")

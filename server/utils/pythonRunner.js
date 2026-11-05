@@ -20,7 +20,7 @@ export function isPythonAvailable() {
 /**
  * Thực thi một Python script trong thư mục dự án với cơ chế Promise-based:
  * - Tự động thiết lập cwd = ROOT_DIR.
- * - Tự động kế thừa process.env (chứa TURSO_DATABASE_URL, DB_MODE, GEMINI_API_KEY).
+ * - Tự động kế thừa process.env (chứa TURSO_DATABASE_URL, DB_MODE, OPENROUTER_API_KEY).
  * - Hỗ trợ timeout và bắt lỗi tập trung.
  * 
  * @param {string} scriptRelativePath - Đường dẫn tương đối từ ROOT_DIR, ví dụ 'scripts/sync_fundamentals.py'

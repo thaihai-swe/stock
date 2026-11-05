@@ -2,8 +2,9 @@
 """
 scripts/lib/ai_service.py
 Module dịch vụ AI dùng chung (Python AI Service):
-Hỗ trợ cả Google Gemini REST API và OpenAI Standard API (/v1/chat/completions).
-Tự động fallback sang Two-Tier Heuristic Engine 0ms nếu không có API Key.
+Sử dụng cổng kết nối OpenRouter API (/v1/chat/completions) duy nhất cho toàn hệ thống
+(hỗ trợ linh hoạt DeepSeek, Claude, LLaMA, Qwen qua OpenRouter).
+Tự động fallback sang Two-Tier Heuristic Engine 0ms nếu không có API Key hoặc gặp sự cố mạng.
 """
 
 import os
@@ -14,6 +15,10 @@ from pathlib import Path
 from typing import Any, Dict, Optional, List
 
 logger = logging.getLogger(__name__)
+
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = ROOT_DIR / "data"
+FUNDAMENTALS_FILE = DATA_DIR / "fundamentals_cache.json"
 
 try:
     import requests
@@ -44,21 +49,20 @@ def _load_dotenv():
 
 
 class PythonAiService:
-    SUPPORTED_GEMINI_MODELS = [
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
-        "gemini-2.0-flash",
-        "gemini-2.0-flash-lite",
-        "gemini-2.5-flash",
-        "gemini-3.5-flash-lite",
-        "gemini-flash-latest",
+    SUPPORTED_OPENROUTER_MODELS = [
+        "deepseek/deepseek-chat",
+        "deepseek/deepseek-r1",
+        "anthropic/claude-3.5-sonnet",
+        "meta-llama/llama-3.3-70b-instruct",
+        "qwen/qwen-2.5-72b-instruct",
+        "mistralai/mistral-large-2411",
     ]
 
     def __init__(self):
         self.refresh_env()
 
     def refresh_env(self):
-        """Tải lại biến môi trường và cấu hình hệ thống aiEngineHub."""
+        """Tải lại biến môi trường và cấu hình hệ thống aiEngineHub cho OpenRouter."""
         _load_dotenv()
         ai_cfg = {}
         try:
@@ -71,40 +75,38 @@ class PythonAiService:
             except Exception:
                 ai_cfg = {}
 
-        self.provider = (os.environ.get("AI_PROVIDER") or ai_cfg.get("provider") or "auto").lower()
-        self.gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-        self.openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
-        self.openai_base_url = (os.environ.get("OPENAI_BASE_URL") or ai_cfg.get("openaiBaseUrl") or "https://api.openai.com/v1").rstrip("/")
-        # Thứ tự ưu tiên: GEMINI_MODEL > AI_MODEL > config.json geminiModel > default
-        self.gemini_model = os.environ.get("GEMINI_MODEL") or os.environ.get("AI_MODEL") or ai_cfg.get("geminiModel") or "gemini-1.5-flash"
-        self.openai_model = os.environ.get("OPENAI_MODEL") or os.environ.get("AI_MODEL") or ai_cfg.get("openaiModel") or "gpt-4o-mini"
+        self.provider = (os.environ.get("AI_PROVIDER") or ai_cfg.get("provider") or "openrouter").lower()
+        self.openrouter_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+        self.openrouter_base_url = (os.environ.get("OPENROUTER_BASE_URL") or ai_cfg.get("openrouterBaseUrl") or "https://openrouter.ai/api/v1").rstrip("/")
+        # Thứ tự ưu tiên: OPENROUTER_MODEL > AI_MODEL > config.json openrouterModel > default
+        self.openrouter_model = (
+            os.environ.get("OPENROUTER_MODEL")
+            or os.environ.get("AI_MODEL")
+            or ai_cfg.get("openrouterModel")
+            or "deepseek/deepseek-chat"
+        )
+        self.openrouter_site_url = os.environ.get("OPENROUTER_SITE_URL", "http://localhost:5173")
+        self.openrouter_site_name = os.environ.get("OPENROUTER_APP_NAME", "Stock Portfolio Manager & Enterprise Valuation Engine")
         self.temperature = float(os.environ.get("AI_TEMPERATURE", ai_cfg.get("temperature", 0.2)))
         self.max_tokens = int(os.environ.get("AI_MAX_TOKENS", ai_cfg.get("maxTokens", 2048)))
 
     def resolve_provider(self, requested_provider: Optional[str] = None) -> str:
         self.refresh_env()
-        prov = (requested_provider or self.provider or "auto").lower()
+        prov = (requested_provider or self.provider or "openrouter").lower()
         if prov in ("heuristic", "offline", "fallback"):
             return "heuristic_fallback"
-        if prov == "openai" and self.openai_key:
-            return "openai"
-        if prov == "gemini" and self.gemini_key:
-            return "gemini"
-        if self.gemini_key:
-            return "gemini"
-        if self.openai_key:
-            return "openai"
+        if self.openrouter_key:
+            return "openrouter"
         return "heuristic_fallback"
 
     def get_status(self) -> Dict[str, Any]:
         return {
             "activeProvider": self.resolve_provider(),
             "configuredProvider": self.provider,
-            "hasGeminiKey": bool(self.gemini_key),
-            "hasOpenAiKey": bool(self.openai_key),
-            "geminiModel": self.gemini_model,
-            "openaiModel": self.openai_model,
-            "supportedGeminiModels": self.SUPPORTED_GEMINI_MODELS,
+            "hasOpenRouterKey": bool(self.openrouter_key),
+            "openrouterModel": self.openrouter_model,
+            "openrouterBaseUrl": self.openrouter_base_url,
+            "supportedOpenRouterModels": self.SUPPORTED_OPENROUTER_MODELS,
         }
 
     def generate_json(
@@ -115,40 +117,18 @@ class PythonAiService:
         model: Optional[str] = None,
         provider: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Gọi LLM trả về JSON dict hoặc fallback sang heuristic."""
+        """Gọi OpenRouter API trả về JSON dict hoặc fallback sang heuristic."""
         active = self.resolve_provider(requested_provider=provider)
 
-        if active == "gemini" and requests:
+        if active == "openrouter" and requests:
             try:
-                res = self._call_gemini(system_prompt, user_prompt, model=model)
+                res = self._call_openrouter(system_prompt, user_prompt, model=model)
                 if res:
                     return res
             except Exception as e:
-                logger.warning(f"⚠️ Lỗi gọi Gemini API: {e}. Thử fallback.")
-                if self.openai_key:
-                    try:
-                        res = self._call_openai(system_prompt, user_prompt, model=model)
-                        if res:
-                            return res
-                    except Exception as oe:
-                        logger.warning(f"⚠️ Lỗi gọi OpenAI fallback: {oe}.")
+                logger.warning(f"⚠️ Lỗi gọi OpenRouter API: {e}. Chuyển sang fallback định lượng Heuristic.")
 
-        elif active == "openai" and requests:
-            try:
-                res = self._call_openai(system_prompt, user_prompt, model=model)
-                if res:
-                    return res
-            except Exception as e:
-                logger.warning(f"⚠️ Lỗi gọi OpenAI API: {e}. Thử fallback.")
-                if self.gemini_key:
-                    try:
-                        res = self._call_gemini(system_prompt, user_prompt, model=model)
-                        if res:
-                            return res
-                    except Exception as ge:
-                        logger.warning(f"⚠️ Lỗi gọi Gemini fallback: {ge}.")
-
-        # Tier 2 Fallback
+        # Tier 2 Fallback: Heuristic Engine
         if callable(fallback_fn):
             fb = fallback_fn()
             fb["status"] = "success"
@@ -156,65 +136,16 @@ class PythonAiService:
             fb["model"] = "Quantitative Deterministic Heuristic v4.0"
             return fb
 
-        return {"status": "error", "message": "Không thể kết nối AI provider"}
+        return {"status": "error", "message": "Không thể kết nối OpenRouter provider"}
 
-    def _call_gemini(self, system_prompt: str, user_prompt: str, model: Optional[str] = None) -> Optional[Dict[str, Any]]:
-        target_model = (model or self.gemini_model or "gemini-3.5-flash").strip()
-        models_to_try = [target_model]
-        for alt in ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite", "gemini-1.5-flash"]:
-            if alt not in models_to_try:
-                models_to_try.append(alt)
-
-        combined = f"{system_prompt}\n\n{user_prompt}\n\nQUY TẮC: Chỉ trả về JSON thuần, không bọc markdown ```json."
-        token_limit = min(self.max_tokens, 4096) if self.max_tokens else 4096
-
-        last_error = None
-        for cur_model in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{cur_model}:generateContent?key={self.gemini_key}"
-            payload = {
-                "contents": [{"parts": [{"text": combined}]}],
-                "generationConfig": {
-                    "temperature": self.temperature,
-                    "maxOutputTokens": token_limit,
-                    "responseMimeType": "application/json"
-                }
-            }
-            # Exponential Backoff Retry (up to 3 attempts on HTTP 429)
-            for attempt in range(3):
-                try:
-                    resp = requests.post(url, json=payload, timeout=60)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        raw = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                        if raw:
-                            cleaned = raw.strip().replace("```json", "").replace("```", "").strip()
-                            parsed = json.loads(cleaned)
-                            parsed["status"] = "success"
-                            parsed["provider"] = "gemini"
-                            parsed["model"] = cur_model
-                            return parsed
-                    elif resp.status_code == 429:
-                        wait_s = 2.0 * (2 ** attempt)
-                        logger.warning(f"⚠️ Gemini ({cur_model}) HTTP 429 Rate Limit. Tạm nghỉ {wait_s}s trước khi thử lại lần {attempt + 1}/3...")
-                        time.sleep(wait_s)
-                        continue
-                    else:
-                        last_error = f"Gemini ({cur_model}) HTTP {resp.status_code}: {resp.text[:200]}"
-                        logger.warning(f"⚠️ {cur_model} trả về lỗi HTTP {resp.status_code}. Thử model tiếp theo...")
-                        break
-                except Exception as e:
-                    last_error = f"Gemini ({cur_model}) error: {e}"
-                    logger.warning(f"⚠️ Lỗi kết nối {cur_model}: {e}. Thử model tiếp theo...")
-                    break
-
-        raise RuntimeError(last_error or "Tất cả mô hình Gemini đều không phản hồi")
-
-    def _call_openai(self, system_prompt: str, user_prompt: str, model: Optional[str] = None) -> Optional[Dict[str, Any]]:
-        target_model = (model or self.openai_model or "gpt-4o-mini").strip()
-        url = f"{self.openai_base_url}/chat/completions"
+    def _call_openrouter(self, system_prompt: str, user_prompt: str, model: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        target_model = (model or self.openrouter_model or "deepseek/deepseek-chat").strip()
+        url = f"{self.openrouter_base_url}/chat/completions"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.openai_key}"
+            "Authorization": f"Bearer {self.openrouter_key}",
+            "HTTP-Referer": self.openrouter_site_url,
+            "X-Title": self.openrouter_site_name,
         }
         payload = {
             "model": target_model,
@@ -227,9 +158,8 @@ class PythonAiService:
             "stream": False,
         }
 
-        # Exponential Backoff Retry (up to 3 attempts on HTTP 429)
         max_retries = 3
-        timeout_s = int(os.environ.get("OPENAI_TIMEOUT", 75))
+        timeout_s = int(os.environ.get("OPENROUTER_TIMEOUT", 90))
         for attempt in range(max_retries):
             try:
                 resp = requests.post(url, headers=headers, json=payload, timeout=timeout_s)
@@ -262,20 +192,27 @@ class PythonAiService:
                         cleaned = cleaned.strip()
                         parsed = json.loads(cleaned)
                         parsed["status"] = "success"
-                        parsed["provider"] = "openai"
+                        parsed["provider"] = "openrouter"
                         parsed["model"] = target_model
                         return parsed
                 elif resp.status_code == 429:
                     wait_s = 2.0 * (2 ** attempt)
-                    logger.warning(f"⚠️ OpenAI ({target_model}) HTTP 429 Rate Limit. Tạm nghỉ {wait_s}s trước khi thử lại lần {attempt + 1}/{max_retries}...")
+                    logger.warning(f"⚠️ OpenRouter ({target_model}) HTTP 429 Rate Limit. Tạm nghỉ {wait_s}s trước khi thử lại lần {attempt + 1}/{max_retries}...")
                     time.sleep(wait_s)
                     continue
                 else:
-                    raise RuntimeError(f"OpenAI ({target_model}) HTTP {resp.status_code}: {resp.text[:200]}")
+                    err_msg = resp.text[:250]
+                    try:
+                        err_json = resp.json()
+                        if "error" in err_json and isinstance(err_json["error"], dict):
+                            err_msg = err_json["error"].get("message", err_msg)
+                    except Exception:
+                        pass
+                    raise RuntimeError(f"OpenRouter ({target_model}) HTTP {resp.status_code}: {err_msg}")
             except Exception as e:
                 if attempt < max_retries - 1 and ("429" in str(e) or "rate" in str(e).lower()):
                     wait_s = 2.0 * (2 ** attempt)
-                    logger.warning(f"⚠️ OpenAI ({target_model}) gặp lỗi tốc độ {e}. Tạm nghỉ {wait_s}s...")
+                    logger.warning(f"⚠️ OpenRouter ({target_model}) gặp lỗi tốc độ {e}. Tạm nghỉ {wait_s}s...")
                     time.sleep(wait_s)
                     continue
                 raise

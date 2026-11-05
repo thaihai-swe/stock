@@ -19,15 +19,11 @@ export function getIntelligenceSource(item) {
 
   const provider = (item.provider || '').toLowerCase();
   const isKnownAiProvider = (
-    provider === 'openai' ||
-    provider === 'gemini' ||
-    provider === 'anthropic' ||
-    provider === 'deepseek' ||
     provider === 'openrouter' ||
+    provider === 'deepseek' ||
+    provider === 'anthropic' ||
     provider.includes('ai') ||
-    provider.includes('gpt') ||
-    provider.includes('claude') ||
-    provider.includes('super-vip')
+    provider.includes('claude')
   );
 
   // Nhận diện nếu đối tượng mang payload phân tích AI đặc thù
@@ -74,7 +70,7 @@ export function getIntelligenceSource(item) {
  * @param {Object} [props.source] Đối tượng nguồn dữ liệu (report, aiInsight, aiDeepDive...) tự động trích xuất thông tin
  * @param {Object} [props.item] Bí danh cho source
  * @param {'ai' | 'heuristic' | 'h'} [props.type] Loại nhãn cưỡng bức
- * @param {string} [props.provider] Tự động nhận diện qua provider (openai, gemini, offline-heuristic-engine, v.v.)
+ * @param {string} [props.provider] Tự động nhận diện qua provider (openrouter, offline-heuristic-engine, v.v.)
  * @param {string} [props.tooltip] Nội dung tooltip tùy chỉnh khi rê chuột
  * @param {'xs' | 'sm'} [props.size='sm'] Kích thước nhãn
  * @param {string} [props.className] Class tùy biến bổ sung
@@ -104,15 +100,11 @@ export default function IntelligenceBadge({
     const p = provider.toLowerCase();
     const isExplicitHeuristic = p === 'heuristic' || p === 'offline-heuristic-engine';
     const isKnownAi = (
-      p === 'openai' ||
-      p === 'gemini' ||
-      p === 'anthropic' ||
-      p === 'deepseek' ||
       p === 'openrouter' ||
+      p === 'deepseek' ||
+      p === 'anthropic' ||
       p.includes('ai') ||
-      p.includes('gpt') ||
-      p.includes('claude') ||
-      p.includes('super-vip')
+      p.includes('claude')
     );
     resolvedType = (isKnownAi && !isExplicitHeuristic) ? 'ai' : 'heuristic';
   }

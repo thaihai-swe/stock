@@ -446,7 +446,7 @@ def get_valuation_narratives() -> Dict[str, Any]:
 
 
 def get_ai_engine_config() -> Dict[str, Any]:
-    """Lấy cấu hình hệ sinh thái AI trợ lý (Gemini / OpenAI / Heuristic)."""
+    """Lấy cấu hình hệ sinh thái AI trợ lý (OpenRouter / Heuristic)."""
     cfg = load_system_constants()
     return cfg.get("aiEngineHub", {})
 
