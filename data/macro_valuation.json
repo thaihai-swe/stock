@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updatedAt": "2026-11-05T18:25:21Z",
+    "updatedAt": "2026-11-06T17:47:02Z",
     "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
     "version": "4.0"
   },
@@ -70,7 +70,7 @@
       "equityRiskPremium": 4.99,
       "earningsYield": 9.5,
       "vnCurvature": -0.56,
-      "usCurvature": 0.55,
+      "usCurvature": 0.54,
       "vnMoveFocus": "LONG (Đầu dài 10Y)",
       "favoredSectors": "Luân chuyển cân bằng (Neutral Rotation)"
     },
@@ -120,15 +120,15 @@
         "id": 4,
         "metric": "2Y / 5Y / 10Y Yields (Bộ 3 kỳ hạn TPCP)",
         "vn": "2.45% / 3.20% / 4.51%",
-        "us": "4.65% / 5.02% / 4.84%",
-        "delta": "Spread 10Y: -0.33%",
+        "us": "4.65% / 5.02% / 4.85%",
+        "delta": "Spread 10Y: -0.34%",
         "highlight": "normal"
       },
       {
         "id": 5,
         "metric": "Level / Slope / Curvature (Nelson-Siegel)",
         "vn": "3.39% / +2.06% / -0.56%",
-        "us": "4.84% / +0.19% / +0.55%",
+        "us": "4.84% / +0.20% / +0.54%",
         "delta": "Curv VN: -0.56%",
         "highlight": "normal"
       },
@@ -144,7 +144,7 @@
         "id": 7,
         "metric": "Segmented Slope (Độ dốc phân đoạn)",
         "vn": "2-5Y: +0.75% | 5-10Y: +1.31%",
-        "us": "2-5Y: +0.37% | 5-10Y: -0.18%",
+        "us": "2-5Y: +0.37% | 5-10Y: -0.17%",
         "delta": "10Y-2Y: +2.06%",
         "highlight": "normal"
       },
@@ -152,7 +152,7 @@
         "id": 8,
         "metric": "Curve Stress Score (Điểm căng thẳng đường cong)",
         "vn": "38.1/100 (MID)",
-        "us": "61.5/100 (MID)",
+        "us": "61.1/100 (MID)",
         "delta": "Ngưỡng rủi ro: 75/100",
         "highlight": "normal"
       },
@@ -176,7 +176,7 @@
         "id": 11,
         "metric": "4 Macro Spreads (4 Chênh lệch vĩ mô)",
         "vn": "LiqGap: +1.97% | 10Y-Policy: +0.01%",
-        "us": "Spread10Y: -0.33% | PolicyGap: -0.35%",
+        "us": "Spread10Y: -0.34% | PolicyGap: -0.35%",
         "delta": "Driver: LOCAL STRESS",
         "highlight": "warning"
       },
@@ -192,7 +192,7 @@
         "id": 13,
         "metric": "Funding Dynamics (Động lực thanh khoản hệ thống)",
         "vn": "Thanh khoản dồi dào | Gap: +1.97%",
-        "us": "Spread 2Y: -2.20% | USD/VND: 25,680",
+        "us": "Spread 2Y: -2.20% | USD/VND: 25,580",
         "delta": "LOCAL STRESS",
         "highlight": "normal"
       },
@@ -233,13 +233,13 @@
   "marketIndex": {
     "symbol": "VNINDEX",
     "name": "Chỉ Số VN-Index",
-    "currentPoint": 1740.73,
-    "prevPoint": 1733.02,
-    "change": 7.71,
-    "changePercent": 0.44,
-    "high": 1753.15,
-    "low": 1736.26,
-    "volume": 738585984,
+    "currentPoint": 1725.36,
+    "prevPoint": 1740.73,
+    "change": -15.37,
+    "changePercent": -0.88,
+    "high": 1734.42,
+    "low": 1713.46,
+    "volume": 972595584,
     "currentPE": 10.53,
     "currentPB": 1.77,
     "historicalMeanPE": 11.45,
@@ -2186,12 +2186,6 @@
   "executiveSummary": {
     "keyRisks": [
       {
-        "level": "Cao",
-        "title": "Áp Lực Tỷ Giá USD/VND & Can Thiệp Tiền Tệ",
-        "risk": "Tỷ giá USD/VND neo cao ở mức 25,680 đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
-        "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
-      },
-      {
         "level": "Trung bình",
         "title": "Lãi Suất Liên Ngân Hàng Tăng Nhiệt",
         "risk": "Lãi suất liên ngân hàng qua đêm đạt 6.47%, báo hiệu thanh khoản cục bộ của hệ thống ngân hàng bị thắt chặt.",
@@ -2232,7 +2226,7 @@
     ],
     "keyTakeaways": [
       "⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha 'Mở Rộng Tăng Trưởng' với điểm rủi ro vĩ mô 44/100. P/E thị trường 10.53x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
-      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,680) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
+      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,580) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
       "Cơ hội lớn nhất: Ưu tiên tích lũy cổ phiếu giá trị, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
     ]
   },
@@ -2293,16 +2287,16 @@
   "macro": {
     "vn10yYield": 4.51,
     "sbvRefinancingRate": 4.5,
-    "us10yYield": 4.84,
-    "usdVndRate": 25680.0,
-    "goldWorld": 4112.7,
-    "oilBrent": 97.83,
-    "dxy": 101.43,
-    "sjcGoldBuy": 139.5,
-    "sjcGoldSell": 142.5,
-    "pnjGoldBuy": 138.0,
-    "pnjGoldSell": 142.0,
-    "pnjUpdateDate": "05/11/2026 15:24:05",
+    "us10yYield": 4.85,
+    "usdVndRate": 25580.0,
+    "goldWorld": 4067.8,
+    "oilBrent": 97.69,
+    "dxy": 102.17,
+    "sjcGoldBuy": 138.0,
+    "sjcGoldSell": 141.0,
+    "pnjGoldBuy": 136.3,
+    "pnjGoldSell": 140.3,
+    "pnjUpdateDate": "06/11/2026 12:02:29",
     "inflationCpi": 5.08,
     "coreInflation": 4.45,
     "interbankOvernight": 6.47,
@@ -2359,25 +2353,25 @@
   },
   "yieldCurveAnalysis": {
     "vn10y": 4.51,
-    "us10y": 4.84,
+    "us10y": 4.85,
     "sbvRefinancingRate": 4.5,
     "longShortSpread": 0.01,
-    "crossCountrySpread": -0.33,
+    "crossCountrySpread": -0.34,
     "inversionWarning": false,
     "recessionLead": false,
     "ycRegime": "Neutral",
     "ycRegimeVi": "Cân Bằng Chu Kỳ",
     "regimeBadge": "bg-blue-500/20 text-blue-400 border-blue-500/30",
     "ycStressIndex": 65.7,
-    "assessment": "Lợi suất TPCP 10Y (4.51%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = +0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.33%. Độ dốc đường cong duy trì trong trạng thái bình thường."
+    "assessment": "Lợi suất TPCP 10Y (4.51%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = +0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.34%. Độ dốc đường cong duy trì trong trạng thái bình thường."
   },
   "scenarioMatrix": {
     "base": {
       "name": "Kịch Bản Cơ Sở (Base Case)",
       "probability": 55,
       "badgeColor": "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-      "currentPoint": 1740.73,
-      "vnIndexRange": "1706 - 1802",
+      "currentPoint": 1725.36,
+      "vnIndexRange": "1691 - 1786",
       "conditions": "CPI duy trì quanh 5.1%, PMI mở rộng trên 51 điểm, SBV giữ lãi suất điều hành 4.5%, tỷ giá ổn định trong biên độ quản lý.",
       "sectorBenefit": [
         "Ngân Hàng",
@@ -2394,8 +2388,8 @@
       "name": "Kịch Bản Tích Cực (Bull Case)",
       "probability": 25,
       "badgeColor": "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      "currentPoint": 1740.73,
-      "vnIndexRange": "1784 - 1889",
+      "currentPoint": 1725.36,
+      "vnIndexRange": "1768 - 1872",
       "conditions": "Fed tiếp tục chu kỳ hạ lãi suất, SBV nới lỏng room tín dụng, dòng vốn FDI & khối ngoại quay lại mua ròng, tỷ giá hạ nhiệt.",
       "sectorBenefit": [
         "Chứng Khoán",
@@ -2413,8 +2407,8 @@
       "name": "Kịch Bản Thận Trọng (Bear Case)",
       "probability": 20,
       "badgeColor": "bg-rose-500/20 text-rose-400 border border-rose-500/30",
-      "currentPoint": 1740.73,
-      "vnIndexRange": "1601 - 1697",
+      "currentPoint": 1725.36,
+      "vnIndexRange": "1587 - 1682",
       "conditions": "Lạm phát thế giới và giá dầu tăng vọt, SBV buộc phải hút ròng thanh khoản tiền đồng hoặc tăng lãi suất, USD/VND vượt đỉnh.",
       "sectorBenefit": [
         "Năng Lượng & Dầu Khí",
@@ -2433,9 +2427,9 @@
   "hasActiveTailRisk": false,
   "criticalTailRiskCount": 0,
   "leadLagDivergence": {
-    "leadingPct": 54.3,
+    "leadingPct": 53.2,
     "laggingPct": 40.1,
-    "divergence": 14.2,
+    "divergence": 13.1,
     "signal": "➡️ ALIGNED",
     "signalVi": "Đồng Pha Ổn Định (Aligned)",
     "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
@@ -2451,7 +2445,7 @@
     "signalClarity": 70.0
   },
   "riskAssessment": {
-    "riskScore": 44.0,
+    "riskScore": 43.7,
     "riskBucket": "B2",
     "riskBucketLabel": "Trung Bình (Cần theo dõi cẩn trọng)",
     "riskBucketColor": "text-amber-400",
@@ -2459,7 +2453,7 @@
       "monetary": 36.1,
       "growth": 26.9,
       "price": 64.4,
-      "external": 54.6
+      "external": 53.5
     }
   },
   "sectorRotation": [
@@ -2717,7 +2711,7 @@
       {
         "key": "fx",
         "name": "Tỷ Giá USD/VND",
-        "val": "25,680",
+        "val": "25,580",
         "status": "neutral",
         "lead": "Tỷ giá ổn định giảm áp lực can thiệp hút ròng của Ngân hàng Nhà nước."
       },
@@ -2802,19 +2796,19 @@
     }
   },
   "goldAdvisor": {
-    "worldConvertedVnd": 127334000,
-    "worldPriceUsd": 4112.7,
-    "spreadPct": 11.91,
-    "sjcSpreadPct": 11.91,
-    "pnjSpreadPct": 11.52,
-    "sjcBuy": 139.5,
-    "sjcSell": 142.5,
-    "pnjBuy": 138.0,
-    "pnjSell": 142.0,
-    "updatedAt": "05/11/2026 15:24:05",
+    "worldConvertedVnd": 125453408,
+    "worldPriceUsd": 4067.8,
+    "spreadPct": 12.39,
+    "sjcSpreadPct": 12.39,
+    "pnjSpreadPct": 11.83,
+    "sjcBuy": 138.0,
+    "sjcSell": 141.0,
+    "pnjBuy": 136.3,
+    "pnjSell": 140.3,
+    "updatedAt": "06/11/2026 12:02:29",
     "action": "MUA PHÒNG THỦ",
     "sizeHint": "5-10% danh mục",
-    "reason": "Chênh lệch SJC vs Thế giới rất lớn (11.91%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
+    "reason": "Chênh lệch SJC vs Thế giới rất lớn (12.39%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
   },
   "tradingEconomics": {
     "_meta": {
@@ -3960,7 +3954,7 @@
   },
   "marketValuationHistory": {
     "_meta": {
-      "updatedAt": "2026-11-05T18:25:23.362905",
+      "updatedAt": "2026-11-06T17:47:04.022559",
       "sheetId": "1TdXzsXN_bMQKHLN0Zqc8t4lS-59us02Btr_SLc0AgpQ",
       "source": "Google Sheets (Simply Wall St Vietnam)",
       "periods": [
@@ -3970,10 +3964,10 @@
         "10year"
       ],
       "totalObservations": {
-        "1year": 48,
-        "3year": 41,
-        "5year": 41,
-        "10year": 41
+        "1year": 49,
+        "3year": 42,
+        "5year": 42,
+        "10year": 42
       }
     },
     "metrics": [
@@ -4017,53 +4011,53 @@
     "periods": {
       "1year": {
         "period": "1year",
-        "observationsCount": 48,
+        "observationsCount": 49,
         "stats": {
           "marketCap": {
-            "observations": 48,
-            "current": 8727.79,
-            "mean": 8577.25,
-            "stdDev": 606.88,
+            "observations": 49,
+            "current": 8741.89,
+            "mean": 8580.61,
+            "stdDev": 600.99,
             "min": 7326.6,
             "max": 9419.8
           },
           "revenue": {
-            "observations": 48,
-            "current": 5604.42,
-            "mean": 4524.69,
-            "stdDev": 497.89,
+            "observations": 49,
+            "current": 5636.76,
+            "mean": 4547.38,
+            "stdDev": 517.66,
             "min": 3811.2,
-            "max": 5604.42
+            "max": 5636.76
           },
           "earnings": {
-            "observations": 48,
-            "current": 795.02,
-            "mean": 607.06,
-            "stdDev": 91.2,
+            "observations": 49,
+            "current": 796.3,
+            "mean": 610.92,
+            "stdDev": 94.21,
             "min": 469.3,
-            "max": 795.02
+            "max": 796.3
           },
           "pe": {
-            "observations": 48,
-            "current": 9.6,
-            "mean": 11.64,
-            "stdDev": 1.48,
+            "observations": 49,
+            "current": 9.7,
+            "mean": 11.6,
+            "stdDev": 1.49,
             "min": 9.5,
             "max": 14.8
           },
           "absolutePe": {
-            "observations": 48,
+            "observations": 49,
             "current": 11.0,
-            "mean": 14.35,
-            "stdDev": 1.61,
+            "mean": 14.28,
+            "stdDev": 1.66,
             "min": 11.0,
             "max": 17.7
           },
           "ps": {
-            "observations": 48,
+            "observations": 49,
             "current": 1.6,
-            "mean": 1.91,
-            "stdDev": 0.15,
+            "mean": 1.9,
+            "stdDev": 0.16,
             "min": 1.6,
             "max": 2.3
           }
@@ -4788,58 +4782,73 @@
             "absolutePeRaw": "11x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Fri, 06 Nov 2026",
+            "marketCap": 8741.89,
+            "marketCapRaw": "₫8741.89t",
+            "revenue": 5636.76,
+            "revenueRaw": "₫5636.76t",
+            "earnings": 796.3,
+            "earningsRaw": "₫796.30t",
+            "pe": 9.7,
+            "peRaw": "9.7x",
+            "absolutePe": 11.0,
+            "absolutePeRaw": "11x",
+            "ps": 1.6,
+            "psRaw": "1.6x"
           }
         ]
       },
       "3year": {
         "period": "3year",
-        "observationsCount": 41,
+        "observationsCount": 42,
         "stats": {
           "marketCap": {
-            "observations": 41,
-            "current": 8727.79,
-            "mean": 6925.78,
-            "stdDev": 1713.76,
+            "observations": 42,
+            "current": 8741.89,
+            "mean": 6969.02,
+            "stdDev": 1715.77,
             "min": 4648.6,
             "max": 9169.3
           },
           "revenue": {
-            "observations": 41,
-            "current": 5604.42,
-            "mean": 3844.74,
-            "stdDev": 945.51,
+            "observations": 42,
+            "current": 5636.76,
+            "mean": 3887.41,
+            "stdDev": 973.99,
             "min": 2747.4,
-            "max": 5604.42
+            "max": 5636.76
           },
           "earnings": {
-            "observations": 41,
-            "current": 795.02,
-            "mean": 495.27,
-            "stdDev": 157.16,
+            "observations": 42,
+            "current": 796.3,
+            "mean": 502.44,
+            "stdDev": 162.03,
             "min": 319.4,
-            "max": 795.02
+            "max": 796.3
           },
           "pe": {
-            "observations": 41,
-            "current": 9.6,
-            "mean": 12.82,
-            "stdDev": 2.02,
+            "observations": 42,
+            "current": 9.7,
+            "mean": 12.74,
+            "stdDev": 2.05,
             "min": 9.5,
             "max": 16.4
           },
           "absolutePe": {
-            "observations": 41,
+            "observations": 42,
             "current": 11.0,
-            "mean": 14.31,
-            "stdDev": 1.53,
+            "mean": 14.23,
+            "stdDev": 1.59,
             "min": 11.0,
             "max": 17.1
           },
           "ps": {
-            "observations": 41,
+            "observations": 42,
             "current": 1.6,
-            "mean": 1.81,
-            "stdDev": 0.15,
+            "mean": 1.8,
+            "stdDev": 0.16,
             "min": 1.5,
             "max": 2.2
           }
@@ -5459,57 +5468,72 @@
             "absolutePeRaw": "11x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Fri, 06 Nov 2026",
+            "marketCap": 8741.89,
+            "marketCapRaw": "₫8741.89t",
+            "revenue": 5636.76,
+            "revenueRaw": "₫5636.76t",
+            "earnings": 796.3,
+            "earningsRaw": "₫796.30t",
+            "pe": 9.7,
+            "peRaw": "9.7x",
+            "absolutePe": 11.0,
+            "absolutePeRaw": "11x",
+            "ps": 1.6,
+            "psRaw": "1.6x"
           }
         ]
       },
       "5year": {
         "period": "5year",
-        "observationsCount": 41,
+        "observationsCount": 42,
         "stats": {
           "marketCap": {
-            "observations": 41,
-            "current": 8727.79,
-            "mean": 6483.26,
-            "stdDev": 1712.02,
+            "observations": 42,
+            "current": 8741.89,
+            "mean": 6537.03,
+            "stdDev": 1726.55,
             "min": 4390.0,
             "max": 9267.5
           },
           "revenue": {
-            "observations": 41,
-            "current": 5604.42,
-            "mean": 3534.53,
-            "stdDev": 1061.62,
+            "observations": 42,
+            "current": 5636.76,
+            "mean": 3584.59,
+            "stdDev": 1097.62,
             "min": 2286.1,
-            "max": 5604.42
+            "max": 5636.76
           },
           "earnings": {
-            "observations": 41,
-            "current": 795.02,
-            "mean": 461.33,
-            "stdDev": 162.47,
+            "observations": 42,
+            "current": 796.3,
+            "mean": 469.3,
+            "stdDev": 168.59,
             "min": 312.5,
-            "max": 795.02
+            "max": 796.3
           },
           "pe": {
-            "observations": 41,
-            "current": 9.6,
-            "mean": 12.6,
-            "stdDev": 2.18,
+            "observations": 42,
+            "current": 9.7,
+            "mean": 12.53,
+            "stdDev": 2.2,
             "min": 9.5,
             "max": 16.6
           },
           "absolutePe": {
-            "observations": 41,
+            "observations": 42,
             "current": 11.0,
-            "mean": 14.49,
-            "stdDev": 2.01,
+            "mean": 14.4,
+            "stdDev": 2.06,
             "min": 11.0,
             "max": 19.6
           },
           "ps": {
-            "observations": 41,
+            "observations": 42,
             "current": 1.6,
-            "mean": 1.88,
+            "mean": 1.87,
             "stdDev": 0.29,
             "min": 1.5,
             "max": 2.7
@@ -6130,57 +6154,72 @@
             "absolutePeRaw": "11x",
             "ps": 1.6,
             "psRaw": "1.6x"
+          },
+          {
+            "date": "Fri, 06 Nov 2026",
+            "marketCap": 8741.89,
+            "marketCapRaw": "₫8741.89t",
+            "revenue": 5636.76,
+            "revenueRaw": "₫5636.76t",
+            "earnings": 796.3,
+            "earningsRaw": "₫796.30t",
+            "pe": 9.7,
+            "peRaw": "9.7x",
+            "absolutePe": 11.0,
+            "absolutePeRaw": "11x",
+            "ps": 1.6,
+            "psRaw": "1.6x"
           }
         ]
       },
       "10year": {
         "period": "10year",
-        "observationsCount": 41,
+        "observationsCount": 42,
         "stats": {
           "marketCap": {
-            "observations": 41,
-            "current": 8727.79,
-            "mean": 5358.56,
-            "stdDev": 2391.03,
+            "observations": 42,
+            "current": 8741.89,
+            "mean": 5439.12,
+            "stdDev": 2418.7,
             "min": 1474.4,
             "max": 9267.5
           },
           "revenue": {
-            "observations": 41,
-            "current": 5604.42,
-            "mean": 3031.31,
-            "stdDev": 1328.59,
+            "observations": 42,
+            "current": 5636.76,
+            "mean": 3093.34,
+            "stdDev": 1372.49,
             "min": 1094.3,
-            "max": 5604.42
+            "max": 5636.76
           },
           "earnings": {
-            "observations": 41,
-            "current": 795.02,
-            "mean": 376.68,
-            "stdDev": 213.5,
+            "observations": 42,
+            "current": 796.3,
+            "mean": 386.68,
+            "stdDev": 220.6,
             "min": 85.5,
-            "max": 795.02
+            "max": 796.3
           },
           "pe": {
-            "observations": 41,
-            "current": 9.6,
-            "mean": 11.56,
-            "stdDev": 2.06,
+            "observations": 42,
+            "current": 9.7,
+            "mean": 11.52,
+            "stdDev": 2.05,
             "min": 9.4,
             "max": 16.6
           },
           "absolutePe": {
-            "observations": 41,
+            "observations": 42,
             "current": 11.0,
-            "mean": 15.22,
-            "stdDev": 2.4,
+            "mean": 15.12,
+            "stdDev": 2.46,
             "min": 11.0,
             "max": 21.6
           },
           "ps": {
-            "observations": 41,
+            "observations": 42,
             "current": 1.6,
-            "mean": 1.77,
+            "mean": 1.76,
             "stdDev": 0.3,
             "min": 1.3,
             "max": 2.7
@@ -6797,6 +6836,21 @@
             "earningsRaw": "₫795.02t",
             "pe": 9.6,
             "peRaw": "9.6x",
+            "absolutePe": 11.0,
+            "absolutePeRaw": "11x",
+            "ps": 1.6,
+            "psRaw": "1.6x"
+          },
+          {
+            "date": "Fri, 06 Nov 2026",
+            "marketCap": 8741.89,
+            "marketCapRaw": "₫8741.89t",
+            "revenue": 5636.76,
+            "revenueRaw": "₫5636.76t",
+            "earnings": 796.3,
+            "earningsRaw": "₫796.30t",
+            "pe": 9.7,
+            "peRaw": "9.7x",
             "absolutePe": 11.0,
             "absolutePeRaw": "11x",
             "ps": 1.6,
