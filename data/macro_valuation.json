@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updatedAt": "2026-11-10T18:24:03Z",
+    "updatedAt": "2026-11-11T18:15:57Z",
     "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
     "version": "4.0"
   },
@@ -67,10 +67,10 @@
       "assetDecision": "EQUITY FAVORED OVER BONDS",
       "assetDecisionVi": "Ưu Tiên Cổ Phiếu Vượt Trội Trái Phiếu (ERP cao)",
       "assetBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-      "equityRiskPremium": 4.99,
+      "equityRiskPremium": 5.03,
       "earningsYield": 9.5,
-      "vnCurvature": -0.56,
-      "usCurvature": 0.38,
+      "vnCurvature": -0.52,
+      "usCurvature": 0.39,
       "vnMoveFocus": "LONG (Đầu dài 10Y)",
       "favoredSectors": "Luân chuyển cân bằng (Neutral Rotation)"
     },
@@ -119,17 +119,17 @@
       {
         "id": 4,
         "metric": "2Y / 5Y / 10Y Yields (Bộ 3 kỳ hạn TPCP)",
-        "vn": "2.45% / 3.20% / 4.51%",
-        "us": "4.65% / 5.02% / 5.01%",
-        "delta": "Spread 10Y: -0.50%",
+        "vn": "2.45% / 3.20% / 4.47%",
+        "us": "4.65% / 5.02% / 5.00%",
+        "delta": "Spread 10Y: -0.53%",
         "highlight": "normal"
       },
       {
         "id": 5,
         "metric": "Level / Slope / Curvature (Nelson-Siegel)",
-        "vn": "3.39% / +2.06% / -0.56%",
-        "us": "4.89% / +0.36% / +0.38%",
-        "delta": "Curv VN: -0.56%",
+        "vn": "3.37% / +2.02% / -0.52%",
+        "us": "4.89% / +0.35% / +0.39%",
+        "delta": "Curv VN: -0.52%",
         "highlight": "normal"
       },
       {
@@ -143,16 +143,16 @@
       {
         "id": 7,
         "metric": "Segmented Slope (Độ dốc phân đoạn)",
-        "vn": "2-5Y: +0.75% | 5-10Y: +1.31%",
-        "us": "2-5Y: +0.37% | 5-10Y: -0.01%",
-        "delta": "10Y-2Y: +2.06%",
+        "vn": "2-5Y: +0.75% | 5-10Y: +1.27%",
+        "us": "2-5Y: +0.37% | 5-10Y: -0.02%",
+        "delta": "10Y-2Y: +2.02%",
         "highlight": "normal"
       },
       {
         "id": 8,
         "metric": "Curve Stress Score (Điểm căng thẳng đường cong)",
-        "vn": "38.1/100 (MID)",
-        "us": "53.9/100 (MID)",
+        "vn": "37.7/100 (MID)",
+        "us": "54.4/100 (MID)",
         "delta": "Ngưỡng rủi ro: 75/100",
         "highlight": "normal"
       },
@@ -175,8 +175,8 @@
       {
         "id": 11,
         "metric": "4 Macro Spreads (4 Chênh lệch vĩ mô)",
-        "vn": "LiqGap: +1.97% | 10Y-Policy: +0.01%",
-        "us": "Spread10Y: -0.50% | PolicyGap: -0.35%",
+        "vn": "LiqGap: +1.97% | 10Y-Policy: -0.03%",
+        "us": "Spread10Y: -0.53% | PolicyGap: -0.35%",
         "delta": "Driver: LOCAL STRESS",
         "highlight": "warning"
       },
@@ -192,7 +192,7 @@
         "id": 13,
         "metric": "Funding Dynamics (Động lực thanh khoản hệ thống)",
         "vn": "Thanh khoản dồi dào | Gap: +1.97%",
-        "us": "Spread 2Y: -2.20% | USD/VND: 25,594",
+        "us": "Spread 2Y: -2.20% | USD/VND: 25,651",
         "delta": "LOCAL STRESS",
         "highlight": "normal"
       },
@@ -223,7 +223,7 @@
       {
         "id": 17,
         "metric": "Asset Decision (Quyết định ưu tiên tài sản)",
-        "vn": "EQUITY FAVORED OVER BONDS (ERP = +4.99%)",
+        "vn": "EQUITY FAVORED OVER BONDS (ERP = +5.03%)",
         "us": "Neutral Equity vs Fixed Income",
         "delta": "Ưu Tiên Cổ Phiếu Vượt Trội Trái Phiếu (ERP cao)",
         "highlight": "success"
@@ -233,13 +233,13 @@
   "marketIndex": {
     "symbol": "VNINDEX",
     "name": "Chỉ Số VN-Index",
-    "currentPoint": 1743.07,
-    "prevPoint": 1714.32,
-    "change": 28.75,
-    "changePercent": 1.68,
-    "high": 1743.07,
-    "low": 1723.81,
-    "volume": 873359168,
+    "currentPoint": 1746.9,
+    "prevPoint": 1743.07,
+    "change": 3.83,
+    "changePercent": 0.22,
+    "high": 1751.57,
+    "low": 1734.25,
+    "volume": 664808768,
     "currentPE": 10.53,
     "currentPB": 1.77,
     "historicalMeanPE": 11.45,
@@ -2186,6 +2186,12 @@
   "executiveSummary": {
     "keyRisks": [
       {
+        "level": "Cao",
+        "title": "Áp Lực Tỷ Giá USD/VND & Can Thiệp Tiền Tệ",
+        "risk": "Tỷ giá USD/VND neo cao ở mức 25,651 đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
+        "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
+      },
+      {
         "level": "Trung bình",
         "title": "Lãi Suất Liên Ngân Hàng Tăng Nhiệt",
         "risk": "Lãi suất liên ngân hàng qua đêm đạt 6.47%, báo hiệu thanh khoản cục bộ của hệ thống ngân hàng bị thắt chặt.",
@@ -2226,7 +2232,7 @@
     ],
     "keyTakeaways": [
       "⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha 'Mở Rộng Tăng Trưởng' với điểm rủi ro vĩ mô 44/100. P/E thị trường 10.53x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
-      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,594) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
+      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,651) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
       "Cơ hội lớn nhất: Ưu tiên tích lũy cổ phiếu giá trị, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
     ]
   },
@@ -2285,18 +2291,18 @@
     }
   },
   "macro": {
-    "vn10yYield": 4.51,
+    "vn10yYield": 4.47,
     "sbvRefinancingRate": 4.5,
-    "us10yYield": 5.01,
-    "usdVndRate": 25594.0,
-    "goldWorld": 4026.0,
-    "oilBrent": 91.83,
-    "dxy": 102.32,
-    "sjcGoldBuy": 137.9,
-    "sjcGoldSell": 140.9,
-    "pnjGoldBuy": 136.1,
-    "pnjGoldSell": 140.3,
-    "pnjUpdateDate": "10/11/2026 10:31:29",
+    "us10yYield": 5.0,
+    "usdVndRate": 25651.0,
+    "goldWorld": 3996.0,
+    "oilBrent": 93.4,
+    "dxy": 102.92,
+    "sjcGoldBuy": 137.0,
+    "sjcGoldSell": 140.0,
+    "pnjGoldBuy": 134.7,
+    "pnjGoldSell": 138.9,
+    "pnjUpdateDate": "11/11/2026 14:41:03",
     "inflationCpi": 5.08,
     "coreInflation": 4.45,
     "interbankOvernight": 6.47,
@@ -2352,26 +2358,26 @@
     ]
   },
   "yieldCurveAnalysis": {
-    "vn10y": 4.51,
-    "us10y": 5.01,
+    "vn10y": 4.47,
+    "us10y": 5.0,
     "sbvRefinancingRate": 4.5,
-    "longShortSpread": 0.01,
-    "crossCountrySpread": -0.5,
-    "inversionWarning": false,
+    "longShortSpread": -0.03,
+    "crossCountrySpread": -0.53,
+    "inversionWarning": true,
     "recessionLead": false,
-    "ycRegime": "Neutral",
-    "ycRegimeVi": "Cân Bằng Chu Kỳ",
-    "regimeBadge": "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    "ycStressIndex": 65.7,
-    "assessment": "Lợi suất TPCP 10Y (4.51%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = +0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.50%. Độ dốc đường cong duy trì trong trạng thái bình thường."
+    "ycRegime": "Stress",
+    "ycRegimeVi": "Căng Thẳng / Nguy Cơ Đảo Ngược Kỳ Hạn",
+    "regimeBadge": "bg-rose-500/20 text-rose-400 border-rose-500/30",
+    "ycStressIndex": 65.9,
+    "assessment": "Lợi suất TPCP 10Y (4.47%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = -0.03%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.53%. ⚠️ Cảnh báo: Lợi suất dài hạn đang thấp hơn lãi suất điều hành, cần theo dõi thanh khoản hệ thống."
   },
   "scenarioMatrix": {
     "base": {
       "name": "Kịch Bản Cơ Sở (Base Case)",
       "probability": 55,
       "badgeColor": "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-      "currentPoint": 1743.07,
-      "vnIndexRange": "1708 - 1804",
+      "currentPoint": 1746.9,
+      "vnIndexRange": "1712 - 1808",
       "conditions": "CPI duy trì quanh 5.1%, PMI mở rộng trên 51 điểm, SBV giữ lãi suất điều hành 4.5%, tỷ giá ổn định trong biên độ quản lý.",
       "sectorBenefit": [
         "Ngân Hàng",
@@ -2388,8 +2394,8 @@
       "name": "Kịch Bản Tích Cực (Bull Case)",
       "probability": 25,
       "badgeColor": "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      "currentPoint": 1743.07,
-      "vnIndexRange": "1787 - 1891",
+      "currentPoint": 1746.9,
+      "vnIndexRange": "1791 - 1895",
       "conditions": "Fed tiếp tục chu kỳ hạ lãi suất, SBV nới lỏng room tín dụng, dòng vốn FDI & khối ngoại quay lại mua ròng, tỷ giá hạ nhiệt.",
       "sectorBenefit": [
         "Chứng Khoán",
@@ -2407,8 +2413,8 @@
       "name": "Kịch Bản Thận Trọng (Bear Case)",
       "probability": 20,
       "badgeColor": "bg-rose-500/20 text-rose-400 border border-rose-500/30",
-      "currentPoint": 1743.07,
-      "vnIndexRange": "1604 - 1699",
+      "currentPoint": 1746.9,
+      "vnIndexRange": "1607 - 1703",
       "conditions": "Lạm phát thế giới và giá dầu tăng vọt, SBV buộc phải hút ròng thanh khoản tiền đồng hoặc tăng lãi suất, USD/VND vượt đỉnh.",
       "sectorBenefit": [
         "Năng Lượng & Dầu Khí",
@@ -2427,9 +2433,9 @@
   "hasActiveTailRisk": false,
   "criticalTailRiskCount": 0,
   "leadLagDivergence": {
-    "leadingPct": 53.3,
+    "leadingPct": 54.2,
     "laggingPct": 40.1,
-    "divergence": 13.2,
+    "divergence": 14.1,
     "signal": "➡️ ALIGNED",
     "signalVi": "Đồng Pha Ổn Định (Aligned)",
     "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
@@ -2445,15 +2451,15 @@
     "signalClarity": 70.0
   },
   "riskAssessment": {
-    "riskScore": 43.5,
+    "riskScore": 43.7,
     "riskBucket": "B2",
     "riskBucketLabel": "Trung Bình (Cần theo dõi cẩn trọng)",
     "riskBucketColor": "text-amber-400",
     "layers": {
-      "monetary": 36.1,
-      "growth": 26.9,
+      "monetary": 36.4,
+      "growth": 27.3,
       "price": 64.4,
-      "external": 52.6
+      "external": 53.0
     }
   },
   "sectorRotation": [
@@ -2711,23 +2717,23 @@
       {
         "key": "fx",
         "name": "Tỷ Giá USD/VND",
-        "val": "25,594",
+        "val": "25,651",
         "status": "neutral",
         "lead": "Tỷ giá ổn định giảm áp lực can thiệp hút ròng của Ngân hàng Nhà nước."
       },
       {
         "key": "vn10y",
         "name": "Lợi Suất TPCP 10Y",
-        "val": "4.51%",
-        "status": "bearish",
+        "val": "4.47%",
+        "status": "neutral",
         "lead": "Lợi suất thấp giúp duy trì mức P/E chiết khấu hấp dẫn cho thị trường cổ phiếu."
       }
     ],
     "bullishCount": 2,
-    "bearishCount": 2,
-    "netScore": 0,
-    "stance": "Trung Tính (Cân bằng danh mục)",
-    "badgeClass": "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+    "bearishCount": 1,
+    "netScore": 1,
+    "stance": "Risk-On Nhẹ (Môi trường khả quan)",
+    "badgeClass": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
   },
   "assetAllocation": {
     "recommendedEquityPct": 85,
@@ -2796,19 +2802,19 @@
     }
   },
   "goldAdvisor": {
-    "worldConvertedVnd": 124232226,
-    "worldPriceUsd": 4026.0,
-    "spreadPct": 13.42,
-    "sjcSpreadPct": 13.42,
-    "pnjSpreadPct": 12.93,
-    "sjcBuy": 137.9,
-    "sjcSell": 140.9,
-    "pnjBuy": 136.1,
-    "pnjSell": 140.3,
-    "updatedAt": "10/11/2026 10:31:29",
+    "worldConvertedVnd": 123581115,
+    "worldPriceUsd": 3996.0,
+    "spreadPct": 13.29,
+    "sjcSpreadPct": 13.29,
+    "pnjSpreadPct": 12.4,
+    "sjcBuy": 137.0,
+    "sjcSell": 140.0,
+    "pnjBuy": 134.7,
+    "pnjSell": 138.9,
+    "updatedAt": "11/11/2026 14:41:03",
     "action": "MUA PHÒNG THỦ",
     "sizeHint": "5-10% danh mục",
-    "reason": "Chênh lệch SJC vs Thế giới rất lớn (13.42%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
+    "reason": "Chênh lệch SJC vs Thế giới rất lớn (13.29%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
   },
   "tradingEconomics": {
     "_meta": {
@@ -3954,7 +3960,7 @@
   },
   "marketValuationHistory": {
     "_meta": {
-      "updatedAt": "2026-11-10T18:24:05.443058",
+      "updatedAt": "2026-11-11T18:15:59.768739",
       "sheetId": "1TdXzsXN_bMQKHLN0Zqc8t4lS-59us02Btr_SLc0AgpQ",
       "source": "Google Sheets (Simply Wall St Vietnam)",
       "periods": [
