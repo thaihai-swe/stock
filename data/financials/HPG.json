@@ -2,24 +2,24 @@
   "_meta": {
     "symbol": "HPG",
     "companyName": "Hoa Phat Group JSC",
-    "updatedAt": "2026-11-16T20:45:48Z",
+    "updatedAt": "2026-11-17T19:30:19Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 35958,
+    "grahamNumber": 35022,
     "ddmTarget": 6728,
     "peTarget": 45500,
     "pbTarget": 32076,
     "evEbitdaFairPrice": 20273,
     "pcfFairPrice": 27953,
     "psFairPrice": 28200,
-    "consensusFairValue": 29878,
-    "marginOfSafety": 29.5,
-    "upside": 41.9,
-    "consensusDiffPercent": 41.9,
+    "consensusFairValue": 29843,
+    "marginOfSafety": 29.6,
+    "upside": 42.1,
+    "consensusDiffPercent": 42.1,
     "valuationRating": "🟢 STRONG BUY",
     "valuationRatingText": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
     "valuationRatingBadge": "bg-emerald-600 text-white",
@@ -30,17 +30,17 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 35958,
-        "targetPrice": 35958,
-        "diffPercent": 70.8,
+        "value": 35022,
+        "targetPrice": 35022,
+        "diffPercent": 66.8,
         "weight": 0.05,
         "baseWeight": 0.05,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 12.1,
+        "outlierGapPct": 9.2,
         "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-        "formulaDetail": "V = 3,250 × (7.0x + 1.0 × 5.0%) × (4.61% / 5.0%) | Bội số=12.00x, Tỷ số LS=0.922",
+        "formulaDetail": "V = 3,250 × (7.0x + 1.0 × 5.0%) × (4.49% / 5.0%) | Bội số=12.00x, Tỷ số LS=0.898",
         "parameters": {
           "eps": 3250.0,
           "epsAvg": 1231,
@@ -48,9 +48,9 @@
           "peMedian": 14.0,
           "hs": 1.0,
           "gCagr": 5.0,
-          "constantVn": 4.61,
+          "constantVn": 4.49,
           "yVn": 5.0,
-          "vn10yYield": 4.61
+          "vn10yYield": 4.49
         },
         "statusNote": "Phù hợp"
       },
@@ -61,7 +61,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 45500,
         "targetPrice": 45500,
-        "diffPercent": 116.2,
+        "diffPercent": 116.7,
         "weight": 0.2,
         "baseWeight": 0.2,
         "suitability": 1.0,
@@ -87,7 +87,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 32076,
         "targetPrice": 32076,
-        "diffPercent": 52.4,
+        "diffPercent": 52.7,
         "weight": 0.1,
         "baseWeight": 0.1,
         "suitability": 1.0,
@@ -116,7 +116,7 @@
         "cleanName": "DCF Đa Giai Đoạn",
         "value": 58289,
         "targetPrice": 58289,
-        "diffPercent": 176.9,
+        "diffPercent": 177.6,
         "weight": 0.18,
         "baseWeight": 0.18,
         "suitability": 1.0,
@@ -164,7 +164,7 @@
         "cleanName": "FCFF Doanh Nghiệp",
         "value": 16326,
         "targetPrice": 16326,
-        "diffPercent": -22.4,
+        "diffPercent": -22.3,
         "weight": 0.12,
         "baseWeight": 0.12,
         "suitability": 1.0,
@@ -198,7 +198,7 @@
         "cleanName": "FCFE Cổ Đông",
         "value": 21262,
         "targetPrice": 21262,
-        "diffPercent": 1.0,
+        "diffPercent": 1.2,
         "weight": 0.08,
         "baseWeight": 0.08,
         "suitability": 1.0,
@@ -222,7 +222,7 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 72039,
         "targetPrice": 72039,
-        "diffPercent": 242.2,
+        "diffPercent": 243.0,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.55,
@@ -247,7 +247,7 @@
         "cleanName": "Book NAV / P/B Chuẩn Hóa",
         "value": 32076,
         "targetPrice": 32076,
-        "diffPercent": 52.4,
+        "diffPercent": 52.7,
         "weight": 0.043,
         "baseWeight": 0.05,
         "suitability": 0.85,
@@ -271,7 +271,7 @@
         "cleanName": "EV/EBITDA & EV/Sales",
         "value": 17975,
         "targetPrice": 17975,
-        "diffPercent": -14.6,
+        "diffPercent": -14.4,
         "weight": 0.22,
         "baseWeight": 0.22,
         "suitability": 1.0,
@@ -292,9 +292,9 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 28412,
+      "cleanWeightedAvg": 28355,
       "cleanMedian": 32076,
-      "dispersionPct": 11.4,
+      "dispersionPct": 11.6,
       "consensusLevel": "HIGH",
       "coveragePct": 87.5,
       "confidenceScore": 95.0,
@@ -357,18 +357,18 @@
     "sevenPriceZones": {
       "currentZone": "Buy Zone",
       "zoneBadge": "bg-emerald-500 text-white",
-      "safeBuyPrice": 22408,
-      "acceptableBuyPrice": 25396,
-      "bearPrice": 20915,
-      "bullPrice": 37348,
+      "safeBuyPrice": 22382,
+      "acceptableBuyPrice": 25367,
+      "bearPrice": 20890,
+      "bullPrice": 37304,
       "boundaries": {
-        "deepValue": 20167,
-        "safeBuy": 22408,
-        "accumulate": 25396,
-        "fairLow": 28384,
-        "fairHigh": 32866,
-        "aboveFair": 35480,
-        "expensive": 42950
+        "deepValue": 20144,
+        "safeBuy": 22382,
+        "accumulate": 25367,
+        "fairLow": 28351,
+        "fairHigh": 32827,
+        "aboveFair": 35439,
+        "expensive": 42899
       }
     },
     "threeLayerDecision": {
@@ -398,7 +398,7 @@
         "p50": 14.0,
         "p75": 15.85,
         "mean": 14.78,
-        "current": 6.48,
+        "current": 6.46,
         "yearsUsed": 4
       },
       "pbBand": {
@@ -453,9 +453,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 6.48,
+          "current": 6.46,
           "sma5y": 14.78,
-          "deltaPct": -56.1,
+          "deltaPct": -56.3,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -464,9 +464,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 1.38,
+          "current": 1.37,
           "sma5y": 2.13,
-          "deltaPct": -35.2,
+          "deltaPct": -35.7,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -609,12 +609,12 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 6.48,
-      "pb": 1.38,
+      "pe": 6.46,
+      "pb": 1.37,
       "ps": 1.14,
       "pCf": 5.0,
-      "evEbitda": 4.3,
-      "dividendYield": 2.16
+      "evEbitda": 4.2,
+      "dividendYield": 2.17
     },
     "profitability": {
       "roe": 22.09,
@@ -693,6 +693,15 @@
       "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOR05UeXlkNEZWbmxIY3FzUzBWdWMwbFlBMVV6U0RhWFpjZVRCVFozSmhvQzFvZTlVVnZvaFROZEVLRUwtc1psM3Z4eDdlYmo5LXI4ZF9QdVhncTM2UW5ZTngxTk4tRnNucFp1cEJFaGNrVnJ5SmVCZTZqZF9idnNCT0dUUC1RSGNUdXl1ZXFsd0VLM0NjMjNELTNRQ1N5Z0xhOEdPdnhBVFRkLWRXazJKUHEtOHZIcUxIQVQ5SU5ZTFRHSlU?oc=5"
     },
     {
+      "date": "2026-05-25",
+      "type": "Cổ tức tiền mặt",
+      "content": "Hòa Phát và các doanh nghiệp trả cổ tức tiền mặt và cổ phiếu",
+      "ratio": "10%",
+      "value": 455,
+      "source": "Tạp chí Kinh tế - Tài chính Online",
+      "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxObzNZTWtqS0ZyeW9NZEc0ZWsxTE16bmFEVHNOSVFiYnluWl9hYlRSOE9nOG5UR1Y3U1JlVXk4RDM4QzduVjFaWktRbjk0MmdOSHM0T0NMcHYtbmVIeWN3OHdyYjJOTlFQeEx6TVBEZ2VqZmxnalk0dmhnMXdMWm16TV93VWxLRnVHdGxoUDJtYnlpaFEwUWVoWERsbW15VmdlczJlbnhXTQ?oc=5"
+    },
+    {
       "date": "2026-05-13",
       "type": "Cổ tức cổ phiếu",
       "content": "Hòa Phát (HPG) tiếp tục thực hiện chia cổ tức bằng cổ phiếu, tỷ lệ 10%",
@@ -700,6 +709,51 @@
       "value": null,
       "source": "Tin nhanh chứng khoán",
       "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNTGxpOEVYcTJyYnV2QUh2eUdqVmxRX2NVUEZkd2NiMHV2cmdZSVhxV1BRVm56M3pVYTZWOXotRm1wSVcycUJPYjlJLTc3cFRCam40OTgzUGlZYjBHemJUUEdRZVRHYkYtc0k1RkJzRmNmb2dqdGk1NUgxTTFaaHlGaGMzWXd2aW16YUdYS2xkbEpkc3lIdlJJUm9OYzJZZldMRGhxeUhwN2FuTWh0amJ2ZXNwaTAtT1HSAbMBQVVfeXFMUEJ1UmJJMDVkSUlQa1Yya1lhQVAzMkVWWDNVZFg4NFdMS0ZNU1dDM2xWM1B1cmFvX1ZnZkZJZlQtbjlhSXNhdi05Y081U0VaUTdRb3N1b3ZLNHIxUGVYLVJ6Q2lneFZuS1Y1eFREeTk3dFdVNE1iQ0hVSk5vUFdaSkw4RU1UY3gySnd6cENaQ1FFd2xmMzU5NEhGY04xR2Y2b2w1SDAyWWpXcURmeDk1ZUg1U00?oc=5"
+    },
+    {
+      "date": "2026-05-12",
+      "type": "Cổ tức cổ phiếu",
+      "content": "Hòa Phát (HPG) chia cổ tức tổng tỷ lệ 15%, phát hành thêm hơn 767 triệu cổ phiếu",
+      "ratio": "10%",
+      "value": null,
+      "source": "Tạp chí điện tử Thương Trường",
+      "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQN0F2ZjJSZGRWdHJmWEhvVzg5b1pjNkphY251Sm5CTmhJTVZ6T2xLcXkwNDc2ak5HS1lwWUlralJHSXQxRkZSU2JpLW44STNEazNVN2o5M28tUmpSTjN3UTcyRGJxWnIxY0xBZ0ZhQmUtZlpsdzhpNjRGUGE0NTBreU9nUU93NDBrYkU0bFQtRXdza0JxZ0UzVmhDejB0dDN0UEdnaFIwemtlaU02OUhJS3lVN2NJRWtIWmtvbm53?oc=5"
+    },
+    {
+      "date": "2026-05-10",
+      "type": "Cổ tức cổ phiếu",
+      "content": "Hòa Phát chốt ngày phát hành hơn 767 triệu cổ phiếu trả cổ tức",
+      "ratio": "10%",
+      "value": null,
+      "source": "CafeF",
+      "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOVGRFSkZzR3ZQQ3hSVHExZnBRNjVVR25NRWxPSU5RRHlQNWVEX0RkbFJka1FfaGlBVjl3NUt2eFM0cWhxbXNBTUpTMzJ4T0Q1MnpDekZxMUlrM2l3aVRFMVFVVjBmU09HWmQ5NnN5aC1VYWNsMlFaczdOZ25WcERCY0pibXV0RHVoT0tKY0JieVljb0s1eG5uZ0JwZ1JEQ0hzUnJvdA?oc=5"
+    },
+    {
+      "date": "2026-05-05",
+      "type": "Cổ tức tiền mặt",
+      "content": "Hòa Phát chốt ngày trả cổ tức tiền mặt",
+      "ratio": "10%",
+      "value": 455,
+      "source": "Mekong ASEAN",
+      "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQOFlReE8wQTAyaHNfaUtETktBT09BUG8yUHptby1lUmdSY0NnYW4zUmFJeXotbkFZa3JUVGFZX3JsYkd5a1V1cjY4a3hPOEdaWkQtLXVZVk5VNk5RNndRdVBPR2pkOG8wOW5aczNDaU14WEtoVlgwcjBXVVFuSU9scg?oc=5"
+    },
+    {
+      "date": "2026-04-29",
+      "type": "Cổ tức tiền mặt",
+      "content": "Cổ đông HPG sắp nhận cổ tức tiền mặt đầu tiên sau 4 năm",
+      "ratio": "10%",
+      "value": 455,
+      "source": "Vietstock",
+      "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPZGNHVFl3blZWSlBfNHpHZVJJVGhRZUxOMWFFd1gxOU10N2pCNDlQWW1MZ3VwS2pkUUhLNm1rNkhqdExTTHpqOFh5VlljSklSY1Y1WDRSaUpZcWNiaXZ4blhPcWwtRGM1MlVmTUtjOWx4YWJwZFNKekhjdnF1QV9feVB4aXpmQWQxazJhQzhoTjlQTWNfNTdZaXlVVUdaeHF6aEE?oc=5"
+    },
+    {
+      "date": "2026-04-21",
+      "type": "Đại hội cổ đông",
+      "content": "'Điểm nóng' đại hội HPG: Lợi nhuận quý 1 hơn 9.000 tỷ đồng, không ngại VinMetal",
+      "ratio": "—",
+      "value": null,
+      "source": "Mekong ASEAN",
+      "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPdEdaNkYtTEhoRXZUangwN0xjR3B2X2o3UXpQVlVGQ05uelJaSVRfWndtbmdBZUFWRHlHWWQ0dEYteG5NbHFqaUNhWkFCbXVFcDExMXRmSXJlOHNTZWJlR0h3LVJLSUFWWDZBMVFJWENGY0tPSWVsa0J3OUxnbndqdFMzTXFRWGVlNlE2dUdCd2JjeVFkdXUtV0JMNFExeXJXNWhkRmFUN2k5ckV4?oc=5"
     }
   ],
   "shareholders": [
@@ -1547,7 +1601,7 @@
     "sharpeRatio": 0.8,
     "sortinoRatio": 1.14,
     "beta": 1.0,
-    "riskFreeRate": 4.61,
+    "riskFreeRate": 4.49,
     "ratings": {
       "volatility": "Cao",
       "drawdown": "Trung bình",
@@ -1692,16 +1746,16 @@
           "priceLow": 20930,
           "priceHigh": 21150,
           "priceMid": 21040,
-          "volume": 145959800.0,
-          "volumePercent": 12.8
+          "volume": 158623400.0,
+          "volumePercent": 13.9
         },
         {
           "index": 5,
           "priceLow": 21150,
           "priceHigh": 21370,
           "priceMid": 21260,
-          "volume": 233934500.0,
-          "volumePercent": 20.5
+          "volume": 218778100.0,
+          "volumePercent": 19.2
         },
         {
           "index": 6,
@@ -1717,7 +1771,7 @@
           "priceHigh": 21810,
           "priceMid": 21700,
           "volume": 130354700.0,
-          "volumePercent": 11.4
+          "volumePercent": 11.5
         },
         {
           "index": 8,
@@ -1725,7 +1779,7 @@
           "priceHigh": 22030,
           "priceMid": 21920,
           "volume": 26779000.0,
-          "volumePercent": 2.3
+          "volumePercent": 2.4
         },
         {
           "index": 9,
@@ -1741,8 +1795,8 @@
         "priceLow": 21150,
         "priceHigh": 21370,
         "priceMid": 21260,
-        "volume": 233934500.0,
-        "volumePercent": 20.5
+        "volume": 218778100.0,
+        "volumePercent": 19.2
       },
       "hvn": [
         {
@@ -1750,16 +1804,16 @@
           "priceLow": 20930,
           "priceHigh": 21150,
           "priceMid": 21040,
-          "volume": 145959800.0,
-          "volumePercent": 12.8
+          "volume": 158623400.0,
+          "volumePercent": 13.9
         },
         {
           "index": 5,
           "priceLow": 21150,
           "priceHigh": 21370,
           "priceMid": 21260,
-          "volume": 233934500.0,
-          "volumePercent": 20.5
+          "volume": 218778100.0,
+          "volumePercent": 19.2
         }
       ],
       "lvn": [
@@ -1785,19 +1839,19 @@
           "priceHigh": 22030,
           "priceMid": 21920,
           "volume": 26779000.0,
-          "volumePercent": 2.3
+          "volumePercent": 2.4
         }
       ],
       "priceRange": {
         "min": 20050,
         "max": 22250
       },
-      "totalVolume": 1140434600
+      "totalVolume": 1137941800
     },
     "moneyFlow": {
-      "vpci": 0.63,
+      "vpci": 0.6,
       "vpciStatus": "VOLUME_FADING",
-      "cmf": -0.146,
+      "cmf": -0.203,
       "cmfStatus": "DISTRIBUTION",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -1807,8 +1861,8 @@
       "state": "BALANCED_MARKET"
     },
     "tailRisk": {
-      "skewness": 0.45,
-      "kurtosis": -0.26,
+      "skewness": 0.5,
+      "kurtosis": -0.06,
       "var95": 2.19,
       "var99": 2.66,
       "es95": 2.55,
@@ -1827,13 +1881,13 @@
     "items": [
       {
         "id": "news-HPG-1",
-        "title": "Hòa Phát (HPG) góp gần 650 tỷ đồng thành lập Công ty năng lượng tái tạo",
-        "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-11-16.",
+        "title": "Hòa Phát đầu tư 650 tỷ đồng vào năng lượng tái tạo",
+        "summary": "Bản tin phân tích về HPG từ nguồn VnEconomy. Cập nhật ngày 2026-11-17.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-16",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNci1vUDVOekZVcUxpTW16TTJ0TzBKdzU1T2dNb3lKc0VCdGJ2SklIMTNrNng0NS1IeTE0cWd1T3dPSW5PeWpWQkVGMGJDRzZPNk9mVThmUUNJekF6cHNTSTd2MUM1dDREQVRjejdSS3d0cU0xaEpOWl85MXRBSkJzY0ZqUm1jRm92ckRJdFczRXdFQmRwTlc5QlFvamFYMERsRGpWS3ItSGxXb1U3dnBnbUhtcVU3R29yVWlR0gG3AUFVX3lxTFBCRm5yc3pLMWY5TDk4eTJCeXR3Mi1KZmdSLUFfdlotcFFfb3d0MmZSRFNqcTJJNGx2QUhiRmduaUxOOGJJY3VDdS10YmdlVWw3MGw1MWxvRnA1cTlLSUJpSDhESUo1cWJOT0pzTDBVdEZXYnVwQUJELWNfbGRqeUJMbUpBOFJucGJTR29TYXE1bWdsZXNYTk1nVXJkTWhTSzhoOUR5RFFnX001VlZfZ3hhNFl1R1NtYw?oc=5",
+        "date": "2026-11-17",
+        "source": "VnEconomy",
+        "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxPeFZaZG9BckZMQU1HeExIY09PRjFOM0NoeXo1Xy02b1NuSlpZemJLZk56Y0tuM1JKTUU2M0d0QWpldnVacy1GWWNGRS1KaW1XbTljbUNrSm5CSWRNekZhWTNFUDVnSUlzRjhpbGFleVJyZXBzbjA4Nnh6dlRtd3JrcQ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -1841,6 +1895,48 @@
       },
       {
         "id": "news-HPG-2",
+        "title": "Hơn 26.000 tỷ đồng vốn hóa “bốc hơi” khỏi nhóm thép từ đầu năm, chuyện gì đây?",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeBiz. Cập nhật ngày 2026-11-17.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-17",
+        "source": "CafeBiz",
+        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQWUVXT1pvb2VPVHRhM1dNblIzMjQ5Z0plTm0tSGl2RXdkSEw2elM4Tm5lRmhEa0loSWx5b2tyRi1TZlFpM0NMaks4RFlqTXNtWnJ1bGdyWU5famdjLTI5M2hQZXpNOW13Q1BlUXNGM1d3Q3dHWHQzTVoyNkpXeVczN0lnWXpJekZIajNRbnEta3JybTdBVkJTNTU3d2lKV3dQeEVSeWt3Nmo5UWlGQy1SWWJDcFJNQQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-3",
+        "title": "Hòa Phát tăng tốc lợi nhuận, Dung Quất 2 tiến sát công suất tối đa: Động lực tăng trưởng còn dư địa đến đâu?",
+        "summary": "Bản tin phân tích về HPG từ nguồn MoneyF. Cập nhật ngày 2026-11-17.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-17",
+        "source": "MoneyF",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOVV9RTnBkeFc5TUZyTUZrZlJvU2J1UG1FSHFxY1Jtd0E2RjRvUTRRZkF4RC1wc1lEZTRxUzRGQjJZZUptX1c1RHhicHFPOVZ6ekpwUmk0NmdXcHRMazdEWEVzUGJjTXhBdW5fVjdlVTd3bEwwbXF4VGx2eHNEVWpja2pETQ?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-HPG-4",
+        "title": "Hòa Phát (HPG) - Lợi nhuận trên đà tăng trường",
+        "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-11-17.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-17",
+        "source": "24HMoney",
+        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNT1FxekJPR2hDYmFBMlRLVDlaQ0QtUF9Qd0Nlb2FKZnRpTFd1N1JVTE10M084NUM3bGdyQWpIV0FXN0FUZTUwOEx5a2xTV19ETVliZjlaMUZBTTBIRUsxVUM1LVV6a1lnOW1mWG1Edy1QQTRwT3BQWnBzVGlIbVpCU1RSS0t1MkNUTUNycg?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-5",
         "title": "Khuyến nghị tích cực với cổ phiếu MWG, PHR và HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn Bnews.vn. Cập nhật ngày 2026-11-16.",
         "category": "analyst",
@@ -1854,7 +1950,21 @@
         "weight": 2.0
       },
       {
-        "id": "news-HPG-3",
+        "id": "news-HPG-6",
+        "title": "Hòa Phát (HPG) góp gần 650 tỷ đồng thành lập Công ty năng lượng tái tạo",
+        "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-11-16.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-16",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNci1vUDVOekZVcUxpTW16TTJ0TzBKdzU1T2dNb3lKc0VCdGJ2SklIMTNrNng0NS1IeTE0cWd1T3dPSW5PeWpWQkVGMGJDRzZPNk9mVThmUUNJekF6cHNTSTd2MUM1dDREQVRjejdSS3d0cU0xaEpOWl85MXRBSkJzY0ZqUm1jRm92ckRJdFczRXdFQmRwTlc5QlFvamFYMERsRGpWS3ItSGxXb1U3dnBnbUhtcVU3R29yVWlR0gG3AUFVX3lxTFBCRm5yc3pLMWY5TDk4eTJCeXR3Mi1KZmdSLUFfdlotcFFfb3d0MmZSRFNqcTJJNGx2QUhiRmduaUxOOGJJY3VDdS10YmdlVWw3MGw1MWxvRnA1cTlLSUJpSDhESUo1cWJOT0pzTDBVdEZXYnVwQUJELWNfbGRqeUJMbUpBOFJucGJTR29TYXE1bWdsZXNYTk1nVXJkTWhTSzhoOUR5RFFnX001VlZfZ3hhNFl1R1NtYw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-7",
         "title": "Hòa Phát (HPG) rót vốn lập pháp nhân năng lượng tái tạo, lợi nhuận 9 tháng vượt kế hoạch năm",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-11-16.",
         "category": "biz",
@@ -1868,21 +1978,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-HPG-4",
+        "id": "news-HPG-8",
         "title": "Biên lợi nhuận trở lại vùng cao, Hòa Phát (HPG) hướng tới năm 2027 với những kỳ vọng và áp lực mới",
-        "summary": "Bản tin phân tích về HPG từ nguồn MoneyF. Cập nhật ngày 2026-11-16.",
+        "summary": "Bản tin phân tích về HPG từ nguồn Tạp chí Kinh tế chứng khoán Việt Nam. Cập nhật ngày 2026-11-16.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-11-16",
-        "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPeGd3VUhBdU9sZWdIQ21rTExIeFg5ZVo4LVpqX2JhQlA5RUNDMXhSY3huREM1b3dGZXBSU0NsbnU3SzBpeDZFc1U0OG5CS1duU1dXcnhpMU1IdFBrRVNicGxiOERBRE54NDFBV0RDVGFNQU04eko2dTljQ3dvUmpVcGY3MA?oc=5",
+        "source": "Tạp chí Kinh tế chứng khoán Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQVnZSRDUyNTFuS19yQURqSmxONENNaEZIamhFQ0pubnJjeE5oQ1pnWFFyRXNoVk15Z0JZdS00TnY2OHE1YWl2dU8yV3d3QmhRWjBYY1pmc0lLMGNGc3RvOUdwcUhnYjZjcXZzcURvcjBiTVM0T245OVBFWGxaN0M1bW5qaUVBdzZsME55NHRwNk9vMW80X2o3bjF3WHp2Z3d6OE1hTnpvUVV1bkhTNF9BUTVwT1lXVTFBQjVLc280aVA?oc=5",
         "sentiment": "bearish",
         "sentimentValue": -1,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-HPG-5",
+        "id": "news-HPG-9",
         "title": "Cổ phiếu đáng chú ý ngày 16/11: MWG dẫn đầu kỳ vọng tăng giá",
         "summary": "Bản tin phân tích về HPG từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-11-15.",
         "category": "biz",
@@ -1896,7 +2006,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-6",
+        "id": "news-HPG-10",
         "title": "Tỷ phú Trần Đình Long, 6 cổ phiếu HPG và những đại dự án tỷ USD",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo VietNamNet. Cập nhật ngày 2026-11-14.",
         "category": "sector",
@@ -1910,7 +2020,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-HPG-7",
+        "id": "news-HPG-11",
         "title": "Cổ phiếu Hòa Phát (HPG) trở lại vùng định giá thấp hiếm thấy cách đây 17 năm",
         "summary": "Bản tin phân tích về HPG từ nguồn MoneyF. Cập nhật ngày 2026-11-12.",
         "category": "analyst",
@@ -1924,7 +2034,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-8",
+        "id": "news-HPG-12",
         "title": "Một cổ phiếu \"quốc dân\" bất ngờ về vùng định giá thấp hiếm thấy trong 17 năm",
         "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-11-11.",
         "category": "analyst",
@@ -1938,7 +2048,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-9",
+        "id": "news-HPG-13",
         "title": "Hòa Phát nằm trong Top 50 Công ty kinh doanh hiệu quả nhất Việt Nam lần thứ 15 liên tiếp",
         "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-11-11.",
         "category": "biz",
@@ -1952,7 +2062,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-10",
+        "id": "news-HPG-14",
         "title": "Một số cổ phiếu cần quan tâm 11/11: Cơ hội tiềm năng với HPG và POW",
         "summary": "Bản tin phân tích về HPG từ nguồn VOV.VN. Cập nhật ngày 2026-11-10.",
         "category": "biz",
@@ -1966,49 +2076,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-11",
-        "title": "Khối ngoại bán ròng 823 tỷ đồng, tập trung ở cổ phiếu Hòa Phát (HPG)",
-        "summary": "Bản tin phân tích về HPG từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-11-10.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-10",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQNzZueFo2WjdJTUc1M1l3bzdKYVFyRkluMjRnUnpIaXYxYTM3M2g1NXA4bTM1RUpFa2VqeXVkZ1RSSXlETmVDaDc5QTNsUzBfVzJyb2FJTHV6OXh2UjdWb2dFLTlaeXF4TTRCa1R6VW9IRHRKVGIxOC02dnVPM2hCX2JEcGRkMlNZRnFudGhOclNOSllCU0g2X0RvTWhyVzhveE1kWEp3N2lyT2JRQjQzTg?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-12",
-        "title": "ACBS hạ giá mục tiêu Hòa Phát, lưu ý khả năng biên lãi gộp bị thu hẹp",
-        "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-11-10.",
-        "category": "analyst",
-        "categoryLabel": "Phân Tích CTCK",
-        "date": "2026-11-10",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPRXFwcGFMSV9kZTctbG9kLXR3MFJkRnZHcmlva1dER2plRmRiSFBwOG9ocFJqNmRQLUw2UUdpUm1WSS1SaHQ0SVZ5SHo3SUdldEpsNm0wbmctRlZBN2NwSHN0VEZxakJsUFpIejllSTg4eVl5cW80TVVRT2xGNEV5Rl9MdWozZnBLSDVraUFZQzNBaUR4SHp1Sm5hbVpQMGtqbjZ0bjliTQ?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-13",
-        "title": "MBS dự báo lợi nhuận năm 2026 của loạt doanh nghiệp “hot”, một ông lớn có thể tăng hơn 100%",
-        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-11-09.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-09",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPV0tQZWZ6NlJ2bUNtSE91bjNoSGtOOGtyeXNCTV9LemdQTTM1OHM5NkpCYkY1LWtwbWJFd1ZrVG1JTnBuZ1NlVmd4R1JBYUprX3o2Z1hzNFo5NXdIZmY1S0lMcWlmd2dVNjMwZzRqT1FZMVhtMXBUaUlMYXQ5TVlqMXl0ODRfWEQ5N0ZJcWRvMzhxOUhDWnR2YkU1Y25hUm1TR3VuWmpyeER2MVhwR0ozOWFkaExrQXdjMTNTRUEwZFVvT1ROTFE?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-14",
+        "id": "news-HPG-15",
         "title": "Thành viên HĐQT Hòa Phát muốn bán bớt cổ phiếu HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-10-30.",
         "category": "disclosure",
@@ -2022,7 +2090,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-15",
+        "id": "news-HPG-16",
+        "title": "Hòa Phát Vượt Kế Hoạch Lợi Nhuận, Cổ Phiếu HPG Ít Biến Động",
+        "summary": "Bản tin phân tích về HPG từ nguồn VnBusiness. Cập nhật ngày 2026-10-30.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-30",
+        "source": "VnBusiness",
+        "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPd2tBTG16ZEU4V1NtTklybHk4eklfWTVvdmFidk9vUXJDSDRNVzVkbkFsMFdBRTBYaUdXY1JwYjdLc2dNUHlxRjVVc3F5OTFSYTdlVWdsbFR5amFiTzBsWVFoR0dFNzNldXNCcExVc1Q3dl9MSHFJdUVkZF9ZZ1RyU0wxUlpyVjI1TkY4LVR0MA?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-HPG-17",
         "title": "Nóng: Hòa Phát (HPG) báo lợi nhuận quý III tăng 106%",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-29.",
         "category": "biz",
@@ -2036,7 +2118,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-16",
+        "id": "news-HPG-18",
         "title": "Hòa Phát (HPG) lãi 23.746 tỷ đồng sau 9 tháng, vượt 8% kế hoạch cả năm",
         "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-28.",
         "category": "biz",
@@ -2050,7 +2132,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-HPG-17",
+        "id": "news-HPG-19",
         "title": "Con trai Chủ tịch HPG đăng ký mua 50 triệu cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn VnEconomy. Cập nhật ngày 2026-10-05.",
         "category": "disclosure",
@@ -2064,7 +2146,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-18",
+        "id": "news-HPG-20",
         "title": "HPG về vùng thấp nhất năm, con trai ông Trần Đình Long đăng ký mua 50 triệu cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-02.",
         "category": "disclosure",
@@ -2078,7 +2160,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-19",
+        "id": "news-HPG-21",
         "title": "Con trai tỷ phú Trần Đình Long sắp chi hơn 1.000 tỷ đồng mua cổ phiếu HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Dân trí. Cập nhật ngày 2026-10-02.",
         "category": "analyst",
@@ -2092,7 +2174,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-20",
+        "id": "news-HPG-22",
         "title": "300.000 cổ đông Hòa Phát và câu nói 'cổ phiếu HPG từ tốt đến rất tốt'",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-29.",
         "category": "biz",
@@ -2106,7 +2188,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-21",
+        "id": "news-HPG-23",
         "title": "Hai trợ lực đang giúp Hòa Phát (HPG) 'ăn nên làm ra', được dự báo lãi 5.600 tỷ đồng trong quý III/2026",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-19.",
         "category": "biz",
@@ -2120,7 +2202,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-22",
+        "id": "news-HPG-24",
         "title": "Chị ruột Phó Chủ HPG tịch đăng ký bán 350.000 cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn VnEconomy. Cập nhật ngày 2026-09-11.",
         "category": "disclosure",
@@ -2134,7 +2216,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-23",
+        "id": "news-HPG-25",
         "title": "Hòa Phát lãi gấp đôi, chất lượng tăng trưởng đến từ đâu? - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về HPG từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-14.",
         "category": "biz",
@@ -2148,21 +2230,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-HPG-24",
-        "title": "Hòa Phát (HPG) báo lãi quý II/2026 tăng 51%, sản xuất gần 7 triệu tấn thép thô trong nửa đầu năm",
-        "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-29.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-07-29",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNQ2pZWlVJV3psbXFVclpsc1lHQlpTOGpfMHdZZFpEamZHOHp1Z2N2czliRmhma2tHWmw3TTJXQmJBQWxHSlVfcEYtSVF4NWg0bWZvMC1GQTZQcWZHY1gxRGJkV0RqQWRpYjVxU0ZzYThLeWFXbDEyb0lJTEptSGpUSDlXTGRtbTlXeVEtSXVZQWZ2MkRBR2hiMFJwWFNDMXJEVjFkRFdvNU92ZEExajBOcDE4NXdCaGRKZ19CMDN6QTBPWjk2VkhR?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-25",
+        "id": "news-HPG-26",
         "title": "HPG: Kết quả kinh doanh quý 2/2026",
         "summary": "Bản tin phân tích về HPG từ nguồn Vietstock. Cập nhật ngày 2026-07-29.",
         "category": "biz",
@@ -2176,7 +2244,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-26",
+        "id": "news-HPG-27",
+        "title": "Hòa Phát (HPG) báo lãi quý II/2026 tăng 51%, sản xuất gần 7 triệu tấn thép thô trong nửa đầu năm",
+        "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-29.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-29",
+        "source": "nguoiquansat.vn",
+        "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNQ2pZWlVJV3psbXFVclpsc1lHQlpTOGpfMHdZZFpEamZHOHp1Z2N2czliRmhma2tHWmw3TTJXQmJBQWxHSlVfcEYtSVF4NWg0bWZvMC1GQTZQcWZHY1gxRGJkV0RqQWRpYjVxU0ZzYThLeWFXbDEyb0lJTEptSGpUSDlXTGRtbTlXeVEtSXVZQWZ2MkRBR2hiMFJwWFNDMXJEVjFkRFdvNU92ZEExajBOcDE4NXdCaGRKZ19CMDN6QTBPWjk2VkhR?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-28",
         "title": "Vì sao cổ phiếu HPG rơi xuống đáy 1 năm: Thị trường đang lo điều gì ở Hòa Phát?",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-21.",
         "category": "biz",
@@ -2190,7 +2272,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-27",
+        "id": "news-HPG-29",
         "title": "Cổ phiếu HPG giảm sâu: Nhà đầu tư lo ngại điều gì?",
         "summary": "Bản tin phân tích về HPG từ nguồn VnBusiness. Cập nhật ngày 2026-07-20.",
         "category": "biz",
@@ -2204,7 +2286,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-28",
+        "id": "news-HPG-30",
         "title": "Cổ phiếu Hòa Phát bất ngờ \"thủng\" đáy 1 năm, điều gì đang diễn ra?",
         "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-07-20.",
         "category": "biz",
@@ -2218,7 +2300,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-29",
+        "id": "news-HPG-31",
         "title": "Cổ phiếu HPG được \"gọi tên\" cho nửa cuối 2026, tiềm năng tăng giá hơn 41%",
         "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-07-02.",
         "category": "biz",
@@ -2232,7 +2314,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-30",
+        "id": "news-HPG-32",
         "title": "HPG: Dung Quất 2 bắt đầu \"gánh\" lợi nhuận – cơ hội cho ai?",
         "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-06-17.",
         "category": "biz",
@@ -2246,7 +2328,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-31",
+        "id": "news-HPG-33",
         "title": "Ông Nguyễn Ngọc Quang đăng ký bán 6,6 triệu cổ phiếu HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn VnEconomy. Cập nhật ngày 2026-06-08.",
         "category": "disclosure",
@@ -2260,7 +2342,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-32",
+        "id": "news-HPG-34",
         "title": "Hòa Phát (HPG): Thành viên HĐQT đăng ký bán 6,6 triệu cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-06-06.",
         "category": "disclosure",
@@ -2274,7 +2356,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-33",
+        "id": "news-HPG-35",
         "title": "Lãnh đạo Hòa Phát muốn bán 6,6 triệu cổ phiếu HPG giữa lúc thị giá về đáy từ đầu năm",
         "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-06-05.",
         "category": "biz",
@@ -2288,7 +2370,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-34",
+        "id": "news-HPG-36",
         "title": "Vì sao cổ phiếu HPG được định giá tăng tới 50%?",
         "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-05-30.",
         "category": "analyst",
@@ -2302,7 +2384,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-35",
+        "id": "news-HPG-37",
+        "title": "Hòa Phát và các doanh nghiệp trả cổ tức tiền mặt và cổ phiếu - Tạp chí Kinh tế",
+        "summary": "Bản tin phân tích về HPG từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-05-25.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-05-25",
+        "source": "Tạp chí Kinh tế - Tài chính Online",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxObzNZTWtqS0ZyeW9NZEc0ZWsxTE16bmFEVHNOSVFiYnluWl9hYlRSOE9nOG5UR1Y3U1JlVXk4RDM4QzduVjFaWktRbjk0MmdOSHM0T0NMcHYtbmVIeWN3OHdyYjJOTlFQeEx6TVBEZ2VqZmxnalk0dmhnMXdMWm16TV93VWxLRnVHdGxoUDJtYnlpaFEwUWVoWERsbW15VmdlczJlbnhXTQ?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-38",
         "title": "Hòa Phát (HPG) tiếp tục thực hiện chia cổ tức bằng cổ phiếu, tỷ lệ 10%",
         "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-05-13.",
         "category": "disclosure",
@@ -2316,7 +2412,105 @@
         "weight": 2.0
       },
       {
-        "id": "news-HPG-36",
+        "id": "news-HPG-39",
+        "title": "Hòa Phát (HPG) chia cổ tức tổng tỷ lệ 15%, phát hành thêm hơn 767 triệu cổ phiếu",
+        "summary": "Bản tin phân tích về HPG từ nguồn Tạp chí điện tử Thương Trường. Cập nhật ngày 2026-05-12.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-05-12",
+        "source": "Tạp chí điện tử Thương Trường",
+        "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQN0F2ZjJSZGRWdHJmWEhvVzg5b1pjNkphY251Sm5CTmhJTVZ6T2xLcXkwNDc2ak5HS1lwWUlralJHSXQxRkZSU2JpLW44STNEazNVN2o5M28tUmpSTjN3UTcyRGJxWnIxY0xBZ0ZhQmUtZlpsdzhpNjRGUGE0NTBreU9nUU93NDBrYkU0bFQtRXdza0JxZ0UzVmhDejB0dDN0UEdnaFIwemtlaU02OUhJS3lVN2NJRWtIWmtvbm53?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-40",
+        "title": "767 triệu cp HPG sắp về tài khoản của cổ đông",
+        "summary": "Bản tin phân tích về HPG từ nguồn Vietstock. Cập nhật ngày 2026-05-12.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-05-12",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQakp5dTBwWDNWb2pCWnliV29GQnJOeEhlVXpiaFVBd0pUY1lPTGFpQUU0ZzEwWlJib2J2SEFTdVpHaGwtRnJxdm9BRjhQMk04bzVUcWZjeDg1Z3RqMlk3T2FGdEF2dEYyOWNHNjh2SEhzRS03Wmo2SlV2WDRGdFlVU3dScXlpZlhqZnplSnpxR0R1dlEt?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-41",
+        "title": "Hòa Phát chốt ngày phát hành hơn 767 triệu cổ phiếu trả cổ tức",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-05-10.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-05-10",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOVGRFSkZzR3ZQQ3hSVHExZnBRNjVVR25NRWxPSU5RRHlQNWVEX0RkbFJka1FfaGlBVjl3NUt2eFM0cWhxbXNBTUpTMzJ4T0Q1MnpDekZxMUlrM2l3aVRFMVFVVjBmU09HWmQ5NnN5aC1VYWNsMlFaczdOZ25WcERCY0pibXV0RHVoT0tKY0JieVljb0s1eG5uZ0JwZ1JEQ0hzUnJvdA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-42",
+        "title": "Tập đoàn Hòa Phát (HPG) chốt quyền trả cổ tức tỷ lệ 15%, vốn điều lệ sắp vượt 84.400 tỷ đồng",
+        "summary": "Bản tin phân tích về HPG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-05-10.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-05-10",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNemc5Y0JHNGQtbHctNzlBRkIyNHZDT051XzZ4M25WRm94RG1sQk5SY3dleVpqbUNfTUp3c2JJV1RQSXFPc00xSXFyU0dlcFFROFFCT0NtOER4d09JejZKeE1FMWJZaHBiTnR2cEZtc2E4OEpqUjV3aW5yMk9Ec2hGWFYwYVhqQlI5MWNzb3RZZWlObFFmYlJmUzB1Nm5aZHpMMGFJOHlmNHhjRGJXS3pUbHk5R0ZuU2VRaG00XzZLYXhWaWlU?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-43",
+        "title": "Hòa Phát chốt ngày trả cổ tức tiền mặt",
+        "summary": "Bản tin phân tích về HPG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-05-05.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-05-05",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQOFlReE8wQTAyaHNfaUtETktBT09BUG8yUHptby1lUmdSY0NnYW4zUmFJeXotbkFZa3JUVGFZX3JsYkd5a1V1cjY4a3hPOEdaWkQtLXVZVk5VNk5RNndRdVBPR2pkOG8wOW5aczNDaU14WEtoVlgwcjBXVVFuSU9scg?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-44",
+        "title": "Cổ đông HPG sắp nhận cổ tức tiền mặt đầu tiên sau 4 năm",
+        "summary": "Bản tin phân tích về HPG từ nguồn Vietstock. Cập nhật ngày 2026-04-29.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-29",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPZGNHVFl3blZWSlBfNHpHZVJJVGhRZUxOMWFFd1gxOU10N2pCNDlQWW1MZ3VwS2pkUUhLNm1rNkhqdExTTHpqOFh5VlljSklSY1Y1WDRSaUpZcWNiaXZ4blhPcWwtRGM1MlVmTUtjOWx4YWJwZFNKekhjdnF1QV9feVB4aXpmQWQxazJhQzhoTjlQTWNfNTdZaXlVVUdaeHF6aEE?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-45",
+        "title": "Tập đoàn Hòa Phát chốt ngày chi hơn 3.800 tỷ đồng trả cổ tức",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-04-29.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-29",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNakJwa0VydV9oNGVtQjEzZU5kLVNiNUlWQnlfNkhWV08tZmNPd015QjFtM1JFamZFZmN0S3pzU0hNZVp2THJpZzZLUmZ0V1c3aG5mWWpNOXRjbXJWMmgzTjY1RGpVVDNDVk9qWVpPX3dVeEE0WHIwc2hNb2ZpNXkzQnVvTXpvcERSRldFNGpKSkgtcGJ3MzJuWGc1MVFwMFU?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-HPG-46",
         "title": "Cổ đông HPG: Tôi tin tưởng vào sự minh bạch và khả năng tăng trưởng của Hòa Phát",
         "summary": "Bản tin phân tích về HPG từ nguồn HoaPhat. Cập nhật ngày 2026-04-24.",
         "category": "biz",
@@ -2330,21 +2524,49 @@
         "weight": 1.5
       },
       {
-        "id": "news-HPG-37",
-        "title": "Hòa Phát đạt 9.056 tỷ đồng lợi nhuận sau thuế quý 1, tăng 170% so với cùng kỳ",
-        "summary": "Bản tin phân tích về HPG từ nguồn HoaPhat. Cập nhật ngày 2026-04-21.",
+        "id": "news-HPG-47",
+        "title": "Cổ đông Hòa Phát: Người tích 100.000 cổ phiếu cho trẻ sơ sinh làm học phí, người chờ bán giá 33.000 đồng",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-04-22.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-21",
-        "source": "HoaPhat",
-        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOWERaNnJxalQ0TElBVGJvcjhnMWVuSWdUSGJTNGo3SXBYNkR1M1g0Ull2bll0T0ZpNDJYRnFVNW91bEE3QU1WdUdaS1pwWGs4OXk1OVVhc1A0em9ORFlQUzBqWXpGTm52OXZ1dkVFUVBoOEFDd0RCRzZPWDlCZ0pXQXNLUHNJS2FOVzA4ZlRNMW5UTll1dkNxN3Y0TGFDalplbFFOT1hYbUJkY0Z4QWRHb0VBQndtdw?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
+        "date": "2026-04-22",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOTXR4UHNVWG9TMnpyV2dUU0x0Y0VISmFMZTR2cXNhU0RCdFdKZl9BZGRVeWFqNUhhZVBYdF8yQnBDLXN3UHJsMVVCQTRLMkRVUVIxQk92dlJwdjFEOG8yUi1fclJQUEdXTE02WmpfVll3M0YzZUlodnJqdHQ4T2d2SkNjQnhjdG1uU1o1Y0JBc2UzM3lDYndBREpXLUt3SHRaUDlIWEVjcUVmZkRWS3B3SVFXY1JFenRWVTlwNWFjOXdCRHo2bVkxZGJ2TThaRW5yLUItRzBYWQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-HPG-38",
+        "id": "news-HPG-48",
+        "title": "Chủ tịch Trần Đình Long (HPG) gửi thông điệp đến 300,000 cổ đông",
+        "summary": "Bản tin phân tích về HPG từ nguồn Vietstock. Cập nhật ngày 2026-04-21.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-21",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNb0hidzJPMVlVeUNyMEh6dFZtcGJsV0VRcXJBNTUtSS1Ub1FfTVVzLVkyclF5UWN6bUQybFZJYzJuMzRrVG1wV01xQ211MFMxYjkzSUI1Q3MzMHVkNVhFRTMtb19nU24wRlFqRTZOdUlnX1FiTEFJYnpydXFXWTZSYWU3ME9aXzhoUk9nOVIxZXBnaGZYSVV5WlBRdENUNWlVMF92XzFUMkxBZw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-49",
+        "title": "'Điểm nóng' đại hội HPG: Lợi nhuận quý 1 hơn 9.000 tỷ đồng, không ngại VinMetal",
+        "summary": "Bản tin phân tích về HPG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-21.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-04-21",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPdEdaNkYtTEhoRXZUangwN0xjR3B2X2o3UXpQVlVGQ05uelJaSVRfWndtbmdBZUFWRHlHWWQ0dEYteG5NbHFqaUNhWkFCbXVFcDExMXRmSXJlOHNTZWJlR0h3LVJLSUFWWDZBMVFJWENGY0tPSWVsa0J3OUxnbndqdFMzTXFRWGVlNlE2dUdCd2JjeVFkdXUtV0JMNFExeXJXNWhkRmFUN2k5ckV4?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-HPG-50",
         "title": "Hòa Phát đặt mục tiêu tăng trưởng doanh thu và lợi nhuận hai chữ số",
         "summary": "Bản tin phân tích về HPG từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-04-21.",
         "category": "biz",
@@ -2356,154 +2578,41 @@
         "sentimentValue": 1,
         "impact": "Cao",
         "weight": 1.5
-      },
-      {
-        "id": "news-HPG-39",
-        "title": "Chủ tịch Trần Đình Long (HPG) gửi thông điệp đến 300,000 cổ đông",
-        "summary": "Bản tin phân tích về HPG từ nguồn Fili.vn. Cập nhật ngày 2026-04-21.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-04-21",
-        "source": "Fili.vn",
-        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNemtvTlJOWW1hOWdXUWItV2ktd2RFalcwQXBfbnp2YlJFakc3Tko4X3hZd2ViN1JvUkZreWw4NFQ4ck9rcGtXWVdXNzk3UWd5Vy1Na1QtSTVPel9IeE12eEk4Tk5aaENwRWhSWng5M1dJRkRITnVDaUlTQ2hUWGFLZF9xSkFkdVdJeEhZVVpFajZMU3l1bTcyQkdfMkdKTkJfWUd3?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-40",
-        "title": "ĐHCĐ Hòa Phát (HPG): Quý I/2026 lãi sau thuế 9.056 tỷ đồng, tăng trưởng 170%",
-        "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-04-20.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-20",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPQ0p1ODN0WldEbFoxUktNX0xqcVdzbEdQSXZURFVWMmVLM2NoVDlZNE01bmxRVU9oRlRMejFiZml4VGVXOHI3NDRzVHJRV1NsNHQzbnd6am11eFQ4NVJfUmtYV2N4aG5sbHgtQnJpdWJacGg0VGtNWVAya0VtMkRoaHJpMy16enlqREFOMjNHS0Y1UUYzTXVNdXYxSjZCNl9seVJXOG5TaVRhTFN5ZDhMLW1fcFFSREJzcnZ30gG3AUFVX3lxTE96aWp5dnlxa3hNMl9vT0JCZ25wV2VBWE1CSTBrZTFQV2R1d3BnOWdVaHFDNjBwdGRodmd4aDR0YUstNTFla1ZSUlRnVktFSklfRFRjTzFOTTBwQU5iUHpwZm9idnJSaGVfbGM2XzZUSGRYTGh1YmVSVDRkSVBnWnUyR2VZQVhEQ1FjNkFfaHk1U1BhNVV2RmllUjFFRUFkTGNiUGFlejJMLVJ6dlJjVnBpMXozWFlmcw?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
-        "id": "news-HPG-41",
-        "title": "Hòa Phát hướng tới doanh thu 210.000 tỷ đồng trong năm 2026",
-        "summary": "Bản tin phân tích về HPG từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-03-31.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-03-31",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOY00wM1hXWTNtZkRuRUZQbmRCSzdYN1hQMm9wN19tX1JQLS1JYnE1WjNtYlFnQ2k3WV8wWjZzNzhkbVc3MXphVVYwVFhMbFotbldtcDZKV0kyOVpNQXY0VmxwWkI1RWtmOVZpeEVJbExhRkxBb293TGs5LTYwbkRwbXR1OEVrMGxUUEhsRVVKWWt5a2tyeDRUQVlCSFNhVEFqVkdPbGxBRQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-42",
-        "title": "Vượt gió ngược, Tập đoàn Hòa Phát (HPG) đặt mục tiêu lãi năm nay tăng 42%",
-        "summary": "Bản tin phân tích về HPG từ nguồn Tạp chí Công Thương. Cập nhật ngày 2026-03-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-03-30",
-        "source": "Tạp chí Công Thương",
-        "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQVUNiZzVESE9jR184V1pBNDRQN3U0Z1NCQnJMWHpKLWRzUE1aWVYtVzVHeThYTENFaWlKSUJzMkpQUHl1QlR2eXlZRjkycUFkdDQteHZiM1N5QktGWS1Yb1R1NVZSbHZuM0t2VjJKMVBRTTJJd1R3TjNMeWNCdkNhU1JpM2ZFT0Naa2VXdTNjMHBBbFAtRHYzeFo1Z3F0a0w0UUNrNGtfeG55WUtBWU1YWg?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-43",
-        "title": "Hòa Phát (HPG) đặt mục tiêu lợi nhuận sau thuế 22.000 tỷ đồng và cổ tức 15% năm 2026",
-        "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-03-29.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-03-29",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQSXpucEZlaEs4MHM4R09hNy1LT0F2UG9LZ2otOW5UdzFQNVlnOFY0WjQ2cWx4VGp5a0Z6Mk4tTmhaVEhIT00tZHhZeEdzRG05YzZoWk1VTF83OUc5c1BSanFwSFhFdjVPekVtU2JkMEZScVlEWGhyUVpGSzUtVFBxWFM4MHY3OHctS1lmMmhCejgwN1JOZ3l2SzBNMDVHM0ZyV21LelNvQVBDaGlwMk1mbjZxbUZlSlhhRkdDZmUxVkRGemlEYXJVaTh30gHGAUFVX3lxTE9PZXE4cUlxaTA3b3NSaS15UkV0dUs1a0N4Q3IxRFZvRUlPdklFcm45TFpaR3BCQ1pZYnBQc1d4ZXpPMW1kS2tMeWxsX0ZpUU1rSnF4OFVjd2RWRVl2VFpxYUJrZkc3b0xoMFNfVDRyUExUQ3k2RFU4SlRadFdadWJUNkhVV2puS0wzSXBkZ3BHb2JHUEJqbmMwbjVlekhQdEFaRW8zQk84VGRJY3V6a0NOTE9BRFZIT2N1WkJzNHY3bnlHcDNRQQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-HPG-44",
-        "title": "Hòa Phát (HPG) báo lãi sau thuế năm 2025 đạt hơn 15.500 tỷ đồng, tăng 29% so với năm 2024",
-        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-01-30.",
-        "category": "macro",
-        "categoryLabel": "Vĩ Mô & Chính Sách",
-        "date": "2026-01-30",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQSUVZQldzampXbjFRRjJBRElnTFI1dTlGanZ5d2tWdUpQaHV0QnlrV3dzaG1vM0VSY0NaTGVZQ0V0M01oU2tOMGRBVllmUHpCblZJLTIyMUExVWVqbU54TEEtUTFmS3JPb2tDQnZIWkpTV09GOXo0ZFQzd09FVDFPN29qa2NrV055U3YxZXZ1eGxfdEFPVXpwV1RJVHVKV0dCSE5Lby1KNmdpeWRlZ19OVmxWeE9aWld3WDAwWVE1NThZUQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-45",
-        "title": "Hòa Phát hoàn thành vượt kế hoạch lợi nhuận năm 2025",
-        "summary": "Bản tin phân tích về HPG từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-01-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-01-30",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQZDZ5a2ZxamdjdlpJel9SRVJFaTBndTk3ZE9sMDJHNlhTUkVDbzcxWHNNUGF5VzNwSW9CWXVyekc5M05mRW1VZHJXQnZtUTdkTjlVZUgzNFR6TTlNN3BSU2taMUZpQlJ5Q2VtZEl3Y1dHdksxN1duMnlZZE1hQTk3UmQ0ckhzOU5uSkt5SzlUdTJyczFWeXJLZWJJbno1REU?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
-      },
-      {
-        "id": "news-HPG-46",
-        "title": "Hòa Phát báo lãi gần 3.900 tỷ quý 4/2025, tăng trưởng 38%",
-        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-01-30.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-01-30",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQTHJCV2hpWkRwWjZCXzJqcFd1UnlUaGZrMGRaaV8tUzUtbWJVN0kzYm9oZXYzMTNhYzNQSnVGM3NDMGFSVUZRVDZfdnVkR0lGV0syWHB3VHFPNXBRWVR3UWRIbE5oZmpCa3FmWnJfSWwxNkVPSzVGcTB0d0k3cnFjY054QWR5MDgxYlFKRHE2ckUwaGdOWVo3aHRn?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Cao",
-        "weight": 1.5
       }
     ],
     "sentiment": {
-      "score": 37.0,
+      "score": 43.3,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 19,
-      "neutralCount": 22,
-      "bearishCount": 5,
-      "totalCount": 46,
+      "bullishCount": 20,
+      "neutralCount": 27,
+      "bearishCount": 3,
+      "totalCount": 50,
       "categoryScores": {
-        "biz": 45.7,
-        "analyst": 28.6,
+        "biz": 41.5,
+        "analyst": 50.0,
         "sector": 0.0,
-        "disclosure": 11.1,
-        "macro": 100.0
+        "disclosure": 47.8
       }
     },
     "tldr": {
       "title": "HPG 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về HPG nghiêng rõ rệt về chiều hướng tích cực với 19/46 tin tức mang gam màu tươi sáng (41.3%). Tâm điểm chú ý xoay quanh: 'Hòa Phát (HPG) góp gần 650 tỷ đồng thành lập Công ty năng lượng tái tạo'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về HPG nghiêng rõ rệt về chiều hướng tích cực với 20/50 tin tức mang gam màu tươi sáng (40.0%). Tâm điểm chú ý xoay quanh: 'Hòa Phát đầu tư 650 tỷ đồng vào năng lượng tái tạo'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
-          "value": "46 tin",
+          "value": "50 tin",
           "type": "neutral"
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "41.3%",
+          "value": "40.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+37.0",
+          "value": "+43.3",
           "type": "positive"
         },
         {
