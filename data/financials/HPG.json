@@ -2,24 +2,24 @@
   "_meta": {
     "symbol": "HPG",
     "companyName": "Hoa Phat Group JSC",
-    "updatedAt": "2026-11-17T19:30:19Z",
+    "updatedAt": "2026-11-18T19:16:39Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 35022,
+    "grahamNumber": 34320,
     "ddmTarget": 6728,
     "peTarget": 45500,
     "pbTarget": 32076,
     "evEbitdaFairPrice": 20273,
     "pcfFairPrice": 27953,
     "psFairPrice": 28200,
-    "consensusFairValue": 29843,
-    "marginOfSafety": 29.6,
-    "upside": 42.1,
-    "consensusDiffPercent": 42.1,
+    "consensusFairValue": 29818,
+    "marginOfSafety": 31.4,
+    "upside": 45.8,
+    "consensusDiffPercent": 45.8,
     "valuationRating": "🟢 STRONG BUY",
     "valuationRatingText": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
     "valuationRatingBadge": "bg-emerald-600 text-white",
@@ -30,17 +30,17 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 35022,
-        "targetPrice": 35022,
-        "diffPercent": 66.8,
+        "value": 34320,
+        "targetPrice": 34320,
+        "diffPercent": 67.8,
         "weight": 0.05,
         "baseWeight": 0.05,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 9.2,
+        "outlierGapPct": 7.0,
         "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-        "formulaDetail": "V = 3,250 × (7.0x + 1.0 × 5.0%) × (4.49% / 5.0%) | Bội số=12.00x, Tỷ số LS=0.898",
+        "formulaDetail": "V = 3,250 × (7.0x + 1.0 × 5.0%) × (4.4% / 5.0%) | Bội số=12.00x, Tỷ số LS=0.880",
         "parameters": {
           "eps": 3250.0,
           "epsAvg": 1231,
@@ -48,9 +48,9 @@
           "peMedian": 14.0,
           "hs": 1.0,
           "gCagr": 5.0,
-          "constantVn": 4.49,
+          "constantVn": 4.4,
           "yVn": 5.0,
-          "vn10yYield": 4.49
+          "vn10yYield": 3.45
         },
         "statusNote": "Phù hợp"
       },
@@ -61,7 +61,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 45500,
         "targetPrice": 45500,
-        "diffPercent": 116.7,
+        "diffPercent": 122.5,
         "weight": 0.2,
         "baseWeight": 0.2,
         "suitability": 1.0,
@@ -87,7 +87,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 32076,
         "targetPrice": 32076,
-        "diffPercent": 52.7,
+        "diffPercent": 56.9,
         "weight": 0.1,
         "baseWeight": 0.1,
         "suitability": 1.0,
@@ -116,7 +116,7 @@
         "cleanName": "DCF Đa Giai Đoạn",
         "value": 58289,
         "targetPrice": 58289,
-        "diffPercent": 177.6,
+        "diffPercent": 185.0,
         "weight": 0.18,
         "baseWeight": 0.18,
         "suitability": 1.0,
@@ -141,7 +141,7 @@
         "cleanName": "Chiết Khấu DDM",
         "value": 6728,
         "targetPrice": 6728,
-        "diffPercent": -68.0,
+        "diffPercent": -67.1,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 1.0,
@@ -164,7 +164,7 @@
         "cleanName": "FCFF Doanh Nghiệp",
         "value": 16326,
         "targetPrice": 16326,
-        "diffPercent": -22.3,
+        "diffPercent": -20.2,
         "weight": 0.12,
         "baseWeight": 0.12,
         "suitability": 1.0,
@@ -198,7 +198,7 @@
         "cleanName": "FCFE Cổ Đông",
         "value": 21262,
         "targetPrice": 21262,
-        "diffPercent": 1.2,
+        "diffPercent": 4.0,
         "weight": 0.08,
         "baseWeight": 0.08,
         "suitability": 1.0,
@@ -222,7 +222,7 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 72039,
         "targetPrice": 72039,
-        "diffPercent": 243.0,
+        "diffPercent": 252.3,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.55,
@@ -247,7 +247,7 @@
         "cleanName": "Book NAV / P/B Chuẩn Hóa",
         "value": 32076,
         "targetPrice": 32076,
-        "diffPercent": 52.7,
+        "diffPercent": 56.9,
         "weight": 0.043,
         "baseWeight": 0.05,
         "suitability": 0.85,
@@ -271,7 +271,7 @@
         "cleanName": "EV/EBITDA & EV/Sales",
         "value": 17975,
         "targetPrice": 17975,
-        "diffPercent": -14.4,
+        "diffPercent": -12.1,
         "weight": 0.22,
         "baseWeight": 0.22,
         "suitability": 1.0,
@@ -292,9 +292,9 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 28355,
+      "cleanWeightedAvg": 28312,
       "cleanMedian": 32076,
-      "dispersionPct": 11.6,
+      "dispersionPct": 11.7,
       "consensusLevel": "HIGH",
       "coveragePct": 87.5,
       "confidenceScore": 95.0,
@@ -357,18 +357,18 @@
     "sevenPriceZones": {
       "currentZone": "Buy Zone",
       "zoneBadge": "bg-emerald-500 text-white",
-      "safeBuyPrice": 22382,
-      "acceptableBuyPrice": 25367,
-      "bearPrice": 20890,
-      "bullPrice": 37304,
+      "safeBuyPrice": 22364,
+      "acceptableBuyPrice": 25345,
+      "bearPrice": 20873,
+      "bullPrice": 37272,
       "boundaries": {
-        "deepValue": 20144,
-        "safeBuy": 22382,
-        "accumulate": 25367,
-        "fairLow": 28351,
-        "fairHigh": 32827,
-        "aboveFair": 35439,
-        "expensive": 42899
+        "deepValue": 20128,
+        "safeBuy": 22364,
+        "accumulate": 25345,
+        "fairLow": 28327,
+        "fairHigh": 32800,
+        "aboveFair": 35409,
+        "expensive": 42863
       }
     },
     "threeLayerDecision": {
@@ -398,7 +398,7 @@
         "p50": 14.0,
         "p75": 15.85,
         "mean": 14.78,
-        "current": 6.46,
+        "current": 6.29,
         "yearsUsed": 4
       },
       "pbBand": {
@@ -406,7 +406,7 @@
         "p50": 1.82,
         "p75": 2.44,
         "mean": 2.13,
-        "current": 1.19,
+        "current": 1.16,
         "yearsUsed": 7
       },
       "priceBands": {
@@ -453,9 +453,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 6.46,
+          "current": 6.29,
           "sma5y": 14.78,
-          "deltaPct": -56.3,
+          "deltaPct": -57.4,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -464,9 +464,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 1.37,
+          "current": 1.34,
           "sma5y": 2.13,
-          "deltaPct": -35.7,
+          "deltaPct": -37.1,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -609,12 +609,12 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 6.46,
-      "pb": 1.37,
-      "ps": 1.14,
-      "pCf": 5.0,
+      "pe": 6.29,
+      "pb": 1.34,
+      "ps": 1.11,
+      "pCf": 4.9,
       "evEbitda": 4.2,
-      "dividendYield": 2.17
+      "dividendYield": 2.22
     },
     "profitability": {
       "roe": 22.09,
@@ -745,15 +745,6 @@
       "value": 455,
       "source": "Vietstock",
       "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPZGNHVFl3blZWSlBfNHpHZVJJVGhRZUxOMWFFd1gxOU10N2pCNDlQWW1MZ3VwS2pkUUhLNm1rNkhqdExTTHpqOFh5VlljSklSY1Y1WDRSaUpZcWNiaXZ4blhPcWwtRGM1MlVmTUtjOWx4YWJwZFNKekhjdnF1QV9feVB4aXpmQWQxazJhQzhoTjlQTWNfNTdZaXlVVUdaeHF6aEE?oc=5"
-    },
-    {
-      "date": "2026-04-21",
-      "type": "Đại hội cổ đông",
-      "content": "'Điểm nóng' đại hội HPG: Lợi nhuận quý 1 hơn 9.000 tỷ đồng, không ngại VinMetal",
-      "ratio": "—",
-      "value": null,
-      "source": "Mekong ASEAN",
-      "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPdEdaNkYtTEhoRXZUangwN0xjR3B2X2o3UXpQVlVGQ05uelJaSVRfWndtbmdBZUFWRHlHWWQ0dEYteG5NbHFqaUNhWkFCbXVFcDExMXRmSXJlOHNTZWJlR0h3LVJLSUFWWDZBMVFJWENGY0tPSWVsa0J3OUxnbndqdFMzTXFRWGVlNlE2dUdCd2JjeVFkdXUtV0JMNFExeXJXNWhkRmFUN2k5ckV4?oc=5"
     }
   ],
   "shareholders": [
@@ -1598,10 +1589,10 @@
     "dailyVolatility": 2.27,
     "maxDrawdown": 20.0,
     "var95": 3.73,
-    "sharpeRatio": 0.8,
-    "sortinoRatio": 1.14,
+    "sharpeRatio": 0.83,
+    "sortinoRatio": 1.18,
     "beta": 1.0,
-    "riskFreeRate": 4.49,
+    "riskFreeRate": 3.45,
     "ratings": {
       "volatility": "Cao",
       "drawdown": "Trung bình",
@@ -1667,7 +1658,7 @@
       "terminalG": 3.0,
       "note": "DCF FCFF 3 kịch bản: Base (Kế hoạch), Bull (+Tăng trưởng, -WACC), Bear (-Tăng trưởng, +WACC)"
     },
-    "reverseDcfImpliedGrowth": 13.67,
+    "reverseDcfImpliedGrowth": 13.63,
     "sensitivityMatrix": {
       "waccList": [
         9.0,
@@ -1722,8 +1713,8 @@
           "priceLow": 20270,
           "priceHigh": 20490,
           "priceMid": 20380,
-          "volume": 69195700.0,
-          "volumePercent": 6.1
+          "volume": 91162900.0,
+          "volumePercent": 8.0
         },
         {
           "index": 2,
@@ -1739,7 +1730,7 @@
           "priceHigh": 20930,
           "priceMid": 20820,
           "volume": 136787800.0,
-          "volumePercent": 12.0
+          "volumePercent": 12.1
         },
         {
           "index": 4,
@@ -1747,7 +1738,7 @@
           "priceHigh": 21150,
           "priceMid": 21040,
           "volume": 158623400.0,
-          "volumePercent": 13.9
+          "volumePercent": 14.0
         },
         {
           "index": 5,
@@ -1755,7 +1746,7 @@
           "priceHigh": 21370,
           "priceMid": 21260,
           "volume": 218778100.0,
-          "volumePercent": 19.2
+          "volumePercent": 19.3
         },
         {
           "index": 6,
@@ -1770,8 +1761,8 @@
           "priceLow": 21590,
           "priceHigh": 21810,
           "priceMid": 21700,
-          "volume": 130354700.0,
-          "volumePercent": 11.5
+          "volume": 105216300.0,
+          "volumePercent": 9.3
         },
         {
           "index": 8,
@@ -1796,7 +1787,7 @@
         "priceHigh": 21370,
         "priceMid": 21260,
         "volume": 218778100.0,
-        "volumePercent": 19.2
+        "volumePercent": 19.3
       },
       "hvn": [
         {
@@ -1805,7 +1796,7 @@
           "priceHigh": 21150,
           "priceMid": 21040,
           "volume": 158623400.0,
-          "volumePercent": 13.9
+          "volumePercent": 14.0
         },
         {
           "index": 5,
@@ -1813,18 +1804,10 @@
           "priceHigh": 21370,
           "priceMid": 21260,
           "volume": 218778100.0,
-          "volumePercent": 19.2
+          "volumePercent": 19.3
         }
       ],
       "lvn": [
-        {
-          "index": 1,
-          "priceLow": 20270,
-          "priceHigh": 20490,
-          "priceMid": 20380,
-          "volume": 69195700.0,
-          "volumePercent": 6.1
-        },
         {
           "index": 6,
           "priceLow": 21370,
@@ -1846,12 +1829,12 @@
         "min": 20050,
         "max": 22250
       },
-      "totalVolume": 1137941800
+      "totalVolume": 1134770600
     },
     "moneyFlow": {
-      "vpci": 0.6,
+      "vpci": 0.73,
       "vpciStatus": "VOLUME_FADING",
-      "cmf": -0.203,
+      "cmf": -0.25,
       "cmfStatus": "DISTRIBUTION",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -1862,10 +1845,10 @@
     },
     "tailRisk": {
       "skewness": 0.5,
-      "kurtosis": -0.06,
-      "var95": 2.19,
-      "var99": 2.66,
-      "es95": 2.55,
+      "kurtosis": 0.06,
+      "var95": 2.29,
+      "var99": 2.72,
+      "es95": 2.66,
       "es99": 2.86,
       "tailRiskAssessment": "Phân phối lợi suất bình thường"
     },
@@ -1895,15 +1878,15 @@
       },
       {
         "id": "news-HPG-2",
-        "title": "Hơn 26.000 tỷ đồng vốn hóa “bốc hơi” khỏi nhóm thép từ đầu năm, chuyện gì đây?",
-        "summary": "Bản tin phân tích về HPG từ nguồn CafeBiz. Cập nhật ngày 2026-11-17.",
+        "title": "Hòa Phát (HPG) - Lợi nhuận trên đà tăng trường",
+        "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-11-17.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-11-17",
-        "source": "CafeBiz",
-        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQWUVXT1pvb2VPVHRhM1dNblIzMjQ5Z0plTm0tSGl2RXdkSEw2elM4Tm5lRmhEa0loSWx5b2tyRi1TZlFpM0NMaks4RFlqTXNtWnJ1bGdyWU5famdjLTI5M2hQZXpNOW13Q1BlUXNGM1d3Q3dHWHQzTVoyNkpXeVczN0lnWXpJekZIajNRbnEta3JybTdBVkJTNTU3d2lKV3dQeEVSeWt3Nmo5UWlGQy1SWWJDcFJNQQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
+        "source": "24HMoney",
+        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNT1FxekJPR2hDYmFBMlRLVDlaQ0QtUF9Qd0Nlb2FKZnRpTFd1N1JVTE10M084NUM3bGdyQWpIV0FXN0FUZTUwOEx5a2xTV19ETVliZjlaMUZBTTBIRUsxVUM1LVV6a1lnOW1mWG1Edy1QQTRwT3BQWnBzVGlIbVpCU1RSS0t1MkNUTUNycg?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -1923,15 +1906,15 @@
       },
       {
         "id": "news-HPG-4",
-        "title": "Hòa Phát (HPG) - Lợi nhuận trên đà tăng trường",
-        "summary": "Bản tin phân tích về HPG từ nguồn 24HMoney. Cập nhật ngày 2026-11-17.",
+        "title": "Hơn 26.000 tỷ đồng vốn hóa “bốc hơi” khỏi nhóm thép từ đầu năm, chuyện gì đây?",
+        "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-11-17.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-11-17",
-        "source": "24HMoney",
-        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNT1FxekJPR2hDYmFBMlRLVDlaQ0QtUF9Qd0Nlb2FKZnRpTFd1N1JVTE10M084NUM3bGdyQWpIV0FXN0FUZTUwOEx5a2xTV19ETVliZjlaMUZBTTBIRUsxVUM1LVV6a1lnOW1mWG1Edy1QQTRwT3BQWnBzVGlIbVpCU1RSS0t1MkNUTUNycg?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOQlFPUzBuN1hKWDRYMk1wQjNSUlMtZkV5THRmLTFhVWpJQlhDZGRoVlQzTEY1WWlqRHhCd3FQblhheF8tRk9tZGc0bGtrejlka3RYaXN5RlpiUzk2TFNvV3BCakJLMjR1NnNXUjdNN25JV25tVUlJb2dQcThkeld0em5RUkxYQ1lnZDRZcTFOa1FBNDE1U2dZX0lnNWpPMC1nNHBZdnByTXlJSEdENGNTVE1R?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -2063,20 +2046,6 @@
       },
       {
         "id": "news-HPG-14",
-        "title": "Một số cổ phiếu cần quan tâm 11/11: Cơ hội tiềm năng với HPG và POW",
-        "summary": "Bản tin phân tích về HPG từ nguồn VOV.VN. Cập nhật ngày 2026-11-10.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-10",
-        "source": "VOV.VN",
-        "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPTy1CS3JER3ItX2ozbENqalktcUxZc1lkT2prYi03NTBlWFlkMl9ybW5DMGNYZW0yZzE3Y3FNQkJBMTFXdHRnVmRXbEJsa3piSFJVTVlVMGNQSFBjZVhPcnZXQkJkVFIzWEEtbm1RWElsTXVRMUQyTmVVdWVicnB6aUZ2TlB1R2E0MU1yZzFyUjViTWtWM0pIN3VpdHgyV2R6RHpXdEMxMjVFNGs?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-15",
         "title": "Thành viên HĐQT Hòa Phát muốn bán bớt cổ phiếu HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn CafeF. Cập nhật ngày 2026-10-30.",
         "category": "disclosure",
@@ -2090,7 +2059,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-16",
+        "id": "news-HPG-15",
         "title": "Hòa Phát Vượt Kế Hoạch Lợi Nhuận, Cổ Phiếu HPG Ít Biến Động",
         "summary": "Bản tin phân tích về HPG từ nguồn VnBusiness. Cập nhật ngày 2026-10-30.",
         "category": "biz",
@@ -2104,7 +2073,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-HPG-17",
+        "id": "news-HPG-16",
         "title": "Nóng: Hòa Phát (HPG) báo lợi nhuận quý III tăng 106%",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-10-29.",
         "category": "biz",
@@ -2118,7 +2087,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-18",
+        "id": "news-HPG-17",
         "title": "Hòa Phát (HPG) lãi 23.746 tỷ đồng sau 9 tháng, vượt 8% kế hoạch cả năm",
         "summary": "Bản tin phân tích về HPG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-28.",
         "category": "biz",
@@ -2132,7 +2101,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-HPG-19",
+        "id": "news-HPG-18",
         "title": "Con trai Chủ tịch HPG đăng ký mua 50 triệu cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn VnEconomy. Cập nhật ngày 2026-10-05.",
         "category": "disclosure",
@@ -2146,7 +2115,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-20",
+        "id": "news-HPG-19",
         "title": "HPG về vùng thấp nhất năm, con trai ông Trần Đình Long đăng ký mua 50 triệu cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-02.",
         "category": "disclosure",
@@ -2160,7 +2129,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-21",
+        "id": "news-HPG-20",
         "title": "Con trai tỷ phú Trần Đình Long sắp chi hơn 1.000 tỷ đồng mua cổ phiếu HPG",
         "summary": "Bản tin phân tích về HPG từ nguồn Báo Dân trí. Cập nhật ngày 2026-10-02.",
         "category": "analyst",
@@ -2174,7 +2143,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-22",
+        "id": "news-HPG-21",
         "title": "300.000 cổ đông Hòa Phát và câu nói 'cổ phiếu HPG từ tốt đến rất tốt'",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-29.",
         "category": "biz",
@@ -2188,7 +2157,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-23",
+        "id": "news-HPG-22",
         "title": "Hai trợ lực đang giúp Hòa Phát (HPG) 'ăn nên làm ra', được dự báo lãi 5.600 tỷ đồng trong quý III/2026",
         "summary": "Bản tin phân tích về HPG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-09-19.",
         "category": "biz",
@@ -2202,7 +2171,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-24",
+        "id": "news-HPG-23",
         "title": "Chị ruột Phó Chủ HPG tịch đăng ký bán 350.000 cổ phiếu",
         "summary": "Bản tin phân tích về HPG từ nguồn VnEconomy. Cập nhật ngày 2026-09-11.",
         "category": "disclosure",
@@ -2216,7 +2185,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-HPG-25",
+        "id": "news-HPG-24",
         "title": "Hòa Phát lãi gấp đôi, chất lượng tăng trưởng đến từ đâu? - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về HPG từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-14.",
         "category": "biz",
@@ -2228,6 +2197,20 @@
         "sentimentValue": 1,
         "impact": "Cao",
         "weight": 1.5
+      },
+      {
+        "id": "news-HPG-25",
+        "title": "Vì sao khối ngoại mua ròng cổ phiếu HPG và CTG?",
+        "summary": "Bản tin phân tích về HPG từ nguồn Báo Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-07-30.",
+        "category": "analyst",
+        "categoryLabel": "Phân Tích CTCK",
+        "date": "2026-07-30",
+        "source": "Báo Diễn đàn Doanh nghiệp",
+        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQdFVPd0V0d242VnF6MHl4dkhsQ1JrdTdKQTZzcEg5TThyY2NobHM5RE5Ib0NfUXRtRjZWWWtOblhuOXNGU3E0WFpSdzlSeVItWnJJamFUWkd2NEhmTmtOVk5LSloxZFo3dzd2cWZrX0cyaGx3VEJMM2JscHNkMVZKa3lJY194X25HQUFsT3VxY1FpY1V4?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
       },
       {
         "id": "news-HPG-26",
@@ -2553,20 +2536,6 @@
       },
       {
         "id": "news-HPG-49",
-        "title": "'Điểm nóng' đại hội HPG: Lợi nhuận quý 1 hơn 9.000 tỷ đồng, không ngại VinMetal",
-        "summary": "Bản tin phân tích về HPG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-21.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-21",
-        "source": "Mekong ASEAN",
-        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPdEdaNkYtTEhoRXZUangwN0xjR3B2X2o3UXpQVlVGQ05uelJaSVRfWndtbmdBZUFWRHlHWWQ0dEYteG5NbHFqaUNhWkFCbXVFcDExMXRmSXJlOHNTZWJlR0h3LVJLSUFWWDZBMVFJWENGY0tPSWVsa0J3OUxnbndqdFMzTXFRWGVlNlE2dUdCd2JjeVFkdXUtV0JMNFExeXJXNWhkRmFUN2k5ckV4?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-HPG-50",
         "title": "Hòa Phát đặt mục tiêu tăng trưởng doanh thu và lợi nhuận hai chữ số",
         "summary": "Bản tin phân tích về HPG từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-04-21.",
         "category": "biz",
@@ -2578,6 +2547,20 @@
         "sentimentValue": 1,
         "impact": "Cao",
         "weight": 1.5
+      },
+      {
+        "id": "news-HPG-50",
+        "title": "Trước tin đồn bán 10% vốn cho đối tác ngoại, cầm HPG Hòa nhiều hơn Phát, Chủ tịch Trần Đình Long nói gì?",
+        "summary": "Bản tin phân tích về HPG từ nguồn Báo Dân Việt. Cập nhật ngày 2026-04-21.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-21",
+        "source": "Báo Dân Việt",
+        "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPeEdfQTlhclNCRTd0bzdzN2pZUDNYWmNfMXRjaW9xQUFXVDZIWm9FYy1vcGJGOXJkMUwwbGEzZjVtVmlyLXJTWklCT3JSek9vY3BuTFdtMjd0a2ctOGpodHhfUkZOMzl2b2dkeEI2enBwMkgzVXdoVGhtRVMtaHZuREpRcVFkelh1NkdCSkFad1R4VWpKMDFtTE1xbFo4Z0xLdl8waDN6bEwyVm5scUVYSEdCMjJCMi1rRTZ0eVJsNF9KZjRDRjZkTUY5WFl0MFV6NUxQQnln?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
       }
     ],
     "sentiment": {
@@ -2590,10 +2573,10 @@
       "bearishCount": 3,
       "totalCount": 50,
       "categoryScores": {
-        "biz": 41.5,
-        "analyst": 50.0,
+        "biz": 44.3,
+        "analyst": 42.9,
         "sector": 0.0,
-        "disclosure": 47.8
+        "disclosure": 45.8
       }
     },
     "tldr": {
@@ -2707,16 +2690,16 @@
     "summary": "M-Score = -1.65 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
   },
   "magicFormula": {
-    "earningsYield": 11.56,
+    "earningsYield": 11.58,
     "roic": 18.43,
-    "compositeScore": 69.2,
+    "compositeScore": 69.3,
     "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
     "tier": "TOP_TIER",
     "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
     "parameters": {
       "ebitTTM": 27443.0,
-      "enterpriseValue": 237334.4,
-      "marketCap": 177724.4,
+      "enterpriseValue": 236912.3,
+      "marketCap": 177302.3,
       "netDebt": 59610.0,
       "capitalEmployed": 148879.0
     },
@@ -2826,16 +2809,16 @@
       "summary": "M-Score = -1.65 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
     },
     "magicFormula": {
-      "earningsYield": 11.56,
+      "earningsYield": 11.58,
       "roic": 18.43,
-      "compositeScore": 69.2,
+      "compositeScore": 69.3,
       "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
       "tier": "TOP_TIER",
       "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
       "parameters": {
         "ebitTTM": 27443.0,
-        "enterpriseValue": 237334.4,
-        "marketCap": 177724.4,
+        "enterpriseValue": 236912.3,
+        "marketCap": 177302.3,
         "netDebt": 59610.0,
         "capitalEmployed": 148879.0
       },
