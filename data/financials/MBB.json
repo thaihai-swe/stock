@@ -2,24 +2,24 @@
   "_meta": {
     "symbol": "MBB",
     "companyName": "Military Commercial Joint Stock Bank",
-    "updatedAt": "2026-11-18T19:16:46Z",
+    "updatedAt": "2026-11-19T19:16:48Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 51999,
+    "grahamNumber": 53063,
     "ddmTarget": 13264,
     "peTarget": 27368,
     "pbTarget": 44281,
     "evEbitdaFairPrice": null,
     "pcfFairPrice": 51965,
     "psFairPrice": 9155,
-    "consensusFairValue": 36139,
-    "marginOfSafety": 48.0,
-    "upside": 92.2,
-    "consensusDiffPercent": 92.2,
+    "consensusFairValue": 36159,
+    "marginOfSafety": 48.3,
+    "upside": 93.4,
+    "consensusDiffPercent": 93.4,
     "valuationRating": "🟢 STRONG BUY",
     "valuationRatingText": "MOS vượt trội biên an toàn + Chất lượng tài chính vững chắc",
     "valuationRatingBadge": "bg-emerald-600 text-white",
@@ -30,17 +30,17 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 51999,
-        "targetPrice": 51999,
-        "diffPercent": 176.6,
+        "value": 53063,
+        "targetPrice": 53063,
+        "diffPercent": 183.8,
         "weight": 0.017,
         "baseWeight": 0.05,
         "suitability": 0.35,
         "suitabilityNote": "Ít phù hợp NH/CK",
         "isOutlier": false,
-        "outlierGapPct": 41.3,
+        "outlierGapPct": 44.2,
         "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-        "formulaDetail": "V = 3,110 × (7.0x + 1.0 × 12.0%) × (4.4% / 5.0%) | Bội số=19.00x, Tỷ số LS=0.880",
+        "formulaDetail": "V = 3,110 × (7.0x + 1.0 × 12.0%) × (4.49% / 5.0%) | Bội số=19.00x, Tỷ số LS=0.898",
         "parameters": {
           "eps": 3110.0,
           "epsAvg": 2248,
@@ -48,9 +48,9 @@
           "peMedian": 8.8,
           "hs": 1.0,
           "gCagr": 12.0,
-          "constantVn": 4.4,
+          "constantVn": 4.49,
           "yVn": 5.0,
-          "vn10yYield": 3.45
+          "vn10yYield": 4.49
         },
         "statusNote": "Ít phù hợp NH/CK"
       },
@@ -61,7 +61,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 27368,
         "targetPrice": 27368,
-        "diffPercent": 45.6,
+        "diffPercent": 46.4,
         "weight": 0.13,
         "baseWeight": 0.13,
         "suitability": 1.0,
@@ -87,7 +87,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 44281,
         "targetPrice": 44281,
-        "diffPercent": 135.5,
+        "diffPercent": 136.8,
         "weight": 0.22,
         "baseWeight": 0.22,
         "suitability": 1.0,
@@ -116,7 +116,7 @@
         "cleanName": "DCF Đa Giai Đoạn",
         "value": 116790,
         "targetPrice": 116790,
-        "diffPercent": 521.2,
+        "diffPercent": 524.5,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.0,
@@ -141,7 +141,7 @@
         "cleanName": "Chiết Khấu DDM",
         "value": 13264,
         "targetPrice": 13264,
-        "diffPercent": -29.4,
+        "diffPercent": -29.1,
         "weight": 0.25,
         "baseWeight": 0.25,
         "suitability": 1.0,
@@ -164,7 +164,7 @@
         "cleanName": "FCFF Doanh Nghiệp",
         "value": 90677,
         "targetPrice": 90677,
-        "diffPercent": 382.3,
+        "diffPercent": 384.9,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.0,
@@ -198,7 +198,7 @@
         "cleanName": "FCFE Cổ Đông",
         "value": 92190,
         "targetPrice": 92190,
-        "diffPercent": 390.4,
+        "diffPercent": 393.0,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.0,
@@ -222,7 +222,7 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 507620,
         "targetPrice": 507620,
-        "diffPercent": 2600.1,
+        "diffPercent": 2614.5,
         "weight": 0.18,
         "baseWeight": 0.18,
         "suitability": 1.0,
@@ -247,7 +247,7 @@
         "cleanName": "Book NAV / P/B Chuẩn Hóa",
         "value": 29325,
         "targetPrice": 29325,
-        "diffPercent": 56.0,
+        "diffPercent": 56.8,
         "weight": 0.17,
         "baseWeight": 0.17,
         "suitability": 1.0,
@@ -292,9 +292,9 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 35696,
+      "cleanWeightedAvg": 35730,
       "cleanMedian": 36803,
-      "dispersionPct": 3.0,
+      "dispersionPct": 2.9,
       "consensusLevel": "HIGH",
       "coveragePct": 66.7,
       "confidenceScore": 78.7,
@@ -358,18 +358,18 @@
     "sevenPriceZones": {
       "currentZone": "Deep Value",
       "zoneBadge": "bg-emerald-600 text-white",
-      "safeBuyPrice": 27104,
-      "acceptableBuyPrice": 30718,
-      "bearPrice": 25297,
-      "bullPrice": 45174,
+      "safeBuyPrice": 27119,
+      "acceptableBuyPrice": 30735,
+      "bearPrice": 25311,
+      "bullPrice": 45199,
       "boundaries": {
-        "deepValue": 24394,
-        "safeBuy": 27104,
-        "accumulate": 30718,
-        "fairLow": 34332,
-        "fairHigh": 39753,
-        "aboveFair": 42915,
-        "expensive": 51950
+        "deepValue": 24407,
+        "safeBuy": 27119,
+        "accumulate": 30735,
+        "fairLow": 34351,
+        "fairHigh": 39775,
+        "aboveFair": 42939,
+        "expensive": 51979
       }
     },
     "threeLayerDecision": {
@@ -399,7 +399,7 @@
         "p50": 8.8,
         "p75": 9.55,
         "mean": 8.74,
-        "current": 6.05,
+        "current": 6.01,
         "yearsUsed": 4
       },
       "pbBand": {
@@ -407,7 +407,7 @@
         "p50": 1.73,
         "p75": 2.0,
         "mean": 1.77,
-        "current": 1.11,
+        "current": 1.1,
         "yearsUsed": 4
       },
       "priceBands": {
@@ -454,9 +454,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 6.04,
+          "current": 6.01,
           "sma5y": 8.74,
-          "deltaPct": -30.9,
+          "deltaPct": -31.3,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -465,9 +465,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 1.34,
+          "current": 1.33,
           "sma5y": 1.77,
-          "deltaPct": -24.4,
+          "deltaPct": -25.0,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -610,12 +610,12 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 6.04,
-      "pb": 1.34,
-      "ps": 2.44,
+      "pe": 6.01,
+      "pb": 1.33,
+      "ps": 2.42,
       "pCf": -3.6,
       "evEbitda": 3.3,
-      "dividendYield": 4.43
+      "dividendYield": 4.45
     },
     "profitability": {
       "roe": 20.48,
@@ -710,6 +710,15 @@
       "value": null,
       "source": "Tạp chí Kinh tế - Tài chính Online",
       "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQYmdfSGVCZTE5WFZaSGNIcnl1VkwxVlZUa2h1bkd4a2dIeExVdnFIOWNManYzMTVySXVwNThlUzJ0T24zRlZVV0pMMV9VVWhKOWJGMWl1UlR1dE95dlppNi1reWc0ZVF6RDc1WjlEYTR3SERselBSSVpxU1JQRDFVRGotOFF2dWJXQXhCR0gzOWY0cjladGpWWlpOZEczdmdmempidEM3X1BNRnc?oc=5"
+    },
+    {
+      "date": "2026-08-17",
+      "type": "Cổ tức tiền mặt",
+      "content": "Cổ đông ngân hàng nhận cổ tức khủng",
+      "ratio": "10%",
+      "value": 1000,
+      "source": "Báo Tiền Phong",
+      "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5QaGVVNEl0R1huclU2RWVPS2ZKYlNwU3dLU1BVaE03QUZIb1JIYnpWakU3N2t2VUVOblp0UFNwUGRyX3FIX1hnY0lheWFKM3V2WE1kSUo3aTEtZmZJU3BMaDlZTXpkbl9OZXVQNEhOcm5DX1d5LUN4N0VINE8?oc=5"
     },
     {
       "date": "2026-08-08",
@@ -1509,10 +1518,10 @@
     "dailyVolatility": 2.27,
     "maxDrawdown": 20.0,
     "var95": 3.73,
-    "sharpeRatio": 0.83,
-    "sortinoRatio": 1.18,
+    "sharpeRatio": 0.8,
+    "sortinoRatio": 1.14,
     "beta": 1.0,
-    "riskFreeRate": 3.45,
+    "riskFreeRate": 4.49,
     "ratings": {
       "volatility": "Cao",
       "drawdown": "Trung bình",
@@ -1592,155 +1601,163 @@
       "buckets": [
         {
           "index": 0,
-          "priceLow": 18750,
-          "priceHigh": 18980,
-          "priceMid": 18865,
-          "volume": 80904600.0,
-          "volumePercent": 11.7
+          "priceLow": 18700,
+          "priceHigh": 18935,
+          "priceMid": 18818,
+          "volume": 78511800.0,
+          "volumePercent": 11.4
         },
         {
           "index": 1,
-          "priceLow": 18980,
-          "priceHigh": 19210,
-          "priceMid": 19095,
-          "volume": 99234400.0,
-          "volumePercent": 14.3
+          "priceLow": 18935,
+          "priceHigh": 19170,
+          "priceMid": 19052,
+          "volume": 85949500.0,
+          "volumePercent": 12.4
         },
         {
           "index": 2,
-          "priceLow": 19210,
-          "priceHigh": 19440,
-          "priceMid": 19325,
-          "volume": 84422700.0,
-          "volumePercent": 12.2
+          "priceLow": 19170,
+          "priceHigh": 19405,
+          "priceMid": 19288,
+          "volume": 108892000.0,
+          "volumePercent": 15.8
         },
         {
           "index": 3,
-          "priceLow": 19440,
-          "priceHigh": 19670,
-          "priceMid": 19555,
-          "volume": 57765300.0,
-          "volumePercent": 8.3
+          "priceLow": 19405,
+          "priceHigh": 19640,
+          "priceMid": 19522,
+          "volume": 38320400.0,
+          "volumePercent": 5.5
         },
         {
           "index": 4,
-          "priceLow": 19670,
-          "priceHigh": 19900,
-          "priceMid": 19785,
-          "volume": 101786800.0,
-          "volumePercent": 14.7
+          "priceLow": 19640,
+          "priceHigh": 19875,
+          "priceMid": 19758,
+          "volume": 121231700.0,
+          "volumePercent": 17.6
         },
         {
           "index": 5,
-          "priceLow": 19900,
-          "priceHigh": 20130,
-          "priceMid": 20015,
+          "priceLow": 19875,
+          "priceHigh": 20110,
+          "priceMid": 19992,
           "volume": 118574800.0,
-          "volumePercent": 17.1
+          "volumePercent": 17.2
         },
         {
           "index": 6,
-          "priceLow": 20130,
-          "priceHigh": 20360,
-          "priceMid": 20245,
+          "priceLow": 20110,
+          "priceHigh": 20345,
+          "priceMid": 20228,
           "volume": 56751100.0,
           "volumePercent": 8.2
         },
         {
           "index": 7,
-          "priceLow": 20360,
-          "priceHigh": 20590,
-          "priceMid": 20475,
+          "priceLow": 20345,
+          "priceHigh": 20580,
+          "priceMid": 20462,
           "volume": 25355900.0,
           "volumePercent": 3.7
         },
         {
           "index": 8,
-          "priceLow": 20590,
-          "priceHigh": 20820,
-          "priceMid": 20705,
-          "volume": 32937000.0,
-          "volumePercent": 4.8
+          "priceLow": 20580,
+          "priceHigh": 20815,
+          "priceMid": 20698,
+          "volume": 21866600.0,
+          "volumePercent": 3.2
         },
         {
           "index": 9,
-          "priceLow": 20820,
+          "priceLow": 20815,
           "priceHigh": 21050,
-          "priceMid": 20935,
+          "priceMid": 20932,
           "volume": 35039400.0,
           "volumePercent": 5.1
         }
       ],
       "poc": {
-        "index": 5,
-        "priceLow": 19900,
-        "priceHigh": 20130,
-        "priceMid": 20015,
-        "volume": 118574800.0,
-        "volumePercent": 17.1
+        "index": 4,
+        "priceLow": 19640,
+        "priceHigh": 19875,
+        "priceMid": 19758,
+        "volume": 121231700.0,
+        "volumePercent": 17.6
       },
       "hvn": [
         {
-          "index": 1,
-          "priceLow": 18980,
-          "priceHigh": 19210,
-          "priceMid": 19095,
-          "volume": 99234400.0,
-          "volumePercent": 14.3
+          "index": 2,
+          "priceLow": 19170,
+          "priceHigh": 19405,
+          "priceMid": 19288,
+          "volume": 108892000.0,
+          "volumePercent": 15.8
         },
         {
           "index": 4,
-          "priceLow": 19670,
-          "priceHigh": 19900,
-          "priceMid": 19785,
-          "volume": 101786800.0,
-          "volumePercent": 14.7
+          "priceLow": 19640,
+          "priceHigh": 19875,
+          "priceMid": 19758,
+          "volume": 121231700.0,
+          "volumePercent": 17.6
         },
         {
           "index": 5,
-          "priceLow": 19900,
-          "priceHigh": 20130,
-          "priceMid": 20015,
+          "priceLow": 19875,
+          "priceHigh": 20110,
+          "priceMid": 19992,
           "volume": 118574800.0,
-          "volumePercent": 17.1
+          "volumePercent": 17.2
         }
       ],
       "lvn": [
         {
+          "index": 3,
+          "priceLow": 19405,
+          "priceHigh": 19640,
+          "priceMid": 19522,
+          "volume": 38320400.0,
+          "volumePercent": 5.5
+        },
+        {
           "index": 7,
-          "priceLow": 20360,
-          "priceHigh": 20590,
-          "priceMid": 20475,
+          "priceLow": 20345,
+          "priceHigh": 20580,
+          "priceMid": 20462,
           "volume": 25355900.0,
           "volumePercent": 3.7
         },
         {
           "index": 8,
-          "priceLow": 20590,
-          "priceHigh": 20820,
-          "priceMid": 20705,
-          "volume": 32937000.0,
-          "volumePercent": 4.8
+          "priceLow": 20580,
+          "priceHigh": 20815,
+          "priceMid": 20698,
+          "volume": 21866600.0,
+          "volumePercent": 3.2
         },
         {
           "index": 9,
-          "priceLow": 20820,
+          "priceLow": 20815,
           "priceHigh": 21050,
-          "priceMid": 20935,
+          "priceMid": 20932,
           "volume": 35039400.0,
           "volumePercent": 5.1
         }
       ],
       "priceRange": {
-        "min": 18750,
+        "min": 18700,
         "max": 21050
       },
-      "totalVolume": 692772000
+      "totalVolume": 690493200
     },
     "moneyFlow": {
-      "vpci": 0.83,
+      "vpci": 0.86,
       "vpciStatus": "VOLUME_FADING",
-      "cmf": 0.199,
+      "cmf": 0.211,
       "cmfStatus": "ACCUMULATION",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -1750,7 +1767,7 @@
       "state": "BALANCED_MARKET"
     },
     "tailRisk": {
-      "skewness": -0.05,
+      "skewness": -0.04,
       "kurtosis": 0.43,
       "var95": 2.15,
       "var99": 2.98,
@@ -1770,6 +1787,20 @@
     "items": [
       {
         "id": "news-MBB-1",
+        "title": "Chứng khoán hôm nay 19/11: 7 doanh nghiệp giao dịch cổ phiếu số lượng lớn",
+        "summary": "Bản tin phân tích về MBB từ nguồn Bnews.vn. Cập nhật ngày 2026-11-19.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-11-19",
+        "source": "Bnews.vn",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNRk41S1lzY2NjS2hleHRpamY0ekV3Q2hSUFJLem5EbnRWWWZ6eWJGQVl1ellidU9NcW5QRGV1ckJpSDBKQUlNZ1FXV3ZVektNbExNUFY0LTRqdVc0ajlzNl9GRzRkVjViN0Q1T2FyTUJMYWFJRVlBSjAyZFE2cVRteF9xTVJkREY0ZXZSV2JSTm1QYTZrVE1qM0FabVRFUFBKTTVn?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-MBB-2",
         "title": "MBB lãi hơn 8.000 tỷ đồng trong một quý, đặt mục tiêu tăng trưởng tín dụng 35%",
         "summary": "Bản tin phân tích về MBB từ nguồn MoneyF. Cập nhật ngày 2026-11-16.",
         "category": "biz",
@@ -1783,7 +1814,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-MBB-2",
+        "id": "news-MBB-3",
         "title": "Viettel muốn mua 27 triệu cổ phiếu MB",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Doanh nhân trẻ. Cập nhật ngày 2026-11-14.",
         "category": "analyst",
@@ -1797,7 +1828,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-3",
+        "id": "news-MBB-4",
         "title": "MBBank lãi sau thuế hơn 24.400 tỷ đồng sau 9 tháng, nợ xấu tăng 53%",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Doanh nhân trẻ. Cập nhật ngày 2026-11-14.",
         "category": "macro",
@@ -1811,7 +1842,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-4",
+        "id": "news-MBB-5",
         "title": "Vietcombank dự chi 694 tỷ đồng \"ôm\" cổ phiếu MB",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Dân Việt. Cập nhật ngày 2026-11-14.",
         "category": "biz",
@@ -1825,7 +1856,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-5",
+        "id": "news-MBB-6",
         "title": "MBB chào bán riêng lẻ 200 triệu cổ phiếu, thu 3.018 tỷ đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn VnEconomy. Cập nhật ngày 2026-11-13.",
         "category": "biz",
@@ -1839,7 +1870,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-6",
+        "id": "news-MBB-7",
         "title": "6 NĐT mua 200 triệu cổ phiếu MBB giá 15.090 đồng/cp",
         "summary": "Bản tin phân tích về MBB từ nguồn 24HMoney. Cập nhật ngày 2026-11-13.",
         "category": "analyst",
@@ -1853,7 +1884,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-7",
+        "id": "news-MBB-8",
         "title": "MB Chào Bán 200 Triệu Cổ Phiếu, Huy Động 3.018 Tỷ Đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn VnBusiness. Cập nhật ngày 2026-11-13.",
         "category": "biz",
@@ -1867,35 +1898,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-8",
-        "title": "Vietcombank xuất hiện trong thương vụ chào bán 200 triệu cổ phiếu của MB",
-        "summary": "Bản tin phân tích về MBB từ nguồn Nhaquanly. Cập nhật ngày 2026-11-13.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-13",
-        "source": "Nhaquanly",
-        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQVzFVYXhvWWdLQmh0d3JPaTdTcDV0TmpYQlRfcm10T0ZOWkpiYy03WFdCeW1lZWpNNV90aFhvMWxlbHFxdmlITGFoM19VX2lodUhyVG9kbGtVWHUtbGwwODdYSFRUYS1BUkQxbTVZM0JZekFXZVNTOHlQcENVclpyT0F4Z05pbUltbHdiSzkwdlY0MUJmMVdQMXFVeW81QklmWkJPREdNcEM?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
         "id": "news-MBB-9",
-        "title": "MB chào bán 200 triệu cp riêng lẻ, dự thu hơn 3,000 tỷ",
-        "summary": "Bản tin phân tích về MBB từ nguồn Fili.vn. Cập nhật ngày 2026-11-13.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-13",
-        "source": "Fili.vn",
-        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOengySDVfOGNoeWZ4OHhjZVloWGV4SUpOWmJFd0xZMUx6UmlVYnF6dXktVk9zbENwT3o1OXQxUXQyUWlva290bTBsTHRTVUxLRC00eVlncWFWMHhwcHE3dGRrbzhNTjJMangyUUp2OUFua3d6WDZGdlFPWFlsMEZyVU13Q29TZVh6ZXdtRk1IYUpIbGtHRlJr?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-MBB-10",
         "title": "3 công ty quân đội muốn chi gần 1.500 tỷ đồng mua cổ phiếu MB, công ty đặc biệt của TP.HCM cũng tham gia",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-11-13.",
         "category": "analyst",
@@ -1909,16 +1912,30 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-11",
-        "title": "MB dự kiến tăng vốn thêm 2.000 tỷ đồng, Viettel và SCIC mua lượng lớn cổ phiếu",
-        "summary": "Bản tin phân tích về MBB từ nguồn Hangthat.vn. Cập nhật ngày 2026-11-13.",
-        "category": "analyst",
-        "categoryLabel": "Phân Tích CTCK",
+        "id": "news-MBB-10",
+        "title": "Vietcombank xuất hiện trong thương vụ chào bán 200 triệu cổ phiếu của MB",
+        "summary": "Bản tin phân tích về MBB từ nguồn Nhaquanly. Cập nhật ngày 2026-11-13.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
         "date": "2026-11-13",
-        "source": "Hangthat.vn",
-        "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNMHZfcXJiQndDY0RpZUpGZXl2MnpoVGxOOGJ1SXlXMjVjelpqNEdrODMxMk94d2dzcnhJaU15bkdwZFNESjBwOHlMOWc4Tl9ZbmQxclVFVmF1c04taDNxUFJRQ1JTeWI2SXc2RFdSel9CWUFuV2xWRFVXeFdfTUFxcnpSbE9IME4tWWlNY3diMXQzRWMtRGM0MUFmWHFvYWRsMjA0YVFZWFNBUHZIX252NVJrNVZGektTNUpKYTVxNGdDRTFaZVp1UnRHcFVidw?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
+        "source": "Nhaquanly",
+        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQVzFVYXhvWWdLQmh0d3JPaTdTcDV0TmpYQlRfcm10T0ZOWkpiYy03WFdCeW1lZWpNNV90aFhvMWxlbHFxdmlITGFoM19VX2lodUhyVG9kbGtVWHUtbGwwODdYSFRUYS1BUkQxbTVZM0JZekFXZVNTOHlQcENVclpyT0F4Z05pbUltbHdiSzkwdlY0MUJmMVdQMXFVeW81QklmWkJPREdNcEM?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-MBB-11",
+        "title": "MB chào bán 200 triệu cp riêng lẻ, dự thu hơn 3,000 tỷ",
+        "summary": "Bản tin phân tích về MBB từ nguồn Fili.vn. Cập nhật ngày 2026-11-13.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-13",
+        "source": "Fili.vn",
+        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOengySDVfOGNoeWZ4OHhjZVloWGV4SUpOWmJFd0xZMUx6UmlVYnF6dXktVk9zbENwT3o1OXQxUXQyUWlva290bTBsTHRTVUxLRC00eVlncWFWMHhwcHE3dGRrbzhNTjJMangyUUp2OUFua3d6WDZGdlFPWFlsMEZyVU13Q29TZVh6ZXdtRk1IYUpIbGtHRlJr?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -1938,20 +1955,6 @@
       },
       {
         "id": "news-MBB-13",
-        "title": "MB chào bán 200 triệu cổ phiếu cho 6 nhà đầu tư tổ chức, dự thu hơn 3.000 tỷ đồng",
-        "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-11-12.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-12",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNQmtBYlNZRzljOG9ZY2dKUlFhWVhpY0xRdTEyMllSR2RPTEZ4ZmtiR1Q2X29nQUZzTldueFJ3c25DTVJrQUlHRzZkWmp5NWIyWDd1c2dqZ0lvTWlvRXA1cjBFQldjNHY0YnMxdjBhVUVVSlU2dVp5dkJzRkk5SkFJU2dwRjEySS1CNUxJcWtTRTJ5Y0hra3BkTDJoRUdfbTYyX2VfbDlFQnFUMUZQMUVzTzhCY21Ra2M3b1pjaVFIZ0MwdjFY?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-MBB-14",
         "title": "Đa dạng hóa nguồn thu, MB tăng 42% lợi nhuận trước thuế quý 3",
         "summary": "Bản tin phân tích về MBB từ nguồn Vietstock. Cập nhật ngày 2026-10-31.",
         "category": "biz",
@@ -1965,21 +1968,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-15",
-        "title": "Dần lộ diện kết quả kinh doanh quý III/2026 của nhóm chứng khoán",
-        "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-10-16.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-16",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPQk1jcXBpQjZ3d2E3UXFyd25PMlByc0ttQ01CSmM1a1NWVmVEY0NkUTc0WG4tazZTc05RVzl5ME5sZXJLQ3pZU1BIMHJkZGdzSTVfaWxFeXJOeUhGbGpTQ2Q3UkVVMFB5WlROM0haWnltc1Ayd0FCaHVrY3RqWGk5SkNZWDg5TkMtcXlsMW1ib3haR0toQ2RKSVZQaDJoR2lxN2pTUWpoWURkZG8zQmVF?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-MBB-16",
+        "id": "news-MBB-14",
         "title": "HDBank và MB được dự báo dẫn đầu tăng trưởng lợi nhuận quý III - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-10-12.",
         "category": "biz",
@@ -1993,13 +1982,13 @@
         "weight": 1.5
       },
       {
-        "id": "news-MBB-17",
+        "id": "news-MBB-15",
         "title": "Giá gốc hơn 2.500 đồng/cổ phiếu, một doanh nghiệp sắp chốt lời MBB gấp 8 lần",
-        "summary": "Bản tin phân tích về MBB từ nguồn Tuổi Trẻ. Cập nhật ngày 2026-10-06.",
+        "summary": "Bản tin phân tích về MBB từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-10-06.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-10-06",
-        "source": "Tuổi Trẻ",
+        "source": "Báo Tuổi Trẻ",
         "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOaFpmN0pKd3pHd0t2WnJsSDZOM0VqVG5laWxBLXhlNGhlZzBValBTTHN5dm9hdkZiNTlsdVBWZlFiM2M3QWx5M29oZGRHMzNMdzJsNFlUeVZOUEpKUDhkTVhBNHBBQnp3MmlFamNxcUIxM05NbVRBRVZVMUh2U09mcEVwRVMwRHY4aXgyc0xjSVF6MWdJU21qUnFMT0h4SlI3dUl5bXpac2dhQ3dqekpPRTh4ZUg2anM?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
@@ -2007,7 +1996,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-18",
+        "id": "news-MBB-16",
         "title": "Giá vốn chưa đến 3.000 đồng/cp, doanh nghiệp thuộc Bộ Quốc phòng muốn chốt lãi 2,5 triệu cổ phiếu MBB với giá tối thiểu hơn 20.000 đồng/cp",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-10-06.",
         "category": "biz",
@@ -2021,7 +2010,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-19",
+        "id": "news-MBB-17",
         "title": "Dự báo phần lớn ngân hàng tăng trưởng lợi nhuận hai chữ số trong quý 3/2026",
         "summary": "Bản tin phân tích về MBB từ nguồn VnEconomy. Cập nhật ngày 2026-09-30.",
         "category": "biz",
@@ -2035,7 +2024,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-MBB-20",
+        "id": "news-MBB-18",
         "title": "MB hoàn tất chào bán hơn 805 triệu cổ phiếu, chạm đỉnh vốn điều lệ 100.000 tỷ đồng",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-09-25.",
         "category": "biz",
@@ -2049,7 +2038,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-21",
+        "id": "news-MBB-19",
         "title": "MBB tiếp tục chào bán 12 triệu cổ phiếu cho nhân sự cấp cao",
         "summary": "Bản tin phân tích về MBB từ nguồn VnEconomy. Cập nhật ngày 2026-09-22.",
         "category": "biz",
@@ -2063,21 +2052,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-22",
-        "title": "MBB còn dư địa bứt phá?",
-        "summary": "Bản tin phân tích về MBB từ nguồn Báo Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-08-31.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-08-31",
-        "source": "Báo Diễn đàn Doanh nghiệp",
-        "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTFB6c2xkUGQxWlpYbld5RzUyUTVpUWJydE5pd0NzM05fR3BXMjZoZUJPRWU5VlJPZ1MzeEFfVktCaDNYVks3endNVEZFMXNVS2RweHdPbUl5UnIxcVMxdzI4anhjaTlHdC1ZTlBKTzRwMWhaUG10?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-MBB-23",
+        "id": "news-MBB-20",
         "title": "Cổ phiếu MBB - Có nên mua? DỰ PHÓNG LỢI NHUẬN cuối năm 2026 & 2027 như thế nào?",
         "summary": "Bản tin phân tích về MBB từ nguồn 24HMoney. Cập nhật ngày 2026-08-25.",
         "category": "biz",
@@ -2091,21 +2066,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-24",
-        "title": "Viettel chi gần 1.200 tỷ đồng mua cổ phiếu MBB, vốn điều lệ MB sắp vượt mốc 100.000 tỷ đồng",
-        "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-21.",
-        "category": "analyst",
-        "categoryLabel": "Phân Tích CTCK",
-        "date": "2026-08-21",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNTDZGZDlvRHlQdVVSQ1ZGQnozVnFCRXU2SkhXOEVKeXYwMkNHNWNlNnJXRm4zMldtbkItalhYMzdLdDc0QkFacF9iSEZSWGVDUFIxakJqNzNtMlEwNjVVcjF0cjFCUzlPY2d2cmFaUGd3bWo2ZEhDcXFDQlFpMnZpdmEwSjB5OU50emhsZUFSNHNUbnlTWWhISzFWci1LLW9JWFUxZk90b3ZlelJIN1hrMzM0RjVfS2dtTDY4UHVaT1JzanR4XzdFRWIxWWNPY2xLWEE?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-MBB-25",
+        "id": "news-MBB-21",
         "title": "Viettel sắp chi hơn 1.000 tỷ đồng mua cổ phiếu một ngân hàng",
         "summary": "Bản tin phân tích về MBB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-21.",
         "category": "analyst",
@@ -2119,7 +2080,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-26",
+        "id": "news-MBB-22",
+        "title": "Viettel chi gần 1.200 tỷ đồng mua cổ phiếu MBB, vốn điều lệ MB sắp vượt mốc 100.000 tỷ đồng",
+        "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-21.",
+        "category": "analyst",
+        "categoryLabel": "Phân Tích CTCK",
+        "date": "2026-08-21",
+        "source": "Thời báo Tài chính Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNTDZGZDlvRHlQdVVSQ1ZGQnozVnFCRXU2SkhXOEVKeXYwMkNHNWNlNnJXRm4zMldtbkItalhYMzdLdDc0QkFacF9iSEZSWGVDUFIxakJqNzNtMlEwNjVVcjF0cjFCUzlPY2d2cmFaUGd3bWo2ZEhDcXFDQlFpMnZpdmEwSjB5OU50emhsZUFSNHNUbnlTWWhISzFWci1LLW9JWFUxZk90b3ZlelJIN1hrMzM0RjVfS2dtTDY4UHVaT1JzanR4XzdFRWIxWWNPY2xLWEE?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-MBB-23",
         "title": "Cổ đông MB được mua cổ phiếu phát hành thêm với giá 10.000 đồng - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-18.",
         "category": "disclosure",
@@ -2133,7 +2108,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-27",
+        "id": "news-MBB-24",
+        "title": "Cổ đông ngân hàng nhận cổ tức khủng",
+        "summary": "Bản tin phân tích về MBB từ nguồn Báo Tiền Phong. Cập nhật ngày 2026-08-17.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-08-17",
+        "source": "Báo Tiền Phong",
+        "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5QaGVVNEl0R1huclU2RWVPS2ZKYlNwU3dLU1BVaE03QUZIb1JIYnpWakU3N2t2VUVOblp0UFNwUGRyX3FIX1hnY0lheWFKM3V2WE1kSUo3aTEtZmZJU3BMaDlZTXpkbl9OZXVQNEhOcm5DX1d5LUN4N0VINE8?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-MBB-25",
         "title": "Cổ tức 35% của Phân bón Bình Điền nổi bật trong 6 doanh nghiệp phân phối lợi nhuận - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-11.",
         "category": "biz",
@@ -2147,7 +2136,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-28",
+        "id": "news-MBB-26",
         "title": "MB lập kỷ lục lợi nhuận, vững đà tăng trưởng - Tạp chí Kinh tế",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-08-11.",
         "category": "biz",
@@ -2161,7 +2150,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-29",
+        "id": "news-MBB-27",
         "title": "Tuần tới, một ngân hàng sẽ chốt quyền nhận cổ tức tỷ lệ 15%, cổ đông còn được mua thêm cổ phiếu giá rẻ",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-08-08.",
         "category": "disclosure",
@@ -2175,7 +2164,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-30",
+        "id": "news-MBB-28",
         "title": "MB bứt tốc hướng tới lợi nhuận 39.500 tỷ đồng, không ngại đặt mục tiêu lớn để tạo động lực phát triển nhanh hơn",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-07.",
         "category": "biz",
@@ -2189,7 +2178,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-31",
+        "id": "news-MBB-29",
         "title": "MB sở hữu 38 triệu khách hàng, lãi hơn 20.000 tỷ đồng sau 6 tháng",
         "summary": "Bản tin phân tích về MBB từ nguồn Tạp chí Tài chính Doanh nghiệp. Cập nhật ngày 2026-08-05.",
         "category": "biz",
@@ -2203,7 +2192,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-32",
+        "id": "news-MBB-30",
         "title": "Vì sao khối ngoại đổ tiền mua cổ phiếu MBB?",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-08-04.",
         "category": "analyst",
@@ -2217,7 +2206,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-33",
+        "id": "news-MBB-31",
         "title": "MB chốt quyền chia cổ tức 15%, phát hành chào bán gần 805,5 triệu cổ phiếu giá 10.000 đồng/CP",
         "summary": "Bản tin phân tích về MBB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-08-04.",
         "category": "disclosure",
@@ -2231,7 +2220,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-34",
+        "id": "news-MBB-32",
         "title": "MB sắp trả cổ tức bằng cổ phiếu tỷ lệ 15%, đồng thời chào bán hơn 805 triệu cổ phiếu",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Công Lý. Cập nhật ngày 2026-08-04.",
         "category": "disclosure",
@@ -2245,7 +2234,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-35",
+        "id": "news-MBB-33",
         "title": "MB sắp nâng vốn điều lệ vượt 100.000 tỷ đồng, cổ phiếu MBB tăng chạm trần",
         "summary": "Bản tin phân tích về MBB từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-08-03.",
         "category": "biz",
@@ -2259,7 +2248,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-36",
+        "id": "news-MBB-34",
         "title": "Một ngân hàng sắp trả cổ tức 15%",
         "summary": "Bản tin phân tích về MBB từ nguồn CafeF. Cập nhật ngày 2026-08-03.",
         "category": "disclosure",
@@ -2273,7 +2262,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-37",
+        "id": "news-MBB-35",
         "title": "MBBank (MBB) sắp chào bán cổ phiếu và trả cổ tức cho cổ đông",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-08-02.",
         "category": "disclosure",
@@ -2287,7 +2276,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-MBB-38",
+        "id": "news-MBB-36",
         "title": "MB lãi hơn 20.000 tỷ đồng, tín dụng tăng 13,2% tiếp sức đà tăng trưởng",
         "summary": "Bản tin phân tích về MBB từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -2301,7 +2290,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-MBB-39",
+        "id": "news-MBB-37",
+        "title": "Lợi nhuận MBBank (MBB) vượt 20.000 tỷ đồng bán niên 2026, tín dụng tăng trưởng 13%",
+        "summary": "Bản tin phân tích về MBB từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-08-01.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-08-01",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPc2JERGVOa0RPd3BrRXZTRGM4WEV6a0lHRTRBVDR2b1hMSFRsaVE2TGJRWDVsSjRQMGNjdkMzaE1mZWNUbXdMcWZDdGFaVVBmRXE1Ty1OTkZzanU0MDBNLXFJdFA0NmJDa0dOX1NvQWZsRlRhM3JCd0hTQk44Y2xIR05VMHZsSmFOWmV2S3pfNEVfN2poczV1UUx4SWhWNFd2UnBnQWJpMzZUV2JTM1phN0hkM0dmODA?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-MBB-38",
         "title": "MB thu về hơn 20.000 tỷ đồng lợi nhuận sau 6 tháng đầu năm",
         "summary": "Bản tin phân tích về MBB từ nguồn Mekong ASEAN. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2315,7 +2318,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-40",
+        "id": "news-MBB-39",
         "title": "MB lãi hơn 20.188 tỷ đồng sau 6 tháng đầu năm 2026, tăng hơn 27% so với cùng kỳ",
         "summary": "Bản tin phân tích về MBB từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2329,7 +2332,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-41",
+        "id": "news-MBB-40",
         "title": "Dòng tiền kinh doanh MBBank bất ngờ âm tới 53.000 tỷ đồng, nợ xấu 17.797 tỷ",
         "summary": "Bản tin phân tích về MBB từ nguồn Báo Nông nghiệp và Môi trường. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2343,7 +2346,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-MBB-42",
+        "id": "news-MBB-41",
         "title": "Lợi nhuận trước thuế quý 2 của MB tăng 41% nhờ hoạt động kinh doanh chính tăng mạnh",
         "summary": "Bản tin phân tích về MBB từ nguồn Vietstock. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2353,6 +2356,20 @@
         "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOQUswZnJ4N3N3cjNjdlNHa3h3ajlxUHBrdEtuUnFRUktiVHlWOWhrc0lrMFdFLVRQT1ZjeE1zV2x1S0ttSXljenM1d19TWTFYTURENGFEYk1ka041ZTd1MGJtaDBDLXRXVEtCdU9mVDJZdDZEXzNYMHJsdjhRU0hyN29VWDB1M295N1VBdjZFMjhINUVDNEl6Qm5PRVkxbzdDckJIekc1U2RBR2JsS1VvamEzMXFtYlhkWER6YWx6bWN6b051cVE?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-MBB-42",
+        "title": "MBB: Giá cổ phiếu Ngân hàng Quân đội hôm nay",
+        "summary": "Bản tin phân tích về MBB từ nguồn 24HMoney. Cập nhật ngày 2026-07-28.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-28",
+        "source": "24HMoney",
+        "link": "https://news.google.com/rss/articles/CBMiQ0FVX3lxTE1MdG5PaS1kQlIwX2VCbC1HVUxBU3RCWC0wdnl0b1FZQmN4NlQycHBCRnBXejh1UU5yNWtsRVNDNlJfNTQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
@@ -2470,7 +2487,7 @@
       }
     ],
     "sentiment": {
-      "score": 46.3,
+      "score": 46.0,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
@@ -2479,15 +2496,15 @@
       "bearishCount": 0,
       "totalCount": 50,
       "categoryScores": {
-        "biz": 37.5,
-        "analyst": 28.6,
-        "macro": 100.0,
-        "disclosure": 59.3
+        "disclosure": 53.3,
+        "biz": 42.9,
+        "analyst": 16.7,
+        "macro": 100.0
       }
     },
     "tldr": {
       "title": "MBB 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về MBB nghiêng rõ rệt về chiều hướng tích cực với 20/50 tin tức mang gam màu tươi sáng (40.0%). Tâm điểm chú ý xoay quanh: 'MBB lãi hơn 8.000 tỷ đồng trong một quý, đặt mục tiêu tăng trưởng tín dụng 35%'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về MBB nghiêng rõ rệt về chiều hướng tích cực với 20/50 tin tức mang gam màu tươi sáng (40.0%). Tâm điểm chú ý xoay quanh: 'Chứng khoán hôm nay 19/11: 7 doanh nghiệp giao dịch cổ phiếu số lượng lớn'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2501,7 +2518,7 @@
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+46.3",
+          "value": "+46.0",
           "type": "positive"
         },
         {
@@ -2596,16 +2613,16 @@
     "summary": "M-Score = -1.64 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
   },
   "magicFormula": {
-    "earningsYield": 8.08,
+    "earningsYield": 8.11,
     "roic": 594.9,
-    "compositeScore": 76.9,
+    "compositeScore": 77.0,
     "category": "Hạng 2: Cổ Phiếu Tăng Trưởng Chất Lượng (Định Giá Cao)",
     "tier": "QUALITY_GROWTH",
     "recommendation": "Cổ phiếu sinh lời vốn tuyệt vời, có thể canh mua khi thị trường điều chỉnh.",
     "parameters": {
       "ebitTTM": 32547.0,
-      "enterpriseValue": 402900.6,
-      "marketCap": 175538.6,
+      "enterpriseValue": 401511.1,
+      "marketCap": 174149.1,
       "netDebt": 227362.0,
       "capitalEmployed": 5471.0
     },
@@ -2715,16 +2732,16 @@
       "summary": "M-Score = -1.64 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
     },
     "magicFormula": {
-      "earningsYield": 8.08,
+      "earningsYield": 8.11,
       "roic": 594.9,
-      "compositeScore": 76.9,
+      "compositeScore": 77.0,
       "category": "Hạng 2: Cổ Phiếu Tăng Trưởng Chất Lượng (Định Giá Cao)",
       "tier": "QUALITY_GROWTH",
       "recommendation": "Cổ phiếu sinh lời vốn tuyệt vời, có thể canh mua khi thị trường điều chỉnh.",
       "parameters": {
         "ebitTTM": 32547.0,
-        "enterpriseValue": 402900.6,
-        "marketCap": 175538.6,
+        "enterpriseValue": 401511.1,
+        "marketCap": 174149.1,
         "netDebt": 227362.0,
         "capitalEmployed": 5471.0
       },
