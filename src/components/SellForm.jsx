@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { addSellOrder } from '../utils/api.js';
 import { DEFAULT_TAGS, DISCIPLINE_TAGS, fmtDate, fmtMoney, getTodayDate, plBg, plColor } from '../utils/format.js';
-import { DEFAULT_TRADE_FEE_PCT } from '../utils/constants.js';
+import { DEFAULT_SELL_FEE_PCT, DEFAULT_TRADE_FEE_PCT, PRESET_FEE_PCTS } from '../utils/constants.js';
 import TagSelector from './common/TagSelector.jsx';
 
 export default function SellForm({
@@ -24,7 +24,7 @@ export default function SellForm({
       symbol: sym,
       quantity: initialQuantity ? String(initialQuantity) : (p ? String(p.totalQty) : '100'),
       price: resolvedPrice,
-      feePct: '0.1',
+      feePct: String(DEFAULT_SELL_FEE_PCT),
       note: '',
       date: getTodayDate(),
       matchMethod: 'lowest', // 'lowest' | 'highest' | 'fifo'
@@ -67,14 +67,15 @@ export default function SellForm({
     const marketPrice = marketPrices[sym]?.price;
     const portfolioStock = portfolio.find(p => p.symbol === sym);
     const avgCost = portfolioStock?.avgCost;
-    const breakEven = portfolioStock?.breakEvenPrice || avgCost;
+    const feePct = form.feePct !== '' && !isNaN(Number(form.feePct)) ? Number(form.feePct) : DEFAULT_SELL_FEE_PCT;
+    const breakEven = avgCost ? (feePct < 100 ? avgCost / (1 - feePct / 100) : avgCost) : (portfolioStock?.breakEvenPrice || avgCost);
 
     return {
       marketPrice: marketPrice ? marketPrice / 1000 : null,
       avgCost: avgCost ? avgCost / 1000 : null,
-      breakEven: breakEven ? breakEven / 1000 : null,
+      breakEven: breakEven ? Number((breakEven / 1000).toFixed(2)) : null,
     };
-  }, [form.symbol, marketPrices, portfolio]);
+  }, [form.symbol, form.feePct, marketPrices, portfolio]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -142,7 +143,7 @@ export default function SellForm({
 
     const avgCost = totalCost / requestedQty;
     const sellPrice = form.price && !isNaN(Number(form.price)) ? Number(form.price) * 1000 : null;
-    const feePercent = form.feePct !== '' && !isNaN(Number(form.feePct)) ? Number(form.feePct) : 0.1;
+    const feePercent = form.feePct !== '' && !isNaN(Number(form.feePct)) ? Number(form.feePct) : DEFAULT_SELL_FEE_PCT;
 
     let grossRevenue = 0;
     let fee = 0;
@@ -201,14 +202,14 @@ export default function SellForm({
         symbol: form.symbol,
         quantity: Number(form.quantity),
         price: Number(form.price) * 1000,
-        feePct: form.feePct !== '' ? Number(form.feePct) : 0.1,
+        feePct: form.feePct !== '' ? Number(form.feePct) : DEFAULT_SELL_FEE_PCT,
         note: form.note,
         date: form.date || getTodayDate(),
         tags: [selectedTag, selectedDiscipline].filter(Boolean),
         matchMethod: form.matchMethod || 'lowest',
       });
       setResult(order);
-      setForm({ symbol: '', quantity: '100', price: '', feePct: '0.1', note: '', date: getTodayDate(), matchMethod: form.matchMethod || 'lowest' });
+      setForm({ symbol: '', quantity: '100', price: '', feePct: String(DEFAULT_SELL_FEE_PCT), note: '', date: getTodayDate(), matchMethod: form.matchMethod || 'lowest' });
       setSelectedTag('');
       setSelectedDiscipline('');
       if (onSuccess) onSuccess();
@@ -479,9 +480,22 @@ export default function SellForm({
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
                   Phí Bán (%)
                 </label>
-                <span className="text-[11px] text-gray-400 dark:text-slate-500">
-                  Trừ trực tiếp vào giá bán
-                </span>
+                <div className="flex items-center gap-1">
+                  {(Array.isArray(PRESET_FEE_PCTS) ? PRESET_FEE_PCTS : ['0', '0.1', '0.15']).map(pct => (
+                    <button
+                      key={pct}
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, feePct: pct }))}
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                        form.feePct === pct || (form.feePct !== '' && Number(form.feePct) === Number(pct))
+                          ? 'bg-rose-600 text-white border-rose-600'
+                          : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {pct}%
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="relative">
                 <input
@@ -491,7 +505,7 @@ export default function SellForm({
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder={String(DEFAULT_TRADE_FEE_PCT)}
+                  placeholder={String(DEFAULT_SELL_FEE_PCT)}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-extrabold text-gray-900 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 pr-9 transition-all"
                 />
                 <span className="absolute right-3.5 top-3 text-gray-400 text-xs font-bold">%</span>
@@ -847,7 +861,7 @@ export default function SellForm({
               <button
                 type="button"
                 onClick={() => {
-                  const feePct = form.feePct !== '' && !isNaN(Number(form.feePct)) ? Number(form.feePct) : 0.1;
+                  const feePct = form.feePct !== '' && !isNaN(Number(form.feePct)) ? Number(form.feePct) : DEFAULT_SELL_FEE_PCT;
                   const bePrice = feePct < 100 ? costPreview.avgCost / (1 - feePct / 100) : costPreview.avgCost;
                   setForm(f => ({ ...f, price: String((bePrice / 1000).toFixed(2)) }));
                 }}

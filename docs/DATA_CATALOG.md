@@ -1109,10 +1109,11 @@ Hệ thống định giá doanh nghiệp được thiết kế dưới dạng **
    - `goldArbitrage`: Thuế phí gia công vàng trong nước (1.5%) và ngưỡng chênh lệch giá vàng (high: 10%, low: 3%).
    - `marketValuationBands`: Cảnh báo z-score cực đoan (|z| > 2.0) và ngưỡng tích số Benjamin Graham (22.5).
    - `fallbackIndicators`: Giá trị dự phòng trung tâm cho 10 chỉ số vĩ mô khi thiếu dữ liệu nguồn sống (cpiYoY, interbankRate, sbvRefinancingRate, vn10yYield, us10yYield, usdvnd, oilBrent, pmi, creditGrowthYoY, gdpGrowthYoY).
-4. **`tradingAndFees` (Giao Dịch, Thuế, Phí)**:
-   - `personalIncomeTaxRate`: 0.001 (0.1% thuế TNCN khi bán CP).
-   - `defaultBrokerFeeRate`: 0.0015 (0.15% phí môi giới mặc định).
-   - `brokerFeePresets`: [0.0, 0.001, 0.0015].
+4. **`tradingAndFees` / `taxAndFees` (Giao Dịch, Thuế, Phí)**:
+   - `stockSaleTaxPct` / `personalIncomeTaxRate`: 0.1% (0.001 thuế TNCN khi bán CP).
+   - `defaultTradeFeePct`: 0.1% (phí giao dịch chung mặc định).
+   - `defaultSellFeePct` / `defaultBrokerFeeRate`: 0.15% (0.0015 phí bán cổ phiếu mặc định).
+   - `presetFeePcts` / `brokerFeePresets`: ["0", "0.1", "0.15"] (các mốc phí nhập nhanh giao dịch mua/bán).
    - `dividendCashTaxRate`: 0.05 (5.0% thuế TNCN cổ tức tiền mặt).
    - `riskFreeRateAnnual`: 0.045 (4.5% lãi suất tham chiếu Sharpe / Sortino).
    - `vnindexAnnualVolatility`: 18.0 (18% độ biến động chuẩn VN-Index).

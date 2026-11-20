@@ -66,7 +66,7 @@ router.post('/sell', asyncHandler(async (req, res) => {
   const sym = sanitizeSymbol(symbol);
   const qty = validatePositiveNumber(quantity, 'số lượng', { min: 0, max: 10_000_000, integer: true });
   const prc = validatePositiveNumber(price, 'giá', { min: 0, max: 2_000_000 });
-  const feePercent = validatePercentage(feePct, 'tỷ lệ phí', { min: 0, max: 10, defaultVal: 0.1 });
+  const feePercent = validatePercentage(feePct, 'tỷ lệ phí', { min: 0, max: 10, defaultVal: 0.15 });
   const sellDate = sanitizeDate(date, getTodayString());
 
   const userId = req.user?.id || 'demo';

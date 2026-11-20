@@ -1,4 +1,4 @@
-export function matchSellOrder(symbol, quantity, sellPrice, buyOrders, sellFeePct = 0.1, matchMethod = 'lowest') {
+export function matchSellOrder(symbol, quantity, sellPrice, buyOrders, sellFeePct = 0.15, matchMethod = 'lowest') {
   // Sắp xếp các lô mua còn hàng theo phương thức khớp lệnh được chọn
   const available = buyOrders
     .filter(b => b.symbol === symbol.toUpperCase() && b.remainingQty > 0)

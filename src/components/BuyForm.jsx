@@ -472,7 +472,7 @@ export default function BuyForm({
                     type="button"
                     onClick={() => setForm(f => ({ ...f, feePct: pct }))}
                     className={`text-[10px] font-bold px-1.5 py-0.5 rounded-lg border transition-all cursor-pointer ${
-                      form.feePct === pct
+                      form.feePct === pct || (form.feePct !== '' && Number(form.feePct) === Number(pct))
                         ? 'bg-emerald-600 text-white border-emerald-600'
                         : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700'
                     }`}
