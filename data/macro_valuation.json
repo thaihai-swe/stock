@@ -1,18 +1,18 @@
 {
   "_meta": {
-    "updatedAt": "2026-11-20T18:55:53Z",
+    "updatedAt": "2026-11-21T10:49:56Z",
     "source": "Vietstock, HNX, SBV, GICS Vietnam & TradingEconomics",
     "version": "4.0"
   },
   "aiInsight": {
     "headline": "Chiến Lược CIO: Pha Mở Rộng Tăng Trưởng — MUA GOM MẠNH",
-    "executiveSummary": "Môi trường vĩ mo Việt Nam đang trong pha Mở Rộng Tăng Trưởng với rủi ro hệ thống 43.4/100. P/E thị trường 10.53x tạo biên an toàn hấp dẫn cho chu kỳ đầu tư mới.",
+    "executiveSummary": "Môi trường vĩ mo Việt Nam đang trong pha Mở Rộng Tăng Trưởng với rủi ro hệ thống 44.1/100. P/E thị trường 10.53x tạo biên an toàn hấp dẫn cho chu kỳ đầu tư mới.",
     "macroRegimeAssessment": "Tỷ giá USD/VND và lãi suất liên ngân hàng duy trì trong biên độ điều hành mục tiêu của SBV, bảo vệ thanh khoản hệ thống.",
     "yieldCurveDiagnosis": "Đường cong lợi suất nằm ở trạng thái YC0 (NEUTRAL_MIXED). Phần bù rủi ro vốn chủ ERP thuận lợi cho cổ phiếu.",
     "sectorActionStrategy": "Ưu tiên nhóm ngành Sweet Spot (Ngân hàng, Bán lẻ, Công nghệ) có tăng trưởng lợi nhuận vững chắc.",
     "assetAllocationAdvice": "Duy trì tỷ trọng 70% Cổ phiếu cơ bản và 30% Tiền mặt linh hoạt.",
     "strategicTakeaways": [
-      "Định vị chu kỳ: Pha Mở Rộng Tăng Trưởng với rủi ro vĩ mô kiểm soát tốt (43.4/100).",
+      "Định vị chu kỳ: Pha Mở Rộng Tăng Trưởng với rủi ro vĩ mô kiểm soát tốt (44.1/100).",
       "P/E VN-Index 10.53x mở ra cơ hội tích lũy dài hạn.",
       "Kiểm soát tỷ trọng cổ phiếu chu kỳ."
     ],
@@ -27,7 +27,7 @@
     "status": "success",
     "provider": "offline-heuristic-engine",
     "model": "Quantitative Deterministic Heuristic v4.0",
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00"
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00"
   },
   "weeklyPulse": {
     "pulseHeadline": "Nhịp Đập Tuần: VN-Index tích lũy quanh vùng 1,250 điểm trong pha Mở Rộng Tăng Trưởng",
@@ -47,7 +47,7 @@
     "status": "success",
     "provider": "offline-heuristic-engine",
     "model": "Quantitative Deterministic Heuristic v4.0",
-    "updatedAt": "2026-11-14T10:05:48.580536+00:00"
+    "updatedAt": "2026-11-21T10:52:29.284613+00:00"
   },
   "yieldCurveMonitor": {
     "_meta": {
@@ -70,7 +70,7 @@
       "equityRiskPremium": 4.99,
       "earningsYield": 9.5,
       "vnCurvature": -0.56,
-      "usCurvature": 0.45,
+      "usCurvature": 0.48,
       "vnMoveFocus": "LONG (Đầu dài 10Y)",
       "favoredSectors": "Luân chuyển cân bằng (Neutral Rotation)"
     },
@@ -120,15 +120,15 @@
         "id": 4,
         "metric": "2Y / 5Y / 10Y Yields (Bộ 3 kỳ hạn TPCP)",
         "vn": "2.45% / 3.20% / 4.51%",
-        "us": "4.65% / 5.02% / 4.94%",
-        "delta": "Spread 10Y: -0.43%",
+        "us": "4.65% / 5.02% / 4.91%",
+        "delta": "Spread 10Y: -0.40%",
         "highlight": "normal"
       },
       {
         "id": 5,
         "metric": "Level / Slope / Curvature (Nelson-Siegel)",
         "vn": "3.39% / +2.06% / -0.56%",
-        "us": "4.87% / +0.29% / +0.45%",
+        "us": "4.86% / +0.26% / +0.48%",
         "delta": "Curv VN: -0.56%",
         "highlight": "normal"
       },
@@ -144,7 +144,7 @@
         "id": 7,
         "metric": "Segmented Slope (Độ dốc phân đoạn)",
         "vn": "2-5Y: +0.75% | 5-10Y: +1.31%",
-        "us": "2-5Y: +0.37% | 5-10Y: -0.08%",
+        "us": "2-5Y: +0.37% | 5-10Y: -0.11%",
         "delta": "10Y-2Y: +2.06%",
         "highlight": "normal"
       },
@@ -152,7 +152,7 @@
         "id": 8,
         "metric": "Curve Stress Score (Điểm căng thẳng đường cong)",
         "vn": "38.1/100 (MID)",
-        "us": "57.0/100 (MID)",
+        "us": "58.4/100 (MID)",
         "delta": "Ngưỡng rủi ro: 75/100",
         "highlight": "normal"
       },
@@ -176,7 +176,7 @@
         "id": 11,
         "metric": "4 Macro Spreads (4 Chênh lệch vĩ mô)",
         "vn": "LiqGap: +1.97% | 10Y-Policy: +0.01%",
-        "us": "Spread10Y: -0.43% | PolicyGap: -0.35%",
+        "us": "Spread10Y: -0.40% | PolicyGap: -0.35%",
         "delta": "Driver: LOCAL STRESS",
         "highlight": "warning"
       },
@@ -192,7 +192,7 @@
         "id": 13,
         "metric": "Funding Dynamics (Động lực thanh khoản hệ thống)",
         "vn": "Thanh khoản dồi dào | Gap: +1.97%",
-        "us": "Spread 2Y: -2.20% | USD/VND: 25,705",
+        "us": "Spread 2Y: -2.20% | USD/VND: 25,745",
         "delta": "LOCAL STRESS",
         "highlight": "normal"
       },
@@ -1341,88 +1341,6 @@
   "dualMatrix": {
     "items": [
       {
-        "code": "VNMAT",
-        "name": "Nguyên vật liệu",
-        "label": "Nguyên vật liệu & Thép",
-        "icon": "🧱",
-        "slug": "nguyen-vat-lieu",
-        "gicsGroup": "Materials",
-        "pe": 8.29,
-        "pb": 1.6,
-        "divYield": 4.56,
-        "marketCapBn": 496701.0,
-        "totalTickers": 259,
-        "netIncomeEstGrowth": 9.56,
-        "pricePctChg1d": -1.46,
-        "pricePctChg7d": -0.21,
-        "pricePctChgYtd": 0.29,
-        "pricePctChg1y": -10.2,
-        "pricePctChg3y": 57.26,
-        "valuationBand": "Rất rẻ",
-        "valuationBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
-        "valuationColor": "#10b981",
-        "macroScore": 3.0,
-        "macroAction": "TẬP TRUNG MUA",
-        "actionTag": "Overweight",
-        "rank": 1,
-        "decomposition": {
-          "interbank": 0.0,
-          "sbvRate": -0.0,
-          "cpi": 0.0,
-          "usdVnd": -0.0,
-          "oil": 1.5,
-          "pmi": 1.5
-        },
-        "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-        "badgeColor": "bg-emerald-500",
-        "quadrantKey": "sweet_spot",
-        "quadrantTitle": "Vùng Vàng Gom Mua (Sweet Spot)",
-        "quadrantIcon": "💎",
-        "quadrantBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
-        "recommendation": "Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động."
-      },
-      {
-        "code": "VNENE",
-        "name": "Năng lượng",
-        "label": "Năng lượng & Dầu khí",
-        "icon": "⚡",
-        "slug": "nang-luong",
-        "gicsGroup": "Energy",
-        "pe": 11.27,
-        "pb": 2.09,
-        "divYield": 2.28,
-        "marketCapBn": 470031.0,
-        "totalTickers": 82,
-        "netIncomeEstGrowth": 2.34,
-        "pricePctChg1d": -0.65,
-        "pricePctChg7d": -7.96,
-        "pricePctChgYtd": 30.21,
-        "pricePctChg1y": 38.99,
-        "pricePctChg3y": 51.96,
-        "valuationBand": "Rẻ",
-        "valuationBadge": "bg-teal-500/20 text-teal-400 border-teal-400/40",
-        "valuationColor": "#14b8a6",
-        "macroScore": 2.5,
-        "macroAction": "TẬP TRUNG MUA",
-        "actionTag": "Overweight",
-        "rank": 2,
-        "decomposition": {
-          "interbank": 0.0,
-          "sbvRate": -0.0,
-          "cpi": 0.0,
-          "usdVnd": 0.0,
-          "oil": 2.0,
-          "pmi": 0.5
-        },
-        "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-        "badgeColor": "bg-emerald-500",
-        "quadrantKey": "sweet_spot",
-        "quadrantTitle": "Vùng Vàng Gom Mua (Sweet Spot)",
-        "quadrantIcon": "💎",
-        "quadrantBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
-        "recommendation": "Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động."
-      },
-      {
         "code": "VNREAL",
         "name": "Bất động sản",
         "label": "Bất động sản & KCN",
@@ -1446,7 +1364,7 @@
         "macroScore": 2.0,
         "macroAction": "TẬP TRUNG MUA",
         "actionTag": "Overweight",
-        "rank": 3,
+        "rank": 1,
         "decomposition": {
           "interbank": -1.0,
           "sbvRate": 2.0,
@@ -1454,6 +1372,47 @@
           "usdVnd": -0.0,
           "oil": 0.0,
           "pmi": 1.0
+        },
+        "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
+        "badgeColor": "bg-emerald-500",
+        "quadrantKey": "sweet_spot",
+        "quadrantTitle": "Vùng Vàng Gom Mua (Sweet Spot)",
+        "quadrantIcon": "💎",
+        "quadrantBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
+        "recommendation": "Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động."
+      },
+      {
+        "code": "VNMAT",
+        "name": "Nguyên vật liệu",
+        "label": "Nguyên vật liệu & Thép",
+        "icon": "🧱",
+        "slug": "nguyen-vat-lieu",
+        "gicsGroup": "Materials",
+        "pe": 8.29,
+        "pb": 1.6,
+        "divYield": 4.56,
+        "marketCapBn": 496701.0,
+        "totalTickers": 259,
+        "netIncomeEstGrowth": 9.56,
+        "pricePctChg1d": -1.46,
+        "pricePctChg7d": -0.21,
+        "pricePctChgYtd": 0.29,
+        "pricePctChg1y": -10.2,
+        "pricePctChg3y": 57.26,
+        "valuationBand": "Rất rẻ",
+        "valuationBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
+        "valuationColor": "#10b981",
+        "macroScore": 1.5,
+        "macroAction": "TẬP TRUNG MUA",
+        "actionTag": "Overweight",
+        "rank": 3,
+        "decomposition": {
+          "interbank": 0.0,
+          "sbvRate": -0.0,
+          "cpi": 0.0,
+          "usdVnd": -0.0,
+          "oil": 0.0,
+          "pmi": 1.5
         },
         "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
         "badgeColor": "bg-emerald-500",
@@ -1487,7 +1446,7 @@
         "macroScore": 0.9,
         "macroAction": "KHẢ QUAN",
         "actionTag": "Accumulate",
-        "rank": 7,
+        "rank": 6,
         "decomposition": {
           "interbank": -1.8,
           "sbvRate": 1.5,
@@ -1495,6 +1454,47 @@
           "usdVnd": -0.0,
           "oil": 0.0,
           "pmi": 1.2
+        },
+        "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
+        "badgeColor": "bg-green-500",
+        "quadrantKey": "sweet_spot",
+        "quadrantTitle": "Vùng Vàng Gom Mua (Sweet Spot)",
+        "quadrantIcon": "💎",
+        "quadrantBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
+        "recommendation": "Thiên thời hội tụ: Định giá rẻ kết hợp vĩ mô ủng hộ. Ưu tiên giải ngân chủ động."
+      },
+      {
+        "code": "VNENE",
+        "name": "Năng lượng",
+        "label": "Năng lượng & Dầu khí",
+        "icon": "⚡",
+        "slug": "nang-luong",
+        "gicsGroup": "Energy",
+        "pe": 11.27,
+        "pb": 2.09,
+        "divYield": 2.28,
+        "marketCapBn": 470031.0,
+        "totalTickers": 82,
+        "netIncomeEstGrowth": 2.34,
+        "pricePctChg1d": -0.65,
+        "pricePctChg7d": -7.96,
+        "pricePctChgYtd": 30.21,
+        "pricePctChg1y": 38.99,
+        "pricePctChg3y": 51.96,
+        "valuationBand": "Rẻ",
+        "valuationBadge": "bg-teal-500/20 text-teal-400 border-teal-400/40",
+        "valuationColor": "#14b8a6",
+        "macroScore": 0.5,
+        "macroAction": "KHẢ QUAN",
+        "actionTag": "Accumulate",
+        "rank": 7,
+        "decomposition": {
+          "interbank": 0.0,
+          "sbvRate": -0.0,
+          "cpi": 0.0,
+          "usdVnd": 0.0,
+          "oil": 0.0,
+          "pmi": 0.5
         },
         "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
         "badgeColor": "bg-green-500",
@@ -1566,20 +1566,20 @@
         "valuationBand": "Hợp lý",
         "valuationBadge": "bg-blue-500/20 text-blue-400 border-blue-400/40",
         "valuationColor": "#3b82f6",
-        "macroScore": 1.0,
-        "macroAction": "KHẢ QUAN",
-        "actionTag": "Accumulate",
-        "rank": 4,
+        "macroScore": 1.5,
+        "macroAction": "TẬP TRUNG MUA",
+        "actionTag": "Overweight",
+        "rank": 2,
         "decomposition": {
           "interbank": -1.0,
           "sbvRate": 1.0,
           "cpi": -0.0,
           "usdVnd": -0.0,
-          "oil": -0.5,
+          "oil": -0.0,
           "pmi": 1.5
         },
-        "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
-        "badgeColor": "bg-green-500",
+        "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
+        "badgeColor": "bg-emerald-500",
         "quadrantKey": "defense",
         "quadrantTitle": "Vùng Phòng Thủ (Defense)",
         "quadrantIcon": "🛡️",
@@ -1610,7 +1610,7 @@
         "macroScore": 1.0,
         "macroAction": "KHẢ QUAN",
         "actionTag": "Accumulate",
-        "rank": 5,
+        "rank": 4,
         "decomposition": {
           "interbank": -0.5,
           "sbvRate": 0.5,
@@ -1651,7 +1651,7 @@
         "macroScore": 1.0,
         "macroAction": "KHẢ QUAN",
         "actionTag": "Accumulate",
-        "rank": 6,
+        "rank": 5,
         "decomposition": {
           "interbank": 0.0,
           "sbvRate": -0.0,
@@ -1730,20 +1730,20 @@
         "valuationBand": "Rất rẻ",
         "valuationBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
         "valuationColor": "#10b981",
-        "macroScore": -1.5,
-        "macroAction": "THẬN TRỌNG",
-        "actionTag": "Underweight",
+        "macroScore": -0.5,
+        "macroAction": "TRUNG LẬP",
+        "actionTag": "Neutral",
         "rank": 10,
         "decomposition": {
           "interbank": -1.0,
           "sbvRate": 1.0,
           "cpi": 0.0,
           "usdVnd": 0.0,
-          "oil": -1.0,
+          "oil": -0.0,
           "pmi": -0.5
         },
-        "colorClass": "text-amber-400 bg-amber-500/15 border-amber-500/30",
-        "badgeColor": "bg-amber-500",
+        "colorClass": "text-gray-300 bg-gray-500/10 border-gray-500/20",
+        "badgeColor": "bg-gray-400",
         "quadrantKey": "value_trap",
         "quadrantTitle": "Vùng Bẫy Giá Rẻ (Value Trap)",
         "quadrantIcon": "⚠️",
@@ -1777,7 +1777,7 @@
           "macroScore": 0.9,
           "macroAction": "KHẢ QUAN",
           "actionTag": "Accumulate",
-          "rank": 7,
+          "rank": 6,
           "decomposition": {
             "interbank": -1.8,
             "sbvRate": 1.5,
@@ -1818,7 +1818,7 @@
           "macroScore": 2.0,
           "macroAction": "TẬP TRUNG MUA",
           "actionTag": "Overweight",
-          "rank": 3,
+          "rank": 1,
           "decomposition": {
             "interbank": -1.0,
             "sbvRate": 2.0,
@@ -1897,16 +1897,16 @@
           "valuationBand": "Rất rẻ",
           "valuationBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
           "valuationColor": "#10b981",
-          "macroScore": 3.0,
+          "macroScore": 1.5,
           "macroAction": "TẬP TRUNG MUA",
           "actionTag": "Overweight",
-          "rank": 1,
+          "rank": 3,
           "decomposition": {
             "interbank": 0.0,
             "sbvRate": -0.0,
             "cpi": 0.0,
             "usdVnd": -0.0,
-            "oil": 1.5,
+            "oil": 0.0,
             "pmi": 1.5
           },
           "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
@@ -1938,20 +1938,20 @@
           "valuationBand": "Rẻ",
           "valuationBadge": "bg-teal-500/20 text-teal-400 border-teal-400/40",
           "valuationColor": "#14b8a6",
-          "macroScore": 2.5,
-          "macroAction": "TẬP TRUNG MUA",
-          "actionTag": "Overweight",
-          "rank": 2,
+          "macroScore": 0.5,
+          "macroAction": "KHẢ QUAN",
+          "actionTag": "Accumulate",
+          "rank": 7,
           "decomposition": {
             "interbank": 0.0,
             "sbvRate": -0.0,
             "cpi": 0.0,
             "usdVnd": 0.0,
-            "oil": 2.0,
+            "oil": 0.0,
             "pmi": 0.5
           },
-          "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-          "badgeColor": "bg-emerald-500",
+          "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
+          "badgeColor": "bg-green-500",
           "quadrantKey": "sweet_spot",
           "quadrantTitle": "Vùng Vàng Gom Mua (Sweet Spot)",
           "quadrantIcon": "💎",
@@ -1981,20 +1981,20 @@
           "valuationBand": "Rất rẻ",
           "valuationBadge": "bg-emerald-500/20 text-emerald-400 border-emerald-400/40",
           "valuationColor": "#10b981",
-          "macroScore": -1.5,
-          "macroAction": "THẬN TRỌNG",
-          "actionTag": "Underweight",
+          "macroScore": -0.5,
+          "macroAction": "TRUNG LẬP",
+          "actionTag": "Neutral",
           "rank": 10,
           "decomposition": {
             "interbank": -1.0,
             "sbvRate": 1.0,
             "cpi": 0.0,
             "usdVnd": 0.0,
-            "oil": -1.0,
+            "oil": -0.0,
             "pmi": -0.5
           },
-          "colorClass": "text-amber-400 bg-amber-500/15 border-amber-500/30",
-          "badgeColor": "bg-amber-500",
+          "colorClass": "text-gray-300 bg-gray-500/10 border-gray-500/20",
+          "badgeColor": "bg-gray-400",
           "quadrantKey": "value_trap",
           "quadrantTitle": "Vùng Bẫy Giá Rẻ (Value Trap)",
           "quadrantIcon": "⚠️",
@@ -2027,7 +2027,7 @@
           "macroScore": 1.0,
           "macroAction": "KHẢ QUAN",
           "actionTag": "Accumulate",
-          "rank": 6,
+          "rank": 5,
           "decomposition": {
             "interbank": 0.0,
             "sbvRate": -0.0,
@@ -2067,20 +2067,20 @@
           "valuationBand": "Hợp lý",
           "valuationBadge": "bg-blue-500/20 text-blue-400 border-blue-400/40",
           "valuationColor": "#3b82f6",
-          "macroScore": 1.0,
-          "macroAction": "KHẢ QUAN",
-          "actionTag": "Accumulate",
-          "rank": 4,
+          "macroScore": 1.5,
+          "macroAction": "TẬP TRUNG MUA",
+          "actionTag": "Overweight",
+          "rank": 2,
           "decomposition": {
             "interbank": -1.0,
             "sbvRate": 1.0,
             "cpi": -0.0,
             "usdVnd": -0.0,
-            "oil": -0.5,
+            "oil": -0.0,
             "pmi": 1.5
           },
-          "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
-          "badgeColor": "bg-green-500",
+          "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
+          "badgeColor": "bg-emerald-500",
           "quadrantKey": "defense",
           "quadrantTitle": "Vùng Phòng Thủ (Defense)",
           "quadrantIcon": "🛡️",
@@ -2111,7 +2111,7 @@
           "macroScore": 1.0,
           "macroAction": "KHẢ QUAN",
           "actionTag": "Accumulate",
-          "rank": 5,
+          "rank": 4,
           "decomposition": {
             "interbank": -0.5,
             "sbvRate": 0.5,
@@ -2188,7 +2188,7 @@
       {
         "level": "Cao",
         "title": "Áp Lực Tỷ Giá USD/VND & Can Thiệp Tiền Tệ",
-        "risk": "Tỷ giá USD/VND neo cao ở mức 25,705 đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
+        "risk": "Tỷ giá USD/VND neo cao ở mức 25,745 đ/USD, gây áp lực lên thanh khoản tiền đồng và kích hoạt khối ngoại bán ròng.",
         "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
       },
       {
@@ -2206,7 +2206,7 @@
       {
         "level": "Cao",
         "title": "Cú Sốc Tỷ Giá Ngoại Vi (External Shock)",
-        "risk": "Tỷ giá USD/VND (25,705) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.43%). SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng.",
+        "risk": "Tỷ giá USD/VND (25,745) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.40%). SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng.",
         "color": "text-rose-400 bg-rose-500/10 border-rose-500/30"
       }
     ],
@@ -2238,7 +2238,7 @@
     ],
     "keyTakeaways": [
       "⭐ Insight Tổng Hợp: Kinh tế Việt Nam đang trong pha 'Mở Rộng Tăng Trưởng' với điểm rủi ro vĩ mô 44/100. P/E thị trường 10.53x phản ánh vùng định giá hấp dẫn cho chu kỳ đầu tư mới.",
-      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,705) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
+      "Rủi ro lớn nhất: Căng thẳng tỷ giá USD/VND (25,745) và thanh khoản liên ngân hàng (6.47%) đòi hỏi kiểm soát chặt chẽ tỷ trọng đòn bẩy margin.",
       "Cơ hội lớn nhất: Ưu tiên tích lũy cổ phiếu giá trị, tập trung vào nhóm cổ phiếu hưởng lợi vĩ mô (Ngân hàng, Chứng khoán, Công nghệ) và nhóm định giá rẻ vượt trội (VN Diamond, VN Midcap)."
     ]
   },
@@ -2299,16 +2299,16 @@
   "macro": {
     "vn10yYield": 4.51,
     "sbvRefinancingRate": 4.5,
-    "us10yYield": 4.94,
-    "usdVndRate": 25705.0,
-    "goldWorld": 3506.9,
-    "oilBrent": 89.34,
-    "dxy": 103.88,
-    "sjcGoldBuy": 129.2,
-    "sjcGoldSell": 134.2,
-    "pnjGoldBuy": 127.8,
-    "pnjGoldSell": 132.0,
-    "pnjUpdateDate": "20/11/2026 16:29:04",
+    "us10yYield": 4.91,
+    "usdVndRate": 25745.0,
+    "goldWorld": 3515.4,
+    "oilBrent": 92.57,
+    "dxy": 103.81,
+    "sjcGoldBuy": 128.5,
+    "sjcGoldSell": 133.5,
+    "pnjGoldBuy": 126.0,
+    "pnjGoldSell": 131.5,
+    "pnjUpdateDate": "21/11/2026 08:20:12",
     "inflationCpi": 5.08,
     "coreInflation": 4.45,
     "interbankOvernight": 6.47,
@@ -2365,17 +2365,17 @@
   },
   "yieldCurveAnalysis": {
     "vn10y": 4.51,
-    "us10y": 4.94,
+    "us10y": 4.91,
     "sbvRefinancingRate": 4.5,
     "longShortSpread": 0.01,
-    "crossCountrySpread": -0.43,
+    "crossCountrySpread": -0.4,
     "inversionWarning": false,
     "recessionLead": false,
     "ycRegime": "Neutral",
     "ycRegimeVi": "Cân Bằng Chu Kỳ",
     "regimeBadge": "bg-blue-500/20 text-blue-400 border-blue-500/30",
     "ycStressIndex": 65.7,
-    "assessment": "Lợi suất TPCP 10Y (4.51%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = +0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.43%. Độ dốc đường cong duy trì trong trạng thái bình thường."
+    "assessment": "Lợi suất TPCP 10Y (4.51%) so với lãi suất tái cấp vốn SBV (4.50%) tạo độ dốc LSS = +0.01%. Chênh lệch TPCP Việt Nam so với Mỹ 10Y là -0.40%. Độ dốc đường cong duy trì trong trạng thái bình thường."
   },
   "scenarioMatrix": {
     "base": {
@@ -2442,16 +2442,16 @@
       "signal": "CAUTION",
       "badge": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
       "severity": "MEDIUM",
-      "trigger": "Tỷ giá USD/VND (25,705) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.43%).",
+      "trigger": "Tỷ giá USD/VND (25,745) neo cao hoặc chênh lệch lợi suất TPCP VN - Mỹ âm sâu (-0.40%).",
       "impact": "SBV chịu áp lực hút ròng tiền đồng qua tín phiếu hoặc can thiệp ngoại tệ, kích hoạt khối ngoại bán ròng."
     }
   ],
   "hasActiveTailRisk": true,
   "criticalTailRiskCount": 0,
   "leadLagDivergence": {
-    "leadingPct": 54.6,
+    "leadingPct": 55.0,
     "laggingPct": 40.1,
-    "divergence": 14.5,
+    "divergence": 14.9,
     "signal": "➡️ ALIGNED",
     "signalVi": "Đồng Pha Ổn Định (Aligned)",
     "badge": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
@@ -2467,7 +2467,7 @@
     "signalClarity": 70.0
   },
   "riskAssessment": {
-    "riskScore": 43.9,
+    "riskScore": 44.1,
     "riskBucket": "B2",
     "riskBucketLabel": "Trung Bình (Cần theo dõi cẩn trọng)",
     "riskBucketColor": "text-amber-400",
@@ -2475,54 +2475,10 @@
       "monetary": 36.1,
       "growth": 26.9,
       "price": 64.4,
-      "external": 54.2
+      "external": 54.8
     }
   },
   "sectorRotation": [
-    {
-      "key": "VNMAT",
-      "code": "VNMAT",
-      "name": "Nguyên Vật Liệu",
-      "label": "Nguyên vật liệu & Thép",
-      "icon": "🧱",
-      "gicsGroup": "Materials",
-      "netScore": 3.0,
-      "action": "TẬP TRUNG MUA",
-      "actionTag": "Overweight",
-      "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-      "badgeColor": "bg-emerald-500",
-      "decomposition": {
-        "interbank": 0.0,
-        "sbvRate": -0.0,
-        "cpi": 0.0,
-        "usdVnd": -0.0,
-        "oil": 1.5,
-        "pmi": 1.5
-      },
-      "rank": 1
-    },
-    {
-      "key": "VNENE",
-      "code": "VNENE",
-      "name": "Năng Lượng",
-      "label": "Năng lượng & Dầu khí",
-      "icon": "⚡",
-      "gicsGroup": "Energy",
-      "netScore": 2.5,
-      "action": "TẬP TRUNG MUA",
-      "actionTag": "Overweight",
-      "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-      "badgeColor": "bg-emerald-500",
-      "decomposition": {
-        "interbank": 0.0,
-        "sbvRate": -0.0,
-        "cpi": 0.0,
-        "usdVnd": 0.0,
-        "oil": 2.0,
-        "pmi": 0.5
-      },
-      "rank": 2
-    },
     {
       "key": "VNREAL",
       "code": "VNREAL",
@@ -2543,7 +2499,7 @@
         "oil": 0.0,
         "pmi": 1.0
       },
-      "rank": 3
+      "rank": 1
     },
     {
       "key": "VNIND",
@@ -2552,20 +2508,42 @@
       "label": "Công nghiệp & Xây dựng",
       "icon": "🏗️",
       "gicsGroup": "Industrials",
-      "netScore": 1.0,
-      "action": "KHẢ QUAN",
-      "actionTag": "Accumulate",
-      "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
-      "badgeColor": "bg-green-500",
+      "netScore": 1.5,
+      "action": "TẬP TRUNG MUA",
+      "actionTag": "Overweight",
+      "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
+      "badgeColor": "bg-emerald-500",
       "decomposition": {
         "interbank": -1.0,
         "sbvRate": 1.0,
         "cpi": -0.0,
         "usdVnd": -0.0,
-        "oil": -0.5,
+        "oil": -0.0,
         "pmi": 1.5
       },
-      "rank": 4
+      "rank": 2
+    },
+    {
+      "key": "VNMAT",
+      "code": "VNMAT",
+      "name": "Nguyên Vật Liệu",
+      "label": "Nguyên vật liệu & Thép",
+      "icon": "🧱",
+      "gicsGroup": "Materials",
+      "netScore": 1.5,
+      "action": "TẬP TRUNG MUA",
+      "actionTag": "Overweight",
+      "colorClass": "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
+      "badgeColor": "bg-emerald-500",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": 0.0,
+        "usdVnd": -0.0,
+        "oil": 0.0,
+        "pmi": 1.5
+      },
+      "rank": 3
     },
     {
       "key": "VNDISCR",
@@ -2587,7 +2565,7 @@
         "oil": 0.0,
         "pmi": 1.0
       },
-      "rank": 5
+      "rank": 4
     },
     {
       "key": "VNIT",
@@ -2609,7 +2587,7 @@
         "oil": 0.0,
         "pmi": 1.0
       },
-      "rank": 6
+      "rank": 5
     },
     {
       "key": "VNFIN",
@@ -2630,6 +2608,28 @@
         "usdVnd": -0.0,
         "oil": 0.0,
         "pmi": 1.2
+      },
+      "rank": 6
+    },
+    {
+      "key": "VNENE",
+      "code": "VNENE",
+      "name": "Năng Lượng",
+      "label": "Năng lượng & Dầu khí",
+      "icon": "⚡",
+      "gicsGroup": "Energy",
+      "netScore": 0.5,
+      "action": "KHẢ QUAN",
+      "actionTag": "Accumulate",
+      "colorClass": "text-green-400 bg-green-500/10 border-green-500/20",
+      "badgeColor": "bg-green-500",
+      "decomposition": {
+        "interbank": 0.0,
+        "sbvRate": -0.0,
+        "cpi": 0.0,
+        "usdVnd": 0.0,
+        "oil": 0.0,
+        "pmi": 0.5
       },
       "rank": 7
     },
@@ -2684,17 +2684,17 @@
       "label": "Tiện ích (Điện, Nước, Khí)",
       "icon": "🚰",
       "gicsGroup": "Utilities",
-      "netScore": -1.5,
-      "action": "THẬN TRỌNG",
-      "actionTag": "Underweight",
-      "colorClass": "text-amber-400 bg-amber-500/15 border-amber-500/30",
-      "badgeColor": "bg-amber-500",
+      "netScore": -0.5,
+      "action": "TRUNG LẬP",
+      "actionTag": "Neutral",
+      "colorClass": "text-gray-300 bg-gray-500/10 border-gray-500/20",
+      "badgeColor": "bg-gray-400",
       "decomposition": {
         "interbank": -1.0,
         "sbvRate": 1.0,
         "cpi": 0.0,
         "usdVnd": 0.0,
-        "oil": -1.0,
+        "oil": -0.0,
         "pmi": -0.5
       },
       "rank": 10
@@ -2733,7 +2733,7 @@
       {
         "key": "fx",
         "name": "Tỷ Giá USD/VND",
-        "val": "25,705",
+        "val": "25,745",
         "status": "neutral",
         "lead": "Tỷ giá ổn định giảm áp lực can thiệp hút ròng của Ngân hàng Nhà nước."
       },
@@ -2818,19 +2818,19 @@
     }
   },
   "goldAdvisor": {
-    "worldConvertedVnd": 108683426,
-    "worldPriceUsd": 3506.9,
-    "spreadPct": 23.48,
-    "sjcSpreadPct": 23.48,
-    "pnjSpreadPct": 21.45,
-    "sjcBuy": 129.2,
-    "sjcSell": 134.2,
-    "pnjBuy": 127.8,
-    "pnjSell": 132.0,
-    "updatedAt": "20/11/2026 16:29:04",
+    "worldConvertedVnd": 109116386,
+    "worldPriceUsd": 3515.4,
+    "spreadPct": 22.35,
+    "sjcSpreadPct": 22.35,
+    "pnjSpreadPct": 20.51,
+    "sjcBuy": 128.5,
+    "sjcSell": 133.5,
+    "pnjBuy": 126.0,
+    "pnjSell": 131.5,
+    "updatedAt": "21/11/2026 08:20:12",
     "action": "MUA PHÒNG THỦ",
     "sizeHint": "5-10% danh mục",
-    "reason": "Chênh lệch SJC vs Thế giới rất lớn (23.48%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
+    "reason": "Chênh lệch SJC vs Thế giới rất lớn (22.35%). Biểu thị lực cầu nội địa phòng thủ tỷ giá gia tăng."
   },
   "tradingEconomics": {
     "_meta": {
@@ -3976,7 +3976,7 @@
   },
   "marketValuationHistory": {
     "_meta": {
-      "updatedAt": "2026-11-20T18:55:55.861109",
+      "updatedAt": "2026-11-21T10:49:57.885660",
       "sheetId": "1TdXzsXN_bMQKHLN0Zqc8t4lS-59us02Btr_SLc0AgpQ",
       "source": "Google Sheets (Simply Wall St Vietnam)",
       "periods": [
@@ -7017,15 +7017,15 @@
     "status": "success",
     "provider": "offline-heuristic-engine",
     "model": "Quantitative Deterministic Heuristic v4.0",
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00"
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00"
   },
   "aiScenarios": {
-    "marketVerdict": "VN-Index dao động tích lũy quanh vùng 1,735 điểm (P/E 10.5x), phân hóa theo năng lực tăng trưởng EPS thực tế của từng nhóm ngành.",
+    "marketVerdict": "VN-Index dao động tích lũy quanh vùng 1,689 điểm (P/E 10.5x), phân hóa theo năng lực tăng trưởng EPS thực tế của từng nhóm ngành.",
     "scenarios": {
       "base": {
         "name": "Kịch Bản Cơ Sở (Base Case)",
         "probability": 50,
-        "vnIndexTargetRange": "1,700 - 1,804",
+        "vnIndexTargetRange": "1,655 - 1,756",
         "targetPeRange": "11.5x - 11.3x",
         "projectedEpsGrowth": "+10.0% – 12.5%",
         "macroCatalysts": [
@@ -7060,7 +7060,7 @@
       "bull": {
         "name": "Kịch Bản Tích Cực (Bull Case)",
         "probability": 25,
-        "vnIndexTargetRange": "1,787 - 1,908",
+        "vnIndexTargetRange": "1,739 - 1,858",
         "targetPeRange": "11.3x - 12.7x",
         "projectedEpsGrowth": "+14.0% – 18.0%",
         "macroCatalysts": [
@@ -7095,7 +7095,7 @@
       "bear": {
         "name": "Kịch Bản Thận Trọng (Bear Case)",
         "probability": 25,
-        "vnIndexTargetRange": "1,561 - 1,683",
+        "vnIndexTargetRange": "1,520 - 1,638",
         "targetPeRange": "11.2x - 12.3x",
         "projectedEpsGrowth": "+2.0% – 5.0%",
         "macroCatalysts": [
@@ -7132,7 +7132,7 @@
         "actionSummary": "Nâng tỷ trọng tiền mặt và tài sản phòng thủ, kiên nhẫn chờ đợi điểm cân bằng định giá sâu."
       }
     },
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiClockDynamics": {
@@ -7156,7 +7156,7 @@
         "Vật Liệu Nhạy Giá"
       ]
     },
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiYieldCurveDiagnosis": {
@@ -7164,7 +7164,7 @@
     "bankingLiquidityImpact": "Thanh khoản hệ thống ngân hàng được hỗ trợ bởi các công cụ OMO của SBV, biên lãi ròng NIM có dư địa phục hồi nhẹ.",
     "corporateDebtStress": "Áp lực đáo hạn trái phiếu doanh nghiệp đang được các ngân hàng thương mại tái cơ cấu có chọn lọc, rủi ro vỡ nợ hệ thống ở mức thấp.",
     "equityMarketSignal": "Lợi tức thu nhập E/P thị trường cổ phiếu (~7.4%) duy trì mức chênh lệch dương hấp dẫn so với lợi suất TPCP 10 năm (~4.4%).",
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiMultiAssetStrategy": {
@@ -7177,7 +7177,7 @@
       "cash": 10,
       "gold": 5
     },
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiStyleRotation": {
@@ -7185,13 +7185,52 @@
     "largeCapVsMidcap": "Nhóm Large-Cap VN30 đóng vai trò giữ nhịp chỉ số trong khi VN Midcap có sự phân hóa cao, chỉ những mã có câu chuyện tăng trưởng EPS riêng biệt mới thu hút dòng tiền.",
     "diamondForeignRoom": "Các cổ phiếu rổ VN Diamond tiếp tục được định giá cao hơn mặt bằng chung nhờ tỷ lệ sở hữu của khối ngoại luôn chạm trần (FSR).",
     "actionableStrategy": "Chiến lược phân bổ: 50% VN30 đầu ngành, 30% VN Diamond hết room ngoại và 20% VN Midcap chọn lọc.",
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
     "provider": "offline-heuristic-engine"
   },
   "aiTailRiskAnalysis": {
     "contingencyPlan": "Duy trì kỷ luật dừng lỗ tại các ngưỡng hỗ trợ kỹ thuật trọng yếu và chủ động hạ tỷ lệ margin khi thị trường xuất hiện tín hiệu căng thẳng thanh khoản liên ngân hàng.",
     "contagionChain": "Nếu tỷ giá USD/VND vượt đỉnh, áp lực rút vốn ròng của khối ngoại sẽ tác động trực tiếp lên nhóm cổ phiếu vốn hóa lớn VN30, sau đó lan tỏa sang tâm lý thị trường chung.",
-    "updatedAt": "2026-11-14T10:01:34.398942+00:00",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
+    "provider": "offline-heuristic-engine"
+  },
+  "aiSbvOmoDiagnosis": {
+    "liquidityPosture": "TIGHTENING",
+    "headline": "Áp Lực Tỷ Giá Buộc SBV Duy Trì Lãi Suất Liên Ngân Hàng Neo Cao",
+    "strategicNarrative": "Chênh lệch lãi suất USD-VND và tỷ giá neo cao khiến SBV duy trì trạng thái kiểm soát thanh khoản liên ngân hàng thận trọng qua kênh OMO.",
+    "bankingNIMImpact": "Chi phí vốn thị trường 2 tăng nhẹ tạo sự phân hóa rõ nét giữa ngân hàng có CASA cao và các ngân hàng nhỏ.",
+    "equityMarketVerdict": "Dòng tiền trên TTCK sẽ phân hóa mạnh, ưu tiên các cổ phiếu có lượng tiền mặt ròng dồi dào và đòn bẩy thấp.",
+    "actionableAdvice": "Duy trì tỷ trọng cổ phiếu ở mức 50-65%, hạn chế sử dụng Margin cao trong giai đoạn thanh khoản liên ngân hàng neo cao.",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
+    "provider": "offline-heuristic-engine"
+  },
+  "aiInflationDiagnosis": {
+    "cpiAssessment": "Lạm phát CPI ở mức 3.80% YoY, phản ánh áp lực chi phí đẩy từ nhiên liệu và dịch vụ công.",
+    "purchasingPowerVerdict": "Lãi suất tiền gửi tiết kiệm thực tế bị bào mòn đáng kể sau khi trừ lạm phát, việc nắm giữ tiền mặt kéo dài gây suy giảm sức mua.",
+    "assetProtectionRanking": [
+      {
+        "asset": "Cổ Phiếu Cơ Bản Tốt",
+        "rating": "Tối Ưu",
+        "note": "Khả năng chuyển giao chi phí lạm phát vào giá bán giúp bảo toàn EPS."
+      },
+      {
+        "asset": "Vàng SJC / PNJ",
+        "rating": "Khá Tốt",
+        "note": "Kênh trú ẩn an toàn truyền thống chống mất giá tiền tệ."
+      },
+      {
+        "asset": "Trái Phiếu DN Chất Lượng",
+        "rating": "Trung Bình",
+        "note": "Lợi suất cố định bù đắp vừa đủ lạm phát."
+      },
+      {
+        "asset": "Tiền Gửi Ngân Hàng",
+        "rating": "Yếu",
+        "note": "Lãi suất thực sau lạm phát chỉ tiệm cận 0 - 0.5%."
+      }
+    ],
+    "hedgingStrategy": "Phân bổ tối thiểu 60-70% vốn vào cổ phiếu chất lượng cao và Vàng vật chất để bảo vệ sức mua thực tế vượt trên lạm phát.",
+    "updatedAt": "2026-11-21T10:50:43.514361+00:00",
     "provider": "offline-heuristic-engine"
   }
 }
