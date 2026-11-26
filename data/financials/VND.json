@@ -2,45 +2,45 @@
   "_meta": {
     "symbol": "VND",
     "companyName": "VNDirect Securities Corp.",
-    "updatedAt": "2026-11-25T20:19:55Z",
+    "updatedAt": "2026-11-26T19:56:25Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 12109,
+    "grahamNumber": 12028,
     "ddmTarget": 7962,
     "peTarget": 15169,
     "pbTarget": 7148,
     "evEbitdaFairPrice": null,
     "pcfFairPrice": 60041,
     "psFairPrice": 2356,
-    "consensusFairValue": 9919,
-    "marginOfSafety": -41.1,
-    "upside": -29.1,
-    "consensusDiffPercent": -29.1,
+    "consensusFairValue": 8299,
+    "marginOfSafety": -60.9,
+    "upside": -37.8,
+    "consensusDiffPercent": -37.8,
     "valuationRating": "🔴 SELL",
     "valuationRatingText": "Định giá đắt đỏ (> 15% Fair Value)",
     "valuationRatingBadge": "bg-rose-600 text-white",
-    "validModelsCount": 6,
+    "validModelsCount": 5,
     "models10": [
       {
         "id": "graham",
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 12109,
-        "targetPrice": 12109,
-        "diffPercent": -13.5,
+        "value": 12028,
+        "targetPrice": 12028,
+        "diffPercent": -9.9,
         "weight": 0.017,
         "baseWeight": 0.05,
         "suitability": 0.35,
         "suitabilityNote": "Ít phù hợp NH/CK",
         "isOutlier": false,
-        "outlierGapPct": 20.7,
+        "outlierGapPct": 20.3,
         "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-        "formulaDetail": "V = 1,379 × (7.0x + 0.8 × 3.5%) × (4.48% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.896",
+        "formulaDetail": "V = 1,379 × (7.0x + 0.8 × 3.5%) × (4.45% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.890",
         "parameters": {
           "eps": 1379.0,
           "epsAvg": 1158,
@@ -48,9 +48,9 @@
           "peMedian": 11.0,
           "hs": 0.8,
           "gCagr": 3.5,
-          "constantVn": 4.48,
+          "constantVn": 4.45,
           "yVn": 5.0,
-          "vn10yYield": 4.48
+          "vn10yYield": 4.45
         },
         "statusNote": "Ít phù hợp NH/CK"
       },
@@ -61,13 +61,13 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 15169,
         "targetPrice": 15169,
-        "diffPercent": 8.3,
+        "diffPercent": 13.6,
         "weight": 0.13,
         "baseWeight": 0.13,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 51.2,
+        "outlierGapPct": 51.8,
         "formula": "EPS × P/E Chuẩn Hóa (P50 Chu Kỳ)",
         "formulaDetail": "V = 1,379 × 11.0x (Trung vị 4 năm | PE Trung bình: 11.6x)",
         "parameters": {
@@ -87,13 +87,13 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 7148,
         "targetPrice": 7148,
-        "diffPercent": -48.9,
+        "diffPercent": -46.5,
         "weight": 0.22,
         "baseWeight": 0.22,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 28.8,
+        "outlierGapPct": 28.5,
         "formula": "BVPS × [(ROE - g)/(r - g)]",
         "formulaDetail": "V = 14,295 × Gordon Multiple",
         "parameters": {
@@ -116,7 +116,7 @@
         "cleanName": "DCF Đa Giai Đoạn",
         "value": 134939,
         "targetPrice": 134939,
-        "diffPercent": 863.9,
+        "diffPercent": 910.8,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.0,
@@ -141,13 +141,13 @@
         "cleanName": "Chiết Khấu DDM",
         "value": 7962,
         "targetPrice": 7962,
-        "diffPercent": -43.1,
+        "diffPercent": -40.4,
         "weight": 0.25,
         "baseWeight": 0.25,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 20.7,
+        "outlierGapPct": 20.3,
         "formula": "[DPS × (1 + g)] / (r - g) × Fade",
         "formulaDetail": "DPS=500 đ, r=10.0%, g=3.5%",
         "parameters": {
@@ -164,7 +164,7 @@
         "cleanName": "FCFF Doanh Nghiệp",
         "value": 125131,
         "targetPrice": 125131,
-        "diffPercent": 793.8,
+        "diffPercent": 837.3,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.0,
@@ -198,7 +198,7 @@
         "cleanName": "FCFE Cổ Đông",
         "value": 110609,
         "targetPrice": 110609,
-        "diffPercent": 690.1,
+        "diffPercent": 728.5,
         "weight": 0.0,
         "baseWeight": 0.0,
         "suitability": 0.0,
@@ -222,13 +222,13 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 5854,
         "targetPrice": 5854,
-        "diffPercent": -58.2,
+        "diffPercent": -56.1,
         "weight": 0.18,
         "baseWeight": 0.18,
         "suitability": 1.0,
         "suitabilityNote": "Phù hợp",
         "isOutlier": false,
-        "outlierGapPct": 41.7,
+        "outlierGapPct": 41.4,
         "formula": "BVPS + Σ [BVPS × (ROE - r) / (1+r)^t] + TV",
         "formulaDetail": "BVPS=14,295 đ, ROE=6.0%, CoE=10.0%",
         "parameters": {
@@ -247,13 +247,13 @@
         "cleanName": "Book NAV / P/B Chuẩn Hóa",
         "value": 16010,
         "targetPrice": 16010,
-        "diffPercent": 14.4,
+        "diffPercent": 19.9,
         "weight": 0.17,
         "baseWeight": 0.17,
         "suitability": 1.0,
         "suitabilityNote": "Trọng yếu ngành Tài sản/TC",
-        "isOutlier": false,
-        "outlierGapPct": 59.5,
+        "isOutlier": true,
+        "outlierGapPct": 60.2,
         "formula": "BVPS × P/B Chuẩn Hóa (P50 Chu Kỳ)",
         "formulaDetail": "V = 14,295 đ × 1.12x (Median P/B chu kỳ)",
         "parameters": {
@@ -292,15 +292,17 @@
       }
     ],
     "consensusDetails": {
-      "cleanWeightedAvg": 9841,
-      "cleanMedian": 10036,
-      "dispersionPct": 1.9,
+      "cleanWeightedAvg": 8523,
+      "cleanMedian": 7962,
+      "dispersionPct": 7.0,
       "consensusLevel": "HIGH",
-      "coveragePct": 100.0,
-      "confidenceScore": 98.0,
-      "modelsUsed": 6,
+      "coveragePct": 83.3,
+      "confidenceScore": 88.3,
+      "modelsUsed": 5,
       "modelsValid": 6,
-      "excludedOutliers": []
+      "excludedOutliers": [
+        "Book NAV / P/B Chuẩn Hóa"
+      ]
     },
     "valuationTraps": {
       "trapScore": 0.0,
@@ -353,20 +355,20 @@
       ]
     },
     "sevenPriceZones": {
-      "currentZone": "Expensive",
-      "zoneBadge": "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-      "safeBuyPrice": 7439,
-      "acceptableBuyPrice": 8431,
-      "bearPrice": 6943,
-      "bullPrice": 12399,
+      "currentZone": "Danger",
+      "zoneBadge": "bg-rose-600 text-white",
+      "safeBuyPrice": 6224,
+      "acceptableBuyPrice": 7054,
+      "bearPrice": 5809,
+      "bullPrice": 10374,
       "boundaries": {
-        "deepValue": 6695,
-        "safeBuy": 7439,
-        "accumulate": 8431,
-        "fairLow": 9423,
-        "fairHigh": 10911,
-        "aboveFair": 11779,
-        "expensive": 14259
+        "deepValue": 5602,
+        "safeBuy": 6224,
+        "accumulate": 7054,
+        "fairLow": 7884,
+        "fairHigh": 9129,
+        "aboveFair": 9855,
+        "expensive": 11930
       }
     },
     "threeLayerDecision": {
@@ -396,7 +398,7 @@
         "p50": 11.0,
         "p75": 11.95,
         "mean": 11.64,
-        "current": 10.15,
+        "current": 9.68,
         "yearsUsed": 4
       },
       "pbBand": {
@@ -404,7 +406,7 @@
         "p50": 1.12,
         "p75": 1.26,
         "mean": 1.15,
-        "current": 0.98,
+        "current": 0.93,
         "yearsUsed": 4
       },
       "priceBands": {
@@ -451,22 +453,22 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 10.15,
+          "current": 9.68,
           "sma5y": 11.64,
-          "deltaPct": -12.8,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "deltaPct": -16.9,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
         },
         {
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 1.02,
+          "current": 0.97,
           "sma5y": 1.15,
-          "deltaPct": -11.1,
-          "status": "Ổn định",
-          "badgeColor": "text-gray-400",
+          "deltaPct": -15.5,
+          "status": "Cải thiện rõ rệt",
+          "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
         },
         {
@@ -607,12 +609,12 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 10.15,
-      "pb": 1.02,
-      "ps": 4.18,
+      "pe": 9.68,
+      "pb": 0.97,
+      "ps": 3.98,
       "pCf": 1.4,
-      "evEbitda": 6.8,
-      "dividendYield": 3.57
+      "evEbitda": 6.5,
+      "dividendYield": 3.75
     },
     "profitability": {
       "roe": 6.05,
@@ -709,13 +711,13 @@
       "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNZVduYzE0dWtPSlZPYm81RHJrTUVBbF9EdlV0d044LVFfdC1hRjhIS0tKRlVRSjROblBLZGVaR3N2cHotdllPQ0RWcE9DM2tMR1BLVWk4dFVFYVo4ejE2WlpvZnp4TkNHT0RuSHdFcG1UekY1OWQ4ZWd5VmQ0dXpXSy1SeG5UYnVNVEJGTHVaNzZBZWM?oc=5"
     },
     {
-      "date": "2026-11-04",
-      "type": "Cổ tức cổ phiếu",
-      "content": "Thuận Đức (TDP) bị buộc thu hồi cổ phiếu trả cổ tức, lợi nhuận quý III giảm 70%",
-      "ratio": "10%",
+      "date": "2026-10-21",
+      "type": "Đại hội cổ đông",
+      "content": "ĐHĐCĐ bất thường PNJ: Phát hành riêng lẻ không nhằm mục đích tìm cổ đông kiểm soát mới",
+      "ratio": "—",
       "value": null,
-      "source": "Tạp chí điện tử Thương Trường",
-      "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOdW9KSHJYeWczYlVLcF9OY2RCcmlCbFdweWQ0Vkd5UVVVaDFHTzdRNi1UQjhFQUUwVE5IbmtVcm5ZZ3dOZ1BjQjQ3cW92S2VOYl9JNDdpT2FoSWJnWDVLLUdxN0FZOXlQdmhSVmNvMHhpMkJLU1RYdmMzeFBTODNGWkpxS1JmM3c2UVhNenoybUhqVmhsc3FxUkRFRlpySUg0ektVOW1hRnZWOGJfcVRRMmJKbGRGR1dmWUNyRA?oc=5"
+      "source": "Vietstock",
+      "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNMWhoVGtCRnloWFBMLUNTYUFhMGtQaF9pZGJEalVpMmtqWnpLbDllWEdFV2Z0b1ZKSnVlejhpM0VKbG00aXh2OEppTFQzODJScDVNaVIxVllZMWVQYi1RMlNWb2VtSXg1M1B3OFprSVpvNnVqQzJzZU1GdkRhZl9pT3gxVVZJN2hOVlV4VjQ5eXpfUTNPdWFqVHR5WVhPNlVtMVlVWlBzc3VSWVhNa3dsTDN1eDZITENqemkyUnZvYjBDM1FRNnJfcVB3?oc=5"
     },
     {
       "date": "2026-09-30",
@@ -727,6 +729,15 @@
       "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQVS03VTF0NlNxMmh1V1RxZHg5aXl2V1ZwWnlyUjVfME1GbVU3eWNJWjBCSU1SZXBBaW9kSFdzNHFnaUVNRXhPd01zTFRScXJOR2phT3Y4SWV4ZGtNWC05SlpaMVFSTU9yNU1ZOTU5bG5ac1FmZFdSWms5T3JnVTBpUXBPdF90Qld5T3N0RlhjSVZWcTMzMS11RHN5aVFFUQ?oc=5"
     },
     {
+      "date": "2026-09-28",
+      "type": "Giao dịch nội bộ",
+      "content": "Cổ đông nội bộ PNJ đổi vai: Từ đỡ giá, trấn an đến đồng loạt thoái vốn",
+      "ratio": "—",
+      "value": null,
+      "source": "Vietstock",
+      "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxObkl1V2kwUHBaQlpFek9MZVRxdk5PVHhCWWN6by02clFFbEM5SXhlaklsVEFIY29zQ2JyMDNOOXZwX2I4SF9jX0lYVVl2V1dNaVhCT3c1ZVVKX2cwR0UwTllyOUxiQXRnUTFBN0hpTTFjVGtaU051bTctU2prTlZhWFJ4QURmOWx6bndBMnlyZWs5Sk1sa25YbGJpY2drd29fRUhCajhtaHF6ZzI1ZHRGS295WQ?oc=5"
+    },
+    {
       "date": "2026-09-11",
       "type": "Cổ tức cổ phiếu",
       "content": "VPBank chốt ngày đăng ký cuối cùng nhận cổ tức tỷ lệ 26%",
@@ -736,15 +747,6 @@
       "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOYnVIczZDLXFubmNjcTN0elFURlZSSno1LVowY0VMN2J0VWZCU19Sb0xNeF94X2wyY3ZkUWRodEh5ZkpXMjEwRXBEb0ZhNnJ1SVFCVll1WFhCck83SFFMSkxkOExpeE55T0xUYnFsSDVEQ3lDejB6YlhCZDlnSko1enV3UVowN3FJTnVhTTRtOGw1STl3Vl9FclpUQU01U2p3U1ZYbQ?oc=5"
     },
     {
-      "date": "2026-08-24",
-      "type": "Cổ tức cổ phiếu",
-      "content": "Techcombank dự tính điều chỉnh kế hoạch tăng vốn, hạ tỷ lệ chia cổ tức bằng cổ phiếu còn 50%",
-      "ratio": "10%",
-      "value": null,
-      "source": "Thời báo Tài chính Việt Nam",
-      "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOdUt6UkVISkxsTGQ5SE5wN0ZwTEpyUXNzZnlzTHlCSUVSTFpxa05FSjNQelh0Vkh0MFdjeDFJdXdlVjNPUVpRNS1JbmlGSnBnYVRlZnJxNm5pWmJhNV9YQjR3TmhqVXUyNXFHOF8xVFlmR09HR25QMzN3MVU5eFRFYU5hYThnNkpFTmZMUFZZTG1aOEJ3SDlCX3BYS2hrZkM0cjc4dnFSeW11b3k0RV82R1pndDZBSXg4V1VQamRsYWwxdnVUaUx1eVYwVHZVZGtsQWc?oc=5"
-    },
-    {
       "date": "2026-08-17",
       "type": "Cổ tức tiền mặt",
       "content": "Cổ đông ngân hàng nhận cổ tức khủng",
@@ -752,6 +754,15 @@
       "value": 1000,
       "source": "Báo Tiền Phong",
       "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5QaGVVNEl0R1huclU2RWVPS2ZKYlNwU3dLU1BVaE03QUZIb1JIYnpWakU3N2t2VUVOblp0UFNwUGRyX3FIX1hnY0lheWFKM3V2WE1kSUo3aTEtZmZJU3BMaDlZTXpkbl9OZXVQNEhOcm5DX1d5LUN4N0VINE8?oc=5"
+    },
+    {
+      "date": "2026-08-13",
+      "type": "Cổ tức cổ phiếu",
+      "content": "Cổ đông VIX sắp nhận cổ tức bằng cổ phiếu tỷ lệ 5%",
+      "ratio": "10%",
+      "value": null,
+      "source": "thitruongtaichinhtiente.vn",
+      "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQdm1qMFBpWm1TcXNrdEI3ZXViTkVMR3FJM2ZSUXFrYTFQSmNybmlhR3ZlREFQN2dVaVpUVExNcTFwTUtBaDhuNndZMlpyTVZTbEdsaG1sbG5SaGpDakllQ293S1o5ejVyeFc3N2JObEljay1nb1pGM0hBWWlNSHRmY2c2WHM4ZmVDY1FTdmN5U2FlOEJILXVPWjJfWQ?oc=5"
     },
     {
       "date": "2026-08-05",
@@ -1513,7 +1524,7 @@
     "sharpeRatio": 0.8,
     "sortinoRatio": 1.14,
     "beta": 1.0,
-    "riskFreeRate": 4.48,
+    "riskFreeRate": 4.45,
     "ratings": {
       "volatility": "Cao",
       "drawdown": "Trung bình",
@@ -1594,170 +1605,178 @@
         {
           "index": 0,
           "priceLow": 12900,
-          "priceHigh": 13275,
-          "priceMid": 13088,
-          "volume": 91317700.0,
-          "volumePercent": 14.0
+          "priceHigh": 13250,
+          "priceMid": 13075,
+          "volume": 69078600.0,
+          "volumePercent": 10.5
         },
         {
           "index": 1,
-          "priceLow": 13275,
-          "priceHigh": 13650,
-          "priceMid": 13462,
-          "volume": 79757100.0,
-          "volumePercent": 12.3
+          "priceLow": 13250,
+          "priceHigh": 13600,
+          "priceMid": 13425,
+          "volume": 98073900.0,
+          "volumePercent": 14.9
         },
         {
           "index": 2,
-          "priceLow": 13650,
-          "priceHigh": 14025,
-          "priceMid": 13838,
-          "volume": 125538800.0,
-          "volumePercent": 19.3
+          "priceLow": 13600,
+          "priceHigh": 13950,
+          "priceMid": 13775,
+          "volume": 95228500.0,
+          "volumePercent": 14.5
         },
         {
           "index": 3,
-          "priceLow": 14025,
-          "priceHigh": 14400,
-          "priceMid": 14212,
-          "volume": 55009300.0,
-          "volumePercent": 8.5
+          "priceLow": 13950,
+          "priceHigh": 14300,
+          "priceMid": 14125,
+          "volume": 82963400.0,
+          "volumePercent": 12.6
         },
         {
           "index": 4,
-          "priceLow": 14400,
-          "priceHigh": 14775,
-          "priceMid": 14588,
-          "volume": 127708900.0,
-          "volumePercent": 19.6
+          "priceLow": 14300,
+          "priceHigh": 14650,
+          "priceMid": 14475,
+          "volume": 101918000.0,
+          "volumePercent": 15.5
         },
         {
           "index": 5,
-          "priceLow": 14775,
-          "priceHigh": 15150,
-          "priceMid": 14962,
-          "volume": 86823300.0,
-          "volumePercent": 13.4
+          "priceLow": 14650,
+          "priceHigh": 15000,
+          "priceMid": 14825,
+          "volume": 136151100.0,
+          "volumePercent": 20.7
         },
         {
           "index": 6,
-          "priceLow": 15150,
-          "priceHigh": 15525,
-          "priceMid": 15338,
+          "priceLow": 15000,
+          "priceHigh": 15350,
+          "priceMid": 15175,
           "volume": 28558900.0,
           "volumePercent": 4.4
         },
         {
           "index": 7,
-          "priceLow": 15525,
-          "priceHigh": 15900,
-          "priceMid": 15712,
-          "volume": 15634000.0,
-          "volumePercent": 2.4
+          "priceLow": 15350,
+          "priceHigh": 15700,
+          "priceMid": 15525,
+          "volume": 0.0,
+          "volumePercent": 0.0
         },
         {
           "index": 8,
-          "priceLow": 15900,
-          "priceHigh": 16275,
-          "priceMid": 16088,
-          "volume": 14209300.0,
-          "volumePercent": 2.2
+          "priceLow": 15700,
+          "priceHigh": 16050,
+          "priceMid": 15875,
+          "volume": 23930900.0,
+          "volumePercent": 3.6
         },
         {
           "index": 9,
-          "priceLow": 16275,
-          "priceHigh": 16650,
-          "priceMid": 16462,
-          "volume": 25494600.0,
-          "volumePercent": 3.9
+          "priceLow": 16050,
+          "priceHigh": 16400,
+          "priceMid": 16225,
+          "volume": 20394300.0,
+          "volumePercent": 3.1
         }
       ],
       "poc": {
-        "index": 4,
-        "priceLow": 14400,
-        "priceHigh": 14775,
-        "priceMid": 14588,
-        "volume": 127708900.0,
-        "volumePercent": 19.6
+        "index": 5,
+        "priceLow": 14650,
+        "priceHigh": 15000,
+        "priceMid": 14825,
+        "volume": 136151100.0,
+        "volumePercent": 20.7
       },
       "hvn": [
         {
-          "index": 0,
-          "priceLow": 12900,
-          "priceHigh": 13275,
-          "priceMid": 13088,
-          "volume": 91317700.0,
-          "volumePercent": 14.0
+          "index": 1,
+          "priceLow": 13250,
+          "priceHigh": 13600,
+          "priceMid": 13425,
+          "volume": 98073900.0,
+          "volumePercent": 14.9
         },
         {
           "index": 2,
-          "priceLow": 13650,
-          "priceHigh": 14025,
-          "priceMid": 13838,
-          "volume": 125538800.0,
-          "volumePercent": 19.3
+          "priceLow": 13600,
+          "priceHigh": 13950,
+          "priceMid": 13775,
+          "volume": 95228500.0,
+          "volumePercent": 14.5
+        },
+        {
+          "index": 3,
+          "priceLow": 13950,
+          "priceHigh": 14300,
+          "priceMid": 14125,
+          "volume": 82963400.0,
+          "volumePercent": 12.6
         },
         {
           "index": 4,
-          "priceLow": 14400,
-          "priceHigh": 14775,
-          "priceMid": 14588,
-          "volume": 127708900.0,
-          "volumePercent": 19.6
+          "priceLow": 14300,
+          "priceHigh": 14650,
+          "priceMid": 14475,
+          "volume": 101918000.0,
+          "volumePercent": 15.5
         },
         {
           "index": 5,
-          "priceLow": 14775,
-          "priceHigh": 15150,
-          "priceMid": 14962,
-          "volume": 86823300.0,
-          "volumePercent": 13.4
+          "priceLow": 14650,
+          "priceHigh": 15000,
+          "priceMid": 14825,
+          "volume": 136151100.0,
+          "volumePercent": 20.7
         }
       ],
       "lvn": [
         {
           "index": 6,
-          "priceLow": 15150,
-          "priceHigh": 15525,
-          "priceMid": 15338,
+          "priceLow": 15000,
+          "priceHigh": 15350,
+          "priceMid": 15175,
           "volume": 28558900.0,
           "volumePercent": 4.4
         },
         {
           "index": 7,
-          "priceLow": 15525,
-          "priceHigh": 15900,
-          "priceMid": 15712,
-          "volume": 15634000.0,
-          "volumePercent": 2.4
+          "priceLow": 15350,
+          "priceHigh": 15700,
+          "priceMid": 15525,
+          "volume": 0.0,
+          "volumePercent": 0.0
         },
         {
           "index": 8,
-          "priceLow": 15900,
-          "priceHigh": 16275,
-          "priceMid": 16088,
-          "volume": 14209300.0,
-          "volumePercent": 2.2
+          "priceLow": 15700,
+          "priceHigh": 16050,
+          "priceMid": 15875,
+          "volume": 23930900.0,
+          "volumePercent": 3.6
         },
         {
           "index": 9,
-          "priceLow": 16275,
-          "priceHigh": 16650,
-          "priceMid": 16462,
-          "volume": 25494600.0,
-          "volumePercent": 3.9
+          "priceLow": 16050,
+          "priceHigh": 16400,
+          "priceMid": 16225,
+          "volume": 20394300.0,
+          "volumePercent": 3.1
         }
       ],
       "priceRange": {
         "min": 12900,
-        "max": 16650
+        "max": 16400
       },
-      "totalVolume": 650051900
+      "totalVolume": 656297600
     },
     "moneyFlow": {
-      "vpci": 0.92,
-      "vpciStatus": "VOLUME_FADING",
-      "cmf": 0.048,
+      "vpci": 0.96,
+      "vpciStatus": "NORMAL",
+      "cmf": -0.024,
       "cmfStatus": "BALANCED",
       "obvTrend": "BULLISH_FLOW"
     },
@@ -1767,12 +1786,12 @@
       "state": "BALANCED_MARKET"
     },
     "tailRisk": {
-      "skewness": 0.74,
-      "kurtosis": 0.92,
-      "var95": 3.37,
-      "var99": 3.99,
-      "es95": 3.91,
-      "es99": 4.42,
+      "skewness": 0.63,
+      "kurtosis": 0.78,
+      "var95": 3.63,
+      "var99": 4.51,
+      "es95": 4.25,
+      "es99": 4.64,
       "tailRiskAssessment": "Phân phối lợi suất bình thường"
     },
     "archetype": {
@@ -1787,20 +1806,48 @@
     "items": [
       {
         "id": "news-VND-1",
-        "title": "Ordföranden och sekreteraren för Royal Invest (RYG) registrerade gemensamt för att köpa 1,5 miljoner aktier när marknadspriset sjönk till 6 680 VND.",
-        "summary": "Bản tin phân tích về VND từ nguồn Vietnam.vn. Cập nhật ngày 2026-11-25.",
+        "title": "TPHCM vào cao điểm mua sắm, doanh thu dự kiến vượt 97.000 tỷ đồng",
+        "summary": "Bản tin phân tích về VND từ nguồn Báo Dân trí. Cập nhật ngày 2026-11-26.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-25",
-        "source": "Vietnam.vn",
-        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQblI4OFV6NXZwa3RiOG1CWU9DSXJpTFBoU1E0VWR0Ynlqb0tpUWREZjhkSk91TmJOajJoRlN4NmFNWFpReHV4WWFXWE9ILW9BT1BqWXVwYkFJR2FVOGFhcTJSNG5tMVRQZjhCOVlyd2hJazl3bGJ5TVN1aWNNMnVRS01JVUk0SmIteElJQU1UMWhGQzhhRmdLb19mUnJDMk9LZ2IwVTlCS25tdHRsTDZGZFdiUjNERDFtUU1ZRlJsaFgtbUpYa0E?oc=5",
+        "date": "2026-11-26",
+        "source": "Báo Dân trí",
+        "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNcHNrVHBsT0ZuUDVMS2NWdHVtQ0NiSDRRLUhZV3N2amJmck9YclAyQURERTZ2TnBYd0x2UDJMUTRrVzFVdU9jZUw3cE9yYnhHREFoclAwNGg1ZXh0bmljakJTWVlMOUJ3M1A1QUFaSXJidnFRdkFxWHFVX2xZS0hXLVpQakFya2xSSVdfNVY3NmgtY0NJenlnVU5fSnlieE5vNEoyaTlaV2lCTFVaZ21kakJwWnpwb0NfRWc?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-2",
+        "title": "Xây lắp III Petrolimex (PEN): Gần 30 tỷ đồng vay từ cá nhân, các khoản phải thu chiếm hơn 70% tài sản",
+        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-26.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-26",
+        "source": "MoneyF",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQVm0xNnQ2cDVEZkZZU3BWR1VKTDNpS29DNVpKRmhkUjhuSC1DOTBTT040eXZyQ1VNNC1DQTdPTmt1NnZnNVZXbk1MWHAyaXBqZ3UtckpZYTA5NVJENFU5RmVqRHhBaTFfbzh4YVJJNG01NzktUlc2Tl9NT21qeVR0ekRUaw?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-VND-2",
+        "id": "news-VND-3",
+        "title": "Kết quả Vietlott Power 6/55 hôm nay 26/11/2026 Jackpot 2 gần 4 tỷ đồng đã có chủ",
+        "summary": "Bản tin phân tích về VND từ nguồn VietnamBiz. Cập nhật ngày 2026-11-26.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-26",
+        "source": "VietnamBiz",
+        "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPT1U2SlNWMndaVllNOU9uSFJiQ3d1UUk1UUJKUFFCczVmYzRUT2M2VWQ5b2hSdmREdndQUV9NdVJhRnRjbkpCZmYzRHBDWWltTFBONnhvRXdYMUgxRnUzR1VaS0kyaVBMZ1JDeFFBam1XZFlseldKdEJBZkFfV3Q1d2FNUnYzQV9ZckFpVFFVNjIwb1FnTjlsenZMazJXRkt2MDdkWGN5MUdLTlVKUnMtdnBSMWhZNnl4S1NpenpB?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-4",
         "title": "Tỷ giá trung tâm USD/VND lên cao kỷ lục Theo Vietstock",
         "summary": "Bản tin phân tích về VND từ nguồn Investing.com Việt Nam. Cập nhật ngày 2026-11-25.",
         "category": "macro",
@@ -1814,21 +1861,49 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-3",
-        "title": "Xuất khẩu phân bón tăng mạnh, lợi nhuận Đạm Cà Mau có thể giảm 30% năm 2027",
-        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-25.",
+        "id": "news-VND-5",
+        "title": "Ordföranden och sekreteraren för Royal Invest (RYG) registrerade gemensamt för att köpa 1,5 miljoner aktier när marknadspriset sjönk till 6 680 VND.",
+        "summary": "Bản tin phân tích về VND từ nguồn Vietnam.vn. Cập nhật ngày 2026-11-25.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-11-25",
-        "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQWGJ4QU45U1AtMkI2dW5kdnhIQVZCa185X1ZTTkk4RUwzZWFPUm9DVU1vU3JIeW1YZGZha2xJS1NZTHQyTF9mTndfWTY4aXFRR1B2bkdKd3RsQmpjQUZweFZPbktHTW96M3hJcVlXVHlVeU9sVm1GVnk5N01kM3ppZk1n?oc=5",
+        "source": "Vietnam.vn",
+        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQblI4OFV6NXZwa3RiOG1CWU9DSXJpTFBoU1E0VWR0Ynlqb0tpUWREZjhkSk91TmJOajJoRlN4NmFNWFpReHV4WWFXWE9ILW9BT1BqWXVwYkFJR2FVOGFhcTJSNG5tMVRQZjhCOVlyd2hJazl3bGJ5TVN1aWNNMnVRS01JVUk0SmIteElJQU1UMWhGQzhhRmdLb19mUnJDMk9LZ2IwVTlCS25tdHRsTDZGZFdiUjNERDFtUU1ZRlJsaFgtbUpYa0E?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
-        "impact": "Cao",
-        "weight": 1.5
+        "impact": "Trung bình",
+        "weight": 1.0
       },
       {
-        "id": "news-VND-4",
+        "id": "news-VND-6",
+        "title": "Cổ phiếu cần quan tâm ngày 26/11",
+        "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-11-25.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-25",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQZTBuZjBrRWdQUEhuZ3ZjMklBaXZ0YlRhUjVQNkRIemlTUklsRlRJQ2JaNkp4aUJXYmliM2J1RV9ka0F2WF9ibXh2UXRSWTB1R3UzQWprYmZqZ0R1OW5FNUM2OHZFbkFmTkUxc01ZT2xiVFdwb2doOEltSkd4NWpOSnZ1YW1tSnRE0gGEAUFVX3lxTE9NM294bk51R19PSG9fRUtSaHkxcEJPN256cENKbFo2OXBzWVBuMVk5Wmt1ckpUbVZNd3A5N2lnMGxJMUxLTGg5WUFVUUcwWFFyRGNUcTlqb0QzTzNsVDBWWXIyVE0xQllXUEVvMDd4UXozeENYMjNQM1ZZQ2x4TjQ5a1hVRA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-7",
+        "title": "Nên đánh giá cổ phiếu theo kết quả kinh doanh từng quý hay cả năm?",
+        "summary": "Bản tin phân tích về VND từ nguồn Tạp chí Kinh tế chứng khoán Việt Nam. Cập nhật ngày 2026-11-25.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-25",
+        "source": "Tạp chí Kinh tế chứng khoán Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQdi1IRFBrc3paMEl4YklJSWhEMG16aDI5N0ZqQmRUSldFWGhFNmo3VEV3OUVvOTR1M19jNEhWZDNWYnZGQ2xiY3M4M0VNTFVweU9XOUJheFVvbnRVX3BUOWtyT0RzV19jMHN2RXFTdkd1M3N5VzRhSUs5N0tfUEVwalh3THBJSXo4ejRIbWdrc1RKeGJYQk5DVA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-8",
         "title": "Masan nâng mục tiêu lợi nhuận năm 2026 lên 11.500 tỷ đồng",
         "summary": "Bản tin phân tích về VND từ nguồn Nhịp sống kinh doanh. Cập nhật ngày 2026-11-25.",
         "category": "biz",
@@ -1842,7 +1917,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-5",
+        "id": "news-VND-9",
         "title": "Quyền chọn Netskope Inc báo hiệu biến động 18% trước kết quả kinh doanh",
         "summary": "Bản tin phân tích về VND từ nguồn Investing.com Việt Nam. Cập nhật ngày 2026-11-25.",
         "category": "biz",
@@ -1856,7 +1931,35 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-6",
+        "id": "news-VND-10",
+        "title": "Xuất khẩu phân bón tăng mạnh, lợi nhuận Đạm Cà Mau có thể giảm 30% năm 2027",
+        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-25.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-25",
+        "source": "MoneyF",
+        "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQWGJ4QU45U1AtMkI2dW5kdnhIQVZCa185X1ZTTkk4RUwzZWFPUm9DVU1vU3JIeW1YZGZha2xJS1NZTHQyTF9mTndfWTY4aXFRR1B2bkdKd3RsQmpjQUZweFZPbktHTW96M3hJcVlXVHlVeU9sVm1GVnk5N01kM3ppZk1n?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-VND-11",
+        "title": "Kết quả Vietlott Mega 6/45 hôm nay 25/11/2026 Jackpot hơn 22 tỷ đồng không có chủ nhân may mắn",
+        "summary": "Bản tin phân tích về VND từ nguồn VietnamBiz. Cập nhật ngày 2026-11-25.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-25",
+        "source": "VietnamBiz",
+        "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQbWVjNVJCbjd2NjJBRjBIOHNhZFFFRlhYZTR1Zk5WdEVjQzBqNEx5SmRSaXU0QzVVS2hYdERzRF9vNk10ZUkyUzc4R1A3dVhURE1WaHA3QlhyWnlTdFBGaTJ3VGN2SWxOemQtWjBGaHFhOUt4bjdfMlE0V25TNENMU2xibnhUandabkxWd2EyakYzTnNPOW41VHFIN29mSXVLRGxudFlObFk4dlZyMDMyWDdNdVhndmdoalpWeU9wdXdQWHBhVkpzLWhudU53Z2M?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-12",
         "title": "MSB lên kế hoạch phát hành 1.800 tỷ đồng trái phiếu có bảo lãnh từ CGIF",
         "summary": "Bản tin phân tích về VND từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-11-24.",
         "category": "disclosure",
@@ -1870,7 +1973,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-VND-7",
+        "id": "news-VND-13",
         "title": "Cuu Long Pharmaceutical (DCL) experienced its fourth consecutive day of limit-down trading, reporting a loss of over 18 billion VND in the third quarter.",
         "summary": "Bản tin phân tích về VND từ nguồn Vietnam.vn. Cập nhật ngày 2026-11-24.",
         "category": "biz",
@@ -1884,7 +1987,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-8",
+        "id": "news-VND-14",
         "title": "Nhộn nhịp mùa cổ tức cuối năm",
         "summary": "Bản tin phân tích về VND từ nguồn Thương gia. Cập nhật ngày 2026-11-24.",
         "category": "disclosure",
@@ -1898,35 +2001,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-9",
-        "title": "Tân Quyền Tổng Giám đốc LPBank: Gần 16 năm tại VNDirect, từng điều hành IPA",
-        "summary": "Bản tin phân tích về VND từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-11-24.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-11-24",
-        "source": "Thuonghieucongluan.com.vn",
-        "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ2pEVWZDTEdYWGd3TjRWZ2lOeHd6NFFxeE9PVDN2ZzZldFI0TUVtOUt5emE5UHFwNk5iZkFmX2hBY0g5RGpSZTh5dEdDb0FFZkY2OTBNVWlyUXIzQ3lMeENvZktyeC1GckpwZl9kdzM0d1BsZmtRcVhuMFdJYmZVempfNV9IeXp1ZWdSVnJweXVWLWZKQ0h5eWVkVWlYSkduSlVTU0doSkZSM2lFOFZmLXV2blhPbHN2U2JSSQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-10",
-        "title": "Hệ sinh thái VIMC (Bài 1): Lãi gần 3.000 tỷ đồng sau 9 tháng, những trụ cột nào đang đóng góp lớn?",
-        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-24.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-24",
-        "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOUVl0T1NmcUxfeDV1SzFxNWp6bE51Rm42VjBzVG5yMEQ1Mi1YbWplOFRDUUI3UHVPLVRLeXpaeFFFNWx5SVVfc0Z5SnRObkZZRUNjWEdmendQbi1rRmhlSEMxekl4aV9VZGh1ZEFpV0lETWI5SUJmUTBxRHgtZVpkRHc1Zw?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-11",
+        "id": "news-VND-15",
         "title": "Thu ngân sách trong lĩnh vực thương mại điện tử đạt 241,2 nghìn tỷ đồng",
         "summary": "Bản tin phân tích về VND từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-11-24.",
         "category": "biz",
@@ -1940,35 +2015,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-12",
-        "title": "Một tập đoàn Trung Quốc doanh thu hàng tỷ USD vừa đưa nhà máy liên doanh với VinFast vào vận hành",
-        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-24.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-24",
-        "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxNQW44VF90TmhMNk5hcC13cFZJQ0pSM0pvNnFwbnB0elVnS0V5U21FZmEtd1NTNTRuaTZvVkpUOWpOamFSTWY5amx5Nkd3ZE14dmx0QjFNQWV6NWYxVVVPNTVFWkZaR25VSHAtSmduZGZYQ3pMUjdYd29zclg4cjlYd0Vn?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-13",
-        "title": "Doanh nghiệp bất động sản đang gánh hơn 3.300 tỷ đồng trái phiếu bị phạt 85 triệu đồng vì chậm công bố thông tin",
-        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-24.",
-        "category": "sector",
-        "categoryLabel": "Ngành & Dự Án",
-        "date": "2026-11-24",
-        "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOUkV4ajVReTRrUGtNSmxPbkl3eWlfMmZLUFlKcjVyLU53cjBGNk55c1BOWnhrRXVBVlFfVWp2cWxtV0NMZU55ZTUyX0VuYmJYNXI5c2pvVGRGYkxEd0NQZDRpbmpPYUY4b254UkJobnZ3TkZRRUdyejlUSGcyelI0N09kbw?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-14",
+        "id": "news-VND-16",
         "title": "BIDV dự kiến phát hành gần 1,4 tỷ cổ phiếu để trả cổ tức, tăng vốn thêm gần 14.000 tỷ đồng",
         "summary": "Bản tin phân tích về VND từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-11-23.",
         "category": "disclosure",
@@ -1982,91 +2029,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-15",
-        "title": "Sự kiện chứng khoán ngày 23/11/2026 - Tạp chí Kinh tế",
-        "summary": "Bản tin phân tích về VND từ nguồn Tạp chí Kinh tế - Tài chính Online. Cập nhật ngày 2026-11-23.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-23",
-        "source": "Tạp chí Kinh tế - Tài chính Online",
-        "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPRjNhSXdFUGlOdVl5VHZrdGFfdGluVzVRaUV3cmlZZlc0TFhmRzMyRC1JbVBLc0d0cEJNeGFlZTdZQnlUbHhMRWFzejI0bUhDVVdralVUNGdYMDJ0aTVONDhqb0JEdVdpcnBUSFdIa1pHVFp5OHc2Y3hXeGVKWnBaREwyZGlMUQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-16",
-        "title": "Đằng sau những con số đẹp của ngành thép",
-        "summary": "Bản tin phân tích về VND từ nguồn 24HMoney. Cập nhật ngày 2026-11-23.",
-        "category": "sector",
-        "categoryLabel": "Ngành & Dự Án",
-        "date": "2026-11-23",
-        "source": "24HMoney",
-        "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNSm1SUm1pdkM2dGVFUjNyM3U3WFR2aDd5N1hreUtYTF9mcWRCeUYwSDBWMnRhRktiWUx4RDdvVFhjdlRCRXZROVlROU5wemxJZmQxQjlDNVhDZllLeWVfaGs3dS1pYmFfaEVwd2tlX05CT2ZWTkl2UDVzRk5rdXpZRnVWZmlaeVJt?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
         "id": "news-VND-17",
-        "title": "Cổ phiếu Zoom giảm dù kết quả kinh doanh vượt kỳ vọng và khởi động cổ tức",
-        "summary": "Bản tin phân tích về VND từ nguồn Investing.com Việt Nam. Cập nhật ngày 2026-11-23.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-23",
-        "source": "Investing.com Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOOXRjTkNtWFBXYWkydmR4Z3d0a3lydjktVEkzZXlUNjVXbl9ZRTUyT1BEOHJnc3J2SVFKSXhHN0s4WlpzQzBMSEFweGJiczAzSkJmV2xFbEpmcWtxdGZFVjJoMUNlMDdDNUlfdVB1X2prRXN5Sy1mVkZnRVZyWndUQUdwbENkQTB6YnVXZXUtQmM0Wmh0ZHBJY0JlUHZORGNtVTh4OWZ1eHNkQzRZdXpSdHFlM1BILUV0M0ZjUFA5ejE5RHhybHY3ag?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-VND-18",
-        "title": "Ngày Văn hóa Việt Năm 2026: Kết nối doanh nghiệp, tạo động lực mới cho thương mại Việt Nam-Malaysia",
-        "summary": "Bản tin phân tích về VND từ nguồn Thông tấn xã Việt Nam. Cập nhật ngày 2026-11-22.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-22",
-        "source": "Thông tấn xã Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxQS0hhdFV2SndRcDVZT0tNdVBNWnhuOGJNYi1yc2d1c2xXbS1Qc0JscGswYkRmZGZsR29uRW5CLUt6VndCdlBJT2UwYnc0eDVRM3ZydGpQWVp2WFpmOFFPakU2aS1lRzdGNFRnblFKSUZSZ3Bmak90UDhXT09HckFEUTFwWG50bEQzQ3EwbWlHSjl0RDFySzdpbFg4dFJUUmtUMTRpMDN2amlwNnkwbjFvcHk5U1M1ejJneGdYOHNlc1NKMDdWenhCWVVocnB2TDViUWRGc28xRnB1S1pNTGFrcjRaaHhSb2ZKQUE?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-19",
-        "title": "Tỷ giá USD/VND tăng, nhóm cổ phiếu nào hưởng lợi?",
-        "summary": "Bản tin phân tích về VND từ nguồn MoneyF. Cập nhật ngày 2026-11-21.",
-        "category": "macro",
-        "categoryLabel": "Vĩ Mô & Chính Sách",
-        "date": "2026-11-21",
-        "source": "MoneyF",
-        "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE80YVpzT3VwVkUwUTUyZFFxTnhuRW5DUVB5NHdkNkhVQXphSkpPZk1Wb2s3VVdhN1ZCTGtiQy0zR2o2bjRxQ29MZUtMRlVpZUpxVW84dlY5bUM5Nmd6OElfUlRwRnRyeERJMGQwNjR2cl9PcmFYWHdrRjUyTmxhUQ?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-20",
-        "title": "Tiền đổ vào VND, TCH, TCB... giúp VN-Index thoát hiểm cuối phiên, khối ngoại tiếp tục rút ròng",
-        "summary": "Bản tin phân tích về VND từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-11-20.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-20",
-        "source": "nguoiquansat.vn",
-        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNVHRZNnlkYlhaREJUbDlYM3p2NzFmRURJYTFCUnhNMll0LUpsNHN1SHIxUUplbGp3R0ZqUHh3Ym9obU91V0Jub1AtOUswVnIycVQ5V3VwdFhFWTRRZ3lGRFNEX0w3NVVmcWswT0loUFV1SGprN21uZms5RGlaR1NITElxSWhQWFl5bloyeTNQRkxsN1kyZmg5ZVhBY0JTV2JhcHhaTEFtU2ozVFFOQVV4TFJ2UG1VM3NVUmdDa1UtRkxUQQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-21",
         "title": "ĐHĐCĐ bất thường của VNDIRECT và những chuyển động đáng chú ý phía sau cổ phiếu VND",
         "summary": "Bản tin phân tích về VND từ nguồn VIETTIMES. Cập nhật ngày 2026-11-11.",
         "category": "disclosure",
@@ -2080,7 +2043,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-22",
+        "id": "news-VND-18",
         "title": "VNDirect sắp họp đại hội bất thường",
         "summary": "Bản tin phân tích về VND từ nguồn CafeF. Cập nhật ngày 2026-11-05.",
         "category": "disclosure",
@@ -2094,7 +2057,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-23",
+        "id": "news-VND-19",
         "title": "Quý III: Nhiều doanh nghiệp hụt lợi nhuận",
         "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-11-05.",
         "category": "biz",
@@ -2108,7 +2071,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-24",
+        "id": "news-VND-20",
         "title": "VNDIRECT (VND) triệu tập họp đại hội cổ đông bất thường",
         "summary": "Bản tin phân tích về VND từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-11-04.",
         "category": "disclosure",
@@ -2122,21 +2085,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-25",
-        "title": "Thuận Đức (TDP) bị buộc thu hồi cổ phiếu trả cổ tức, lợi nhuận quý III giảm 70%",
-        "summary": "Bản tin phân tích về VND từ nguồn Tạp chí điện tử Thương Trường. Cập nhật ngày 2026-11-04.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-04",
-        "source": "Tạp chí điện tử Thương Trường",
-        "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOdW9KSHJYeWczYlVLcF9OY2RCcmlCbFdweWQ0Vkd5UVVVaDFHTzdRNi1UQjhFQUUwVE5IbmtVcm5ZZ3dOZ1BjQjQ3cW92S2VOYl9JNDdpT2FoSWJnWDVLLUdxN0FZOXlQdmhSVmNvMHhpMkJLU1RYdmMzeFBTODNGWkpxS1JmM3c2UVhNenoybUhqVmhsc3FxUkRFRlpySUg0ektVOW1hRnZWOGJfcVRRMmJKbGRGR1dmWUNyRA?oc=5",
-        "sentiment": "bearish",
-        "sentimentValue": -1,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-VND-26",
+        "id": "news-VND-21",
         "title": "Cách tính thuế hộ kinh doanh 2026: Hướng dẫn chi tiết và ví dụ thực tế",
         "summary": "Bản tin phân tích về VND từ nguồn Hóa Đơn Điện Tử MISA MEINVOICE. Cập nhật ngày 2026-11-03.",
         "category": "macro",
@@ -2150,35 +2099,49 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-27",
-        "title": "Bảo Việt đạt doanh thu gần 48.000 tỉ đồng 9 tháng",
-        "summary": "Bản tin phân tích về VND từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-11-02.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-02",
-        "source": "Báo Tuổi Trẻ",
-        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNMDZvT0VpSjR2Z3VzUV9wd05aQklZSXJHZGRlZTBYUmVKclY1TmE1RnNqdWV5NjFOM2NteUh3cF8ycmNxOTM3Rl9qc3dyWWZydEM1WllGdG1UZVk4eTdNS2dub1FEM2Z4bjdIcFJJRlZWWEt3S2VqSXZnaFAyYW5aNm1lLW1NLXpNcV85UldicHZxNHg0?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-28",
-        "title": "SABECO sở hữu 18.525,6 tỷ đồng tiền và đầu tư ngắn hạn tại cuối quý III/2026",
-        "summary": "Bản tin phân tích về VND từ nguồn baodautu. Cập nhật ngày 2026-10-30.",
+        "id": "news-VND-22",
+        "title": "Lợi nhuận ngành chứng khoán giảm, dư nợ margin lập kỷ lục gần 448.000 tỷ đồng",
+        "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-10-30.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-10-30",
-        "source": "baodautu",
-        "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOQ2FJVlAtVlQ3WGF2NkZFbkJNQVJnNzJnbXJ4QllsNGFCRkM0YnFidEtFRDlDTFhWXzJsQ01oRlZTRTQ4VlZGXzdGVTliUDhzbWt4T0tZWkJWcEZoZ2NnWFFHLXNQeEY0YXIyTF9Fb1ppV0xHcTYzOFFTVTJKenVBdGpwOFpXUk1Xbm8tSUcwakRzWWhBNWpqV2piQVdjZlVNOTh1dkZJUDJoUQ?oc=5",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOLUV1SXVvakNYYU1qQnBLQ0VwS2tjWHZKSWtOc1VELURuOVhiZVpvNHB4aHpmQ1hBSlgzYkRHZkw2RWtlQXExMzY2U3l2RTdPYXhsalRtZTZqc2dJMDVHaEw0RDZYSG1kbmhlTlRWUW9TRjlfamJZT2g5eDFSZ3RWa1ZqZi1WdjVFYnJOMzF4Uk55TzBTVW8zT05PbnZjUTk3QmN4UUo4OXFkaGdnNjE0MC1SS3lnTVFzMUlaRE1VdXlNYU3SAb8BQVVfeXFMT3JKemFISHRHNEhpdWdiNHpLU1UzOFE0OWdaRjhJbHRHUUdkNmdHZWpSdW5LbGRkZHlubUROYlFxOG9tck1qX2g2TWVJck5HaF9JaUNGWTZFdmRUSDRINkRmLVlrSEh4VFppSXBnTTVrLVdqVFR3eFlNaEN3SzRyQmZLclpTSU9PYTcyT3dUNy1ZZjJVbllJLWxiNWNYU3lFSnpxMWprS184alRNb1o5R0U0UW9iRmdfN2pKN3ZBZWc?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VND-23",
+        "title": "Thép Nam Kim báo lãi quý 3 tăng bằng lần, lợi nhuận Tôn Đông Á đi lùi khi chi phí tăng vọt",
+        "summary": "Bản tin phân tích về VND từ nguồn Vietstock. Cập nhật ngày 2026-10-29.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-29",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQanlaTk1Nd1VILVhNTWVoNVJfLU5XRUpScHM3ZDFlZDAxTjJ5Yl9WVlJ2RVdqQkl0T3FIM2Q0RGt1UERqS2pOMFBfdFNOVzNUR3dmRGxBUWt4b041R1ZLanNhMDVXMnB4Z1FQWnFTNkFCaHRXVTJkY1gxa1B0T1hoU0lhTXA4TnpxQ25DejVZRjNLSVdtWjBOa2gtbHBvQUFHQlFwTkRpc00xNzlVNnhWNzdhZWdTblBTRXpJOTRWU09IM2hlUzF4M013OEVqWUU?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-24",
+        "title": "ĐHĐCĐ bất thường PNJ: Phát hành riêng lẻ không nhằm mục đích tìm cổ đông kiểm soát mới",
+        "summary": "Bản tin phân tích về VND từ nguồn Vietstock. Cập nhật ngày 2026-10-21.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-10-21",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNMWhoVGtCRnloWFBMLUNTYUFhMGtQaF9pZGJEalVpMmtqWnpLbDllWEdFV2Z0b1ZKSnVlejhpM0VKbG00aXh2OEppTFQzODJScDVNaVIxVllZMWVQYi1RMlNWb2VtSXg1M1B3OFprSVpvNnVqQzJzZU1GdkRhZl9pT3gxVVZJN2hOVlV4VjQ5eXpfUTNPdWFqVHR5WVhPNlVtMVlVWlBzc3VSWVhNa3dsTDN1eDZITENqemkyUnZvYjBDM1FRNnJfcVB3?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
       },
       {
-        "id": "news-VND-29",
+        "id": "news-VND-25",
         "title": "Mảng môi giới lao dốc, lợi nhuận VNDirect giảm hơn 64% trong quý III",
         "summary": "Bản tin phân tích về VND từ nguồn baodautu. Cập nhật ngày 2026-10-21.",
         "category": "biz",
@@ -2192,7 +2155,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-30",
+        "id": "news-VND-26",
         "title": "Ngành nào sẽ dẫn đầu tăng trưởng lợi nhuận quý III/2026?",
         "summary": "Bản tin phân tích về VND từ nguồn Tạp chí Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-10-10.",
         "category": "biz",
@@ -2206,7 +2169,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-VND-31",
+        "id": "news-VND-27",
+        "title": "Phép thử với cổ đông tại PNJ",
+        "summary": "Bản tin phân tích về VND từ nguồn Vietstock. Cập nhật ngày 2026-10-01.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-10-01",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE0xQ2tlOTh2UUZXV1JDTk1Da2tlYUxFVEYxbTdMVEFXQThqUkw1N1FCRE04VW1UOHpyb0tDX2lsd1lXYVQ3LTFGcWRXSGNKMjJrRDBucE1tWFBZQzYtdDlCcDViZXR1ZlY2dkhrZW1INTJaRGNOUlYzc2tJaFBiQQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-28",
         "title": "SHS dự kiến chi gần 450 tỷ đồng trả cổ tức tiền mặt",
         "summary": "Bản tin phân tích về VND từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-09-30.",
         "category": "disclosure",
@@ -2220,7 +2197,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-32",
+        "id": "news-VND-29",
         "title": "Dự báo top 10 doanh nghiệp lợi nhuận bùng nổ, tăng lên tới 183% trong quý 3/2026",
         "summary": "Bản tin phân tích về VND từ nguồn VnEconomy. Cập nhật ngày 2026-09-29.",
         "category": "biz",
@@ -2234,7 +2211,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-33",
+        "id": "news-VND-30",
         "title": "SSI dự báo kết quả kinh doanh quý 3/2026 của 42 doanh nghiệp: Masan, Viglacera tăng bằng lần, Sacombank dự báo giảm 45%",
         "summary": "Bản tin phân tích về VND từ nguồn CafeF. Cập nhật ngày 2026-09-29.",
         "category": "biz",
@@ -2248,7 +2225,35 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-34",
+        "id": "news-VND-31",
+        "title": "Cổ đông nội bộ PNJ đổi vai: Từ đỡ giá, trấn an đến đồng loạt thoái vốn",
+        "summary": "Bản tin phân tích về VND từ nguồn Vietstock. Cập nhật ngày 2026-09-28.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-09-28",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxObkl1V2kwUHBaQlpFek9MZVRxdk5PVHhCWWN6by02clFFbEM5SXhlaklsVEFIY29zQ2JyMDNOOXZwX2I4SF9jX0lYVVl2V1dNaVhCT3c1ZVVKX2cwR0UwTllyOUxiQXRnUTFBN0hpTTFjVGtaU051bTctU2prTlZhWFJ4QURmOWx6bndBMnlyZWs5Sk1sa25YbGJpY2drd29fRUhCajhtaHF6ZzI1ZHRGS295WQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-VND-32",
+        "title": "Cổ đông của Thế Giới Di Động sắp nhận thêm gần 1.500 tỷ đồng cổ tức",
+        "summary": "Bản tin phân tích về VND từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-09-21.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-09-21",
+        "source": "thitruongtaichinhtiente.vn",
+        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNMEc3OEJjQml4STdpWHFCTDBFYjNaMmZmNS10U3VNVms1U1h5cklOMVhBdlpyRXFlU0xSOVRtWEltQjZyY3NhNUxqTV9BUEZJZHo0eWpMYlM4ekxYcWpUemNjZks3Y3Joc3VpV0hNQjhPYV84amItOXNaUDNsWU9JcWFXUXpPMFFJMlozM2twUjJ5T1F1a0FjUTJaRHNBZW1xb19sc1FTSWlXT01SZWV6MkdxUQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VND-33",
         "title": "VPBank chốt ngày đăng ký cuối cùng nhận cổ tức tỷ lệ 26%",
         "summary": "Bản tin phân tích về VND từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-09-11.",
         "category": "disclosure",
@@ -2262,21 +2267,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-35",
-        "title": "Tuần tới, hơn 30 doanh nghiệp chốt quyền cổ tức, cao nhất 94%",
-        "summary": "Bản tin phân tích về VND từ nguồn Thuonghieucongluan.com.vn. Cập nhật ngày 2026-09-06.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-09-06",
-        "source": "Thuonghieucongluan.com.vn",
-        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQRGF2dlNVS0x5OTRzRVEzYV9XcXpRQy10RHFpOVoxdUNicUp5SmRSNjNTNDFyeHZXWWQ0bENHVHREcU01SEhuUk9qbmV2dndrQXJuYTdiYkxqd25nQjUtbEIyNkVlbjZ1TUhZX2ZYbWFiOFZtM0tOVFpFQlF0VC1SNnhYNTg0a2dTQ01HZlpYemNVMmtkbnRuRGs1S09tc1ZpdmVTVlM5YnA?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-VND-36",
+        "id": "news-VND-34",
         "title": "Chứng khoán VNDIRECT (VND) bị phạt và truy thu thuế gần 6,97 tỷ đồng",
         "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-08-28.",
         "category": "macro",
@@ -2290,21 +2281,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-37",
-        "title": "Techcombank dự tính điều chỉnh kế hoạch tăng vốn, hạ tỷ lệ chia cổ tức bằng cổ phiếu còn 50%",
-        "summary": "Bản tin phân tích về VND từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-24.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-08-24",
-        "source": "Thời báo Tài chính Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOdUt6UkVISkxsTGQ5SE5wN0ZwTEpyUXNzZnlzTHlCSUVSTFpxa05FSjNQelh0Vkh0MFdjeDFJdXdlVjNPUVpRNS1JbmlGSnBnYVRlZnJxNm5pWmJhNV9YQjR3TmhqVXUyNXFHOF8xVFlmR09HR25QMzN3MVU5eFRFYU5hYThnNkpFTmZMUFZZTG1aOEJ3SDlCX3BYS2hrZkM0cjc4dnFSeW11b3k0RV82R1pndDZBSXg4V1VQamRsYWwxdnVUaUx1eVYwVHZVZGtsQWc?oc=5",
+        "id": "news-VND-35",
+        "title": "Masan (MSN): Doanh thu 7 tháng tăng 46% lên 63.846 tỷ đồng",
+        "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-08-19.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-08-19",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNTHJhbWprVFYtQkhSWlpiOTJzbzRsTFVkdE02c0hYVGlTX2xSc2lrZG94VEdEaHctQ0dER1IzM2tma3A5a2NMX1ZmNHM3SE83QzRaakhxTkFMZldwWURMZFJzWU9pTHN2VU5TZ2NBc3ZZSXRQSFhOVDktbTVsZ3hMY21vM2RBYjFPNlFNVFAxNFdoZTlsckJvMXhfdTYzYzQ2dGcybkd30gGiAUFVX3lxTE9SX1dXbzdqdFJxREtjWUxaa3dOWDZxOVl6U25QZnpYTGRKYjVOd3NmSGNXSXhrTlM3U2YtNXVhMWliMHR1NU1yQUdIaVV0YUItWFZxZWgwbHlDc0U3WndiTWlYbmZLZGJ6YUZreGJ3LVI2V3FlZE9rRXZ2NGtLa1lMZTdBSHpzXzhJeWNuaWw2TnNpc1NRVV8tRjdzRDJXdkQ1Zw?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
+        "impact": "Trung bình",
+        "weight": 1.0
       },
       {
-        "id": "news-VND-38",
+        "id": "news-VND-36",
         "title": "Cổ đông ngân hàng nhận cổ tức khủng",
         "summary": "Bản tin phân tích về VND từ nguồn Báo Tiền Phong. Cập nhật ngày 2026-08-17.",
         "category": "disclosure",
@@ -2318,7 +2309,21 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-39",
+        "id": "news-VND-37",
+        "title": "Cổ đông VIX sắp nhận cổ tức bằng cổ phiếu tỷ lệ 5%",
+        "summary": "Bản tin phân tích về VND từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-08-13.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-08-13",
+        "source": "thitruongtaichinhtiente.vn",
+        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQdm1qMFBpWm1TcXNrdEI3ZXViTkVMR3FJM2ZSUXFrYTFQSmNybmlhR3ZlREFQN2dVaVpUVExNcTFwTUtBaDhuNndZMlpyTVZTbEdsaG1sbG5SaGpDakllQ293S1o5ejVyeFc3N2JObEljay1nb1pGM0hBWWlNSHRmY2c2WHM4ZmVDY1FTdmN5U2FlOEJILXVPWjJfWQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-VND-38",
         "title": "ABBank mở rộng kế hoạch tăng vốn lên sát 27.000 tỷ đồng, gấp đôi quy mô chào bán cổ phiếu",
         "summary": "Bản tin phân tích về VND từ nguồn Thời báo Tài chính Việt Nam. Cập nhật ngày 2026-08-05.",
         "category": "sector",
@@ -2330,6 +2335,20 @@
         "sentimentValue": 1,
         "impact": "Cao",
         "weight": 1.5
+      },
+      {
+        "id": "news-VND-39",
+        "title": "So kè lợi nhuận nhóm công ty chứng khoán đầu ngành",
+        "summary": "Bản tin phân tích về VND từ nguồn Mekong ASEAN. Cập nhật ngày 2026-07-22.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-22",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxONDNXaDU2ODFSWUFwQXF2Rm1ob3Y1Q0lLd3NsaDJSQzNkc1hIMTNjcG93ZGs2M3FoZ2hlTG1oTTllMDlCdXlfOGV0MDhPX3RqdEFXc1EyV2pNSmdtU1FGZWVrREp0WkcwUG9BY1ZUT3NPSmxHWldmaVI0VmpWVzB1MmZaQWQzZDZfVGpTNQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
       },
       {
         "id": "news-VND-40",
@@ -2347,20 +2366,6 @@
       },
       {
         "id": "news-VND-41",
-        "title": "Cập nhật BCTC quý 2/2026 chiều ngày 16/7: FPT, Petrolimex công bố kết quả kinh doanh, công ty khoáng sản báo lãi tăng bằng lần",
-        "summary": "Bản tin phân tích về VND từ nguồn CafeF. Cập nhật ngày 2026-07-16.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-07-16",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNeFczSUNqYkx1OHJqTGZ5YnBKQUIxZTRCT3BMb0NsM2F2X2tBSXZ1MldfMEJyZkVUMkVpdjU5VnFTTE13dVZJZ183Z0MxMW5uMUJmTmJoam9QcnRZaWtBb2llVVdtSmRHZHNqeGhJWkZkWG9xQ3pMM3FvVEtoQkI2azBSalU1RGpYQlV1a1ZCV1R0cFgyNkx4ZVhYRy1nY3o1NVJVZUxCS3BiSTlOQW1pQ2JFNGxlNVZS?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-VND-42",
         "title": "VND hay MBS: Cổ phiếu chứng khoán nào đáng chú ý hơn trong 1–3 tháng tới?",
         "summary": "Bản tin phân tích về VND từ nguồn 24HMoney. Cập nhật ngày 2026-07-15.",
         "category": "analyst",
@@ -2374,7 +2379,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-43",
+        "id": "news-VND-42",
         "title": "CC1 ấn định ngày ĐHĐCĐ thường niên 2026, sẵn sàng cho giai đoạn tăng trưởng mới",
         "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-13.",
         "category": "biz",
@@ -2388,7 +2393,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-VND-44",
+        "id": "news-VND-43",
         "title": "Lịch chốt quyền cổ tức 13-17/7: Cổ tức tiền mặt cao nhất 50%, một ngân hàng lớn sắp chi hơn 3.000 tỷ đồng",
         "summary": "Bản tin phân tích về VND từ nguồn CafeF. Cập nhật ngày 2026-07-12.",
         "category": "disclosure",
@@ -2402,7 +2407,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-VND-45",
+        "id": "news-VND-44",
         "title": "Cập nhật KQKD quý 2/2026 chiều ngày 10/7: Doanh thu hợp nhất Petrovietnam đạt hơn 445.000 tỷ đồng, PVOIL báo doanh thu tăng 74%",
         "summary": "Bản tin phân tích về VND từ nguồn CafeF. Cập nhật ngày 2026-07-10.",
         "category": "biz",
@@ -2414,6 +2419,20 @@
         "sentimentValue": 1,
         "impact": "Rất cao",
         "weight": 2.0
+      },
+      {
+        "id": "news-VND-45",
+        "title": "Đón sóng lợi nhuận quý II: Cổ phiếu nào sẽ dẫn dắt thị trường?",
+        "summary": "Bản tin phân tích về VND từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-04.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-07-04",
+        "source": "Tin nhanh chứng khoán",
+        "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPUjRzeS1WbU1GQVRteWZoZ2g4TklRNmpUaXNTRDVSYmJGLUdPSWhucmJ4OTlyVUhjcDJnRnctVkFPVEk0R1RYb212dlljRDVyU0lHcmt0MU1yN3VKOHFGeFZRaEF3eHJDeFRaSUdyUjRTWmJ6LW5MQXVTRFBKRGhLLWNoak5nb0tLbFZqQWFFYWZSZThUMnFmQ1NnSWg4UHFFRUdFbkNLM2NTM09HT2Zj0gGrAUFVX3lxTE83dEx2SmEwaFN6Z3pLYlBYZWR4eDBySlNQaklQdmFLOWMySk5KUG9yWGhoYXJ5TzFHUFdnWjQ5bC1BWmxNaS1Fc2t4V1E5RlM1YnNpdi12d0pNTXh2OGZ4V2xETEkwTU1ncnVYOHVUbE9KVFo1Nl9lYWRvNFVJUUlzd0Z6WDdnenFrVnRJcEhVd0xNemc3MnJzTnhuTjNibkNnQmtEVHVxVGxPaw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
       },
       {
         "id": "news-VND-46",
@@ -2445,20 +2464,6 @@
       },
       {
         "id": "news-VND-48",
-        "title": "'Mưa' cổ tức tháng 7: Hàng chục nghìn tỷ đồng về túi cổ đông",
-        "summary": "Bản tin phân tích về VND từ nguồn Nhadautu.vn. Cập nhật ngày 2026-06-26.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-06-26",
-        "source": "Nhadautu.vn",
-        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPc24xQi04TVQ3Ymp3VHE0X3F6RjR4bGQ2UzF1TG85VFhjSTVjcGZWMXA3bU1lak5GeVh6cklPMDlfUUdwNW0wZ1dnVDdmT1Q0R003RnFkeVBTODJ1dkk3UzVTR2VyU1lVY0t3M3BKNUx0cWNaMm5KWHZPbGhsN1lwanpYVzNFanBIa2tjanItblNPdksy?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-VND-49",
         "title": "Sau lời hứa 'trở lại đường đua' của nữ tướng Phạm Minh Hương, cổ phiếu VND đi được đến đâu?",
         "summary": "Bản tin phân tích về VND từ nguồn VietnamFinance. Cập nhật ngày 2026-06-23.",
         "category": "biz",
@@ -2472,7 +2477,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-VND-50",
+        "id": "news-VND-49",
         "title": "Tập đoàn GELEX (GEX): Đón “sóng kép” từ dòng vốn hàng tỷ USD đổ vào hạ tầng điện, sản xuất chế tạo",
         "summary": "Bản tin phân tích về VND từ nguồn Tạp chí Công Thương. Cập nhật ngày 2026-06-14.",
         "category": "biz",
@@ -2484,28 +2489,42 @@
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
+      },
+      {
+        "id": "news-VND-50",
+        "title": "VND xoay xở giành lại thị phần",
+        "summary": "Bản tin phân tích về VND từ nguồn Tạp chí Diễn đàn Doanh nghiệp. Cập nhật ngày 2026-06-02.",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2026-06-02",
+        "source": "Tạp chí Diễn đàn Doanh nghiệp",
+        "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1tN0pTbUt0cG41TXBlZ1dra2FPa0VEczJnNzRPeHlsVmc5OGZmeFJVMU14T3VGMFNjb0VkNjY5V3EtTlp1dXJhd3B1VFFzZXNRblVONGdzakw0c3NrQzh5SzQ3aWp4cFg4TlN5Y2txa0plUTZGUzl0THZYV1E3XzA?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
       }
     ],
     "sentiment": {
-      "score": 31.3,
+      "score": 33.8,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
       "bullishCount": 15,
-      "neutralCount": 33,
-      "bearishCount": 2,
+      "neutralCount": 34,
+      "bearishCount": 1,
       "totalCount": 50,
       "categoryScores": {
-        "biz": 20.3,
-        "macro": 60.0,
-        "disclosure": 39.2,
-        "sector": 42.9,
+        "biz": 31.8,
+        "macro": 50.0,
+        "disclosure": 32.7,
+        "sector": 60.0,
         "analyst": 0.0
       }
     },
     "tldr": {
       "title": "VND 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về VND nghiêng rõ rệt về chiều hướng tích cực với 15/50 tin tức mang gam màu tươi sáng (30.0%). Tâm điểm chú ý xoay quanh: 'Ordföranden och sekreteraren för Royal Invest (RYG) registrerade gemensamt för att köpa 1,5 miljoner aktier när marknadspriset sjönk till 6 680 VND.'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về VND nghiêng rõ rệt về chiều hướng tích cực với 15/50 tin tức mang gam màu tươi sáng (30.0%). Tâm điểm chú ý xoay quanh: 'TPHCM vào cao điểm mua sắm, doanh thu dự kiến vượt 97.000 tỷ đồng'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2519,7 +2538,7 @@
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+31.3",
+          "value": "+33.8",
           "type": "positive"
         },
         {
@@ -2614,7 +2633,7 @@
     "summary": "M-Score = -0.93 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
   },
   "magicFormula": {
-    "earningsYield": 15.61,
+    "earningsYield": 16.45,
     "roic": 8396.0,
     "compositeScore": 100.0,
     "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
@@ -2622,8 +2641,8 @@
     "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
     "parameters": {
       "ebitTTM": 2099.0,
-      "enterpriseValue": 13447.2,
-      "marketCap": 21997.2,
+      "enterpriseValue": 12762.2,
+      "marketCap": 21312.2,
       "netDebt": -8550.0,
       "capitalEmployed": 25.0
     },
@@ -2733,7 +2752,7 @@
       "summary": "M-Score = -0.93 (> -1.78). Cảnh báo rủi ro làm đẹp số liệu BCTC, tốc độ tăng khoản phải thu hoặc dồn tích cao."
     },
     "magicFormula": {
-      "earningsYield": 15.61,
+      "earningsYield": 16.45,
       "roic": 8396.0,
       "compositeScore": 100.0,
       "category": "Hạng 1: Siêu Phẩm (Chất Lượng Xuất Sắc & Định Giá Hời)",
@@ -2741,8 +2760,8 @@
       "recommendation": "MUA MẠNH theo tiêu chí Joel Greenblatt Magic Formula.",
       "parameters": {
         "ebitTTM": 2099.0,
-        "enterpriseValue": 13447.2,
-        "marketCap": 21997.2,
+        "enterpriseValue": 12762.2,
+        "marketCap": 21312.2,
         "netDebt": -8550.0,
         "capitalEmployed": 25.0
       },
