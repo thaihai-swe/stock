@@ -2,14 +2,14 @@
   "_meta": {
     "symbol": "DXG",
     "companyName": "Bluemarq Group Joint Stock Company",
-    "updatedAt": "2026-11-26T19:56:17Z",
+    "updatedAt": "2026-11-27T19:45:34Z",
     "unit": "Tỷ đồng (Bn. VND) đối với số tuyệt đối, đ/cp đối với EPS & Giá",
     "source": "Yahoo Finance (yfinance) Official Audit Statements",
     "status": "AUDITED_REAL_DATA",
     "exchange": "HOSE"
   },
   "valuationMultiples": {
-    "grahamNumber": 820,
+    "grahamNumber": 822,
     "ddmTarget": null,
     "peTarget": 4158,
     "pbTarget": 14115,
@@ -17,9 +17,9 @@
     "pcfFairPrice": null,
     "psFairPrice": 3696,
     "consensusFairValue": 14115,
-    "marginOfSafety": 28.1,
-    "upside": 39.1,
-    "consensusDiffPercent": 39.1,
+    "marginOfSafety": 26.3,
+    "upside": 35.7,
+    "consensusDiffPercent": 35.7,
     "valuationRating": "🟡 HOLD",
     "valuationRatingText": "Thiếu độ phủ mô hình hoặc phân tán cao",
     "valuationRatingBadge": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
@@ -30,9 +30,9 @@
         "name": "Benjamin Graham",
         "fullName": "1. Benjamin Graham",
         "cleanName": "Benjamin Graham",
-        "value": 820,
-        "targetPrice": 820,
-        "diffPercent": -91.9,
+        "value": 822,
+        "targetPrice": 822,
+        "diffPercent": -92.1,
         "weight": 0.05,
         "baseWeight": 0.05,
         "suitability": 1.0,
@@ -40,7 +40,7 @@
         "isOutlier": true,
         "outlierGapPct": 94.2,
         "formula": "EPS × (PE_base + hs × g) × (Hằng số_VN / y)",
-        "formulaDetail": "V = 94 × (7.0x + 0.8 × 3.5%) × (4.45% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.890",
+        "formulaDetail": "V = 94 × (7.0x + 0.8 × 3.5%) × (4.46% / 5.0%) | Bội số=9.80x, Tỷ số LS=0.892",
         "parameters": {
           "eps": 94.0,
           "epsAvg": 222,
@@ -48,9 +48,9 @@
           "peMedian": 44.23,
           "hs": 0.8,
           "gCagr": 3.5,
-          "constantVn": 4.45,
+          "constantVn": 4.46,
           "yVn": 5.0,
-          "vn10yYield": 4.45
+          "vn10yYield": 4.46
         },
         "statusNote": "Phù hợp"
       },
@@ -61,7 +61,7 @@
         "cleanName": "P/E Chuẩn Hóa",
         "value": 4158,
         "targetPrice": 4158,
-        "diffPercent": -59.0,
+        "diffPercent": -60.0,
         "weight": 0.1,
         "baseWeight": 0.1,
         "suitability": 1.0,
@@ -87,7 +87,7 @@
         "cleanName": "P/B Ngành & Gordon",
         "value": 14115,
         "targetPrice": 14115,
-        "diffPercent": 39.1,
+        "diffPercent": 35.7,
         "weight": 0.18,
         "baseWeight": 0.18,
         "suitability": 1.0,
@@ -222,7 +222,7 @@
         "cleanName": "Residual Income RIM/EVA",
         "value": 261118,
         "targetPrice": 261118,
-        "diffPercent": 2472.6,
+        "diffPercent": 2410.8,
         "weight": 0.044,
         "baseWeight": 0.08,
         "suitability": 0.55,
@@ -247,7 +247,7 @@
         "cleanName": "Book NAV / P/B Chuẩn Hóa",
         "value": 14115,
         "targetPrice": 14115,
-        "diffPercent": 39.1,
+        "diffPercent": 35.7,
         "weight": 0.32,
         "baseWeight": 0.32,
         "suitability": 1.0,
@@ -374,8 +374,8 @@
       }
     },
     "threeLayerDecision": {
-      "compositeScore": 6.0,
-      "valuationLayerScore": 9.6,
+      "compositeScore": 5.9,
+      "valuationLayerScore": 9.3,
       "qualityLayerScore": 1.5,
       "timingLayerScore": 6.5,
       "roeCoeSpread": -11.08,
@@ -400,7 +400,7 @@
         "p50": 44.23,
         "p75": 49.71,
         "mean": 44.68,
-        "current": 107.98,
+        "current": 110.64,
         "yearsUsed": 4
       },
       "pbBand": {
@@ -408,7 +408,7 @@
         "p50": 1.25,
         "p75": 1.32,
         "mean": 1.18,
-        "current": 0.9,
+        "current": 0.92,
         "yearsUsed": 4
       },
       "priceBands": {
@@ -455,9 +455,9 @@
           "key": "pe",
           "label": "Hệ số P/E",
           "unit": "x",
-          "current": 107.59,
+          "current": 110.24,
           "sma5y": 44.68,
-          "deltaPct": 140.8,
+          "deltaPct": 146.7,
           "status": "Suy giảm so với TB",
           "badgeColor": "text-rose-400 font-semibold",
           "invertLogic": true
@@ -466,9 +466,9 @@
           "key": "pb",
           "label": "Hệ số P/B",
           "unit": "x",
-          "current": 0.9,
+          "current": 0.93,
           "sma5y": 1.18,
-          "deltaPct": -23.4,
+          "deltaPct": -20.9,
           "status": "Cải thiện rõ rệt",
           "badgeColor": "text-emerald-500 font-semibold",
           "invertLogic": true
@@ -611,11 +611,11 @@
   },
   "financialRatios": {
     "valuation": {
-      "pe": 107.59,
-      "pb": 0.9,
-      "ps": 2.91,
-      "pCf": -13.0,
-      "evEbitda": 31.2,
+      "pe": 110.24,
+      "pb": 0.93,
+      "ps": 2.98,
+      "pCf": -13.3,
+      "evEbitda": 31.9,
       "dividendYield": 0.0
     },
     "profitability": {
@@ -677,6 +677,24 @@
       "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOcnBRb1JjbG1VOGUtM2NheUs2UjY2dWRObHd5X0JmMHF4WlQ1N2phOW9jX1VOSTRTNUJTbEVGejI3ZU9TT1A2SHQxT3FQOFk1VG5nbnoySFZUcElqWndnQTU5eUo1VHlwNmkyYmRTOWMyN05yZ18yNkNlaEs0MnJ6N2p6NmNGdHVHbFMyRnN3bHJfTldITVE?oc=5"
     },
     {
+      "date": "2026-11-11",
+      "type": "Giao dịch nội bộ",
+      "content": "Nhóm quỹ Dragon Capital mua 5 triệu cổ phiếu, trở lại ghế cổ đông lớn DXG",
+      "ratio": "—",
+      "value": null,
+      "source": "Vietstock",
+      "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNX01HY3ctd0lnX1lXajdUZTFMM1hJNzhjS0lKTlB0elpXWU9ISVI1Ukt2dGphZ1pLbjEwcVJBYXk5YXlQWERmU0l5MVJoTWhfRTZWM3ZpQl84aDEzcGM0ZjhBNEtOLW1BV0U0cmRoOGNvUFNyV1ZNRG5HYVczVWtSYS1jNkxsYXhGTmFWdXJXTjF6TVlrVm5uUHJnRUhHNnhWaVgwYzFMNnBHYjU4djlQTjktR0wtWDZE?oc=5"
+    },
+    {
+      "date": "2026-11-10",
+      "type": "Giao dịch nội bộ",
+      "content": "Bluemarq Group (DXG): Khối ngoại gom 5 triệu cổ phiếu, quỹ của tỷ phú Bill Gates quay lại mua vào",
+      "ratio": "—",
+      "value": null,
+      "source": "Báo Pháp Luật Việt Nam",
+      "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQWUVWcVhaSmRmVEJ2Mld3MG5sQWFPNkFPRzBVd3dvN0E2M1lQc2gxRThKdlhBQWJSaFFFMlA2ZVZVVlZRLVlpWjBQb3BWcHZvdG03bUdfZUxBaHp1N3FCZmJZN1dZQWtjeE9hbkNwQVlBWVFEZG0tRDhTNkZlaG9CajNHbmlZbTN0N05VZXc1bVVRZ21HSFpDR0JnUGtTeUo0eEctV2xsTUs2Ulh0TnBCTkg0aXpPeXZCZ3RHSlNGazFnbFE2RzU3Y0Juaw?oc=5"
+    },
+    {
       "date": "2026-11-09",
       "type": "Giao dịch nội bộ",
       "content": "Nhóm quỹ liên quan Dragon Capital quay trở lại ghế cổ đông lớn sau khi gom thêm 5 triệu cổ phiếu DXG",
@@ -695,33 +713,6 @@
       "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOVGdBWF9rblpQdWdpLWQtYllVU1ppX0RTdXJGSHZKZTk3QVRrR3NZSkQwRWJhOUpZVmV5R3Z4a0V4U1QxVXJxM0ZybjhlWEZPQ1BCMHVVcjlpWkl1UUVjRW5XMzdhRTRHSGNVWXUwcGpnWEJWZC1WeFNuWUY1cnlSczVZeUQ0dnR6WmNReDNYN0hKdkN0?oc=5"
     },
     {
-      "date": "2026-07-19",
-      "type": "Giao dịch nội bộ",
-      "content": "Dragon Capital tiếp tục bán cổ phiếu DXG, không còn là cổ đông lớn",
-      "ratio": "—",
-      "value": null,
-      "source": "Znews",
-      "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQckVrZ1V4UEpiNnRwbWRBMWkwZG9ZUWU4TGlzazh3ZkhlZGN3allNMFJtejdVcGYzb21BeWZ2el9JaWRnVWFuOWt6SHNKTE5ROVlLQmdBaVZ3UlgzSzY5QjJLS0VuZU51VkR2eDdaN2pSTkNHaTNyV2RGLWRYdXQyMlc3VXdzSmVMWHpPVTVzaDFIN1dJVFVOYUtZbHZmNFVD?oc=5"
-    },
-    {
-      "date": "2026-07-17",
-      "type": "Giao dịch nội bộ",
-      "content": "Dragon Capital không còn là cổ đông lớn tại Bluemarq Group (DXG)",
-      "ratio": "—",
-      "value": null,
-      "source": "Tin nhanh chứng khoán",
-      "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOblVWZjcwUllSTzdmNWRkUDh1YzRTYlNaazRiZXBQX0FDdkNlRUVtclZ2X1JqaHBocUxtdGtPaFU1QjdnWDFIeVpCbGktLTEyZUVEeWVCbHhjQng2VzhCRlpxYzJ2cFUzTnFsSVZkRnlYVkQ3UEhJTi1LQlp3UnN1V1prbjR5MktqSEhzQlh6a1pNanNvdGIzcW5UeUY4dmJRUUthRnRMd0x3Q2w0QXJiV2N30gGuAUFVX3lxTE1GWDVteUhMdkZLbXpnOXF1TVB2QWo0X28wSVp5WEk4QjZiSlg3N2JVcHFpTWpma09oeXFNSGg5SUhCbU40NjlITTE2TXJISXdLTFlfdG0zd3FIS09iaVlfMTFTM1VPZzlEaVRhbGRSRWhudjlRUldkeWU2ZHAtdy1MZjR3RzdXREExcEU1MDNtYjl1VGpUNHh6Ml9sQ0hMOG9tYWtCVjdMc1RCNU11UQ?oc=5"
-    },
-    {
-      "date": "2026-06-17",
-      "type": "Giao dịch nội bộ",
-      "content": "Nhóm Dragon Capital bán ra 2,6 triệu cổ phiếu Bluemarq Group (DXG)",
-      "ratio": "—",
-      "value": null,
-      "source": "Tin nhanh chứng khoán",
-      "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxObmVucTZPbXZHT1g1UGFSaHZDWGdzSFprMjhpYl9xRWExWUFKQVVsYkVLdV9BRnd2bW55VGJwazVoa3JBb1NtR05DTkJLcng5UGtTU1g4emN2RlpPRWVvWFNlRmVJQW55WDBpUWtScnZQNVlUTjJEd3N6T0tTaGJ0eklLZHdGU1A5WjBBTENKcGpWOVNGZVk2UVIwblZqajR2dHp2bGxpU2xabGpHSU01VnN0RdIBrwFBVV95cUxPU1M2R3RDTmNud2pJR2xGRFhpZENscnNOSnl4ODAyMkhrYW5wMU1qWlB0amZNOHUxQTRYRlBoMENWaVBTcmlIbEFLeG1DRmxEazk3cjRGOW1MYmRBazRZTWtLMlF6QzZyeGhkZHRTdjRqRFhqOURqT0N4eThMR0pnU3lwUktqMUhVOUpkZHR0cnVBTzJWeWVoZ0hCS292MDNFWm52SS12SFVBZXZCeE0w?oc=5"
-    },
-    {
       "date": "2026-06-05",
       "type": "Phát hành / Tăng vốn",
       "content": "DXG tăng vốn lên gần 12.700 tỷ đồng: Vì sao cổ phiếu vẫn chưa thuyết phục dòng tiền?",
@@ -729,15 +720,6 @@
       "value": null,
       "source": "Thế giới ảnh",
       "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNQVhYM1JGY3FXalc1QVNBeVc3TEROSjZMX2VNWURHVVhfMEtIY0h2NF9NZzAzMVVkX1dqNHZpLW5uQVI1OEdpY2xiZDM2UDFqdzZDbmJVRkg3QVdqb25QZWJyYWc0SDJsdlVybWZEUjNmdHBsYU15RF9ySjg1R2lySExIUEhoanVpSlFNRkRqTjZDU3RUVVpFS1J1OC1MQ1NjRzRZZ3pTOW84NU4zbjB0SWVmNmpMS3ZXUFY1Wkl5SWd1MmxVUm55dkVnbWZyWEE?oc=5"
-    },
-    {
-      "date": "2026-05-10",
-      "type": "Phát hành / Tăng vốn",
-      "content": "Bluemarq Group (DXG) muốn phát hành hơn 155 triệu cổ phiếu thưởng, dự tăng vốn lên gần 12.700 tỷ đồng",
-      "ratio": "—",
-      "value": null,
-      "source": "Báo Pháp Luật Việt Nam",
-      "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPb1JVSWtWbmNsbDR3ZDJXYXdSV3VjeVp6YnBsNG5iN0ZyUUlLMTdFbmFZZEowbEMyWEl0OXdBT2V1clN3WjZ2YUVoTXZNRUNfdUllOGxDdjl4MkxDdndpdXdVdHJ1ck8wS3RnLTFBT1RIMnBtdXhTN1JSVmdJaWJvR0hORTJDQXVIR1VUU2htVWJtUURRZloxOWE2bmE2UmlnMnp6bWdoR2VjSTJjaFk1WW9taXZMZFd1eGQ2T0FHcEs5SzBEY0VRMEJJeFVCMzFZTXc?oc=5"
     },
     {
       "date": "2026-05-09",
@@ -756,6 +738,15 @@
       "value": null,
       "source": "Tin nhanh chứng khoán",
       "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxQMEdPeW1DXzZMbGdWTGVXS01nbm9pdlpyNkdrNjdmNmJtQ3RrbFVhazg1SnREZVl3dkk4UF9BanBuMnJfdmFaamd0aFZTbkVfTUdtd3Noc2d4QnY2UU5qZllsQkFqTHRTQU1uN0xnZDVEbmRoZUNLRHJEZjJJcXJHaGE2ZlJvdzdHcUtRNmhRTUJiOVg2cjFsWnZDWUpCTVhnaVg4cVc2Tms4VGZuZ25XNXo5c1g0VVpUZjg3cUcwZmI5UnhsYVF6YmJEbFJKU3g1RTJmbDVGUl9XZVhtcmNBXzRCWnRzdThz0gHkAUFVX3lxTE1aTlNnMkJQeGlOQlJhWHl0bWlWbldYWjY3Q1Y4Q2JtYlpvTEF1dlNKZ19wRmNlcTI1ekN1bWlTOGkzQTl3MXF6VE5lOWJJdlM5bmFEanlpWkdZLVJIU0lBMTlYb1pGRFlFOVVESEliaE9SbTFqX2NxNkgxcnJjSVZBVlJVYWs1M0NKSEllbElEbXNwdFJycjMtcWlSajF6MmJQS0VoQjZ4MXFnQjdZVURVbnFJYzNrYjRVMF94R3JjUWgzTVRTRnBGdmhuamprekV5ZE5JLXZpZUktelVSdXg1QkVzSQ?oc=5"
+    },
+    {
+      "date": "2026-04-07",
+      "type": "Phát hành / Tăng vốn",
+      "content": "Sắp phát hành hơn 155 triệu cổ phiếu thưởng, Đất Xanh (DXG) lên kế hoạch đổi tên công ty",
+      "ratio": "—",
+      "value": null,
+      "source": "Báo Pháp Luật Việt Nam",
+      "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQRkFaM0VQMlBLNm9XZ2U2ZzZ2Z3FBaVduZ2k2Z18xNGcteXBOTHFFeTYwR0lIal9YQ2RxQ1UtV1V2YUZzc2xiVWU0cnhwMDJhSjJ4UVI4T2ktSFZkNkhrRzF5VVBzU0pzUVpaOFNNUDB2ZEI3Y3RNRmJwLWlLMGNoU0N4cjd6NEJiUmZESVJIN1VBei1CVkoxbXBMbnpRb0xFbGRyVW11UU9oUDZPeGt4R056c0ZYOHVwUjVMcks2ZXY?oc=5"
     }
   ],
   "shareholders": [
@@ -1488,7 +1479,7 @@
     "sharpeRatio": 0.8,
     "sortinoRatio": 1.14,
     "beta": 1.0,
-    "riskFreeRate": 4.45,
+    "riskFreeRate": 4.46,
     "ratings": {
       "volatility": "Cao",
       "drawdown": "Trung bình",
@@ -1580,7 +1571,7 @@
           "priceHigh": 10048,
           "priceMid": 9938,
           "volume": 88643800.0,
-          "volumePercent": 13.6
+          "volumePercent": 13.7
         },
         {
           "index": 2,
@@ -1588,15 +1579,15 @@
           "priceHigh": 10267,
           "priceMid": 10158,
           "volume": 136465900.0,
-          "volumePercent": 21.0
+          "volumePercent": 21.1
         },
         {
           "index": 3,
           "priceLow": 10267,
           "priceHigh": 10486,
           "priceMid": 10376,
-          "volume": 6278200.0,
-          "volumePercent": 1.0
+          "volume": 13871800.0,
+          "volumePercent": 2.1
         },
         {
           "index": 4,
@@ -1604,7 +1595,7 @@
           "priceHigh": 10705,
           "priceMid": 10596,
           "volume": 115824000.0,
-          "volumePercent": 17.8
+          "volumePercent": 17.9
         },
         {
           "index": 5,
@@ -1612,7 +1603,7 @@
           "priceHigh": 10924,
           "priceMid": 10814,
           "volume": 61146100.0,
-          "volumePercent": 9.4
+          "volumePercent": 9.5
         },
         {
           "index": 6,
@@ -1620,7 +1611,7 @@
           "priceHigh": 11143,
           "priceMid": 11034,
           "volume": 95634300.0,
-          "volumePercent": 14.7
+          "volumePercent": 14.8
         },
         {
           "index": 7,
@@ -1628,7 +1619,7 @@
           "priceHigh": 11362,
           "priceMid": 11252,
           "volume": 44429300.0,
-          "volumePercent": 6.8
+          "volumePercent": 6.9
         },
         {
           "index": 8,
@@ -1643,8 +1634,8 @@
           "priceLow": 11581,
           "priceHigh": 11800,
           "priceMid": 11690,
-          "volume": 35321400.0,
-          "volumePercent": 5.4
+          "volume": 23867500.0,
+          "volumePercent": 3.7
         }
       ],
       "poc": {
@@ -1653,7 +1644,7 @@
         "priceHigh": 10267,
         "priceMid": 10158,
         "volume": 136465900.0,
-        "volumePercent": 21.0
+        "volumePercent": 21.1
       },
       "hvn": [
         {
@@ -1662,7 +1653,7 @@
           "priceHigh": 10048,
           "priceMid": 9938,
           "volume": 88643800.0,
-          "volumePercent": 13.6
+          "volumePercent": 13.7
         },
         {
           "index": 2,
@@ -1670,7 +1661,7 @@
           "priceHigh": 10267,
           "priceMid": 10158,
           "volume": 136465900.0,
-          "volumePercent": 21.0
+          "volumePercent": 21.1
         },
         {
           "index": 4,
@@ -1678,7 +1669,7 @@
           "priceHigh": 10705,
           "priceMid": 10596,
           "volume": 115824000.0,
-          "volumePercent": 17.8
+          "volumePercent": 17.9
         },
         {
           "index": 6,
@@ -1686,7 +1677,7 @@
           "priceHigh": 11143,
           "priceMid": 11034,
           "volume": 95634300.0,
-          "volumePercent": 14.7
+          "volumePercent": 14.8
         }
       ],
       "lvn": [
@@ -1703,28 +1694,28 @@
           "priceLow": 10267,
           "priceHigh": 10486,
           "priceMid": 10376,
-          "volume": 6278200.0,
-          "volumePercent": 1.0
+          "volume": 13871800.0,
+          "volumePercent": 2.1
         },
         {
           "index": 9,
           "priceLow": 11581,
           "priceHigh": 11800,
           "priceMid": 11690,
-          "volume": 35321400.0,
-          "volumePercent": 5.4
+          "volume": 23867500.0,
+          "volumePercent": 3.7
         }
       ],
       "priceRange": {
         "min": 9610,
         "max": 11800
       },
-      "totalVolume": 649534100
+      "totalVolume": 645673800
     },
     "moneyFlow": {
       "vpci": 0.69,
       "vpciStatus": "VOLUME_FADING",
-      "cmf": 0.29,
+      "cmf": 0.339,
       "cmfStatus": "ACCUMULATION",
       "obvTrend": "BEARISH_FLOW"
     },
@@ -1734,8 +1725,8 @@
       "state": "BALANCED_MARKET"
     },
     "tailRisk": {
-      "skewness": 0.62,
-      "kurtosis": 1.88,
+      "skewness": 0.57,
+      "kurtosis": 1.58,
       "var95": 3.33,
       "var99": 4.33,
       "es95": 4.01,
@@ -1769,11 +1760,11 @@
       {
         "id": "news-DXG-2",
         "title": "5 quỹ cổ phiếu sinh lời tốt nhất 3 năm qua rót tiền vào những mã nào?",
-        "summary": "Bản tin phân tích về DXG từ nguồn Báo Tuổi Trẻ. Cập nhật ngày 2026-11-22.",
+        "summary": "Bản tin phân tích về DXG từ nguồn Tuổi Trẻ. Cập nhật ngày 2026-11-22.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-11-22",
-        "source": "Báo Tuổi Trẻ",
+        "source": "Tuổi Trẻ",
         "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOY29ldGJvbW5tSVlMTnVLbFhUaEdVNzAwaGw5RlJTNjhldy1QdTR0cXlXclMtUFJpZGIxQ2w5dXUtUU4za0FOVi1WWDNrWkQ1Qmo5RzR0eWUtTFZTdkJQQnhWbG15QjJEX2l2ZFc1X1U0VHctWFp1Y3ZOX040dzFkaUFvcTdIX291dkdHWUVHRXI2Z2tZUnkzMi16dHJFOGo3NkVRZ1NvUkRpY2l5WnJZ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
@@ -1796,6 +1787,34 @@
       },
       {
         "id": "news-DXG-4",
+        "title": "Sau DXG, Dragon Capital tiếp tục nâng sở hữu tại một công ty bất động sản",
+        "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-11-17.",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2026-11-17",
+        "source": "Mekong ASEAN",
+        "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQc3ZqYm1iaGQyb2tOb1ZxTWJ2VHNiZ0dadHZKaXdIT2hwaXU4RzJqQmJrVGIwa2pnV1pCX25zMFNGbktQcHdKNDJGN2ZtREZlb24xaVdMSlYtVHNwRVF3Wk1OcUpSNE4wZHNkQXpXTE9YNnQ3dGRpWkVCZjMyWXRMYmNCMjQzZGhoaWIwYzFNMjdrZjJGeXNfRkJCb0VMVXJhUk1vOTFtZ0QxZw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-5",
+        "title": "“Cá mập\" Dragon Capital vừa bất ngờ gom hơn 17 triệu cổ phiếu một doanh nghiệp bất động sản",
+        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-16.",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2026-11-16",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQcnEtV1hMYWl2YjkyVVhVOU92VDdzSEJ1M2NObUhnbEM4ZHR5TXh5UzFtY3N5SzlFMkFINmplTmkxZG5PbkFfdm1QbmRDaGJBYXFTb2VPeU10VXlkZVBnVlJDTWJKMDY4eWQ1ZTlFQWlfQkRVVTdIWks0WVZ6dENTWUhfMUZpRWpfZUpVeWJ1ekZKRjlVdGI4TVotaG9iRzMwMGZxaHpjM2wta2NXVnBsOV9FU3RKUnhZVlRoRWpsT3ZlMmp3NG9hVw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-6",
         "title": "Dragon Capital đang mua gom cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn Znews. Cập nhật ngày 2026-11-16.",
         "category": "analyst",
@@ -1809,7 +1828,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-5",
+        "id": "news-DXG-7",
         "title": "Bluemarq Group (DXG) đón dòng vốn ngoại quy mô lớn, doanh thu 9 tháng duy trì đà tăng trưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-11-16.",
         "category": "biz",
@@ -1823,7 +1842,7 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-6",
+        "id": "news-DXG-8",
         "title": "Dragon Capital gom thêm 17 triệu cổ phiếu DXG, VinaCapital rót hơn 230 tỷ đồng vào Khang Điền",
         "summary": "Bản tin phân tích về DXG từ nguồn thitruongtaichinhtiente.vn. Cập nhật ngày 2026-11-15.",
         "category": "biz",
@@ -1837,7 +1856,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-7",
+        "id": "news-DXG-9",
+        "title": "Cổ phiếu DXG - Phân tích tiềm năng tăng trưởng - Có còn kỳ vọng? Có nên mua?. DXG - CTCP Bluemarq Group ...",
+        "summary": "Bản tin phân tích về DXG từ nguồn 24HMoney. Cập nhật ngày 2026-11-15.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-15",
+        "source": "24HMoney",
+        "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE11ZkE1SHBQdXBJYkxrUGVTTGp1Y3JRZEtRZ0pKTW10SHhMQmdJdVY2WU9PZUVyNkJqTDlMdVc2NkZMSGctc2lrQk1qOWlWQVJzTlJaZWhR?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-DXG-10",
         "title": "Bluemarq Group (DXG): Hơn 9.000 tỉ đồng khách hàng trả trước, dòng tiền kinh doanh vẫn âm",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Dân Việt. Cập nhật ngày 2026-11-15.",
         "category": "biz",
@@ -1851,21 +1884,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-8",
-        "title": "Dragon Capital nâng tỷ lệ sở hữu tại Bluemarq Group lên hơn 6%",
-        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-14.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-11-14",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQR3cyUFB0TW5zQmh3bWZBMGphRUJobDBUMXdnWGNlSm1uZFVjdnJBRGZ6SmRTcktXaHNUbE1vblN1Mmx0c2JnaW4zQnN5d0VZN2hhMWJ2bXRObktCM3c4clZnMWFXcVNDMnF1RVBkdkVaOVFUbEhxWmtRdXh5aXJoclhHaW8tR1Y0MGVSN2RZSG1SOU80YXpwQjIwU2NnZGVCYVE?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-9",
+        "id": "news-DXG-11",
         "title": "Dragon Capital chi đậm gom triệu cổ phiếu DXG, lợi nhuận Bluemarq Group quý 3 bốc hơi 84%",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-11-14.",
         "category": "biz",
@@ -1879,7 +1898,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-10",
+        "id": "news-DXG-12",
         "title": "Dragon Capital liên tục mua vào một cổ phiếu bất động sản",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-11-14.",
         "category": "sector",
@@ -1893,7 +1912,21 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-11",
+        "id": "news-DXG-13",
+        "title": "Dragon Capital nâng tỷ lệ sở hữu tại Bluemarq Group lên hơn 6%",
+        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-14.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-11-14",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQR3cyUFB0TW5zQmh3bWZBMGphRUJobDBUMXdnWGNlSm1uZFVjdnJBRGZ6SmRTcktXaHNUbE1vblN1Mmx0c2JnaW4zQnN5d0VZN2hhMWJ2bXRObktCM3c4clZnMWFXcVNDMnF1RVBkdkVaOVFUbEhxWmtRdXh5aXJoclhHaW8tR1Y0MGVSN2RZSG1SOU80YXpwQjIwU2NnZGVCYVE?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-14",
         "title": "Hai doanh nghiệp bất động sản Việt được tỷ phú Bill Gates gom hàng triệu cổ phiếu làm ăn ra sao?",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-14.",
         "category": "sector",
@@ -1907,7 +1940,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-12",
+        "id": "news-DXG-15",
         "title": "Nhóm Dragon Capital trở lại gom cổ phiếu DXG, nâng tỷ lệ sở hữu lên 6,19%",
         "summary": "Bản tin phân tích về DXG từ nguồn VIETTIMES. Cập nhật ngày 2026-11-13.",
         "category": "biz",
@@ -1921,7 +1954,63 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-13",
+        "id": "news-DXG-16",
+        "title": "Nhóm quỹ Dragon Capital mua 5 triệu cổ phiếu, trở lại ghế cổ đông lớn DXG",
+        "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-11-11.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-11-11",
+        "source": "Vietstock",
+        "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNX01HY3ctd0lnX1lXajdUZTFMM1hJNzhjS0lKTlB0elpXWU9ISVI1Ukt2dGphZ1pLbjEwcVJBYXk5YXlQWERmU0l5MVJoTWhfRTZWM3ZpQl84aDEzcGM0ZjhBNEtOLW1BV0U0cmRoOGNvUFNyV1ZNRG5HYVczVWtSYS1jNkxsYXhGTmFWdXJXTjF6TVlrVm5uUHJnRUhHNnhWaVgwYzFMNnBHYjU4djlQTjktR0wtWDZE?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-17",
+        "title": "Dragon Capital tăng nắm giữ cổ phần tại DXG, trở lại ghế cổ đông lớn",
+        "summary": "Bản tin phân tích về DXG từ nguồn VnEconomy. Cập nhật ngày 2026-11-11.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-11-11",
+        "source": "VnEconomy",
+        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQYWlpdW1CRktjbDY0MXFEbkZHY2xYdk9xVXkya2VVYlJZVnFQQjRoWlpJWFRpNUhKQktWYnBfRHVCLXAta0ozZUxlRUxUU0dDdUN4V1dJSVRhWEtUQmUzUjI4c1dQNlpoSkh2QlZmYWI1di0xNEo5SWM0S0JET1Rnd1p4LUFaTEQxM3N0cG5SSDktZXZjSnZ3?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-18",
+        "title": "Tỷ phú Bill Gates bất ngờ mua thêm 200.000 cổ phiếu một công ty bất động sản Việt Nam",
+        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-10.",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2026-11-10",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNNUxDU3FwczJZMVlQbjBwMDV6OV9DZ3Q1Y3dPYWRxaW11WWxsZkJmdUt6NGtBRURjV0ZxV25XTkFpNHd4UFRYVHE5ZHRGbmVhLW1SOER0YVZaWjJOM1daNFRNVUVVTmZVS0otTUVpLTJrbUdCZ0dDU0lCdFdUZlFuT3BnN201TkprV2RmY1Bfc2w5TmZjcS1SdHYweXBlY0dHTG1sdEV2bUlPSE1QR0J1dHhVWnlSRkVnR3duWUd2Sm9udw?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-19",
+        "title": "Bluemarq Group (DXG): Khối ngoại gom 5 triệu cổ phiếu, quỹ của tỷ phú Bill Gates quay lại mua vào",
+        "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-11-10.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-11-10",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQWUVWcVhaSmRmVEJ2Mld3MG5sQWFPNkFPRzBVd3dvN0E2M1lQc2gxRThKdlhBQWJSaFFFMlA2ZVZVVlZRLVlpWjBQb3BWcHZvdG03bUdfZUxBaHp1N3FCZmJZN1dZQWtjeE9hbkNwQVlBWVFEZG0tRDhTNkZlaG9CajNHbmlZbTN0N05VZXc1bVVRZ21HSFpDR0JnUGtTeUo0eEctV2xsTUs2Ulh0TnBCTkg0aXpPeXZCZ3RHSlNGazFnbFE2RzU3Y0Juaw?oc=5",
+        "sentiment": "bullish",
+        "sentimentValue": 1,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-DXG-20",
         "title": "Dragon Capital mua thêm 5 triệu cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-11-09.",
         "category": "analyst",
@@ -1935,7 +2024,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-14",
+        "id": "news-DXG-21",
         "title": "Nhóm quỹ liên quan Dragon Capital quay trở lại ghế cổ đông lớn sau khi gom thêm 5 triệu cổ phiếu DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-09.",
         "category": "disclosure",
@@ -1949,7 +2038,21 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-15",
+        "id": "news-DXG-22",
+        "title": "Dragon Capital trở lại ghế cổ đông lớn DXG",
+        "summary": "Bản tin phân tích về DXG từ nguồn An ninh Tiền tệ. Cập nhật ngày 2026-11-09.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-11-09",
+        "source": "An ninh Tiền tệ",
+        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOMHB3Yzh2ZTYyNUhaX3JLbzI1VUhWZTVINTZXVmFEXzd2cG45R0pwRDg0WmxwcUNhc2pVeW1QaE1pblNiV0JvTm0tUXEtQm82QjFLTkRkcWFNcXRPWHFsZHBPSGFTZ1FELVoxUWdSaXRMT3ZoV0FSTDJTWmstZEVVU0pFbFpGaEFaV25GeXBHMjlaQWNXdGtZ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-23",
         "title": "Dragon Capital bất ngờ \"gom\" 5 triệu cổ phiếu DXG, chính thức trở lại ghế cổ đông lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn 24HMoney. Cập nhật ngày 2026-11-09.",
         "category": "disclosure",
@@ -1963,7 +2066,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-16",
+        "id": "news-DXG-24",
         "title": "Dragon Capital bất ngờ “gom” mạnh DXG",
         "summary": "Bản tin phân tích về DXG từ nguồn 24HMoney. Cập nhật ngày 2026-11-09.",
         "category": "biz",
@@ -1977,7 +2080,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-17",
+        "id": "news-DXG-25",
         "title": "DXG báo lãi giảm 98%, hơn 9.000 tỷ đồng người mua trả tiền trước",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-11-02.",
         "category": "analyst",
@@ -1991,7 +2094,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-18",
+        "id": "news-DXG-26",
         "title": "Nhiều doanh nghiệp cạn tiền mặt",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-11-02.",
         "category": "biz",
@@ -2005,7 +2108,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-19",
+        "id": "news-DXG-27",
         "title": "Ông Hà Đức Hiếu dự chi 151 tỷ nâng sở hữu cổ phiếu DXG lên 1,22%",
         "summary": "Bản tin phân tích về DXG từ nguồn VnEconomy. Cập nhật ngày 2026-11-01.",
         "category": "biz",
@@ -2019,7 +2122,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-20",
+        "id": "news-DXG-28",
         "title": "Bluemarq Group (DXG): Tiền khách hàng trả trước vượt 9.100 tỷ đồng, củng cố nguồn thu dài hạn",
         "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-11-01.",
         "category": "biz",
@@ -2033,7 +2136,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-21",
+        "id": "news-DXG-29",
         "title": "DXG: Môi giới hụt hơi, hàng nghìn tỷ đồng nằm ở các khoản phải thu và cho vay",
         "summary": "Bản tin phân tích về DXG từ nguồn CÔNG TY CỔ PHẦN CHỨNG KHOÁN CV. Cập nhật ngày 2026-10-31.",
         "category": "biz",
@@ -2047,21 +2150,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-22",
-        "title": "Bluemarq Group (DXG) ghi nhận kỷ lục hơn 9.000 tỷ đồng tiền người mua nhà trả trước",
-        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-10-31.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-31",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNbmItM0lPQlJ5TV9EazJHZ1JIbkgyV3RscGZZWTVOUXk2MGxVOEFaNTFYZVk1LWpjUkFVZk5la0tRVzcyYkRJanJtSTIzeXI1NWxmRDk2UklDX3YtV1hSZGRYdVdmR3R1cHF5WnFELXBJc1R2Y1BieXh4QXJ4NXFtQ1RjclNPNHFGNHp6LWN6WDl4MVpTX0tkemZMMzhiSWV6aEpUeld3U0lxamQ2Nm00ajNpWGllRWJOZzI0Ug?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Rất cao",
-        "weight": 2.0
-      },
-      {
-        "id": "news-DXG-23",
+        "id": "news-DXG-30",
         "title": "Một thành viên HĐQT DXG muốn gom 15 triệu cổ phiếu",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-10-30.",
         "category": "disclosure",
@@ -2075,49 +2164,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-24",
-        "title": "Lãnh đạo DXG đăng ký gom 15 triệu cp khi thị giá về quanh mệnh giá",
-        "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-10-30.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-10-30",
-        "source": "Vietstock",
-        "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNS1RsOC1lbTVsbUFKdWQ4VFF3RF9WcEVDNVhrUEs2U0hscnJRQ0kyZDU0aUFnTi0wRm9YTVFoQk0xRnk3c3VwZXk3Tk1pRTRCQXd6cndoZ1NrODM5c2F4ZDNIdGwydjBqMFRwYXdkeUZRVlh5WS13TjVnaFY3WWVBbVlWek5XQWZZS2tURTdGT0puZGxwR3pHc0pRWGNlQXBHd2ZZay1Qay0tV2RMS1RTeg?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-25",
-        "title": "Lãnh đạo Bluemarq Group muốn gom 15 triệu cổ phiếu DXG",
-        "summary": "Bản tin phân tích về DXG từ nguồn VietnamBiz. Cập nhật ngày 2026-10-29.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-29",
-        "source": "VietnamBiz",
-        "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxQdmlJM2c0X1FYQzlWVkk2dnlmZ3NVZ1lzcHE2WkEyUVFJV3BjbmFIMU1ZdWViVlczZ0pFNUVZeml4MUVWQXowMFpDbTh5UVduWV9heFp1ajRTeHF4R284LTRjM1pSRlZqT0RobU9vczM0TEtqc3F2RnN5R0s2T0tCM2VnRkk5QXhHMW1XOHhlQmNndjBma0FLcXJiUWxQQQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-26",
-        "title": "DXG: Công ty Cổ phần BLUEMARQ GROUP (HOSE)",
-        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-10-02.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-10-02",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBFYjB1cHhoVFIyQ2lUb2tpdGlGMmw0UV9iaUhub0Y4elZHLVlVR1Y4UzNjS21hLVFfVGNZYjFsbnNRQjNMc0xmRUIzOXNQdV96aU9vbG9ubFpmbTRybnExb0FjS081WHhKYmptcVRmWjdoOHpHODl6WEVKNA?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-27",
+        "id": "news-DXG-31",
         "title": "Cổ phiếu DXG bất ngờ tăng cận trần, thanh khoản đột biến trong phiên cuối tuần “rực lửa”",
         "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-08-15.",
         "category": "biz",
@@ -2131,7 +2178,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-28",
+        "id": "news-DXG-32",
         "title": "Bluemarq Group công bố KQKD quý II: Hé lộ “điểm tựa” đáng chú ý cho giai đoạn phục hồi sắp tới",
         "summary": "Bản tin phân tích về DXG từ nguồn MoneyF. Cập nhật ngày 2026-08-03.",
         "category": "biz",
@@ -2145,7 +2192,7 @@
         "weight": 2.0
       },
       {
-        "id": "news-DXG-29",
+        "id": "news-DXG-33",
         "title": "Chi phí tăng cao khiến lợi nhuận DXG giảm sâu",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -2159,7 +2206,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-30",
+        "id": "news-DXG-34",
         "title": "DXG: Bluemarq Group tăng doanh thu song lợi nhuận đi lùi vì chi phí phình to",
         "summary": "Bản tin phân tích về DXG từ nguồn news.cvs.vn. Cập nhật ngày 2026-08-01.",
         "category": "biz",
@@ -2173,7 +2220,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-31",
+        "id": "news-DXG-35",
         "title": "DXG cập nhật kết quả kinh doanh đáng chú ý trong quý II/2026",
         "summary": "Bản tin phân tích về DXG từ nguồn nguoiquansat.vn. Cập nhật ngày 2026-07-31.",
         "category": "biz",
@@ -2187,7 +2234,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-32",
+        "id": "news-DXG-36",
         "title": "Cổ phiếu DXG giảm sàn sau khi mất cổ đông lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn VnBusiness. Cập nhật ngày 2026-07-20.",
         "category": "disclosure",
@@ -2201,35 +2248,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-33",
-        "title": "Dragon Capital tiếp tục bán cổ phiếu DXG, không còn là cổ đông lớn",
-        "summary": "Bản tin phân tích về DXG từ nguồn Znews. Cập nhật ngày 2026-07-19.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-07-19",
-        "source": "Znews",
-        "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQckVrZ1V4UEpiNnRwbWRBMWkwZG9ZUWU4TGlzazh3ZkhlZGN3allNMFJtejdVcGYzb21BeWZ2el9JaWRnVWFuOWt6SHNKTE5ROVlLQmdBaVZ3UlgzSzY5QjJLS0VuZU51VkR2eDdaN2pSTkNHaTNyV2RGLWRYdXQyMlc3VXdzSmVMWHpPVTVzaDFIN1dJVFVOYUtZbHZmNFVD?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-34",
-        "title": "Dragon Capital không còn là cổ đông lớn tại Bluemarq Group (DXG)",
-        "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-07-17.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-07-17",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOblVWZjcwUllSTzdmNWRkUDh1YzRTYlNaazRiZXBQX0FDdkNlRUVtclZ2X1JqaHBocUxtdGtPaFU1QjdnWDFIeVpCbGktLTEyZUVEeWVCbHhjQng2VzhCRlpxYzJ2cFUzTnFsSVZkRnlYVkQ3UEhJTi1LQlp3UnN1V1prbjR5MktqSEhzQlh6a1pNanNvdGIzcW5UeUY4dmJRUUthRnRMd0x3Q2w0QXJiV2N30gGuAUFVX3lxTE1GWDVteUhMdkZLbXpnOXF1TVB2QWo0X28wSVp5WEk4QjZiSlg3N2JVcHFpTWpma09oeXFNSGg5SUhCbU40NjlITTE2TXJISXdLTFlfdG0zd3FIS09iaVlfMTFTM1VPZzlEaVRhbGRSRWhudjlRUldkeWU2ZHAtdy1MZjR3RzdXREExcEU1MDNtYjl1VGpUNHh6Ml9sQ0hMOG9tYWtCVjdMc1RCNU11UQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-35",
+        "id": "news-DXG-37",
         "title": "Dự báo lợi nhuận quý 2/2026 nhóm doanh nghiệp bất động sản lớn",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-06-20.",
         "category": "biz",
@@ -2241,34 +2260,6 @@
         "sentimentValue": 0,
         "impact": "Trung bình",
         "weight": 1.0
-      },
-      {
-        "id": "news-DXG-36",
-        "title": "Dragon Capital ‘xả hàng’ 2,6 triệu cổ phiếu DXG",
-        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-06-18.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-06-18",
-        "source": "CafeF",
-        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPOGItQlN4RkN6bVljaFc0MzRNVm5EWXBpN1BjaVJnOXFaMWtjcGNuUEdUNEl6a282NHA4VkdZNngxWElSaUFOaXFPd19Wdy02UmpYczlzWC1QTldob1dfOWJia0NQSEJKTU9EUnJrMWJjSk9wVFhHd2pybk9PaHhzNWtsWHZrVkxMQjBtbg?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-37",
-        "title": "Nhóm Dragon Capital bán ra 2,6 triệu cổ phiếu Bluemarq Group (DXG)",
-        "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-06-17.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-06-17",
-        "source": "Tin nhanh chứng khoán",
-        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxObmVucTZPbXZHT1g1UGFSaHZDWGdzSFprMjhpYl9xRWExWUFKQVVsYkVLdV9BRnd2bW55VGJwazVoa3JBb1NtR05DTkJLcng5UGtTU1g4emN2RlpPRWVvWFNlRmVJQW55WDBpUWtScnZQNVlUTjJEd3N6T0tTaGJ0eklLZHdGU1A5WjBBTENKcGpWOVNGZVk2UVIwblZqajR2dHp2bGxpU2xabGpHSU01VnN0RdIBrwFBVV95cUxPU1M2R3RDTmNud2pJR2xGRFhpZENscnNOSnl4ODAyMkhrYW5wMU1qWlB0amZNOHUxQTRYRlBoMENWaVBTcmlIbEFLeG1DRmxEazk3cjRGOW1MYmRBazRZTWtLMlF6QzZyeGhkZHRTdjRqRFhqOURqT0N4eThMR0pnU3lwUktqMUhVOUpkZHR0cnVBTzJWeWVoZ0hCS292MDNFWm52SS12SFVBZXZCeE0w?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Cao",
-        "weight": 1.5
       },
       {
         "id": "news-DXG-38",
@@ -2292,7 +2283,7 @@
         "categoryLabel": "Phân Tích CTCK",
         "date": "2026-06-04",
         "source": "Chứng khoán DNSE",
-        "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPRlVXcXZQZ05JVGRTcTBXOFloaEppZTdxbmo4TmZ1TlN0TmhnNmU4S2JxWHV0VUxaRzFPVVJ3R3FoaVNZUlFabEl1WS1vbmJKSkRXN2NBY29Mc2xQRjNDd0hnc0lHakpFQk5PSlZleTcycWlHQmdQMy1MZ3ppeXpGSGNfR3RxT2hxOHRDNC02VHVxemtHdGg4N0JES0xwSER5eU50SExSLXk3ek90VHhxWHFIazN4VGVMLXZmQmZUT0tsa1JCalRVV1VwRHp4eTBfYUFFN3BXY0szRTA?oc=5",
+        "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNNEhMQ0dTQnc0RzZZRjh5U1NaeHoxQUlkY3FjTHAtYUZ2aXQzVVIxNzkxUU9BYlNQdUVOS3VTbzRDZEtKTGhyM1d3ckhXNk5UejduX25XaUU4b2VzRjJSc2t1VHRNeHhXMzV1NENlQ2VtUC1OaVliRXRmUzF3MTFhb1pUbFZoSmM2MVpkUDZyY0R3UkhyX1V4ZzB5X3k5aWJLLW5qdjkwUnk4ZEVkaGppWGJVeDhSNUxOR25JOHJ4NUxRUGxYODB4UnpFbnJnVmVYcFRmLWJ3NGVLUQ?oc=5",
         "sentiment": "bullish",
         "sentimentValue": 1,
         "impact": "Rất cao",
@@ -2314,13 +2305,13 @@
       },
       {
         "id": "news-DXG-41",
-        "title": "Cổ phiếu DXG “lau sàn” dư bán gần 5 triệu cp",
-        "summary": "Bản tin phân tích về DXG từ nguồn Vietstock. Cập nhật ngày 2026-05-20.",
+        "title": "Tập đoàn Đất Xanh công bố tái cấu trúc và giới thiệu thương hiệu mới",
+        "summary": "Bản tin phân tích về DXG từ nguồn thuonghieucongluan.com.vn. Cập nhật ngày 2026-05-20.",
         "category": "biz",
         "categoryLabel": "Kinh Doanh",
         "date": "2026-05-20",
-        "source": "Vietstock",
-        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQODNCRE5IVTVTbFVwX3Y3ZU5iODFPUU9Nekc0M0piaTlrWHRsOUJqdEo2RDNsRUQyS05mZ20zZHo5MUhyU0xlbE1hblFKRDQzOEltd0U4dXpDS2FLNWdDVmlkWTBSMHZPc0ttalhTQkZPRVF6Wkh6QndiSDZTTXhtQ0hrMlVJeW9GeTFhdXZKVUI?oc=5",
+        "source": "thuonghieucongluan.com.vn",
+        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPS1gxbFExYVFLazhoREE1RGM4YlpfYmpBanAtN3R4aDN1R3RZemRfWjgxbEFBcEZ6bndkQl9TUmpjQ3pfaTcyd0ZVT2V5TExzYUkzSVBHUDRHdE5CNmF4Y2poNmoxLU1KcGNwR2FWeUVKZ2hKSHFGRUYtMmpGbjZKZUc2ajlRTXJHRkZaV28xaGdNTFV5TTk1TUY2d0xrWkp4bGZiT0pkcXJmMGtIczZpSGZVTWVTQQ?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -2342,34 +2333,6 @@
       },
       {
         "id": "news-DXG-43",
-        "title": "Tập đoàn Đất Xanh công bố tái cấu trúc và giới thiệu thương hiệu mới",
-        "summary": "Bản tin phân tích về DXG từ nguồn thuonghieucongluan.com.vn. Cập nhật ngày 2026-05-20.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-05-20",
-        "source": "thuonghieucongluan.com.vn",
-        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPS1gxbFExYVFLazhoREE1RGM4YlpfYmpBanAtN3R4aDN1R3RZemRfWjgxbEFBcEZ6bndkQl9TUmpjQ3pfaTcyd0ZVT2V5TExzYUkzSVBHUDRHdE5CNmF4Y2poNmoxLU1KcGNwR2FWeUVKZ2hKSHFGRUYtMmpGbjZKZUc2ajlRTXJHRkZaV28xaGdNTFV5TTk1TUY2d0xrWkp4bGZiT0pkcXJmMGtIczZpSGZVTWVTQQ?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-44",
-        "title": "Bluemarq Group (DXG) muốn phát hành hơn 155 triệu cổ phiếu thưởng, dự tăng vốn lên gần 12.700 tỷ đồng",
-        "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-05-10.",
-        "category": "disclosure",
-        "categoryLabel": "Công Bố TT & Cổ Tức",
-        "date": "2026-05-10",
-        "source": "Báo Pháp Luật Việt Nam",
-        "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPb1JVSWtWbmNsbDR3ZDJXYXdSV3VjeVp6YnBsNG5iN0ZyUUlLMTdFbmFZZEowbEMyWEl0OXdBT2V1clN3WjZ2YUVoTXZNRUNfdUllOGxDdjl4MkxDdndpdXdVdHJ1ck8wS3RnLTFBT1RIMnBtdXhTN1JSVmdJaWJvR0hORTJDQXVIR1VUU2htVWJtUURRZloxOWE2bmE2UmlnMnp6bWdoR2VjSTJjaFk1WW9taXZMZFd1eGQ2T0FHcEs5SzBEY0VRMEJJeFVCMzFZTXc?oc=5",
-        "sentiment": "bullish",
-        "sentimentValue": 1,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-45",
         "title": "DXG triển khai phương án phát hành cổ phiếu thưởng",
         "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-05-09.",
         "category": "disclosure",
@@ -2383,35 +2346,7 @@
         "weight": 1.0
       },
       {
-        "id": "news-DXG-46",
-        "title": "DXG: CTCP Bluemarq Group - BLUEMARQ GROUP",
-        "summary": "Bản tin phân tích về DXG từ nguồn VietstockFinance. Cập nhật ngày 2026-05-08.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-05-08",
-        "source": "VietstockFinance",
-        "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBFVTJubWRqQnVZNU5qelZUSVNzYVZqZzN5dHFtTG51VkhxLTI2NEVCT0ZVQ3RfelRkcmpBTGtSNTlHNW0xRFNnOHZOaTdSX1BRYktaZEVCYUlLVjVGdGpwQVFhYkdLb2M?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-47",
-        "title": "Nhờ đâu lợi nhuận quý 1/2026 của Đất Xanh gấp gần 3 lần cùng kỳ",
-        "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-05-03.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-05-03",
-        "source": "Mekong ASEAN",
-        "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxObkNHd2xyNnl5YjRzc2RmRTJRT0s2RUMtalNfeDNJZ1p3MEJKYWJsU1E2TmxKaDhaTDFkbzJNd0RoeDFoRjdGdFRZQl8tQUhvVmdHczhweWZ3MV90VVdSbmVuWHJDRDBva19Cbl9sOVc3bHBVMXFyUmZjQXVXdWxJbUdyMFJNc0o5MTNrdWtFUnNYQ2VZWmdlOXRrX20?oc=5",
-        "sentiment": "neutral",
-        "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
-      },
-      {
-        "id": "news-DXG-48",
+        "id": "news-DXG-44",
         "title": "ĐHĐCĐ Đất Xanh (DXG) 2026: Đặt mục tiêu doanh thu 5.000 tỷ, tái cấu trúc cho chiến lược tăng trưởng bền vững",
         "summary": "Bản tin phân tích về DXG từ nguồn Tin nhanh chứng khoán. Cập nhật ngày 2026-04-17.",
         "category": "biz",
@@ -2425,14 +2360,70 @@
         "weight": 1.5
       },
       {
-        "id": "news-DXG-49",
-        "title": "ĐHĐCĐ Đất Xanh: Thưởng cổ phiếu, đổi tên công ty",
-        "summary": "Bản tin phân tích về DXG từ nguồn Mekong ASEAN. Cập nhật ngày 2026-04-17.",
+        "id": "news-DXG-45",
+        "title": "ĐHĐCĐ Đất Xanh 2026: Chuẩn bị “bứt tốc”, đặt mục tiêu lãi tối thiểu 2.000 tỷ đồng mỗi năm từ 2027",
+        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-04-17.",
         "category": "disclosure",
         "categoryLabel": "Công Bố TT & Cổ Tức",
         "date": "2026-04-17",
-        "source": "Mekong ASEAN",
-        "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQZ1psOGttS1lqbWZMSjhQTVhmanlJMl94WVRUalh2NkI5WTg4aEJFZzFCUWxia2FYREJpRkI0MlhoeHlHaU93WHpCdEZJblI2VmJmc3JPX2lMSmtsOEFqMDRvRWI5Mng5Qm1lOWhrRDdtOVVrZEdjTklYVE8yOW5aWjZFSTFmaWs?oc=5",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOa21CWnVZemlZUkJZc2htUlR6WWpJdjdXa3B3c3JNZDlzaTNXU1pGVDF1UlRLY0R1RWhBQkpJQVp3eWxfVHYyakJFSHh5ZTR2d1VQLU41LXRBOUFaWlZKZVF6cTVZZ2hXemsweVRJY3B4TmJEeHdRVnpnNTROYWJGLXRDSUV4dXd1VHBULVhsQTVKQUVYc0dWcEp4VGpEcjc3WjIyTW1QWmNkcExNdTFqQmFIVGtwNlhlanRRU2pVMzZ5MTRGMFBBSDl1LXg?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-46",
+        "title": "ĐHĐCĐ 2026: Đất Xanh (DXG) lên kế hoạch thu 5.000 tỷ đồng, chia thưởng cổ phiếu tỷ lệ 14%",
+        "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-04-17.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-17",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPeUpGQTBNazF4R2pJMUhNaVpXVlFyNlFCYWdMTXZxcTR5SDJ6RzZJU1NJcUZBWG5TZG9YV05TS1o5UjJLNzJxMldBYXRIbUF4d3NWWHZpQ0p1Wks1VDlUQ1pCYms5XzlqdXp4MF9NTnpMdS0tRVZwWnF3X1kySGhCRjNtYTRIYm1jbjEyeVNPSkZkRkRPLXdZbXV1YzdZa0lRQW9XVDJCdV9yQUx3VGpyWENNTnVFY2RhRlVXcjIwRQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Cao",
+        "weight": 1.5
+      },
+      {
+        "id": "news-DXG-47",
+        "title": "ĐHĐCĐ 2026 Đất Xanh (DXG): Nắm trong tay 10 dự án trung tâm TP.HCM, tái cấu trúc thương hiệu tiến lên quy mô toàn cầu",
+        "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-04-17.",
+        "category": "sector",
+        "categoryLabel": "Ngành & Dự Án",
+        "date": "2026-04-17",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNNzhfUnI5VHo0VGpua3BUQTVWTUtsclNJcUY1dE5jbVpQRGtELWxwMFRRWWdUNUpqTDFKV0dIdURJQ25uV3dUSDktVTNTamN0NGVzODgtcHBaOEtzek04X0pJa3o2dEQ4SjZkQXFiMm9UMHhpUk5ZM281RXpoNEJNb09QUERialRTZHlHT1dWTGF4bmt3d05YRUZCNlVrV3BrdUhMTzQzODRxNkdIQk1CamJfOFg0RTd5X3lSZVNxWlJWdm51S2FNS3hJV1ZzdUoxX3dZQXBkYUphOEJBYVBLYnJEZ0plQQ?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Rất cao",
+        "weight": 2.0
+      },
+      {
+        "id": "news-DXG-48",
+        "title": "Đất Xanh Group (DXG) miễn nhiệm một Phó Tổng giám đốc",
+        "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-04-16.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-16",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPLXJPcGtJX0prMkVpb3lRN1JNT1IyeENTSHpHaHpzd0pNcS15SFB0ZjRZbklwSWNWczViS1ZYWkJJTXVielQtMWRuaXROclZRdXZoTk40WURiNS1GNnF2Z01fam9rUjBWRTZRb0ZBVjg0MVZ4WE5GNG5MeVY2b0hrOFRIY2FraXlZRHV0Szd5eTFlWGs?oc=5",
+        "sentiment": "neutral",
+        "sentimentValue": 0,
+        "impact": "Trung bình",
+        "weight": 1.0
+      },
+      {
+        "id": "news-DXG-49",
+        "title": "Đất Xanh (DXG) muốn đổi tên, đặt mục tiêu doanh thu 5.000 tỷ đồng năm 2026",
+        "summary": "Bản tin phân tích về DXG từ nguồn CafeF. Cập nhật ngày 2026-04-11.",
+        "category": "biz",
+        "categoryLabel": "Kinh Doanh",
+        "date": "2026-04-11",
+        "source": "CafeF",
+        "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNbTN5Q1NrclV2cHFlTzlLdWNHYWRuNzl5SWNNN2VjcjI3dHZvNy14cnA4a1NrOFgxMEFDb21VTFByanpJMllPd2ctM0JUeG1zQnV5c25wZllQQXdKU2Jhekx0MlNNMjhBeGZCTFB6b3FoNW82bWhfWVUxN1p4LTZBMDd1X3BnazRyMktXX2lmc3duaDRWVl9zdDNFbkNYQTVtWlNiYV9ZLW9hUl9vV0pV?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
         "impact": "Trung bình",
@@ -2440,38 +2431,38 @@
       },
       {
         "id": "news-DXG-50",
-        "title": "ĐHĐCĐ Tập đoàn Đất Xanh 2026: Đặt mục tiêu doanh thu 5.000 tỉ đồng",
-        "summary": "Bản tin phân tích về DXG từ nguồn Laodong.vn. Cập nhật ngày 2026-04-17.",
-        "category": "biz",
-        "categoryLabel": "Kinh Doanh",
-        "date": "2026-04-17",
-        "source": "Laodong.vn",
-        "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQU2hSR1hMbW04NDJhOG9yZHZNbDhtSmNsSnplYk11WnloOWIybVRxVkdSa0k0OEdxcjBJN243d3Azcmxlam1TS2pFYU5nZFVkdHZONjVsdGYxaUszMUxhUGZXd3dWRDg4R29VQzdrYU1DckhCZXY3aWF6b1NXZHVIUG9CaTZHLWkxUTA1bWVIeFdWRzRzSnVuRTBhTy1HcVcxYnd4NUV1eWdqYlltZjZTUFY4SkpOaGNzS0hybXZvQQ?oc=5",
+        "title": "Sắp phát hành hơn 155 triệu cổ phiếu thưởng, Đất Xanh (DXG) lên kế hoạch đổi tên công ty",
+        "summary": "Bản tin phân tích về DXG từ nguồn Báo Pháp Luật Việt Nam. Cập nhật ngày 2026-04-07.",
+        "category": "disclosure",
+        "categoryLabel": "Công Bố TT & Cổ Tức",
+        "date": "2026-04-07",
+        "source": "Báo Pháp Luật Việt Nam",
+        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQRkFaM0VQMlBLNm9XZ2U2ZzZ2Z3FBaVduZ2k2Z18xNGcteXBOTHFFeTYwR0lIal9YQ2RxQ1UtV1V2YUZzc2xiVWU0cnhwMDJhSjJ4UVI4T2ktSFZkNkhrRzF5VVBzU0pzUVpaOFNNUDB2ZEI3Y3RNRmJwLWlLMGNoU0N4cjd6NEJiUmZESVJIN1VBei1CVkoxbXBMbnpRb0xFbGRyVW11UU9oUDZPeGt4R056c0ZYOHVwUjVMcks2ZXY?oc=5",
         "sentiment": "neutral",
         "sentimentValue": 0,
-        "impact": "Trung bình",
-        "weight": 1.0
+        "impact": "Cao",
+        "weight": 1.5
       }
     ],
     "sentiment": {
-      "score": 26.4,
+      "score": 27.4,
       "verdict": "BULLISH",
       "verdictText": "Tích Cực (Dòng thông tin ủng hộ xu hướng tăng)",
       "verdictBadge": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-      "bullishCount": 13,
-      "neutralCount": 34,
+      "bullishCount": 14,
+      "neutralCount": 33,
       "bearishCount": 3,
       "totalCount": 50,
       "categoryScores": {
         "analyst": 33.3,
-        "biz": 32.4,
-        "sector": 60.0,
-        "disclosure": 0.0
+        "biz": 38.2,
+        "sector": 20.0,
+        "disclosure": 9.7
       }
     },
     "tldr": {
       "title": "DXG 30 Ngày: Toàn Cảnh Bản Tin & Tâm Lý Thị Trường",
-      "summary": "Trong 30 ngày qua, dòng thông tin về DXG nghiêng rõ rệt về chiều hướng tích cực với 13/50 tin tức mang gam màu tươi sáng (26.0%). Tâm điểm chú ý xoay quanh: 'DXG Quý III/2026: Người mua trả trước tiếp tục gia tăng tích cực'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
+      "summary": "Trong 30 ngày qua, dòng thông tin về DXG nghiêng rõ rệt về chiều hướng tích cực với 14/50 tin tức mang gam màu tươi sáng (28.0%). Tâm điểm chú ý xoay quanh: 'DXG Quý III/2026: Người mua trả trước tiếp tục gia tăng tích cực'. Động lực hỗ trợ giá đến từ tăng trưởng kết quả kinh doanh và chính sách cổ tức hấp dẫn.",
       "metricBoxes": [
         {
           "label": "Tổng Tin & Sự Kiện",
@@ -2480,12 +2471,12 @@
         },
         {
           "label": "Tỷ Lệ Tích Cực",
-          "value": "26.0%",
+          "value": "28.0%",
           "type": "neutral"
         },
         {
           "label": "Điểm Tâm Lý (Score)",
-          "value": "+26.4",
+          "value": "+27.4",
           "type": "positive"
         },
         {
@@ -2580,16 +2571,16 @@
     "summary": "M-Score = -1.99 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
   },
   "magicFormula": {
-    "earningsYield": 0.81,
+    "earningsYield": 0.84,
     "roic": 0.37,
-    "compositeScore": 3.3,
+    "compositeScore": 3.4,
     "category": "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)",
     "tier": "UNDERPERFORM",
     "recommendation": "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá.",
     "parameters": {
       "ebitTTM": 112.0,
-      "enterpriseValue": 13784.1,
-      "marketCap": 13315.1,
+      "enterpriseValue": 13340.3,
+      "marketCap": 12871.3,
       "netDebt": 469.0,
       "capitalEmployed": 30561.0
     },
@@ -2699,16 +2690,16 @@
       "summary": "M-Score = -1.99 (Vùng Xám [-2.22; -1.78]). Cần rà soát thêm biến động khoản phải thu hoặc chi phí dở dang."
     },
     "magicFormula": {
-      "earningsYield": 0.81,
+      "earningsYield": 0.84,
       "roic": 0.37,
-      "compositeScore": 3.3,
+      "compositeScore": 3.4,
       "category": "Hạng 4: Kém Hấp Dẫn (Hiệu Suất Vốn Yếu & Định Giá Đắt)",
       "tier": "UNDERPERFORM",
       "recommendation": "Chưa đáp ứng tiêu chí Magic Formula, tỷ suất sinh lời vốn chưa đủ bù đắp định giá.",
       "parameters": {
         "ebitTTM": 112.0,
-        "enterpriseValue": 13784.1,
-        "marketCap": 13315.1,
+        "enterpriseValue": 13340.3,
+        "marketCap": 12871.3,
         "netDebt": 469.0,
         "capitalEmployed": 30561.0
       },
